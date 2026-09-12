@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIVEC-PAP — Mapa de Pacientes</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root {
+    --teal-900: #0d3b3e;
+    --teal-700: #14595d;
+    --teal-500: #1c7a80;
+    --paper: #f6f4ef;
+    --ink: #1f2624;
+    --ink-soft: #5b655f;
+    --line: #dcd7cb;
+    --positiva: #7c3aed;
+    --positiva-vph: #dc2626;
+    --negativa: #ea8c2e;
+    --pendiente: #2f6fb0;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%;
+    font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+  }
+  #app { display: flex; flex-direction: column; height: 100%; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 22px;
+    background: var(--teal-900);
+    color: #fff;
+    flex-shrink: 0;
+  }
+  header h1 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: 0.2px; }
+  header .subtitle { font-size: 12.5px; color: #b9d2d3; margin-top: 2px; }
+  header .titlewrap { display: flex; flex-direction: column; }
+  #settingsBtn {
+    background: rgba(255,255,255,0.12); border: none; color: #fff;
+    width: 34px; height: 34px; border-radius: 8px; cursor: pointer;
+    font-size: 16px; display: flex; align-items: center; justify-content: center;
+  }
+  #settingsBtn:hover { background: rgba(255,255,255,0.22); }
+
+  #statsBar {
+    display: flex; gap: 10px; padding: 10px 22px;
+    background: #fff; border-bottom: 1px solid var(--line);
+    flex-wrap: wrap; flex-shrink: 0;
+  }
+  .stat {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 12px; border-radius: 999px; background: var(--paper);
+    font-size: 13px; border: 1px solid var(--line);
+  }
+  .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .stat b { font-variant-numeric: tabular-nums; }
+
+  #main { flex: 1; position: relative; min-height: 0; }
+  #map { position: absolute; inset: 0; background: #eae7dd; }
+
+  #loading, #errorBox {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 10px; background: var(--paper); z-index: 500;
+  }
+  #loading .spinner {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 3px solid var(--line); border-top-color: var(--teal-500);
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #loading p, #errorBox p { color: var(--ink-soft); font-size: 14px; margin: 0; max-width: 380px; text-align: center; }
+  #errorBox h2 { margin: 0; font-size: 16px; }
+  #errorBox button, #settingsPanel button.primary {
+    margin-top: 6px; background: var(--teal-700); color: #fff; border: none;
+    padding: 9px 18px; border-radius: 7px; cursor: pointer; font-size: 13.5px;
+  }
+  #progressWrap {
+    width: 260px; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; margin-top: 4px;
+  }
+  #progressBar { height: 100%; width: 0%; background: var(--teal-500); transition: width 0.2s; }
+
+  #settingsPanel {
+    position: absolute; top: 0; right: -360px; width: 340px; height: 100%;
+    background: #fff; box-shadow: -8px 0 24px rgba(0,0,0,0.12);
+    z-index: 900; transition: right 0.25s ease; padding: 20px;
+    overflow-y: auto;
+  }
+  #settingsPanel.open { right: 0; }
+  #settingsPanel h2 { font-size: 15px; margin: 0 0 4px; }
+  #settingsPanel p.hint { font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; margin: 0 0 14px; }
+  #settingsPanel label { font-size: 12.5px; font-weight: 600; display: block; margin: 14px 0 5px; }
+  #settingsPanel input {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px;
+    font-size: 13px;
+  }
+  #settingsPanel .closeX {
+    position: absolute; top: 16px; right: 16px; background: none; border: none;
+    cursor: pointer; font-size: 18px; color: var(--ink-soft);
+  }
+  #settingsPanel .danger {
+    margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line);
+  }
+  #settingsPanel .danger button {
+    background: #fff; color: #b33; border: 1px solid #e2b3b3; border-radius: 7px;
+    padding: 7px 14px; font-size: 12.5px; cursor: pointer;
+  }
+
+  .leaflet-popup-content-wrapper { border-radius: 10px; }
+  .balloon { font-size: 13px; line-height: 1.55; min-width: 210px; }
+  .balloon .name { font-weight: 700; font-size: 14px; margin-bottom: 2px; }
+  .balloon .addr { color: var(--ink-soft); margin-bottom: 6px; }
+  .balloon .row { display: flex; gap: 6px; }
+  .balloon .row .label { color: var(--ink-soft); min-width: 92px; flex-shrink: 0; }
+  .balloon .badge {
+    display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11.5px;
+    font-weight: 600; color: #fff;
+  }
+  .pin {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="titlewrap">
+      <h1>SIVEC-PAP</h1>
+      <div class="subtitle">Mapa de pacientes — Centro de Salud San Luis</div>
+    </div>
+    <button id="settingsBtn" title="Configuración">⚙</button>
+  </header>
+
+  <div id="statsBar">
+    <div class="stat"><span class="dot" style="background:var(--positiva)"></span>Positiva <b id="cPositiva">–</b></div>
+    <div class="stat"><span class="dot" style="background:var(--positiva-vph)"></span>Positiva VPH <b id="cVph">–</b></div>
+    <div class="stat"><span class="dot" style="background:var(--negativa)"></span>Negativa <b id="cNegativa">–</b></div>
+    <div class="stat"><span class="dot" style="background:var(--pendiente)"></span>Pendiente <b id="cPendiente">–</b></div>
+    <div class="stat">Total <b id="cTotal">–</b></div>
+  </div>
+
+  <div id="main">
+    <div id="map"></div>
+    <div id="loading">
+      <div class="spinner"></div>
+      <p id="loadingText">Cargando pacientes…</p>
+      <div id="progressWrap" style="display:none"><div id="progressBar"></div></div>
+    </div>
+    <div id="errorBox" style="display:none">
+      <h2>No se pudo cargar el mapa</h2>
+      <p id="errorText"></p>
+      <button onclick="document.getElementById('settingsPanel').classList.add('open')">Abrir configuración</button>
+    </div>
+  </div>
+
+  <div id="settingsPanel">
+    <button class="closeX" onclick="document.getElementById('settingsPanel').classList.remove('open')">✕</button>
+    <h2>Configuración</h2>
+    <p class="hint">Este dato queda guardado en este navegador. Solo hay que configurarlo una vez.</p>
+
+    <label>Enlace CSV de la hoja Mapa_Data</label>
+    <input id="csvUrlInput" placeholder="https://docs.google.com/.../pub?gid=...&output=csv">
+
+    <button class="primary" onclick="saveSettingsAndReload()">Guardar y recargar</button>
+
+    <div class="danger">
+      <p class="hint">Si las ubicaciones de algunas pacientes están mal, esto borra las coordenadas guardadas y las vuelve a calcular todas la próxima vez.</p>
+      <button onclick="clearGeoCache()">Borrar ubicaciones guardadas</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const CATEGORY_COLORS = {
+  "Positiva": "#7c3aed",
+  "Positiva VPH": "#dc2626",
+  "Negativa": "#ea8c2e",
+  "Pendiente": "#2f6fb0"
+};
+const CATEGORY_KEYS = { Positiva: "cPositiva", "Positiva VPH": "cVph", Negativa: "cNegativa", Pendiente: "cPendiente" };
+const GEOCACHE_KEY = 'sivec_geocache_v1';
+
+function getSettings() {
+  return { csvUrl: localStorage.getItem('sivec_csvUrl') || '' };
+}
+function saveSettingsAndReload() {
+  const csvUrl = document.getElementById('csvUrlInput').value.trim();
+  if (csvUrl) localStorage.setItem('sivec_csvUrl', csvUrl);
+  location.reload();
+}
+function clearGeoCache() {
+  localStorage.removeItem(GEOCACHE_KEY);
+  location.reload();
+}
+function loadGeoCache() {
+  try { return JSON.parse(localStorage.getItem(GEOCACHE_KEY) || '{}'); } catch (e) { return {}; }
+}
+function saveGeoCache(cache) {
+  try { localStorage.setItem(GEOCACHE_KEY, JSON.stringify(cache)); } catch (e) {}
+}
+
+function showError(msg) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'flex';
+  document.getElementById('errorText').textContent = msg;
+}
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i], next = text[i+1];
+    if (inQuotes) {
+      if (c === '"' && next === '"') { field += '"'; i++; }
+      else if (c === '"') { inQuotes = false; }
+      else field += c;
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && next === '\n') i++;
+        row.push(field); rows.push(row); row = []; field = '';
+      } else field += c;
+    }
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows.filter(r => r.length > 1 || r[0] !== '');
+}
+function rowsToObjects(rows) {
+  const headers = rows[0].map(h => h.trim());
+  return rows.slice(1).map(r => {
+    const o = {};
+    headers.forEach((h, i) => o[h] = (r[i] || '').trim());
+    return o;
+  });
+}
+
+// Nominatim geocoding, 1 request/second, with localStorage caching so repeat
+// visits and repeat addresses never need a new lookup.
+async function geocodeAll(addresses, cache, onProgress) {
+  const toFetch = addresses.filter(a => !cache[a]);
+  let done = 0;
+  for (const addr of toFetch) {
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(addr)}`;
+      const res = await fetch(url, { headers: { 'Accept-Language': 'es' } });
+      const data = await res.json();
+      if (data && data[0]) {
+        cache[addr] = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+      } else {
+        cache[addr] = null;
+      }
+    } catch (e) {
+      cache[addr] = null;
+    }
+    done++;
+    onProgress(done, toFetch.length);
+    saveGeoCache(cache);
+    await new Promise(r => setTimeout(r, 1050)); // respect Nominatim's 1 req/sec policy
+  }
+  return cache;
+}
+
+async function init() {
+  const { csvUrl } = getSettings();
+  if (!csvUrl) {
+    document.getElementById('csvUrlInput').value = csvUrl;
+    document.getElementById('settingsPanel').classList.add('open');
+    showError('Falta configurar el enlace de la hoja Mapa_Data.');
+    return;
+  }
+
+  let text;
+  try {
+    const res = await fetch(csvUrl);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    text = await res.text();
+  } catch (e) {
+    showError('No se pudo leer la hoja de cálculo. Revisá que el enlace CSV esté correcto y que la hoja esté publicada en la web.');
+    return;
+  }
+
+  const objects = rowsToObjects(parseCSV(text)).filter(o => o['Nombre']);
+  if (!objects.length) {
+    showError('La hoja se leyó, pero no se encontraron pacientes en la columna "Nombre".');
+    return;
+  }
+
+  const addresses = [...new Set(objects.map(o => o['Dirección']).filter(Boolean))];
+  const cache = loadGeoCache();
+  const pending = addresses.filter(a => !cache[a]).length;
+
+  if (pending > 0) {
+    document.getElementById('progressWrap').style.display = 'block';
+    document.getElementById('loadingText').textContent =
+      `Ubicando ${pending} direcciones nuevas (una vez por dirección; la próxima vez será instantáneo)…`;
+  }
+
+  await geocodeAll(addresses, cache, (done, total) => {
+    document.getElementById('loadingText').textContent =
+      `Ubicando direcciones nuevas… ${done}/${total}`;
+    document.getElementById('progressBar').style.width = (total ? (done/total*100) : 100) + '%';
+  });
+
+  renderMap(objects, cache);
+}
+
+function renderMap(patients, cache) {
+  document.getElementById('loading').style.display = 'none';
+
+  const map = L.map('map').setView([-17.7833, -63.1821], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 19,
+  }).addTo(map);
+
+  const counts = { Positiva: 0, "Positiva VPH": 0, Negativa: 0, Pendiente: 0 };
+  const byAddress = {};
+  patients.forEach(p => {
+    const addr = p['Dirección'];
+    if (!addr) return;
+    (byAddress[addr] = byAddress[addr] || []).push(p);
+  });
+
+  const bounds = [];
+  Object.keys(byAddress).forEach(addr => {
+    const loc = cache[addr];
+    const group = byAddress[addr];
+    group.forEach(p => {
+      const cat = p['Categoria Cor'] || 'Pendiente';
+      if (counts[cat] !== undefined) counts[cat]++;
+    });
+    if (!loc) return;
+    group.forEach((p, idx) => {
+      const jitter = idx * 0.00006;
+      const lat = loc.lat + jitter, lng = loc.lng + jitter;
+      const cat = p['Categoria Cor'] || 'Pendiente';
+      const color = CATEGORY_COLORS[cat] || '#888';
+      const icon = L.divIcon({
+        className: '', html: `<div class="pin" style="background:${color}"></div>`,
+        iconSize: [16,16], iconAnchor: [8,8]
+      });
+      const marker = L.marker([lat, lng], { icon }).addTo(map);
+      marker.bindPopup(buildBalloon(p, color));
+      bounds.push([lat, lng]);
+    });
+  });
+
+  if (bounds.length) map.fitBounds(bounds, { padding: [30,30] });
+  updateStats(counts, patients.length);
+}
+
+function esc(s) { return (s || '').replace(/</g,'&lt;'); }
+function buildBalloon(p, color) {
+  const lesion = p['Resultado del PAP'] ? `<div class="row"><span class="label">Lesión:</span> ${esc(p['Resultado del PAP'])}</div>` : '';
+  const vph = p['Resultado VPH'] ? `<div class="row"><span class="label">VPH:</span> ${esc(p['Resultado VPH'])}</div>` : '';
+  const fecha = p['Fecha de toma'] ? `<div class="row"><span class="label">Fecha de toma:</span> ${esc(p['Fecha de toma'])}</div>` : '';
+  return `
+    <div class="balloon">
+      <div class="name">${esc(p['Nombre'])}</div>
+      <div class="addr">${esc(p['Dirección'])}</div>
+      <div class="row"><span class="label">Categoría:</span> <span class="badge" style="background:${color}">${esc(p['Categoria Cor'])}</span></div>
+      ${lesion}
+      <div class="row"><span class="label">Doctor(a):</span> ${esc(p['Doctora'])}</div>
+      ${vph}
+      ${fecha}
+    </div>
+  `;
+}
+function updateStats(counts, total) {
+  Object.keys(CATEGORY_KEYS).forEach(k => {
+    document.getElementById(CATEGORY_KEYS[k]).textContent = counts[k] || 0;
+  });
+  document.getElementById('cTotal').textContent = total;
+}
+
+document.getElementById('settingsBtn').addEventListener('click', () => {
+  document.getElementById('settingsPanel').classList.toggle('open');
+});
+
+init();
+</script>
+</body>
+</html>
