@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIVEC-PAP</title>
+<title>SIVEC PAP/VPH</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%20%20%3Cdefs%3E%20%20%20%20%3ClinearGradient%20id%3D%22g3%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ec4899%22/%3E%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%237c3aed%22/%3E%20%20%20%20%3C/linearGradient%3E%20%20%3C/defs%3E%20%20%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22%230d0e21%22/%3E%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2222%22%20fill%3D%22none%22%20stroke%3D%22url%28%23g3%29%22%20stroke-width%3D%225%22/%3E%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2213%22%20fill%3D%22none%22%20stroke%3D%22url%28%23g3%29%22%20stroke-width%3D%225%22/%3E%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%225%22%20fill%3D%22url%28%23g3%29%22/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
@@ -56,6 +56,17 @@
   header .eyebrow { font-size: 10.5px; letter-spacing: 0.4px; background: rgba(255,255,255,0.18); display:inline-block; padding: 2px 9px; border-radius: 999px; margin-bottom: 6px; position:relative; z-index:1; }
   header h1 { font-size: 19px; font-weight: 800; margin: 0; position:relative; z-index:1; }
   header .subtitle { font-size: 12.5px; color: #f0d9e2; margin-top: 2px; position:relative; z-index:1; }
+  header .brand { display: flex; align-items: center; gap: 13px; position: relative; z-index: 1; }
+  header .brandMark { width: 46px; height: 46px; border-radius: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(145deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08)); border: 1px solid rgba(255,255,255,0.35); box-shadow: 0 4px 14px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.3); }
+  header .brandMark svg { width: 28px; height: 28px; }
+  header h1.brandName { font-size: 24px; font-weight: 900; letter-spacing: 1.5px; line-height: 1.05; display: flex; align-items: center; gap: 8px; }
+  header .brandMod { font-size: 11.5px; font-weight: 800; letter-spacing: 1px; padding: 3px 8px 3px 9px; border-radius: 7px; background: #fff; color: var(--teal-900); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+  header .brandMod i { font-style: normal; opacity: 0.45; margin: 0 1px; }
+  body.dark header .brandMod { color: #3b0f6b; }
+  header .brandSigla { font-size: 11.5px; letter-spacing: 0.3px; color: rgba(255,255,255,0.72); margin-top: 3px; }
+  header .brandSigla b { color: #fff; font-weight: 800; font-size: 12.5px; }
+  @media (max-width: 700px) { header .brandMark { display: none; } header h1.brandName { font-size: 20px; } header .brandSigla { font-size: 10.5px; } }
   nav { display: flex; gap: 4px; }
   nav button {
     background: rgba(255,255,255,0.1); border: none; color: #cfe3e3; padding: 7px 11px 6px;
@@ -268,6 +279,7 @@
   #mapUnlocatedPanel .unlocTitle { font-weight: 700; margin: 12px 0 2px; }
   #mapStatsBar { width: max-content; }
   .addrParts { display: grid; grid-template-columns: 1.3fr 1.5fr 0.5fr 0.5fr 0.5fr; gap: 6px; margin-bottom: 6px; }
+  .addrParts .apLugar { grid-column: 1 / -1; }
   @media (max-width: 600px) { .addrParts { grid-template-columns: 1fr 1fr; } }
   .geoPickRow { display: flex; gap: 8px; align-items: center; margin-top: 6px; font-size: 12.5px; color: var(--ink-soft); flex-wrap: wrap; }
   #geoPickOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 3000; align-items: center; justify-content: center; padding: 16px; }
@@ -361,7 +373,7 @@
 
 <div id="helpOverlay">
   <div id="helpModal">
-    <h2>¿Cómo funciona SIVEC-PAP?</h2>
+    <h2>¿Cómo funciona SIVEC PAP/VPH?</h2>
     <p class="hint" style="margin-top:-8px">Un resumen rápido de cada sección del sistema.</p>
     <div class="helpStep">
       <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg></div>
@@ -391,7 +403,8 @@
 
 <div id="loginOverlay" style="display:none">
   <div id="loginBox">
-    <h2 style="margin:0 0 4px">SIVEC-PAP</h2>
+    <h2 style="margin:0 0 4px">SIVEC PAP/VPH</h2>
+    <p class="hint" style="margin:0 0 10px">Sistema Integral de Vigilancia y Enlace Clínico</p>
     <p class="hint" style="margin:0 0 18px">Iniciá sesión con tu usuario para continuar.</p>
     <form id="loginForm">
       <div class="field"><label>Correo</label><input type="email" id="loginEmail" required autocomplete="username"></div>
@@ -405,9 +418,16 @@
 <div id="app">
   <header>
     <div>
-      <div class="eyebrow">PREVENCIÓN DEL CÁNCER DE CUELLO UTERINO</div>
-      <h1>SIVEC-PAP</h1>
-      <div class="subtitle">Centro de Salud San Luis</div>
+      <div class="brand">
+        <div class="brandMark" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M16 4c-3.2 0-5.4 2.4-5.4 5.3 0 3.4 2.6 7 5.4 10.4 2.8-3.4 5.4-7 5.4-10.4C21.4 6.4 19.2 4 16 4Z" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><path d="M12.6 16.6 7 27.5M19.4 16.6 25 27.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="eyebrow">PREVENCIÓN DEL CÁNCER DE CUELLO UTERINO</div>
+          <h1 class="brandName">SIVEC<span class="brandMod">PAP<i>/</i>VPH</span></h1>
+          <div class="subtitle brandSigla"><b>S</b>istema <b>I</b>ntegral de <b>V</b>igilancia y <b>E</b>nlace <b>C</b>línico</div>
+        </div>
+      </div>
     </div>
     <nav>
       <button data-view="form" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg><span class="navLabel">Registrar</span></button>
@@ -457,14 +477,16 @@
             </select>
           </div>
           <div class="field"><label>Ocupación</label><input name="ocupacion" placeholder="Ej: Comerciante, Ama de casa..."></div>
-          <div class="field span2"><label>Dirección<span class="helpTip" data-tip="Llená Barrio, Calle, Nº, UV y Mz por separado: el sistema arma la dirección solo y así el mapa la encuentra mejor. Si preferís, escribila libre en el campo de abajo.">ⓘ</span></label>
+          <div class="field span2"><label>Dirección<span class="helpTip" data-tip="Llená Barrio, Calle, Nº, UV, Mz y Localidad por separado: el sistema arma la dirección solo y así el mapa la encuentra mejor. Para pacientes de provincias o zonas rurales, poné el municipio o la comunidad (ej: Montero, Comunidad San Isidro). Si preferís, escribila libre en el campo de abajo.">ⓘ</span></label>
             <div class="addrParts">
               <input data-ap="barrio" placeholder="Barrio">
               <input data-ap="calle" placeholder="Calle / Avenida">
               <input data-ap="nro" placeholder="Nº">
               <input data-ap="uv" placeholder="UV">
               <input data-ap="mz" placeholder="Mz">
+              <input data-ap="lugar" list="localidadesList" placeholder="Localidad / Municipio (vacío = Santa Cruz de la Sierra)" class="apLugar">
             </div>
+            <datalist id="localidadesList"></datalist>
             <input name="direccion" placeholder="Se completa sola con los campos de arriba (o escribila libre)">
             <div class="geoPickRow"><button type="button" class="rowBtn geoPickBtn">📍 Marcar en el mapa</button><span class="geoPickStatus">Opcional: marcá la casa y el mapa la mostrará exacta.</span></div>
           </div>
@@ -1694,7 +1716,7 @@ function exportPatientsToExcel() {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Pacientes');
   const fecha = new Date().toISOString().slice(0, 10);
-  XLSX.writeFile(wb, `SIVEC-PAP_pacientes_${fecha}.xlsx`);
+  XLSX.writeFile(wb, `SIVEC-PAP-VPH_pacientes_${fecha}.xlsx`);
 }
 
 function esc(s) { return (s == null ? '' : String(s)).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
@@ -1703,59 +1725,124 @@ function esc(s) { return (s == null ? '' : String(s)).replace(/&/g, '&amp;').rep
 // Tiles: Esri (calles, satélite, relieve) y OpenStreetMap como alternativa.
 // Si se configura una clave de Google Maps, las direcciones se buscan primero con Google.
 const SCZ_BBOX = { south: -17.97, north: -17.58, west: -63.35, east: -62.98 }; // Santa Cruz de la Sierra y alrededores
+const BO_BBOX = { south: -22.95, north: -9.60, west: -69.70, east: -57.40 };  // toda Bolivia
 const SCZ_CENTER = [-17.7833, -63.1821];
 const GEO_FAIL_RETRY_MS = 7 * 24 * 3600 * 1000;
+const CIUDAD_DEFAULT = 'Santa Cruz de la Sierra';
 
-function inSCZ(loc) {
-  return loc && isFinite(loc.lat) && isFinite(loc.lng) &&
-    loc.lat >= SCZ_BBOX.south && loc.lat <= SCZ_BBOX.north && loc.lng >= SCZ_BBOX.west && loc.lng <= SCZ_BBOX.east;
+function inBox(loc, b) {
+  return loc && isFinite(loc.lat) && isFinite(loc.lng) && loc.lat >= b.south && loc.lat <= b.north && loc.lng >= b.west && loc.lng <= b.east;
 }
+function inSCZ(loc) { return inBox(loc, SCZ_BBOX); }
+function inBolivia(loc) { return inBox(loc, BO_BBOX); }
 
-// Separa una dirección escrita a mano ("B. San Luis, C. Muchiri #123, UV-10 Mz 5") en partes útiles.
+// Municipios y localidades conocidas (nombre → departamento). Cuando una parte de la dirección es
+// exactamente una de estas (o viene con "Comunidad", "Loc.", "Municipio"...), se busca en esa localidad
+// y no en Santa Cruz de la Sierra. Cualquier otra localidad se puede escribir como "Comunidad X" o "Loc. X".
+const LOCALIDADES = (() => {
+  const d = {
+    'Santa Cruz': 'Santa Cruz de la Sierra|Cotoca|Porongo|Ayacucho|La Guardia|El Torno|Warnes|Okinawa|Okinawa Uno|Montero|General Saavedra|Saavedra|Mineros|Fernandez Alonso|Chane Independencia|San Pedro|Portachuelo|Santa Rosa del Sara|Colpa Belgica|Buena Vista|San Carlos|Yapacani|San Juan de Yapacani|San Juan|Cuatro Cañadas|San Julian|El Puente|Pailon|San Jose de Chiquitos|Robore|Puerto Suarez|Puerto Quijarro|Carmen Rivero Torrez|San Ignacio de Velasco|San Miguel de Velasco|San Rafael de Velasco|San Rafael|Concepcion|San Javier|San Ramon|San Antonio de Lomerio|Ascension de Guarayos|Guarayos|Urubicha|Camiri|Charagua|Cabezas|Abapo|Lagunillas|Gutierrez|Cuevo|Boyuibe|Vallegrande|Trigal|Moro Moro|Postrer Valle|Pucara|Samaipata|Pampa Grande|Mairana|Quirusillas|Comarapa|Saipina|San Matias|Paurito|Pedro Lorenzo|Palmasola|Montero Hoyos|Los Negros|Limoncito|Tres Cruces|Puerto Pailas|Guabira|Chane|Nuevo Palmar|Cuatro Ojitos',
+    'Beni': 'Trinidad|Riberalta|Guayaramerin|San Borja|Rurrenabaque|Santa Ana del Yacuma|Santa Ana|San Ignacio de Moxos|San Joaquin|Magdalena|Reyes|San Andres|Loreto|Baures|Huacaraje|Exaltacion|Puerto Siles|San Ramon del Beni|Santa Rosa del Yacuma',
+    'Pando': 'Cobija|Porvenir|Puerto Rico|Filadelfia|Bolpebra|Puerto Gonzalo Moreno|Villa Nueva|San Lorenzo|Sena|Bella Flor',
+    'La Paz': 'La Paz|El Alto|Viacha|Achacachi|Copacabana|Caranavi|Coroico|Chulumani|Palos Blancos|Sorata|Patacamaya|Guaqui|Tiahuanacu|Desaguadero|Apolo|Ixiamas|San Buenaventura|Irupana|Coripata|Laja|Pucarani|Achocalla|Mecapaca|Palca|Sica Sica|Colquiri|Inquisivi|Puerto Acosta|Escoma|Charazani|Luribay|Quime',
+    'Cochabamba': 'Cochabamba|Quillacollo|Sacaba|Tiquipaya|Colcapirhua|Vinto|Sipe Sipe|Punata|Cliza|Tolata|Arani|Aiquile|Mizque|Totora|Villa Tunari|Shinahota|Chimore|Puerto Villarroel|Entre Rios|Independencia|Tapacari|Capinota|Tarata|Pocona|Pojo|Colomi|Ivirgarzama',
+    'Chuquisaca': 'Sucre|Monteagudo|Camargo|Padilla|Tomina|Villa Serrano|Muyupampa|Villa Vaca Guzman|Huacareta|Macharetí|Machareti|Tarabuco|Yamparaez|Zudañez|Azurduy|Culpina|Incahuasi|San Lucas|Villa Abecia|Las Carreras|Poroma|Yotala',
+    'Tarija': 'Tarija|Yacuiba|Villamontes|Bermejo|Entre Rios|Padcaya|San Lorenzo|Uriondo|El Puente|Caraparí|Carapari|Yunchara|Palos Blancos',
+    'Oruro': 'Oruro|Huanuni|Challapata|Caracollo|Poopo|Machacamarca|Eucaliptus|Toledo|Corque|Huachacalla|Salinas de Garci Mendoza|Sabaya|Curahuara de Carangas|Totora',
+    'Potosí': 'Potosi|Uyuni|Tupiza|Villazon|Llallagua|Uncia|Betanzos|Cotagaita|Colquechaca|Puna|Vitichi|Atocha|San Cristobal|Ocuri|Sacaca|Chayanta|Tinguipaya|Tomave|Porco|Caiza D',
+  };
+  const m = new Map();
+  Object.entries(d).forEach(([dep, list]) => list.split('|').forEach(n => { const k = normTxtGeo(n); if (!m.has(k)) m.set(k, { nombre: n, dep }); }));
+  return m;
+})();
+function normTxtGeo(s) { return (s == null ? '' : String(s)).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9ñ ]/g, ' ').replace(/\s+/g, ' ').trim(); }
+const PREFIJO_LOCALIDAD = /^(comunidad|com\.?|colonia|localidad|loc\.?|municipio|mun\.?|provincia|prov\.?|canton|cantón|pueblo|asentamiento|sindicato|estancia|propiedad|recinto|poblado|zona rural)\s+/i;
+
+// Separa una dirección escrita a mano ("B. San Luis, C. Muchiri #123, UV-10 Mz 5, Montero") en partes útiles.
 function parseAddress(addr) {
   let s = ' ' + String(addr).replace(/\s+/g, ' ') + ' ';
   s = s.replace(/#\s*[\w-]+/g, ' ')
        .replace(/\b(n[°ºo]|nro|num|número|numero)\.?\s*\d+\w*/gi, ' ')
        .replace(/\bs\s*\/\s*n\b/gi, ' ')
        .replace(/\b(mz|mzn|mza|manzano|manzana|lote|lt|casa)\.?\s*[\w-]+/gi, ' ')
-       .replace(/\b(santa cruz( de la sierra)?|bolivia|scz)\b/gi, ' ');
+       .replace(/\b(bolivia|scz)\b/gi, ' ')
+       .replace(/,\s*santa cruz\s*(,|$)/gi, ',$1'); // ", Santa Cruz" (departamento) no aporta
   s = s.replace(/(^|[\s,])(b|bº|b°|bo|brio|bar)\.\s*/gi, '$1Barrio ')
        .replace(/(^|[\s,])c\.\s*/gi, '$1Calle ')
        .replace(/(^|[\s,])(av|avda|avd)\.?\s+/gi, '$1Avenida ')
        .replace(/(^|[\s,])(pje|psje)\.?\s+/gi, '$1Pasaje ')
        .replace(/(^|[\s,])(urb)\.?\s+/gi, '$1Urbanización ')
        .replace(/(^|[\s,])(zona|z)\.\s*/gi, '$1Zona ');
-  const parts = s.split(/[,;\/]|\s-\s|\s+entre\s+|\s+esq(?:uina)?\.?\s+|\s+y\s+|\s+(?=(?:calle|avenida|pasaje|barrio|urbanización|villa|zona)\s)/i)
-    .map(x => x.replace(/\s+/g, ' ').trim()).filter(x => x.length > 2 && !/^(calle|avenida|pasaje|barrio|urbanización|villa|zona)$/i.test(x));
-  const r = { streets: [], barrios: [], uv: null, other: [] };
+  const parts = s.split(/[,;\/]|\s-\s|\s+entre\s+|\s+esq(?:uina)?\.?\s+|\s+y\s+|\s+(?=(?:calle|avenida|pasaje|barrio|urbanización|villa|zona|comunidad|colonia|localidad|municipio|provincia)\s)/i)
+    .map(x => x.replace(/\s+/g, ' ').trim()).filter(x => x.length > 2 && !/^(calle|avenida|pasaje|barrio|urbanización|villa|zona|loc\.?|com\.?|mun\.?|prov\.?)$/i.test(x));
+  const r = { streets: [], barrios: [], uv: null, other: [], localidad: null, comunidad: null, carretera: null };
   parts.forEach(p => {
     const uv = p.match(/\bu\.?\s*v\.?\s*-?\s*(\d+)/i);
     if (uv) { r.uv = uv[1]; p = p.replace(uv[0], '').trim(); if (p.length <= 2) return; }
-    if (/^(calle|avenida|pasaje|anillo|radial|\d+(er|do|to|mo|vo|no)?\s*anillo)\b/i.test(p)) r.streets.push(p);
+    const conocido = LOCALIDADES.get(normTxtGeo(p.replace(PREFIJO_LOCALIDAD, '')));
+    const carretera = p.match(/(?:carretera|camino|ruta)\s+(?:antigua\s+|nueva\s+)?(?:a|al|hacia)\s+(.+)$/i);
+    if (PREFIJO_LOCALIDAD.test(p)) {
+      if (conocido && !r.localidad) { r.localidad = conocido; r.localidadConPrefijo = true; }
+      else if (!r.comunidad) r.comunidad = p.replace(PREFIJO_LOCALIDAD, '').trim();
+    } else if (conocido && !r.localidad) r.localidad = conocido;
+    else if (carretera) {
+      r.carretera = p;
+      const destino = LOCALIDADES.get(normTxtGeo(carretera[1]));
+      if (destino && !r.localidad) r.localidadRef = destino; // "Km 12 carretera a Cotoca": referencia, no la dirección
+    }
+    else if (/^(calle|avenida|pasaje|anillo|radial|\d+(er|do|to|mo|vo|no)?\s*anillo)\b/i.test(p)) r.streets.push(p);
     else if (/^(barrio|urbanización|villa|zona|plan|condominio)\b/i.test(p)) r.barrios.push(p);
     else r.other.push(p);
   });
+  // "B. X, Sucre #45": en una dirección urbana (con barrio/calle/UV), una capital de otro departamento
+  // escrita sola casi siempre es el nombre de la calle, no la ciudad.
+  if (r.localidad && !r.localidadConPrefijo && r.localidad.dep !== 'Santa Cruz' && (r.barrios.length || r.uv || r.streets.length)) {
+    r.streets.push('Calle ' + r.localidad.nombre); r.localidad = null;
+  }
   return r;
 }
 
 // Lista de búsquedas, de la más precisa a la más general.
+// scope 'scz' = dentro de Santa Cruz de la Sierra; 'bo' = cualquier lugar de Bolivia.
+// fine = se busca una calle/barrio (se descartan resultados de "toda la ciudad");
+// place = se busca un pueblo/comunidad (se acepta el centro del pueblo).
 function geocodeQueries(addr) {
-  const city = ', Santa Cruz de la Sierra, Bolivia';
   const a = parseAddress(addr);
   const q = [];
-  const push = (text, prec) => { if (text && !q.some(x => x.text === text)) q.push({ text: text + city, prec }); };
-  const plain = [...a.streets, ...a.barrios, ...a.other].join(', ');
-  if (a.streets.length >= 2) push(a.streets[0] + ' y ' + a.streets[1], 'esquina');
-  a.streets.forEach(st => { a.barrios.forEach(b => push(st + ', ' + b, 'calle')); push(st, 'calle'); });
-  a.barrios.forEach(b => push(b, 'barrio'));
-  a.other.forEach(o => push(o, 'aprox'));
-  if (!a.streets.length && !a.barrios.length) push(plain, 'aprox');
-  if (a.uv) push('UV-' + a.uv, 'uv');
+  const loc = a.localidad;
+  const ciudad = loc ? loc.nombre + (loc.dep ? ', ' + loc.dep : '') : CIUDAD_DEFAULT;
+  const scope = loc && normTxtGeo(loc.nombre) !== normTxtGeo(CIUDAD_DEFAULT) ? 'bo' : 'scz';
+  const push = (text, prec, sc, kind) => { const t = text + ', ' + (sc === 'bo' && kind === 'place' ? '' : ciudad + ', ') + 'Bolivia'; if (text && !q.some(x => x.text === t)) q.push({ text: t, prec, scope: sc, kind }); };
+  if (a.comunidad) {
+    push('Comunidad ' + a.comunidad + (loc ? ', ' + loc.nombre : ''), 'comunidad', 'bo', 'place');
+    push(a.comunidad + (loc ? ', ' + loc.nombre : ''), 'comunidad', 'bo', 'place');
+  }
+  // Comunidad rural sin municipio conocido: no tiene sentido buscar sus calles/barrios en la ciudad.
+  if (a.comunidad && !loc) return q;
+  if (a.streets.length >= 2) push(a.streets[0] + ' y ' + a.streets[1], 'esquina', scope, 'fine');
+  a.streets.forEach(st => { a.barrios.forEach(b => push(st + ', ' + b, 'calle', scope, 'fine')); push(st, 'calle', scope, 'fine'); });
+  a.barrios.forEach(b => push(b, 'barrio', scope, 'fine'));
+  a.other.forEach(o => push(o, 'aprox', scope, 'fine'));
+  if (a.uv && !loc) push('UV-' + a.uv, 'uv', scope, 'fine');
+  // Localidad sola (centro del pueblo) — útil en zonas rurales.
+  if (loc && scope === 'bo') push(loc.nombre + ', ' + loc.dep, 'localidad', 'bo', 'place');
+  if (a.localidadRef && !loc) push(a.localidadRef.nombre + ', ' + a.localidadRef.dep, 'localidad', 'bo', 'place');
+  // Última opción, solo para direcciones que no parecen urbanas (sin calle, barrio ni UV):
+  // una parte suelta puede ser un pueblo o comunidad fuera de la ciudad.
+  if (!loc && !a.streets.length && !a.barrios.length && !a.uv) a.other.forEach(o => push(o, 'localidad', 'bo', 'place'));
   return q;
 }
 
-// Tipos de resultado que son "toda la ciudad" y no sirven (causa típica de pines amontonados en el centro).
+// Tipos de resultado que son "toda la ciudad/región" y no sirven cuando se busca una calle o barrio
+// (causa típica de pines amontonados en el centro).
 const TOO_GENERIC = /^(city|town|county|state|country|region|province|municipality|administrative|locality|administrative_area_level_\d|political)$/;
+// Para pueblos/comunidades se acepta el centro del lugar, pero no un departamento ni el país entero.
+const TOO_BROAD = /^(country|state|region|province|county|administrative_area_level_[12]|political)$/;
+function rechazar(tipos, kind) {
+  const re = kind === 'place' ? TOO_BROAD : TOO_GENERIC;
+  return tipos.length && tipos.every(t => re.test(t));
+}
+function boxFor(scope) { return scope === 'bo' ? BO_BBOX : SCZ_BBOX; }
 
 let googleGeocoderPromise = null;
 function getGoogleGeocoder() {
@@ -1780,16 +1867,13 @@ const geoProviders = {
   async google(query, state) {
     const gc = await getGoogleGeocoder();
     if (!gc) { state.googleOff = true; return null; }
+    const b = boxFor(query.scope);
     try {
-      const { results } = await gc.geocode({
-        address: query,
-        componentRestrictions: { country: 'BO' },
-        bounds: { south: SCZ_BBOX.south, west: SCZ_BBOX.west, north: SCZ_BBOX.north, east: SCZ_BBOX.east },
-      });
+      const { results } = await gc.geocode({ address: query.text, componentRestrictions: { country: 'BO' }, bounds: { south: b.south, west: b.west, north: b.north, east: b.east } });
       for (const r of results || []) {
-        if ((r.types || []).every(t => TOO_GENERIC.test(t))) continue;
+        if (rechazar(r.types || [], query.kind)) continue;
         const loc = { lat: r.geometry.location.lat(), lng: r.geometry.location.lng() };
-        if (inSCZ(loc)) return loc;
+        if (inBox(loc, b)) return loc;
       }
     } catch (e) {
       if (/REQUEST_DENIED|OVER_QUERY_LIMIT|INVALID_REQUEST/.test(String(e && (e.code || e.message)))) state.googleOff = true;
@@ -1798,29 +1882,32 @@ const geoProviders = {
   },
   async photon(query, state) {
     try {
-      const b = SCZ_BBOX;
-      const res = await fetch(`https://photon.komoot.io/api/?limit=5&lat=${SCZ_CENTER[0]}&lon=${SCZ_CENTER[1]}&bbox=${b.west},${b.south},${b.east},${b.north}&q=${encodeURIComponent(query)}`);
+      const b = boxFor(query.scope);
+      const bias = query.scope === 'scz' ? `&lat=${SCZ_CENTER[0]}&lon=${SCZ_CENTER[1]}` : '';
+      const res = await fetch(`https://photon.komoot.io/api/?limit=5${bias}&bbox=${b.west},${b.south},${b.east},${b.north}&q=${encodeURIComponent(query.text)}`);
       if (!res.ok) { if (res.status === 429 || res.status === 403) state.photonOff = true; return null; }
       const d = await res.json();
       for (const f of d.features || []) {
-        const t = (f.properties && (f.properties.type || f.properties.osm_value)) || '';
-        if (TOO_GENERIC.test(t)) continue;
+        const pr = f.properties || {};
+        if (pr.countrycode && pr.countrycode !== 'BO') continue;
+        const t = pr.type || pr.osm_value || '';
+        if (rechazar([t], query.kind)) continue;
         const loc = { lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] };
-        if (inSCZ(loc)) return loc;
+        if (inBox(loc, b)) return loc;
       }
     } catch (e) { /* red caída: se prueba el siguiente proveedor */ }
     return null;
   },
   async nominatim(query, state) {
     try {
-      const b = SCZ_BBOX;
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&countrycodes=bo&bounded=1&viewbox=${b.west},${b.north},${b.east},${b.south}&q=${encodeURIComponent(query)}`);
+      const b = boxFor(query.scope);
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&countrycodes=bo&bounded=1&viewbox=${b.west},${b.north},${b.east},${b.south}&q=${encodeURIComponent(query.text)}`);
       if (!res.ok) { if (res.status === 429 || res.status === 403) state.nominatimOff = true; return null; }
       const d = await res.json();
       for (const r of d || []) {
-        if (TOO_GENERIC.test(r.addresstype || '') || TOO_GENERIC.test(r.type || '')) continue;
+        if (rechazar([r.addresstype || r.type || ''], query.kind)) continue;
         const loc = { lat: parseFloat(r.lat), lng: parseFloat(r.lon) };
-        if (inSCZ(loc)) return loc;
+        if (inBox(loc, b)) return loc;
       }
     } catch (e) { /* idem */ }
     return null;
@@ -1833,12 +1920,19 @@ async function geocodeAddress(addr, state, isCancelled) {
   for (const prov of ['google', 'photon', 'nominatim']) {
     for (const q of queries) {
       if (isCancelled() || state[prov + 'Off']) break;
-      const loc = await geoProviders[prov](q.text, state);
+      const loc = await geoProviders[prov](q, state);
       await new Promise(r => setTimeout(r, GEO_DELAY[prov]));
       if (loc) return { lat: loc.lat, lng: loc.lng, src: prov, prec: q.prec };
     }
   }
   return null;
+}
+
+// Para imprimir: el departamento de la dirección (Santa Cruz si no dice otra localidad).
+function departamentoDe(addr) {
+  const a = parseAddress(addr || '');
+  const l = a.localidad || a.localidadRef;
+  return l ? l.dep : 'Santa Cruz';
 }
 
 // ---- Dirección por partes + "Marcar en el mapa" en los formularios ----
@@ -1851,8 +1945,15 @@ function composeAddress(form) {
   else if (v('nro')) parts.push('#' + v('nro').replace(/^#/, ''));
   if (v('uv')) parts.push('UV-' + v('uv').replace(/^uv\s*-?\s*/i, ''));
   if (v('mz')) parts.push('Mz ' + v('mz').replace(/^mz\.?\s*/i, ''));
+  const lugar = v('lugar');
+  if (lugar && normTxtGeo(lugar) !== normTxtGeo(CIUDAD_DEFAULT)) {
+    // Siempre con prefijo ("Loc." o "Comunidad ..."), así el mapa no la confunde con una calle del mismo nombre.
+    parts.push(PREFIJO_LOCALIDAD.test(lugar) ? lugar : 'Loc. ' + lugar);
+  }
   return parts.join(', ');
 }
+document.getElementById('localidadesList').innerHTML = [...new Set([...LOCALIDADES.values()].map(l => l.nombre))]
+  .sort((a, b) => a.localeCompare(b)).map(n => `<option value="${esc(n)}">`).join('');
 document.querySelectorAll('[data-ap]').forEach(inp => inp.addEventListener('input', () => {
   const form = inp.closest('form');
   form.direccion.value = composeAddress(form);
@@ -1870,9 +1971,9 @@ function openGeoPick(form) {
   document.getElementById('geoPickOverlay').classList.add('open');
   if (!geoPickMapInst) {
     geoPickMapInst = L.map('geoPickMap').setView(SCZ_CENTER, 13);
-    const esri = svc => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${svc}/MapServer/tile/{z}/{y}/{x}`, { attribution: 'Tiles © Esri', maxZoom: 19 });
-    const calles = esri('World_Street_Map').addTo(geoPickMapInst);
-    L.control.layers({ 'Calles': calles, 'Satélite + calles': L.layerGroup([esri('World_Imagery'), esri('Reference/World_Transportation')]) }, null, { position: 'bottomleft' }).addTo(geoPickMapInst);
+    const bases = mapBaseLayers();
+    bases['Calles'].addTo(geoPickMapInst);
+    L.control.layers(bases, null, { position: 'bottomleft' }).addTo(geoPickMapInst);
     geoPickMapInst.on('click', e => setGeoPickMarker(e.latlng));
   }
   if (geoPickMarker) { geoPickMapInst.removeLayer(geoPickMarker); geoPickMarker = null; }
@@ -1902,7 +2003,7 @@ document.getElementById('geoPickClear').addEventListener('click', () => {
 document.getElementById('geoPickOk').addEventListener('click', () => {
   if (!geoPickMarker) { alert('Primero hacé clic en el mapa donde vive la paciente.'); return; }
   const ll = geoPickMarker.getLatLng();
-  if (!inSCZ({ lat: ll.lat, lng: ll.lng }) && !confirm('Ese punto queda fuera de Santa Cruz de la Sierra. ¿Guardar igual?')) return;
+  if (!inBolivia({ lat: ll.lat, lng: ll.lng }) && !confirm('Ese punto queda fuera de Bolivia. ¿Guardar igual?')) return;
   geoPickForm._geoPick = { lat: ll.lat, lng: ll.lng }; geoPickForm._geoQuitar = false;
   setGeoPickStatus(geoPickForm);
   document.getElementById('geoPickOverlay').classList.remove('open');
@@ -1950,21 +2051,29 @@ async function saveGeoToDb(pacientes, loc, manual) {
 }
 let mapForceRelocate = false;
 
-const PREC_LABEL = { auto: 'automática', esquina: 'esquina', calle: 'calle (aprox.)', barrio: 'barrio (aprox.)', uv: 'UV (aprox.)', aprox: 'aproximada', manual: 'marcada a mano' };
+const PREC_LABEL = { comunidad: 'comunidad (aprox.)', localidad: 'centro de la localidad (aprox.)', auto: 'automática', esquina: 'esquina', calle: 'calle (aprox.)', barrio: 'barrio (aprox.)', uv: 'UV (aprox.)', aprox: 'aproximada', manual: 'marcada a mano' };
+
+// Capas de fondo. Todas funcionan sin clave aunque el archivo se abra desde el disco (file://).
+// Para zonas rurales, "Rural detallado" (OpenStreetMap Humanitario) muestra comunidades, caminos
+// y centros de salud; "Satélite + calles" sirve para ubicar casas aisladas.
+function mapBaseLayers() {
+  const esri = (svc, attr) => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${svc}/MapServer/tile/{z}/{y}/{x}`, { attribution: attr || 'Tiles © Esri', maxZoom: 19 });
+  return {
+    'Calles': esri('World_Street_Map'),
+    'Rural detallado (OSM Humanitario)': L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap, HOT', subdomains: 'abc', maxZoom: 19 }),
+    'Calles (OpenStreetMap)': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }),
+    'Satélite + calles': L.layerGroup([esri('World_Imagery', 'Imágenes © Esri'), esri('Reference/World_Transportation'), esri('Reference/World_Boundaries_and_Places')]),
+    'Topográfico (caminos rurales)': L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap, SRTM | © OpenTopoMap', subdomains: 'abc', maxZoom: 17 }),
+    'Relieve': esri('World_Topo_Map'),
+  };
+}
 
 let mapInstance = null, mapCluster = null, mapRunId = 0, mapPlacingAddr = null;
 let mapState = null;
 
 function initMapInstance() {
   mapInstance = L.map('map', { zoomControl: true }).setView(SCZ_CENTER, 13);
-  // Esri funciona sin clave aunque el archivo se abra desde el disco (file://). CARTO pedía clave ("API KEY REQUIRED").
-  const esri = (svc, attr) => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${svc}/MapServer/tile/{z}/{y}/{x}`, { attribution: attr || 'Tiles © Esri', maxZoom: 19 });
-  const bases = {
-    'Calles': esri('World_Street_Map'),
-    'Calles (OpenStreetMap)': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }),
-    'Satélite + calles': L.layerGroup([esri('World_Imagery', 'Imágenes © Esri'), esri('Reference/World_Transportation'), esri('Reference/World_Boundaries_and_Places')]),
-    'Relieve': esri('World_Topo_Map'),
-  };
+  const bases = mapBaseLayers();
   const saved = localStorage.getItem('sivec_map_layer2') || 'Calles';
   (bases[saved] || bases['Calles']).addTo(mapInstance);
   L.control.layers(bases, null, { position: 'bottomleft' }).addTo(mapInstance);
@@ -2205,7 +2314,7 @@ async function loadMap() {
     else if (c && c.src === 'manual') { saveGeoToDb(grupo, c, true); } // corrección hecha antes en este navegador: se comparte
     else if (relocate) c = null;
     else if (dbAuto) c = { lat: dbAuto.lat, lng: dbAuto.lng, src: 'db', prec: (c && c.lat != null && c.prec) || 'auto' };
-    if (c && c.lat != null && inSCZ(c)) addMarkersFor(addr, c);
+    if (c && c.lat != null && inBolivia(c)) addMarkersFor(addr, c);
     else if (addr.startsWith('📍 ')) { /* sin dirección: no hay qué buscar */ }
     else if (c && c.fail && now - c.t < GEO_FAIL_RETRY_MS) { /* falló hace poco: no se reintenta automáticamente */ }
     else { pending.push(addr); pendingSet.add(addr); }
@@ -2661,7 +2770,7 @@ function buildTemplateData(p) {
     apellido_paterno: nombreParts.apellido_paterno.toUpperCase(),
     apellido_materno: nombreParts.apellido_materno.toUpperCase(),
     carnet: p.carnet || '',
-    direccion: p.direccion ? (p.direccion + ', Santa Cruz, Bolivia').toUpperCase() : '',
+    direccion: p.direccion ? (p.direccion + ', ' + departamentoDe(p.direccion) + ', Bolivia').toUpperCase() : '',
     celular: p.celular || '',
     fecha_toma: fmtFecha(p.fecha_toma),
     fecha_nacimiento: fmtFecha(p.fecha_nacimiento),
