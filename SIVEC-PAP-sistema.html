@@ -267,6 +267,9 @@
   #mapUnlocatedPanel .unlocItem button { flex-shrink: 0; background: var(--teal-700); color: #fff; border: none; border-radius: 6px; padding: 5px 9px; font-size: 12px; cursor: pointer; }
   #mapUnlocatedPanel .unlocTitle { font-weight: 700; margin: 12px 0 2px; }
   #mapStatsBar { width: max-content; }
+  #mapStatsBar, #mapFilter, #mapUnlocatedPanel, #mapProgress { color-scheme: light; }
+  #mapStatsBar button, #mapPlacingHint button { background: #fbf6f3 !important; color: #40323a !important; border: 1px solid #ecdde3 !important; }
+  #mapFilter .chip { background: #fff; color: #40323a; }
   .pieCluster { border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.35); }
   .pieCluster span { background: #fff; color: #40323a; border-radius: 50%; font-weight: 700; font-size: 11.5px; display: flex; align-items: center; justify-content: center; }
   #mapFilter { position: absolute; top: 12px; left: 56px; z-index: 1000; background: #fff; color: #40323a; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); padding: 8px 10px; font-size: 12.5px; max-width: calc(100% - 260px); }
@@ -516,11 +519,17 @@
         <div class="stat"><span class="dot" style="background:var(--negativa)"></span>Negativo PAP <b id="cNeg">–</b></div>
         <div class="stat"><span class="dot" style="background:var(--pendiente)"></span>Pendiente PAP <b id="cPend">–</b></div>
         <div class="stat"><span class="dot" style="background:var(--positiva-vph)"></span>VPH+ <b id="cVph">–</b></div>
-        <div class="stat">Total <b id="cTotal">–</b></div>
+        <div class="stat" title="Cantidad de registros (tomas)">Total <b id="cTotal">–</b></div>
+        <div class="stat" title="Pacientes distintas: se agrupan las tomas de la misma paciente (mismo carnet, o mismo nombre y fecha de nacimiento)">Pacientes únicas <b id="cUnicas">–</b></div>
       </div>
       <div id="listToolbar">
         <input type="text" id="searchInput" placeholder="🔎 Buscar por nombre o carnet...">
         <select id="filterDoctora"><option value="">Todas las doctoras</option></select>
+        <select id="filterTomas" title="Tomas repetidas de la misma paciente">
+          <option value="">Todas las tomas</option>
+          <option value="varias">🔁 Pacientes con varias tomas</option>
+          <option value="duplicado">⚠️ Posibles duplicados (misma fecha)</option>
+        </select>
         <button id="exportExcelBtn" class="rowBtn">📊 Descargar Excel</button>
       </div>
       <div id="overdueBanner" style="display:none"></div>
@@ -935,6 +944,18 @@ function showToast(message, type) {
 const COLORS = { Positivo: '#7c3aed', 'Positivo VPH': '#dc2626', Negativo: '#ea8c2e', Pendiente: '#2f6fb0', SinPap: '#9ca3af' };
 const COLORS_PAP = { Positivo: '#7c3aed', Negativo: '#ea8c2e', Pendiente: '#2f6fb0', SinPap: '#9ca3af' };
 const COLORS_VPH = { Positiva: '#dc2626', Negativa: '#16a34a' };
+// Supabase devuelve como máximo 1000 filas por consulta: esto trae todo, de a 1000.
+async function selectAll(buildQuery) {
+  const PAGE = 1000;
+  let all = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await buildQuery().order('id', { ascending: true }).range(from, from + PAGE - 1);
+    if (error) return { data: null, error };
+    all = all.concat(data || []);
+    if (!data || data.length < PAGE) return { data: all, error: null };
+  }
+}
+
 function esSoloVph(p) { return p.tipo_examen === 'VPH' && !p.estado_pap; }
 
 function getConfig() {
@@ -998,6 +1019,7 @@ async function init() {
   document.getElementById('patientForm').addEventListener('submit', onSubmit);
   document.getElementById('searchInput').addEventListener('input', applyListFilters);
   document.getElementById('filterDoctora').addEventListener('change', applyListFilters);
+  document.getElementById('filterTomas').addEventListener('change', applyListFilters);
   document.getElementById('exportExcelBtn').addEventListener('click', exportPatientsToExcel);
 
   const { url, key } = getConfig();
@@ -1173,9 +1195,9 @@ async function loadBalance() {
   const cont = document.getElementById('balanceResultado');
   if (!inicio || !fin) { cont.innerHTML = '<p class="hint">Elegí las dos fechas primero.</p>'; return; }
   cont.innerHTML = '<p class="hint">Buscando...</p>';
-  const { data, error } = await sb.from('pacientes').select('*').is('deleted_at', null)
+  const { data, error } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null)
     .gte('fecha_toma', inicio).lte('fecha_toma', fin)
-    .order('fecha_toma', { ascending: true });
+    .order('fecha_toma', { ascending: true }));
   if (error) {
     cont.innerHTML = `<p class="hint">Error: ${esc(error.message)}</p>`;
     document.getElementById('balanceImprimirBtn').style.display = 'none';
@@ -1293,7 +1315,7 @@ async function generateBalancePdf() {
 async function loadSegPap() {
   const tbody = document.getElementById('segPapBody');
   tbody.innerHTML = '<tr><td colspan="9">Cargando...</td></tr>';
-  const { data, error } = await sb.from('pacientes').select('*').is('deleted_at', null).eq('estado_pap', 'Positivo').order('fecha_toma', { ascending: true });
+  const { data, error } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null).eq('estado_pap', 'Positivo').order('fecha_toma', { ascending: true }));
   if (error) { tbody.innerHTML = `<tr><td colspan="9">Error: ${esc(error.message)}</td></tr>`; return; }
   if (!data.length) { tbody.innerHTML = '<tr><td colspan="9">No hay casos positivos registrados.</td></tr>'; return; }
   tbody.innerHTML = data.map(p => {
@@ -1318,7 +1340,7 @@ async function loadSegPap() {
 async function loadSegVph() {
   const tbody = document.getElementById('segVphBody');
   tbody.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
-  const { data, error } = await sb.from('pacientes').select('*').is('deleted_at', null).eq('resultado_vph', 'Positiva').order('fecha_toma', { ascending: true });
+  const { data, error } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null).eq('resultado_vph', 'Positiva').order('fecha_toma', { ascending: true }));
   if (error) { tbody.innerHTML = `<tr><td colspan="7">Error: ${esc(error.message)}</td></tr>`; return; }
   if (!data.length) { tbody.innerHTML = '<tr><td colspan="7">No hay pacientes VPH positivo registradas.</td></tr>'; return; }
   tbody.innerHTML = data.map(p => `<tr>
@@ -1353,6 +1375,7 @@ async function onSubmit(e) {
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
+  if (!(await confirmarTomaRepetida(data))) { btn.disabled = false; return; }
   const msg = document.getElementById('formMsg');
   msg.className = ''; msg.style.display = 'none';
 
@@ -1366,6 +1389,7 @@ async function onSubmit(e) {
     msg.textContent = 'Paciente guardada correctamente.';
     msg.className = 'ok';
     showToast('Paciente guardada correctamente ✔', 'ok');
+    allPatientsData = []; // se vuelve a leer en el próximo registro, así también avisa de la toma recién guardada
     form.reset();
   }
 }
@@ -1373,10 +1397,64 @@ async function onSubmit(e) {
 let currentPatients = [];
 let allPatientsData = [];
 
+// ---- Tomas repetidas / duplicados ----
+// Una paciente puede venir varias veces (varias tomas). Se agrupan los registros de la misma paciente
+// por carnet, o por nombre + fecha de nacimiento cuando no hay carnet.
+function normTxt(s) { return (s == null ? '' : String(s)).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim(); }
+function pacienteKeys(p) {
+  const keys = [];
+  const c = normTxt(p.carnet).replace(/[^a-z0-9]/g, '').replace(/^(\d{4,})(lp|sc|scz|cb|or|pt|ch|tj|be|pd)$/, '$1');
+  if (c.length >= 4 && !/^0+$/.test(c)) keys.push('c:' + c);
+  if (normTxt(p.nombre) && p.fecha_nacimiento) keys.push('n:' + normTxt(p.nombre) + '|' + p.fecha_nacimiento);
+  return keys;
+}
+// Devuelve Map(id -> { grupo: [registros ordenados por fecha_toma], orden: n, mismaFecha: bool })
+function buildTomasIndex(list) {
+  const parent = {};
+  const find = x => { while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; };
+  const union = (a, b) => { parent[a] = parent[a] || a; parent[b] = parent[b] || b; const ra = find(a), rb = find(b); if (ra !== rb) parent[ra] = rb; };
+  list.forEach(p => { const id = 'id:' + p.id; parent[id] = parent[id] || id; pacienteKeys(p).forEach(k => union(id, k)); });
+  const groups = {};
+  list.forEach(p => { const r = find('id:' + p.id); (groups[r] = groups[r] || []).push(p); });
+  const idx = new Map();
+  Object.values(groups).forEach(g => {
+    g.sort((a, b) => String(a.fecha_toma || '').localeCompare(String(b.fecha_toma || '')));
+    g.forEach((p, i) => idx.set(p.id, { grupo: g, orden: i + 1, mismaFecha: !!p.fecha_toma && g.some(o => o !== p && o.fecha_toma === p.fecha_toma) }));
+  });
+  idx.unicas = Object.keys(groups).length;
+  return idx;
+}
+let tomasIndex = new Map();
+function tomaResumen(p) {
+  const pap = esSoloVph(p) ? 'solo VPH' : 'PAP ' + (p.estado_pap || 'Pendiente');
+  return `${fmtFecha(p.fecha_toma) || 'sin fecha'} — ${pap}${p.resultado_vph ? ' · VPH ' + p.resultado_vph : ''}${p.doctora ? ' · ' + p.doctora : ''}`;
+}
+// Antes de registrar: avisa si la paciente ya existe. Devuelve true si se puede guardar.
+async function confirmarTomaRepetida(nueva) {
+  if (!allPatientsData.length) {
+    const { data } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null));
+    if (data) allPatientsData = data;
+  }
+  const keys = new Set(pacienteKeys(nueva));
+  const nombre = normTxt(nueva.nombre);
+  const previas = allPatientsData.filter(p => pacienteKeys(p).some(k => keys.has(k)));
+  const soloNombre = previas.length ? [] : allPatientsData.filter(p => nombre && normTxt(p.nombre) === nombre);
+  if (!previas.length && !soloNombre.length) return true;
+  const lista = (previas.length ? previas : soloNombre).slice().sort((a, b) => String(a.fecha_toma || '').localeCompare(String(b.fecha_toma || '')));
+  const lineas = lista.map(p => '  • ' + tomaResumen(p)).join('\n');
+  const mismaFecha = nueva.fecha_toma && lista.some(p => p.fecha_toma === nueva.fecha_toma);
+  let msg;
+  if (mismaFecha) msg = `⛔ POSIBLE DUPLICADO\n\nYa existe un registro de esta paciente con la MISMA fecha de toma (${fmtFecha(nueva.fecha_toma)}):\n${lineas}\n\n¿Guardar igual?`;
+  else if (previas.length) msg = `🔁 Esta paciente ya tiene ${lista.length} registro${lista.length > 1 ? 's' : ''}:\n${lineas}\n\nSe va a guardar como su ${lista.length + 1}ª toma. ¿Continuar?`;
+  else msg = `⚠️ Ya hay ${lista.length} registro${lista.length > 1 ? 's' : ''} con el mismo nombre (pero distinto carnet/fecha de nacimiento):\n${lineas}\n\n¿Es otra paciente? Aceptar = guardar igual.`;
+  return confirm(msg);
+}
+
 async function loadList() {
-  const { data, error } = await sb.from('pacientes').select('*').is('deleted_at', null).order('fecha_toma', { ascending: true });
+  const { data, error } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null).order('fecha_toma', { ascending: true }));
   if (error) { alert('Error al cargar: ' + error.message); return; }
   allPatientsData = data;
+  tomasIndex = buildTomasIndex(data);
   currentPatients = data;
   populateDoctoraFilter(data);
   renderBanners(data);
@@ -1459,6 +1537,14 @@ function applyListFilters() {
   let filtered = allPatientsData;
   if (q) filtered = filtered.filter(p => (p.nombre || '').toLowerCase().includes(q) || (p.carnet || '').toLowerCase().includes(q));
   if (doc) filtered = filtered.filter(p => p.doctora === doc);
+  const tomasF = document.getElementById('filterTomas').value;
+  if (tomasF === 'varias') filtered = filtered.filter(p => (tomasIndex.get(p.id) || {}).grupo?.length > 1);
+  if (tomasF === 'duplicado') filtered = filtered.filter(p => (tomasIndex.get(p.id) || {}).mismaFecha);
+  if (tomasF) filtered = filtered.slice().sort((a, b) => {
+    const ga = tomasIndex.get(a.id), gb = tomasIndex.get(b.id);
+    const ka = ga ? normTxt(ga.grupo[0].nombre) + ga.grupo[0].id : '', kb = gb ? normTxt(gb.grupo[0].nombre) + gb.grupo[0].id : '';
+    return ka.localeCompare(kb) || String(a.fecha_toma || '').localeCompare(String(b.fecha_toma || ''));
+  });
   renderPatientCards(filtered);
 }
 
@@ -1467,12 +1553,6 @@ function renderPatientCards(data) {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
   const hoy = new Date().toISOString().slice(0, 10);
-  const carnetYearCount = {};
-  allPatientsData.forEach(p => {
-    if (!p.carnet || !p.fecha_toma) return;
-    const key = p.carnet + '_' + p.fecha_toma.slice(0, 4);
-    carnetYearCount[key] = (carnetYearCount[key] || 0) + 1;
-  });
   data.forEach(p => {
     const estado = estadoDe(p);
     if (!esSoloVph(p)) {
@@ -1485,11 +1565,17 @@ function renderPatientCards(data) {
     const card = document.createElement('div');
     card.className = 'patientCard';
     card.style.borderLeftColor = COLORS[estado];
-    const visitasClave = p.carnet && p.fecha_toma ? (p.carnet + '_' + p.fecha_toma.slice(0, 4)) : null;
-    const masDeUnaVisita = visitasClave && carnetYearCount[visitasClave] > 1;
+    const tomaInfo = tomasIndex.get(p.id);
+    let tomaBadge = '';
+    if (tomaInfo && tomaInfo.grupo.length > 1) {
+      const titulo = 'Tomas de esta paciente:\n' + tomaInfo.grupo.map((o, i) => `${i + 1}ª: ${tomaResumen(o)}`).join('\n');
+      tomaBadge = tomaInfo.mismaFecha
+        ? ` <span title="${esc(titulo)}" style="font-size:11px;font-weight:700;color:#b91c1c;background:#fee2e2;border-radius:6px;padding:1px 6px;margin-left:4px">⚠️ Posible duplicado (misma fecha)</span>`
+        : ` <span title="${esc(titulo)}" style="font-size:11px;font-weight:600;color:#946200;background:#fff3d6;border-radius:6px;padding:1px 6px;margin-left:4px">🔁 ${tomaInfo.orden}ª toma de ${tomaInfo.grupo.length}</span>`;
+    }
     card.innerHTML = `
       <div>
-        <div class="pcName">${esCumpleanosHoy(p.fecha_nacimiento) ? '🎂 ' : ''}${esc(p.nombre)}${masDeUnaVisita ? ' <span title="Volvió más de una vez este año" style="font-size:11px;font-weight:600;color:#946200;background:#fff3d6;border-radius:6px;padding:1px 6px;margin-left:4px">🔁 ' + carnetYearCount[visitasClave] + 'ª visita</span>' : ''}${p.recibio_resultado ? ' <span title="Recibió información de su resultado" style="font-size:11px;font-weight:600;color:#0d6b47;background:#dcf5e9;border-radius:6px;padding:1px 6px;margin-left:4px">✅ Informada</span>' : ''}</div>
+        <div class="pcName">${esCumpleanosHoy(p.fecha_nacimiento) ? '🎂 ' : ''}${esc(p.nombre)}${tomaBadge}${p.recibio_resultado ? ' <span title="Recibió información de su resultado" style="font-size:11px;font-weight:600;color:#0d6b47;background:#dcf5e9;border-radius:6px;padding:1px 6px;margin-left:4px">✅ Informada</span>' : ''}</div>
         <div class="pcMeta">${esc(p.carnet) || 'Sin carnet'}${edadDe(p.fecha_nacimiento) != null ? ' · ' + edadDe(p.fecha_nacimiento) + ' años' : ''} · ${esc(p.doctora) || '—'} · Toma: ${fmtFecha(p.fecha_toma) || '—'}</div>
       </div>
       <div>
@@ -1526,6 +1612,8 @@ function renderPatientCards(data) {
   document.getElementById('cNeg').textContent = counts.Negativo;
   document.getElementById('cPend').textContent = counts.Pendiente;
   document.getElementById('cTotal').textContent = data.length;
+  const unicas = new Set(data.map(p => { const t = tomasIndex.get(p.id); return t ? t.grupo[0].id : p.id; })).size;
+  document.getElementById('cUnicas').textContent = unicas;
 }
 
 function exportPatientsToExcel() {
@@ -1554,11 +1642,10 @@ function exportPatientsToExcel() {
   XLSX.writeFile(wb, `SIVEC-PAP_pacientes_${fecha}.xlsx`);
 }
 
-function esc(s) { return (s == null ? '' : String(s)).replace(/</g, '&lt;'); }
+function esc(s) { return (s == null ? '' : String(s)).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
 
 // ================= Mapa =================
-// Tiles: CARTO (datos de OpenStreetMap) por defecto, así los nombres de calles del mapa
-// coinciden con los del buscador de direcciones (Photon/Nominatim también usan OpenStreetMap).
+// Tiles: Esri (calles, satélite, relieve) y OpenStreetMap como alternativa.
 // Si se configura una clave de Google Maps, las direcciones se buscan primero con Google.
 const SCZ_BBOX = { south: -17.97, north: -17.58, west: -63.35, east: -62.98 }; // Santa Cruz de la Sierra y alrededores
 const SCZ_CENTER = [-17.7833, -63.1821];
@@ -1706,17 +1793,18 @@ let mapState = null;
 
 function initMapInstance() {
   mapInstance = L.map('map', { zoomControl: true }).setView(SCZ_CENTER, 13);
-  const calles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap © CARTO', subdomains: 'abcd', maxZoom: 20,
-  });
-  const esriCalles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles © Esri', maxZoom: 19 });
-  const satelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Imágenes © Esri', maxZoom: 19 });
-  const etiquetas = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 20, pane: 'overlayPane' });
-  const saved = localStorage.getItem('sivec_map_layer') || 'Calles (OpenStreetMap)';
-  const bases = { 'Calles (OpenStreetMap)': calles, 'Satélite + calles': L.layerGroup([satelite, etiquetas]), 'Calles (Esri)': esriCalles };
-  (bases[saved] || calles).addTo(mapInstance);
+  // Esri funciona sin clave aunque el archivo se abra desde el disco (file://). CARTO pedía clave ("API KEY REQUIRED").
+  const esri = (svc, attr) => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${svc}/MapServer/tile/{z}/{y}/{x}`, { attribution: attr || 'Tiles © Esri', maxZoom: 19 });
+  const bases = {
+    'Calles': esri('World_Street_Map'),
+    'Calles (OpenStreetMap)': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }),
+    'Satélite + calles': L.layerGroup([esri('World_Imagery', 'Imágenes © Esri'), esri('Reference/World_Transportation'), esri('Reference/World_Boundaries_and_Places')]),
+    'Relieve': esri('World_Topo_Map'),
+  };
+  const saved = localStorage.getItem('sivec_map_layer2') || 'Calles';
+  (bases[saved] || bases['Calles']).addTo(mapInstance);
   L.control.layers(bases, null, { position: 'bottomleft' }).addTo(mapInstance);
-  mapInstance.on('baselayerchange', e => { try { localStorage.setItem('sivec_map_layer', e.name); } catch (_) {} });
+  mapInstance.on('baselayerchange', e => { try { localStorage.setItem('sivec_map_layer2', e.name); } catch (_) {} });
 
   mapCluster = L.markerClusterGroup({
     maxClusterRadius: 35, spiderfyOnMaxZoom: true, showCoverageOnHover: false, disableClusteringAtZoom: 19,
@@ -1812,7 +1900,7 @@ renderMapFilterChips();
 async function loadMap() {
   const runId = ++mapRunId; // si se vuelve a abrir el mapa, la búsqueda anterior se detiene (evita búsquedas duplicadas y bloqueos)
   const isCancelled = () => runId !== mapRunId;
-  const { data, error } = await sb.from('pacientes').select('*').is('deleted_at', null);
+  const { data, error } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null));
   if (error) { alert('Error al cargar mapa: ' + error.message); return; }
   if (isCancelled()) return;
 
@@ -1889,7 +1977,7 @@ async function loadMap() {
       (sinDireccion.length ? ` · Sin dirección: ${sinDireccion.length}` : '');
     document.getElementById('mapUnlocatedBtn').style.display = (noUbicadas.length || sinDireccion.length) ? 'inline-block' : 'none';
     document.getElementById('mapUnlocatedList').innerHTML =
-      noUbicadas.map(a => `<div class="unlocItem"><div><b>${byAddr[a].map(p => esc(p.nombre)).join('<br>')}</b><div class="addr">${esc(a)}</div></div><button type="button" data-addr="${esc(a).replace(/"/g, '&quot;')}">📍 Ubicar</button></div>`).join('') +
+      noUbicadas.map(a => `<div class="unlocItem"><div><b>${byAddr[a].map(p => esc(p.nombre)).join('<br>')}</b><div class="addr">${esc(a)}</div></div><button type="button" data-addr="${esc(a)}">📍 Ubicar</button></div>`).join('') +
       (sinDireccion.length ? `<div class="unlocTitle">Sin dirección cargada (${sinDireccion.length})</div>` +
         sinDireccion.map(p => `<div class="unlocItem"><div><b>${esc(p.nombre)}</b><div class="addr">Agregá la dirección en Pacientes → Editar</div></div></div>`).join('') : '');
   }
@@ -2072,7 +2160,7 @@ async function deletePatient(p) {
 
 let panelCharts = {};
 async function loadPanel() {
-  const { data, error } = await sb.from('pacientes').select('*').is('deleted_at', null);
+  const { data, error } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null));
   if (error) { alert('Error al cargar panel: ' + error.message); return; }
 
   const estadoCounts = { Positivo: 0, Negativo: 0, Pendiente: 0 };
@@ -2148,10 +2236,10 @@ async function loadPanel() {
 async function loadMetodos() {
   const tbody = document.getElementById('metodosBody');
   tbody.innerHTML = '<tr><td colspan="8">Cargando...</td></tr>';
-  const { data, error } = await sb.from('pacientes').select('*')
+  const { data, error } = await selectAll(() => sb.from('pacientes').select('*')
     .is('deleted_at', null)
     .not('anticonceptivo_usa', 'is', null)
-    .order('nombre', { ascending: true });
+    .order('nombre', { ascending: true }));
   if (error) { tbody.innerHTML = `<tr><td colspan="8">Error: ${esc(error.message)}</td></tr>`; return; }
   if (!data.length) { tbody.innerHTML = '<tr><td colspan="8">Todavía no hay pacientes con datos de método anticonceptivo.</td></tr>'; return; }
   const hoy = new Date().toISOString().slice(0, 10);
@@ -2179,10 +2267,10 @@ async function loadTrash() {
   tbody.innerHTML = '<tr><td colspan="5">Cargando...</td></tr>';
   const limite = new Date();
   limite.setDate(limite.getDate() - 30);
-  const { data, error } = await sb.from('pacientes').select('*')
+  const { data, error } = await selectAll(() => sb.from('pacientes').select('*')
     .not('deleted_at', 'is', null)
     .gte('deleted_at', limite.toISOString())
-    .order('deleted_at', { ascending: false });
+    .order('deleted_at', { ascending: false }));
   if (error) { tbody.innerHTML = `<tr><td colspan="5">Error: ${esc(error.message)}</td></tr>`; return; }
   if (!data.length) { tbody.innerHTML = '<tr><td colspan="5">La papelera está vacía.</td></tr>'; return; }
   tbody.innerHTML = data.map(p => {
