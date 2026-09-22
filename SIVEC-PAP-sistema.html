@@ -267,6 +267,17 @@
   #mapUnlocatedPanel .unlocItem button { flex-shrink: 0; background: var(--teal-700); color: #fff; border: none; border-radius: 6px; padding: 5px 9px; font-size: 12px; cursor: pointer; }
   #mapUnlocatedPanel .unlocTitle { font-weight: 700; margin: 12px 0 2px; }
   #mapStatsBar { width: max-content; }
+  .addrParts { display: grid; grid-template-columns: 1.3fr 1.5fr 0.5fr 0.5fr 0.5fr; gap: 6px; margin-bottom: 6px; }
+  @media (max-width: 600px) { .addrParts { grid-template-columns: 1fr 1fr; } }
+  .geoPickRow { display: flex; gap: 8px; align-items: center; margin-top: 6px; font-size: 12.5px; color: var(--ink-soft); flex-wrap: wrap; }
+  #geoPickOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 3000; align-items: center; justify-content: center; padding: 16px; }
+  #geoPickOverlay.open { display: flex; }
+  #geoPickBox { background: #fff; color: #40323a; border-radius: 12px; width: min(900px, 100%); height: min(640px, 100%); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+  #geoPickHead { display: flex; gap: 8px; align-items: center; padding: 10px 12px; border-bottom: 1px solid #ecdde3; flex-wrap: wrap; font-size: 13px; }
+  #geoPickHead .sp { flex: 1; color: #8a7078; min-width: 150px; }
+  #geoPickHead button { border: 1px solid #ecdde3; background: #fbf6f3; color: #40323a; border-radius: 7px; padding: 6px 11px; cursor: pointer; font-size: 13px; }
+  #geoPickHead button.primary { background: #7d2a4c; color: #fff; border-color: #7d2a4c; }
+  #geoPickMap { flex: 1; }
   #mapStatsBar, #mapFilter, #mapUnlocatedPanel, #mapProgress { color-scheme: light; }
   #mapStatsBar button, #mapPlacingHint button { background: #fbf6f3 !important; color: #40323a !important; border: 1px solid #ecdde3 !important; }
   #mapFilter .chip { background: #fff; color: #40323a; }
@@ -279,6 +290,7 @@
   #mapFilter .chip.on { opacity: 1; border-color: var(--c); background: color-mix(in srgb, var(--c) 12%, #fff); font-weight: 600; }
   #mapFilter .chip i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); display: inline-block; }
   #mapFilter .chip small { color: var(--ink-soft); font-weight: 400; }
+  #mapFilter .fSel { border: 1px solid #ecdde3; border-radius: 7px; padding: 3px 6px; font-size: 12px; background: #fff; color: #40323a; }
   #mapFilter .fActions button { background: none; border: none; color: var(--teal-700); cursor: pointer; font-size: 12px; padding: 2px 4px; text-decoration: underline; }
   @media (max-width: 700px) { #mapFilter { left: 12px; right: 12px; top: 56px; max-width: none; } }
 
@@ -445,7 +457,17 @@
             </select>
           </div>
           <div class="field"><label>Ocupación</label><input name="ocupacion" placeholder="Ej: Comerciante, Ama de casa..."></div>
-          <div class="field span2"><label>Dirección</label><input name="direccion" placeholder="Barrio / Calle / Nº"></div>
+          <div class="field span2"><label>Dirección<span class="helpTip" data-tip="Llená Barrio, Calle, Nº, UV y Mz por separado: el sistema arma la dirección solo y así el mapa la encuentra mejor. Si preferís, escribila libre en el campo de abajo.">ⓘ</span></label>
+            <div class="addrParts">
+              <input data-ap="barrio" placeholder="Barrio">
+              <input data-ap="calle" placeholder="Calle / Avenida">
+              <input data-ap="nro" placeholder="Nº">
+              <input data-ap="uv" placeholder="UV">
+              <input data-ap="mz" placeholder="Mz">
+            </div>
+            <input name="direccion" placeholder="Se completa sola con los campos de arriba (o escribila libre)">
+            <div class="geoPickRow"><button type="button" class="rowBtn geoPickBtn">📍 Marcar en el mapa</button><span class="geoPickStatus">Opcional: marcá la casa y el mapa la mostrará exacta.</span></div>
+          </div>
           <div class="field"><label>Tipo de examen<span class="helpTip" data-tip="Elegí VPH si la paciente vino solo para el test de VPH, sin toma de PAP. Así no queda marcada como Pendiente de un PAP que nunca se hizo.">ⓘ</span></label>
             <select name="tipo_examen"><option>Papanicolau</option><option>Colposcopia</option><option>VPH</option></select>
           </div>
@@ -599,6 +621,10 @@
           <button type="button" class="chip" data-f="vph:Negativa" style="--c:#16a34a"><i></i>Negativa <small></small></button>
           <span class="fActions"><button type="button" data-fall="1">Todas</button><button type="button" data-fall="0">Ninguna</button></span>
         </div>
+        <div class="fGroup"><span>Filtro</span>
+          <select id="mapFiltDoctora" class="fSel"><option value="">Todas las doctoras</option></select>
+          <select id="mapFiltAnio" class="fSel"><option value="">Todos los años</option></select>
+        </div>
       </div>
       <div id="mapPlacingHint"></div>
       <div id="mapStatsBar"><span id="mapStats"></span><button id="mapUnlocatedBtn" type="button" style="display:none">Ver no ubicadas</button><button id="mapRelocateBtn" type="button" title="Volver a buscar las direcciones (conserva las que marcaste a mano)">↻ Volver a localizar</button></div>
@@ -663,10 +689,28 @@
   <input id="driveFolderInput" placeholder="Ej: 1A2bC3dEfGhIjKlmNoPQrstuVwxYZ">
   <button class="primary" onclick="saveDriveFolder()">Guardar carpeta</button>
 
+  <label style="margin-top:24px">Seguridad</label>
+  <label style="display:flex;gap:8px;align-items:center;font-weight:600"><input type="checkbox" id="requireLoginChk" style="width:auto"> Exigir inicio de sesión</label>
+  <p class="hint" style="margin-top:4px">Activalo recién cuando las cuentas de cada doctora estén creadas en Supabase (Authentication → Users). Para que los datos queden realmente protegidos, hay que activar también las reglas RLS (instrucciones en SUPABASE-SQL.md).</p>
+
   <label style="margin-top:24px">Clave de Google Maps (opcional)</label>
   <p class="hint" style="margin-top:0">Sin clave, el mapa busca las direcciones con OpenStreetMap (gratis). Con una clave de Google Maps (API "Maps JavaScript" + "Geocoding" activadas) las direcciones se buscan con Google, igual que en Google Maps.</p>
   <input id="gmapsKeyInput" placeholder="AIza...">
   <button class="primary" onclick="saveGmapsKey()">Guardar clave</button>
+</div>
+
+<div id="geoPickOverlay">
+  <div id="geoPickBox">
+    <div id="geoPickHead">
+      <b>📍 Ubicación de la casa</b>
+      <span class="sp" id="geoPickInfo">Hacé clic en el mapa donde vive la paciente.</span>
+      <button type="button" id="geoPickSearch">🔎 Buscar la dirección</button>
+      <button type="button" id="geoPickClear">Quitar marca</button>
+      <button type="button" id="geoPickCancel">Cancelar</button>
+      <button type="button" id="geoPickOk" class="primary">Guardar ubicación</button>
+    </div>
+    <div id="geoPickMap"></div>
+  </div>
 </div>
 
 <div id="printOverlay" class="printOverlay">
@@ -805,7 +849,9 @@
         <div class="field"><label>Fecha de nacimiento</label><input type="date" name="fecha_nacimiento"></div>
         <div class="field"><label>Celular</label><input name="celular"></div>
       </div>
-      <div class="field"><label>Dirección</label><input name="direccion"></div>
+      <div class="field"><label>Dirección</label><input name="direccion">
+        <div class="geoPickRow"><button type="button" class="rowBtn geoPickBtn">📍 Marcar en el mapa</button><span class="geoPickStatus"></span></div>
+      </div>
       <div class="row2">
         <div class="field"><label>Estado civil</label>
           <select name="estado_civil">
@@ -1027,6 +1073,13 @@ async function init() {
   document.getElementById('keyInput').value = key;
   document.getElementById('driveFolderInput').value = localStorage.getItem('sivecDriveFolderId') || '';
   document.getElementById('gmapsKeyInput').value = localStorage.getItem('sivec_gmaps_key') || '';
+  const reqChk = document.getElementById('requireLoginChk');
+  reqChk.checked = localStorage.getItem('sivec_require_login') === '1';
+  reqChk.addEventListener('change', () => {
+    if (reqChk.checked && !confirm('¿Exigir inicio de sesión en esta computadora? Asegurate de tener ya tu correo y contraseña creados en Supabase.')) { reqChk.checked = false; return; }
+    localStorage.setItem('sivec_require_login', reqChk.checked ? '1' : '0');
+    location.reload();
+  });
   if (!url || !key) {
     document.getElementById('blocker').style.display = 'flex';
     document.getElementById('settingsPanel').classList.add('open');
@@ -1041,8 +1094,8 @@ async function init() {
     document.querySelector('#blocker p').textContent = e.message;
     return;
   }
-  // Login todavía no está activado (se activa cuando estén creadas las cuentas en Supabase).
-  // await checkAuth();
+  // El login se activa desde Configuración cuando las cuentas ya estén creadas en Supabase (ver SUPABASE-SQL.md).
+  if (localStorage.getItem('sivec_require_login') === '1') await checkAuth();
 }
 
 async function checkAuth() {
@@ -1376,6 +1429,7 @@ async function onSubmit(e) {
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
   if (!(await confirmarTomaRepetida(data))) { btn.disabled = false; return; }
+  await applyGeoPick(form, data, null);
   const msg = document.getElementById('formMsg');
   msg.className = ''; msg.style.display = 'none';
 
@@ -1391,6 +1445,7 @@ async function onSubmit(e) {
     showToast('Paciente guardada correctamente ✔', 'ok');
     allPatientsData = []; // se vuelve a leer en el próximo registro, así también avisa de la toma recién guardada
     form.reset();
+    resetGeoPick(form);
   }
 }
 
@@ -1786,7 +1841,116 @@ async function geocodeAddress(addr, state, isCancelled) {
   return null;
 }
 
-const PREC_LABEL = { esquina: 'esquina', calle: 'calle (aprox.)', barrio: 'barrio (aprox.)', uv: 'UV (aprox.)', aprox: 'aproximada', manual: 'marcada a mano' };
+// ---- Dirección por partes + "Marcar en el mapa" en los formularios ----
+function composeAddress(form) {
+  const v = k => (form.querySelector(`[data-ap="${k}"]`)?.value || '').trim();
+  const calle = v('calle');
+  const parts = [];
+  if (v('barrio')) parts.push('B. ' + v('barrio').replace(/^(b\.|barrio)\s*/i, ''));
+  if (calle) parts.push((/^(av|avenida|calle|c\.|pasaje|pje)\b/i.test(calle) ? calle : 'C. ' + calle) + (v('nro') ? ' #' + v('nro').replace(/^#/, '') : ''));
+  else if (v('nro')) parts.push('#' + v('nro').replace(/^#/, ''));
+  if (v('uv')) parts.push('UV-' + v('uv').replace(/^uv\s*-?\s*/i, ''));
+  if (v('mz')) parts.push('Mz ' + v('mz').replace(/^mz\.?\s*/i, ''));
+  return parts.join(', ');
+}
+document.querySelectorAll('[data-ap]').forEach(inp => inp.addEventListener('input', () => {
+  const form = inp.closest('form');
+  form.direccion.value = composeAddress(form);
+}));
+
+let geoPickMapInst = null, geoPickMarker = null, geoPickForm = null;
+function setGeoPickStatus(form) {
+  const st = form.querySelector('.geoPickStatus');
+  if (!st) return;
+  st.textContent = form._geoPick ? `✔ Ubicación marcada (${form._geoPick.lat.toFixed(5)}, ${form._geoPick.lng.toFixed(5)})` : (form.id === 'patientForm' ? 'Opcional: marcá la casa y el mapa la mostrará exacta.' : '');
+  st.style.color = form._geoPick ? '#0d6b47' : '';
+}
+function openGeoPick(form) {
+  geoPickForm = form;
+  document.getElementById('geoPickOverlay').classList.add('open');
+  if (!geoPickMapInst) {
+    geoPickMapInst = L.map('geoPickMap').setView(SCZ_CENTER, 13);
+    const esri = svc => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${svc}/MapServer/tile/{z}/{y}/{x}`, { attribution: 'Tiles © Esri', maxZoom: 19 });
+    const calles = esri('World_Street_Map').addTo(geoPickMapInst);
+    L.control.layers({ 'Calles': calles, 'Satélite + calles': L.layerGroup([esri('World_Imagery'), esri('Reference/World_Transportation')]) }, null, { position: 'bottomleft' }).addTo(geoPickMapInst);
+    geoPickMapInst.on('click', e => setGeoPickMarker(e.latlng));
+  }
+  if (geoPickMarker) { geoPickMapInst.removeLayer(geoPickMarker); geoPickMarker = null; }
+  const addr = (form.direccion.value || '').trim();
+  const cached = form._geoPick || form._geoInicial || (addr && geoCache[addr] && geoCache[addr].lat != null ? geoCache[addr] : null);
+  setTimeout(() => {
+    geoPickMapInst.invalidateSize();
+    if (cached) { setGeoPickMarker(L.latLng(cached.lat, cached.lng)); geoPickMapInst.setView([cached.lat, cached.lng], 17); }
+    else geoPickMapInst.setView(SCZ_CENTER, 13);
+  }, 60);
+  document.getElementById('geoPickInfo').textContent = addr ? `Dirección: ${addr} — hacé clic en la casa (podés arrastrar el pin).` : 'Hacé clic en el mapa donde vive la paciente.';
+}
+function setGeoPickMarker(latlng) {
+  if (!geoPickMarker) {
+    geoPickMarker = L.marker(latlng, { draggable: true }).addTo(geoPickMapInst);
+  } else geoPickMarker.setLatLng(latlng);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('.geoPickBtn');
+  if (b) openGeoPick(b.closest('form'));
+});
+document.getElementById('geoPickCancel').addEventListener('click', () => document.getElementById('geoPickOverlay').classList.remove('open'));
+document.getElementById('geoPickClear').addEventListener('click', () => {
+  if (geoPickMarker) { geoPickMapInst.removeLayer(geoPickMarker); geoPickMarker = null; }
+  geoPickForm._geoPick = null; geoPickForm._geoQuitar = true; setGeoPickStatus(geoPickForm);
+});
+document.getElementById('geoPickOk').addEventListener('click', () => {
+  if (!geoPickMarker) { alert('Primero hacé clic en el mapa donde vive la paciente.'); return; }
+  const ll = geoPickMarker.getLatLng();
+  if (!inSCZ({ lat: ll.lat, lng: ll.lng }) && !confirm('Ese punto queda fuera de Santa Cruz de la Sierra. ¿Guardar igual?')) return;
+  geoPickForm._geoPick = { lat: ll.lat, lng: ll.lng }; geoPickForm._geoQuitar = false;
+  setGeoPickStatus(geoPickForm);
+  document.getElementById('geoPickOverlay').classList.remove('open');
+});
+document.getElementById('geoPickSearch').addEventListener('click', async () => {
+  const addr = (geoPickForm.direccion.value || '').trim();
+  if (!addr) { alert('Primero escribí la dirección.'); return; }
+  const btn = document.getElementById('geoPickSearch');
+  btn.disabled = true; btn.textContent = 'Buscando...';
+  const loc = await geocodeAddress(addr, {}, () => false);
+  btn.disabled = false; btn.textContent = '🔎 Buscar la dirección';
+  if (!loc) { alert('No se encontró la dirección. Buscá la zona en el mapa y hacé clic en la casa.'); return; }
+  geoPickMapInst.setView([loc.lat, loc.lng], 17);
+  setGeoPickMarker(L.latLng(loc.lat, loc.lng));
+  document.getElementById('geoPickInfo').textContent = `Ubicación ${PREC_LABEL[loc.prec] || 'aproximada'}: ajustá el pin arrastrándolo hasta la casa.`;
+});
+// Agrega lat/lng al registro que se va a guardar (si la base tiene esas columnas) y lo recuerda en este navegador.
+async function applyGeoPick(form, data, direccionOriginal) {
+  const cols = await geoColumnsOk();
+  const addr = (data.direccion || '').trim();
+  if (form._geoPick) {
+    if (addr) { geoCache[addr] = { lat: form._geoPick.lat, lng: form._geoPick.lng, src: 'manual', prec: 'manual' }; saveGeoCache(); }
+    if (cols) Object.assign(data, { lat: form._geoPick.lat, lng: form._geoPick.lng, geo_manual: true });
+  } else if (cols && (form._geoQuitar || (direccionOriginal != null && addr !== (direccionOriginal || '').trim()))) {
+    Object.assign(data, { lat: null, lng: null, geo_manual: false }); // cambió la dirección: se vuelve a buscar
+  }
+}
+function resetGeoPick(form, inicial) { form._geoPick = null; form._geoQuitar = false; form._geoInicial = inicial || null; setGeoPickStatus(form); }
+
+// ---- Ubicaciones compartidas en Supabase (columnas lat, lng, geo_manual) ----
+// Si las columnas existen, lo que una persona corrige en el mapa lo ven todas las computadoras.
+// Si todavía no se crearon (ver SUPABASE-SQL.md), todo sigue funcionando con la caché del navegador.
+let geoColsPromise = null;
+function geoColumnsOk() {
+  if (!sb) return Promise.resolve(false);
+  if (!geoColsPromise) geoColsPromise = sb.from('pacientes').select('lat,lng,geo_manual').limit(1).then(({ error }) => !error, () => false);
+  return geoColsPromise;
+}
+async function saveGeoToDb(pacientes, loc, manual) {
+  if (!loc || !(await geoColumnsOk())) return;
+  const ids = pacientes.filter(p => manual || !p.geo_manual).map(p => p.id);
+  if (!ids.length) return;
+  const { error } = await sb.from('pacientes').update({ lat: loc.lat, lng: loc.lng, geo_manual: !!manual }).in('id', ids);
+  if (!error) pacientes.forEach(p => { if (ids.includes(p.id)) { p.lat = loc.lat; p.lng = loc.lng; p.geo_manual = !!manual; } });
+}
+let mapForceRelocate = false;
+
+const PREC_LABEL = { auto: 'automática', esquina: 'esquina', calle: 'calle (aprox.)', barrio: 'barrio (aprox.)', uv: 'UV (aprox.)', aprox: 'aproximada', manual: 'marcada a mano' };
 
 let mapInstance = null, mapCluster = null, mapRunId = 0, mapPlacingAddr = null;
 let mapState = null;
@@ -1827,7 +1991,7 @@ function initMapInstance() {
     setPlacingMode(null);
     geoCache[addr] = { lat: e.latlng.lat, lng: e.latlng.lng, src: 'manual', prec: 'manual' };
     saveGeoCache();
-    if (mapState) { mapState.addMarkersFor(addr, geoCache[addr]); mapState.refresh(); }
+    if (mapState) { mapState.addMarkersFor(addr, geoCache[addr]); mapState.refresh(); mapState.saveDb(addr, geoCache[addr], true); }
     showToast('Ubicación guardada ✔', 'ok');
   });
 
@@ -1838,6 +2002,7 @@ function initMapInstance() {
     if (!confirm('¿Volver a buscar todas las direcciones? Las ubicaciones que marcaste o arrastraste a mano se conservan.')) return;
     Object.keys(geoCache).forEach(k => { if (!geoCache[k] || geoCache[k].src !== 'manual') delete geoCache[k]; });
     saveGeoCache();
+    mapForceRelocate = true;
     loadMap();
   });
   document.getElementById('mapUnlocatedList').addEventListener('click', e => {
@@ -1871,8 +2036,22 @@ let mapFilterOn;
 try { mapFilterOn = new Set(JSON.parse(localStorage.getItem('sivec_map_filter') || 'null') || MAP_FILTERS.map(f => f.key)); }
 catch (e) { mapFilterOn = new Set(MAP_FILTERS.map(f => f.key)); }
 function mapFilterAll() { return MAP_FILTERS.every(f => mapFilterOn.has(f.key)); }
+let mapExtra = { doctora: '', anio: '' };
+try { mapExtra = Object.assign(mapExtra, JSON.parse(localStorage.getItem('sivec_map_extra') || '{}')); } catch (e) {}
+function mapPassesExtra(p) {
+  if (mapExtra.doctora && p.doctora !== mapExtra.doctora) return false;
+  if (mapExtra.anio && String(p.fecha_toma || '').slice(0, 4) !== mapExtra.anio) return false;
+  return true;
+}
+function mapHayFiltro() { return !mapFilterAll() || !!mapExtra.doctora || !!mapExtra.anio; }
+['mapFiltDoctora', 'mapFiltAnio'].forEach(id => document.getElementById(id).addEventListener('change', () => {
+  mapExtra = { doctora: document.getElementById('mapFiltDoctora').value, anio: document.getElementById('mapFiltAnio').value };
+  try { localStorage.setItem('sivec_map_extra', JSON.stringify(mapExtra)); } catch (_) {}
+  if (mapState) mapState.applyFilter();
+}));
 // Devuelve el color del pin, o null si la paciente queda oculta con el filtro actual.
 function mapPinColor(p) {
+  if (!mapPassesExtra(p)) return null;
   if (mapFilterAll()) return COLORS[estadoDe(p)]; // sin filtro: colores de siempre
   const f = MAP_FILTERS.find(f => mapFilterOn.has(f.key) && f.test(p));
   return f ? f.color : null;
@@ -1911,8 +2090,11 @@ async function loadMap() {
 
   const byAddr = {};
   const sinDireccion = [];
+  const useDb = await geoColumnsOk();
+  const relocate = mapForceRelocate; mapForceRelocate = false;
   data.forEach(p => {
-    const addr = (p.direccion || '').trim();
+    let addr = (p.direccion || '').trim();
+    if (!addr && useDb && p.lat != null) addr = '📍 ' + (p.nombre || p.id); // sin dirección pero marcada en el mapa
     if (!addr) sinDireccion.push(p);
     else (byAddr[addr] = byAddr[addr] || []).push(p);
   });
@@ -1950,6 +2132,7 @@ async function loadMap() {
         geoCache[addr] = { lat: newPos.lat, lng: newPos.lng, src: 'manual', prec: 'manual' };
         saveGeoCache();
         addMarkersFor(addr, geoCache[addr]);
+        saveGeoToDb(byAddr[addr] || [], geoCache[addr], true);
         showToast('Posición actualizada para esta dirección ✔', 'ok');
       });
       markersByAddr[addr].push(marker);
@@ -1972,7 +2155,7 @@ async function loadMap() {
     const visibles = mapCluster.getLayers().length;
     document.getElementById('mapStats').innerHTML =
       `<b>En el mapa: ${enMapa} de ${data.length}</b>` +
-      (mapFilterAll() ? '' : ` · <b style="color:var(--teal-700)">Mostrando: ${visibles}</b>`) +
+      (mapHayFiltro() ? ` · <b style="color:#7d2a4c">Mostrando: ${visibles}</b>` : '') +
       (noUbicadasPac ? ` · <span style="color:#b45309">No ubicadas: ${noUbicadasPac}</span>` : '') +
       (sinDireccion.length ? ` · Sin dirección: ${sinDireccion.length}` : '');
     document.getElementById('mapUnlocatedBtn').style.display = (noUbicadas.length || sinDireccion.length) ? 'inline-block' : 'none';
@@ -1993,18 +2176,37 @@ async function loadMap() {
     mapCluster.removeLayers(hide);
     mapCluster.addLayers(show);
     mapCluster.refreshClusters();
+    recount();
     refresh(lastDone);
   }
-  const counts = {};
-  MAP_FILTERS.forEach(f => { counts[f.key] = data.filter(f.test).length; });
-  renderMapFilterChips(counts);
-  mapState = { addMarkersFor, applyFilter, refresh: () => refresh(true) };
+  function recount() {
+    const counts = {};
+    const base = data.filter(mapPassesExtra);
+    MAP_FILTERS.forEach(f => { counts[f.key] = base.filter(f.test).length; });
+    renderMapFilterChips(counts);
+  }
+  const fillSel = (id, values, label) => {
+    const sel = document.getElementById(id), cur = id === 'mapFiltDoctora' ? mapExtra.doctora : mapExtra.anio;
+    sel.innerHTML = `<option value="">${label}</option>` + values.map(v => `<option value="${esc(v)}"${v === cur ? ' selected' : ''}>${esc(v)}</option>`).join('');
+  };
+  fillSel('mapFiltDoctora', [...new Set(data.map(p => p.doctora).filter(Boolean))].sort(), 'Todas las doctoras');
+  fillSel('mapFiltAnio', [...new Set(data.map(p => String(p.fecha_toma || '').slice(0, 4)).filter(Boolean))].sort().reverse(), 'Todos los años');
+  recount();
+  mapState = { addMarkersFor, applyFilter, refresh: () => refresh(true), saveDb: (addr, loc, manual) => saveGeoToDb(byAddr[addr] || [], loc, manual) };
 
   // 1) Mostrar al instante lo que ya está en caché.
   const now = Date.now();
   Object.keys(byAddr).forEach(addr => {
-    const c = geoCache[addr];
+    const grupo = byAddr[addr];
+    const dbManual = grupo.find(p => p.geo_manual && p.lat != null);
+    const dbAuto = grupo.find(p => p.lat != null);
+    let c = geoCache[addr];
+    if (dbManual) c = { lat: dbManual.lat, lng: dbManual.lng, src: 'manual', prec: 'manual' };
+    else if (c && c.src === 'manual') { saveGeoToDb(grupo, c, true); } // corrección hecha antes en este navegador: se comparte
+    else if (relocate) c = null;
+    else if (dbAuto) c = { lat: dbAuto.lat, lng: dbAuto.lng, src: 'db', prec: (c && c.lat != null && c.prec) || 'auto' };
     if (c && c.lat != null && inSCZ(c)) addMarkersFor(addr, c);
+    else if (addr.startsWith('📍 ')) { /* sin dirección: no hay qué buscar */ }
     else if (c && c.fail && now - c.t < GEO_FAIL_RETRY_MS) { /* falló hace poco: no se reintenta automáticamente */ }
     else { pending.push(addr); pendingSet.add(addr); }
   });
@@ -2027,6 +2229,7 @@ async function loadMap() {
       if (isCancelled()) return;
       geoCache[addr] = loc || { fail: true, t: Date.now() };
       saveGeoCache();
+      if (loc) saveGeoToDb(byAddr[addr], loc, false);
       addMarkersFor(addr, loc);
       pendingSet.delete(addr);
       done++;
@@ -2086,6 +2289,7 @@ function openEdit(p) {
   form.fecha_nacimiento.value = p.fecha_nacimiento || '';
   form.celular.value = p.celular || '';
   form.direccion.value = p.direccion || '';
+  resetGeoPick(form, p.lat != null ? { lat: p.lat, lng: p.lng } : null);
   form.estado_civil.value = p.estado_civil || '';
   form.ocupacion.value = p.ocupacion || '';
   form.numero_folio_d1.value = p.numero_folio_d1 || '';
@@ -2143,6 +2347,8 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
     data.anticonceptivo_proximo_control = calcVencimientoMetodo(data.anticonceptivo_metodo, data.anticonceptivo_fecha_inicio);
   }
   Object.keys(data).forEach(k => { if ((k.startsWith('fecha') || k.includes('fecha') || k.includes('proximo_control')) && data[k] === '') data[k] = null; });
+  const original = (currentPatients || []).find(x => String(x.id) === String(editingId)) || (allPatientsData || []).find(x => String(x.id) === String(editingId));
+  await applyGeoPick(e.target, data, original ? original.direccion : null);
   const { error } = await sb.from('pacientes').update(data).eq('id', editingId);
   if (error) { showToast('Error al guardar: ' + error.message, 'err'); return; }
   closeEdit();
