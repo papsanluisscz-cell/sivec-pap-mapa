@@ -266,6 +266,18 @@
   #mapUnlocatedPanel .unlocItem .addr { color: var(--ink-soft); }
   #mapUnlocatedPanel .unlocItem button { flex-shrink: 0; background: var(--teal-700); color: #fff; border: none; border-radius: 6px; padding: 5px 9px; font-size: 12px; cursor: pointer; }
   #mapUnlocatedPanel .unlocTitle { font-weight: 700; margin: 12px 0 2px; }
+  #mapStatsBar { width: max-content; }
+  .pieCluster { border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.35); }
+  .pieCluster span { background: #fff; color: #40323a; border-radius: 50%; font-weight: 700; font-size: 11.5px; display: flex; align-items: center; justify-content: center; }
+  #mapFilter { position: absolute; top: 12px; left: 56px; z-index: 1000; background: #fff; color: #40323a; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); padding: 8px 10px; font-size: 12.5px; max-width: calc(100% - 260px); }
+  #mapFilter .fGroup { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin: 2px 0; }
+  #mapFilter .fGroup > span { font-weight: 700; min-width: 34px; }
+  #mapFilter .chip { display: inline-flex; align-items: center; gap: 5px; border: 1.5px solid var(--line); background: #fff; color: #40323a; border-radius: 999px; padding: 3px 9px; cursor: pointer; font-size: 12px; opacity: 0.45; }
+  #mapFilter .chip.on { opacity: 1; border-color: var(--c); background: color-mix(in srgb, var(--c) 12%, #fff); font-weight: 600; }
+  #mapFilter .chip i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); display: inline-block; }
+  #mapFilter .chip small { color: var(--ink-soft); font-weight: 400; }
+  #mapFilter .fActions button { background: none; border: none; color: var(--teal-700); cursor: pointer; font-size: 12px; padding: 2px 4px; text-decoration: underline; }
+  @media (max-width: 700px) { #mapFilter { left: 12px; right: 12px; top: 56px; max-width: none; } }
 
   #settingsPanel {
     position: fixed; top: 0; right: -360px; width: 340px; height: 100%; background: #fff;
@@ -567,6 +579,18 @@
     <div id="mapView" class="view">
       <button id="mapFullscreenBtn" title="Pantalla completa">⛶ Pantalla completa</button>
       <div id="mapProgress" style="display:none">Localizando direcciones... <b id="mapProgressCount">0/0</b></div>
+      <div id="mapFilter">
+        <div class="fGroup"><span>PAP</span>
+          <button type="button" class="chip" data-f="pap:Positivo" style="--c:#7c3aed"><i></i>Positivo <small></small></button>
+          <button type="button" class="chip" data-f="pap:Negativo" style="--c:#ea8c2e"><i></i>Negativo <small></small></button>
+          <button type="button" class="chip" data-f="pap:Pendiente" style="--c:#2f6fb0"><i></i>Pendiente <small></small></button>
+        </div>
+        <div class="fGroup"><span>VPH</span>
+          <button type="button" class="chip" data-f="vph:Positiva" style="--c:#dc2626"><i></i>Positiva <small></small></button>
+          <button type="button" class="chip" data-f="vph:Negativa" style="--c:#16a34a"><i></i>Negativa <small></small></button>
+          <span class="fActions"><button type="button" data-fall="1">Todas</button><button type="button" data-fall="0">Ninguna</button></span>
+        </div>
+      </div>
       <div id="mapPlacingHint"></div>
       <div id="mapStatsBar"><span id="mapStats"></span><button id="mapUnlocatedBtn" type="button" style="display:none">Ver no ubicadas</button><button id="mapRelocateBtn" type="button" title="Volver a buscar las direcciones (conserva las que marcaste a mano)">↻ Volver a localizar</button></div>
       <div id="mapUnlocatedPanel">
@@ -1694,7 +1718,19 @@ function initMapInstance() {
   L.control.layers(bases, null, { position: 'bottomleft' }).addTo(mapInstance);
   mapInstance.on('baselayerchange', e => { try { localStorage.setItem('sivec_map_layer', e.name); } catch (_) {} });
 
-  mapCluster = L.markerClusterGroup({ maxClusterRadius: 35, spiderfyOnMaxZoom: true, showCoverageOnHover: false, disableClusteringAtZoom: 19 });
+  mapCluster = L.markerClusterGroup({
+    maxClusterRadius: 35, spiderfyOnMaxZoom: true, showCoverageOnHover: false, disableClusteringAtZoom: 19,
+    // Cada grupo se dibuja como una "torta" con los colores de las pacientes que contiene.
+    iconCreateFunction: cluster => {
+      const kids = cluster.getAllChildMarkers(), byColor = {};
+      kids.forEach(m => { const c = m._sivecColor || '#999'; byColor[c] = (byColor[c] || 0) + 1; });
+      let acc = 0;
+      const stops = Object.entries(byColor).map(([c, n]) => { const a = acc; acc += n / kids.length * 360; return `${c} ${a}deg ${acc}deg`; }).join(',');
+      const size = kids.length < 10 ? 30 : kids.length < 50 ? 38 : 46;
+      return L.divIcon({ className: '', iconSize: [size, size],
+        html: `<div class="pieCluster" style="width:${size}px;height:${size}px;background:conic-gradient(${stops})"><span style="width:${size - 12}px;height:${size - 12}px">${kids.length}</span></div>` });
+    },
+  });
   mapInstance.addLayer(mapCluster);
 
   mapInstance.on('click', e => {
@@ -1734,6 +1770,45 @@ function setPlacingMode(addr) {
   } else hint.style.display = 'none';
 }
 
+// ---- Filtro por resultado: solo se muestran ("se encienden") las pacientes de las categorías elegidas ----
+// Orden = prioridad de color cuando una paciente entra en varias categorías elegidas.
+const MAP_FILTERS = [
+  { key: 'vph:Positiva', color: '#dc2626', test: p => p.resultado_vph === 'Positiva' },
+  { key: 'pap:Positivo', color: '#7c3aed', test: p => !esSoloVph(p) && p.estado_pap === 'Positivo' },
+  { key: 'pap:Negativo', color: '#ea8c2e', test: p => !esSoloVph(p) && p.estado_pap === 'Negativo' },
+  { key: 'pap:Pendiente', color: '#2f6fb0', test: p => !esSoloVph(p) && p.estado_pap !== 'Positivo' && p.estado_pap !== 'Negativo' },
+  { key: 'vph:Negativa', color: '#16a34a', test: p => p.resultado_vph === 'Negativa' },
+];
+let mapFilterOn;
+try { mapFilterOn = new Set(JSON.parse(localStorage.getItem('sivec_map_filter') || 'null') || MAP_FILTERS.map(f => f.key)); }
+catch (e) { mapFilterOn = new Set(MAP_FILTERS.map(f => f.key)); }
+function mapFilterAll() { return MAP_FILTERS.every(f => mapFilterOn.has(f.key)); }
+// Devuelve el color del pin, o null si la paciente queda oculta con el filtro actual.
+function mapPinColor(p) {
+  if (mapFilterAll()) return COLORS[estadoDe(p)]; // sin filtro: colores de siempre
+  const f = MAP_FILTERS.find(f => mapFilterOn.has(f.key) && f.test(p));
+  return f ? f.color : null;
+}
+function pinIcon(color) {
+  return L.divIcon({ className: '', html: `<div class="pin" style="background:${color}"></div>`, iconSize: [16, 16], iconAnchor: [8, 8] });
+}
+function renderMapFilterChips(counts) {
+  document.querySelectorAll('#mapFilter .chip').forEach(ch => {
+    ch.classList.toggle('on', mapFilterOn.has(ch.dataset.f));
+    if (counts) ch.querySelector('small').textContent = counts[ch.dataset.f] || 0;
+  });
+}
+document.getElementById('mapFilter').addEventListener('click', e => {
+  const chip = e.target.closest('.chip'), all = e.target.closest('[data-fall]');
+  if (chip) { const k = chip.dataset.f; mapFilterOn.has(k) ? mapFilterOn.delete(k) : mapFilterOn.add(k); }
+  else if (all) mapFilterOn = new Set(all.dataset.fall === '1' ? MAP_FILTERS.map(f => f.key) : []);
+  else return;
+  try { localStorage.setItem('sivec_map_filter', JSON.stringify([...mapFilterOn])); } catch (_) {}
+  renderMapFilterChips();
+  if (mapState) mapState.applyFilter();
+});
+renderMapFilterChips();
+
 async function loadMap() {
   const runId = ++mapRunId; // si se vuelve a abrir el mapa, la búsqueda anterior se detiene (evita búsquedas duplicadas y bloqueos)
   const isCancelled = () => runId !== mapRunId;
@@ -1761,9 +1836,10 @@ async function loadMap() {
     (markersByAddr[addr] || []).forEach(m => mapCluster.removeLayer(m));
     markersByAddr[addr] = [];
     (byAddr[addr] || []).forEach(p => {
-      const estado = estadoDe(p);
-      const icon = L.divIcon({ className: '', html: `<div class="pin" style="background:${COLORS[estado]}"></div>`, iconSize: [16, 16], iconAnchor: [8, 8] });
-      const marker = L.marker([loc.lat, loc.lng], { icon, draggable: true });
+      const color = mapPinColor(p);
+      const marker = L.marker([loc.lat, loc.lng], { icon: pinIcon(color || '#999'), draggable: true });
+      marker._sivecPaciente = p;
+      marker._sivecColor = color;
       const edad = edadDe(p.fecha_nacimiento);
       const prec = PREC_LABEL[loc.prec] || '';
       marker.bindPopup(`
@@ -1789,7 +1865,7 @@ async function loadMap() {
         showToast('Posición actualizada para esta dirección ✔', 'ok');
       });
       markersByAddr[addr].push(marker);
-      mapCluster.addLayer(marker);
+      if (color) mapCluster.addLayer(marker);
       bounds.push([loc.lat, loc.lng]);
     });
   }
@@ -1797,6 +1873,7 @@ async function loadMap() {
   const pending = [];
   const pendingSet = new Set();
   function refresh(done) {
+    lastDone = done;
     let enMapa = 0;
     const noUbicadas = [];
     Object.keys(byAddr).forEach(addr => {
@@ -1804,8 +1881,10 @@ async function loadMap() {
       else if (!pendingSet.has(addr) || done) noUbicadas.push(addr);
     });
     const noUbicadasPac = noUbicadas.reduce((n, a) => n + byAddr[a].length, 0);
+    const visibles = mapCluster.getLayers().length;
     document.getElementById('mapStats').innerHTML =
       `<b>En el mapa: ${enMapa} de ${data.length}</b>` +
+      (mapFilterAll() ? '' : ` · <b style="color:var(--teal-700)">Mostrando: ${visibles}</b>`) +
       (noUbicadasPac ? ` · <span style="color:#b45309">No ubicadas: ${noUbicadasPac}</span>` : '') +
       (sinDireccion.length ? ` · Sin dirección: ${sinDireccion.length}` : '');
     document.getElementById('mapUnlocatedBtn').style.display = (noUbicadas.length || sinDireccion.length) ? 'inline-block' : 'none';
@@ -1814,7 +1893,24 @@ async function loadMap() {
       (sinDireccion.length ? `<div class="unlocTitle">Sin dirección cargada (${sinDireccion.length})</div>` +
         sinDireccion.map(p => `<div class="unlocItem"><div><b>${esc(p.nombre)}</b><div class="addr">Agregá la dirección en Pacientes → Editar</div></div></div>`).join('') : '');
   }
-  mapState = { addMarkersFor, refresh: () => refresh(true) };
+  let lastDone = false;
+  function applyFilter() {
+    const show = [], hide = [];
+    Object.values(markersByAddr).forEach(list => list.forEach(m => {
+      const color = mapPinColor(m._sivecPaciente);
+      m._sivecColor = color;
+      if (color) { m.setIcon(pinIcon(color)); if (!mapCluster.hasLayer(m)) show.push(m); }
+      else if (mapCluster.hasLayer(m)) hide.push(m);
+    }));
+    mapCluster.removeLayers(hide);
+    mapCluster.addLayers(show);
+    mapCluster.refreshClusters();
+    refresh(lastDone);
+  }
+  const counts = {};
+  MAP_FILTERS.forEach(f => { counts[f.key] = data.filter(f.test).length; });
+  renderMapFilterChips(counts);
+  mapState = { addMarkersFor, applyFilter, refresh: () => refresh(true) };
 
   // 1) Mostrar al instante lo que ya está en caché.
   const now = Date.now();
