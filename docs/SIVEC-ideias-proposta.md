@@ -109,3 +109,27 @@
 - **Segurança**: cada acesso a um resultado fica registrado (quem viu, quando, de qual centro).
 - **Padrão de interoperabilidade**: desenhar desde o início compatível com **HL7 FHIR** (ServiceRequest = pedido, DiagnosticReport/Observation = resultado), o que facilita integrar depois com o Oncológico, laboratórios privados e o Ministério.
 - **Impacto esperado**: menos estudos repetidos, menos papel perdido, menos viagens da paciente só para buscar resultado, e métricas reais de tempo de espera.
+
+### [23/09/2026] Imagens de raio X/ecografia e laudos com modelo pronto
+
+**Ideia do autor:** as **imagens** (raio X, eco) **precisam** estar no sistema, apesar de pesadas. O médico que informa deve ter o **laudo pré-pronto (modelo) para editar**.
+
+**Proposta de funcionamento (sugestão do Claude):**
+- **Imagens em dois níveis**
+  1. **Imagem para visualizar** (sempre): versão comprimida em JPEG/WebP (~0,3–1 MB por imagem), com visor web simples (zoom, brilho/contraste, girar). Abre rápido até com internet fraca.
+  2. **Arquivo original** (quando existir): o DICOM do equipamento digital, guardado em armazenamento separado ("arquivo frio", mais barato), baixado só quando o especialista precisa. Mais adiante, visor DICOM completo (ex.: OHIF, software livre).
+- **Como a imagem entra**, conforme o equipamento de cada centro:
+  - equipamento digital (CR/DR, ecógrafo com saída): exportar a imagem/DICOM e subir;
+  - equipamento com filme: **foto do filme no negatoscópio** com o celular, direto no sistema (menor qualidade, mas melhor que papel perdido);
+  - ecografia: capturas-chave do ecógrafo.
+  → Fazer **levantamento dos equipamentos** de cada centro da Red Centro (dado importante para a proposta).
+- **Estimativa de espaço** (a validar com números reais):
+  - só JPEG/WebP: ~0,5 MB × 10.000 estudos/ano ≈ **5 GB/ano** → barato;
+  - com DICOM original: ~10–30 MB por estudo → **100–300 GB/ano** → requer orçamento e política de retenção (ex.: original por X anos, versão leve permanente).
+- **Laudos com modelos editáveis**
+  - **Modelos por tipo de estudo** (ex.: RX de tórax normal, eco obstétrica, eco pélvica, eco abdominal…) com o texto padrão e campos a preencher (medidas, idade gestacional etc.).
+  - Botão **"Normal"**: carrega o modelo normal inteiro; o médico **só edita o que muda**.
+  - **Frases frequentes** reutilizáveis e modelos próprios de cada médico.
+  - Campos estruturados onde fizer sentido (ex.: medidas da eco) → permitem estatísticas e alertas.
+  - Laudo **assinado** (nome, matrícula, data/hora); depois de assinado, qualquer correção fica registrada como **adendo** (não se apaga o original).
+- O laudo + imagens aparecem no **Historial** do paciente em qualquer centro, e o solicitante recebe o aviso "resultado disponível".
