@@ -164,6 +164,25 @@
   #listView.active { padding: 0; display: flex; flex-direction: column; height: 100%; }
   #statsBar { display: flex; gap: 10px; padding: 10px 22px; background: #fff; border-bottom: 1px solid var(--line); flex-wrap: wrap; flex-shrink: 0; }
   .stat { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: var(--paper); font-size: 13px; border: 1px solid var(--line); }
+  .statBtn { font-family: inherit; color: var(--ink); cursor: pointer; transition: box-shadow .15s, border-color .15s, transform .1s; }
+  .statBtn:hover { border-color: var(--teal-500); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .statBtn:active { transform: scale(0.97); }
+  .statBtn.on { border-color: var(--teal-700); background: var(--surface); box-shadow: 0 0 0 2px color-mix(in srgb, var(--teal-700) 25%, transparent); font-weight: 600; }
+  #quickFilterTag { display: none; align-items: center; gap: 6px; font-size: 12.5px; background: color-mix(in srgb, var(--teal-700) 12%, var(--surface)); color: var(--ink); border: 1px solid var(--teal-500); border-radius: 999px; padding: 5px 6px 5px 12px; }
+  #quickFilterTag button { border: none; background: var(--teal-700); color: #fff; border-radius: 999px; width: 20px; height: 20px; cursor: pointer; font-size: 11px; line-height: 1; }
+  .bannerBtn { margin-left: auto; border: 1px solid currentColor; background: rgba(255,255,255,0.7); color: inherit; border-radius: 8px; padding: 5px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  body.dark .bannerBtn { background: transparent; }
+  .bannerHint { font-size: 12px; color: var(--ink-soft); }
+  .moreWrap { position: relative; display: inline-block; }
+  .moreMenu { display: none; position: absolute; right: 0; top: calc(100% + 4px); z-index: 50; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); padding: 5px; min-width: 150px; }
+  .moreWrap.open .moreMenu { display: block; }
+  .patientCard { position: relative; }
+  .patientCard:has(.moreWrap.open) { z-index: 30; transform: none !important; }
+  .moreMenu { min-width: 190px; white-space: nowrap; }
+  .moreMenu button { display: block; width: 100%; text-align: left; border: none !important; background: none !important; padding: 8px 10px !important; border-radius: 7px; font-size: 13px; cursor: pointer; color: var(--ink); }
+  .moreMenu button:hover { background: var(--paper) !important; }
+  .moreMenu button.danger { color: #b91c1c; }
+  .moreMenu hr { border: none; border-top: 1px solid var(--line); margin: 4px 2px; }
   .dot { width: 9px; height: 9px; border-radius: 50%; }
   #tableWrap { flex: 1; overflow: auto; padding: 0 22px 22px; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; }
@@ -454,8 +473,8 @@
   <div id="content">
     <!-- FORM -->
     <div id="formView" class="view active">
-      <h2>Registrar toma de PAP</h2>
-      <p class="hint">Reemplaza al Formulario 1 de Google Forms.</p>
+      <h2>Registrar toma (PAP / VPH)</h2>
+      <p class="hint">Completá los datos de la paciente y de la toma. Los campos con * son obligatorios.</p>
       <form id="patientForm">
         <div class="formGrid">
           <div class="field"><label>Nombre completo *</label><input name="nombre" required></div>
@@ -562,16 +581,17 @@
     <!-- LIST -->
     <div id="listView" class="view">
       <div id="statsBar">
-        <div class="stat"><span class="dot" style="background:var(--positiva)"></span>Positivo PAP <b id="cPos">–</b></div>
-        <div class="stat"><span class="dot" style="background:var(--negativa)"></span>Negativo PAP <b id="cNeg">–</b></div>
-        <div class="stat"><span class="dot" style="background:var(--pendiente)"></span>Pendiente PAP <b id="cPend">–</b></div>
-        <div class="stat"><span class="dot" style="background:var(--positiva-vph)"></span>VPH+ <b id="cVph">–</b></div>
-        <div class="stat" title="Cantidad de registros (tomas)">Total <b id="cTotal">–</b></div>
+        <button type="button" class="stat statBtn" data-quick="pap:Positivo" title="Mostrar solo estas pacientes"><span class="dot" style="background:var(--positiva)"></span>Positivo PAP <b id="cPos">–</b></button>
+        <button type="button" class="stat statBtn" data-quick="pap:Negativo" title="Mostrar solo estas pacientes"><span class="dot" style="background:var(--negativa)"></span>Negativo PAP <b id="cNeg">–</b></button>
+        <button type="button" class="stat statBtn" data-quick="pap:Pendiente" title="Mostrar solo estas pacientes"><span class="dot" style="background:var(--pendiente)"></span>Pendiente PAP <b id="cPend">–</b></button>
+        <button type="button" class="stat statBtn" data-quick="vph:Positiva" title="Mostrar solo estas pacientes"><span class="dot" style="background:var(--positiva-vph)"></span>VPH+ <b id="cVph">–</b></button>
+        <button type="button" class="stat statBtn" data-quick="" title="Cantidad de registros (tomas). Tocá para quitar el filtro">Total <b id="cTotal">–</b></button>
         <div class="stat" title="Pacientes distintas: se agrupan las tomas de la misma paciente (mismo carnet, o mismo nombre y fecha de nacimiento)">Pacientes únicas <b id="cUnicas">–</b></div>
       </div>
       <div id="listToolbar">
         <input type="text" id="searchInput" placeholder="🔎 Buscar por nombre o carnet...">
         <select id="filterDoctora"><option value="">Todas las doctoras</option></select>
+        <span id="quickFilterTag"><span id="quickFilterText"></span><button type="button" id="quickFilterClear" title="Quitar filtro">✕</button></span>
         <select id="filterTomas" title="Tomas repetidas de la misma paciente">
           <option value="">Todas las tomas</option>
           <option value="varias">🔁 Pacientes con varias tomas</option>
@@ -1568,48 +1588,66 @@ function renderBanners(data) {
   }
 
   const hoy = new Date().toISOString().slice(0, 10);
-  const atrasadas = data.filter(p => {
-    if (esSoloVph(p)) return false;
-    const estado = p.estado_pap || 'Pendiente';
-    const fechaEst = p.fecha_estimada || addDays(p.fecha_toma, 90);
-    return estado === 'Pendiente' && fechaEst && fechaEst < hoy;
-  });
+  const atrasadas = data.filter(esAtrasada);
   const obanner = document.getElementById('overdueBanner');
   if (atrasadas.length) {
     obanner.style.display = 'flex';
-    obanner.innerHTML = `<span>⚠️ <b>${atrasadas.length} paciente${atrasadas.length > 1 ? 's' : ''} con resultado atrasado</b></span>` +
-      atrasadas.slice(0, 12).map(p => `<span class="overdueChip" data-id="${p.id}">${esc(p.nombre)}</span>`).join('') +
-      (atrasadas.length > 12 ? `<span style="font-size:12px;color:var(--ink-soft)">+${atrasadas.length - 12} más</span>` : '');
-    obanner.querySelectorAll('.overdueChip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const p = data.find(x => String(x.id) === String(chip.dataset.id));
-        if (p) openEdit(p);
-      });
-    });
+    obanner.innerHTML = `<span>⚠️ <b>${atrasadas.length} paciente${atrasadas.length > 1 ? 's' : ''} con resultado atrasado</b> <span class="bannerHint">· pasaron más de 90 días desde la toma y el PAP sigue pendiente</span></span>` +
+      `<button type="button" class="bannerBtn" data-quick="atrasadas">${listQuick === 'atrasadas' ? 'Ver todas' : 'Ver solo estas'}</button>`;
   } else {
     obanner.style.display = 'none';
     obanner.innerHTML = '';
   }
 
   const en30dias = addDays(hoy, 30);
-  const vencimientos = data.filter(p => p.anticonceptivo_proximo_control && p.anticonceptivo_proximo_control <= en30dias);
+  const vencimientos = data.filter(esVencimiento);
   const vbanner = document.getElementById('vencimientoBanner');
   if (vencimientos.length) {
     vbanner.style.display = 'flex';
-    vbanner.innerHTML = `<span>🔔 <b>${vencimientos.length} método${vencimientos.length > 1 ? 's' : ''} anticonceptivo${vencimientos.length > 1 ? 's' : ''} por vencer</b></span>` +
-      vencimientos.slice(0, 12).map(p => `<span class="vencChip" data-id="${p.id}">${esc(p.nombre)} · ${fmtFecha(p.anticonceptivo_proximo_control)}</span>`).join('') +
-      (vencimientos.length > 12 ? `<span style="font-size:12px;color:var(--ink-soft)">+${vencimientos.length - 12} más</span>` : '');
-    vbanner.querySelectorAll('.vencChip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const p = data.find(x => String(x.id) === String(chip.dataset.id));
-        if (p) openEdit(p);
-      });
-    });
+    vbanner.innerHTML = `<span>🔔 <b>${vencimientos.length} método${vencimientos.length > 1 ? 's' : ''} anticonceptivo${vencimientos.length > 1 ? 's' : ''} por vencer</b> <span class="bannerHint">· en los próximos 30 días o ya vencidos</span></span>` +
+      `<button type="button" class="bannerBtn" data-quick="vencimientos">${listQuick === 'vencimientos' ? 'Ver todas' : 'Ver solo estas'}</button>`;
   } else {
     vbanner.style.display = 'none';
     vbanner.innerHTML = '';
   }
 }
+
+// ---- Filtro rápido (contadores y avisos de la lista) ----
+let listQuick = '';
+const QUICK_LABEL = { 'pap:Positivo': 'Positivo PAP', 'pap:Negativo': 'Negativo PAP', 'pap:Pendiente': 'Pendiente PAP', 'vph:Positiva': 'VPH+', atrasadas: 'Resultado atrasado', vencimientos: 'Método por vencer' };
+function esAtrasada(p) {
+  if (esSoloVph(p)) return false;
+  const fechaEst = p.fecha_estimada || addDays(p.fecha_toma, 90);
+  return (p.estado_pap || 'Pendiente') === 'Pendiente' && !!fechaEst && fechaEst < new Date().toISOString().slice(0, 10);
+}
+function esVencimiento(p) { return !!p.anticonceptivo_proximo_control && p.anticonceptivo_proximo_control <= addDays(new Date().toISOString().slice(0, 10), 30); }
+function pasaQuick(p) {
+  switch (listQuick) {
+    case 'pap:Positivo': return !esSoloVph(p) && p.estado_pap === 'Positivo';
+    case 'pap:Negativo': return !esSoloVph(p) && p.estado_pap === 'Negativo';
+    case 'pap:Pendiente': return !esSoloVph(p) && (p.estado_pap || 'Pendiente') === 'Pendiente';
+    case 'vph:Positiva': return p.resultado_vph === 'Positiva';
+    case 'atrasadas': return esAtrasada(p);
+    case 'vencimientos': return esVencimiento(p);
+    default: return true;
+  }
+}
+function setListQuick(q) {
+  listQuick = listQuick === q ? '' : q; // tocar de nuevo el mismo filtro lo quita
+  document.querySelectorAll('.statBtn').forEach(b => b.classList.toggle('on', !!listQuick && b.dataset.quick === listQuick));
+  document.querySelectorAll('.bannerBtn[data-quick]').forEach(b => { b.textContent = b.dataset.quick === listQuick ? 'Ver todas' : 'Ver solo estas'; });
+  const tag = document.getElementById('quickFilterTag');
+  tag.style.display = listQuick ? 'inline-flex' : 'none';
+  document.getElementById('quickFilterText').textContent = listQuick ? 'Filtro: ' + QUICK_LABEL[listQuick] : '';
+  applyListFilters();
+  document.getElementById('tableWrap').scrollTop = 0;
+}
+document.getElementById('statsBar').addEventListener('click', e => { const b = e.target.closest('.statBtn'); if (b) setListQuick(b.dataset.quick); });
+document.getElementById('quickFilterClear').addEventListener('click', () => { listQuick = 'x'; setListQuick('x'); });
+document.addEventListener('click', e => {
+  const b = e.target.closest('.bannerBtn[data-quick]');
+  if (b) setListQuick(b.dataset.quick);
+});
 
 function applyListFilters() {
   const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
@@ -1620,26 +1658,27 @@ function applyListFilters() {
   const tomasF = document.getElementById('filterTomas').value;
   if (tomasF === 'varias') filtered = filtered.filter(p => (tomasIndex.get(p.id) || {}).grupo?.length > 1);
   if (tomasF === 'duplicado') filtered = filtered.filter(p => (tomasIndex.get(p.id) || {}).mismaFecha);
+  const base = filtered; // los contadores muestran el total antes del filtro rápido
+  if (listQuick) filtered = filtered.filter(pasaQuick);
   if (tomasF) filtered = filtered.slice().sort((a, b) => {
     const ga = tomasIndex.get(a.id), gb = tomasIndex.get(b.id);
     const ka = ga ? normTxt(ga.grupo[0].nombre) + ga.grupo[0].id : '', kb = gb ? normTxt(gb.grupo[0].nombre) + gb.grupo[0].id : '';
     return ka.localeCompare(kb) || String(a.fecha_toma || '').localeCompare(String(b.fecha_toma || ''));
   });
-  renderPatientCards(filtered);
+  renderPatientCards(filtered, base);
 }
 
-function renderPatientCards(data) {
+function renderPatientCards(data, base) {
   const counts = { Positivo: 0, Negativo: 0, Pendiente: 0, VphPos: 0 };
+  (base || data).forEach(p => {
+    if (!esSoloVph(p)) { const k = p.estado_pap || 'Pendiente'; counts[k] = (counts[k] || 0) + 1; }
+    if (p.resultado_vph === 'Positiva') counts.VphPos++;
+  });
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
   const hoy = new Date().toISOString().slice(0, 10);
   data.forEach(p => {
     const estado = estadoDe(p);
-    if (!esSoloVph(p)) {
-      const estadoPapKey = p.estado_pap || 'Pendiente';
-      counts[estadoPapKey] = (counts[estadoPapKey] || 0) + 1;
-    }
-    if (p.resultado_vph === 'Positiva') counts.VphPos++;
     const fechaEst = p.fecha_estimada || addDays(p.fecha_toma, 90);
     const atrasado = estado === 'Pendiente' && fechaEst && fechaEst < hoy;
     const card = document.createElement('div');
@@ -1680,19 +1719,25 @@ function renderPatientCards(data) {
       </div>
       <div class="pcActions">
         ${esCumpleanosHoy(p.fecha_nacimiento) ? `<button class="rowBtn bdayBtn" data-id="${p.id}" style="background:#fff3e0;border-color:#f3c98f">🎉 Felicitar</button>` : ''}
-        <button class="rowBtn printBtn" data-id="${p.id}">Imprimir</button>
-        <button class="rowBtn colpBtn" data-id="${p.id}">Colposcopia</button>
         <button class="rowBtn editBtn" data-id="${p.id}">Editar</button>
-        <button class="rowBtn delBtn" data-id="${p.id}">Excluir</button>
+        <button class="rowBtn printBtn" data-id="${p.id}">Imprimir</button>
+        <span class="moreWrap"><button class="rowBtn moreBtn" title="Más acciones" aria-label="Más acciones">⋯</button>
+          <span class="moreMenu">
+            <button class="rowBtn colpBtn" data-id="${p.id}">🔬 Colposcopia</button>
+            <hr>
+            <button class="rowBtn delBtn danger" data-id="${p.id}">🗑 Excluir paciente</button>
+          </span>
+        </span>
       </div>`;
     tbody.appendChild(card);
   });
+  if (!data.length) tbody.innerHTML = `<div class="hint" style="padding:30px;text-align:center">No hay pacientes con este filtro.</div>`;
   document.getElementById('cPos').textContent = counts.Positivo;
   document.getElementById('cVph').textContent = counts.VphPos;
   document.getElementById('cNeg').textContent = counts.Negativo;
   document.getElementById('cPend').textContent = counts.Pendiente;
-  document.getElementById('cTotal').textContent = data.length;
-  const unicas = new Set(data.map(p => { const t = tomasIndex.get(p.id); return t ? t.grupo[0].id : p.id; })).size;
+  document.getElementById('cTotal').textContent = (base || data).length;
+  const unicas = new Set((base || data).map(p => { const t = tomasIndex.get(p.id); return t ? t.grupo[0].id : p.id; })).size;
   document.getElementById('cUnicas').textContent = unicas;
 }
 
@@ -2381,6 +2426,14 @@ let editingId = null;
 document.getElementById('tableBody').addEventListener('click', (e) => {
   const btn = e.target.closest('button');
   if (!btn) return;
+  if (btn.classList.contains('moreBtn')) {
+    const wrap = btn.closest('.moreWrap'), abrir = !wrap.classList.contains('open');
+    document.querySelectorAll('.moreWrap.open').forEach(w => w.classList.remove('open'));
+    if (abrir) wrap.classList.add('open');
+    e.stopPropagation();
+    return;
+  }
+  document.querySelectorAll('.moreWrap.open').forEach(w => w.classList.remove('open'));
   const id = btn.dataset.id;
   const patient = currentPatients.find(p => String(p.id) === String(id));
   if (!patient) return;
@@ -2390,6 +2443,8 @@ document.getElementById('tableBody').addEventListener('click', (e) => {
   if (btn.classList.contains('colpBtn')) openColposcopia(patient);
   if (btn.classList.contains('bdayBtn')) openBirthdayModal(patient);
 });
+
+document.addEventListener('click', e => { if (!e.target.closest('.moreWrap')) document.querySelectorAll('.moreWrap.open').forEach(w => w.classList.remove('open')); });
 
 function openEdit(p) {
   editingId = p.id;
