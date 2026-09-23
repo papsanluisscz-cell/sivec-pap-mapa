@@ -172,3 +172,4 @@
 - **Não decide condutas**: apoia a leitura; a decisão é do profissional.
 - Cada consulta fica no **registro de auditoria**.
 - **Privacidade**: enviar dados de pacientes a um serviço de IA externo exige **autorização institucional** e acordo de proteção de dados; alternativa: rodar o modelo em servidor próprio. Decidir isso com a Red/SEDES.
+- **Decisão do autor (23/09/2026):** aprovado incluir no plano. Na proposta, apresentar o **Resumo clínico** como **entrega garantida** e o **assistente em conversa** como **evolução** (depende de autorização sobre privacidade/IA).
