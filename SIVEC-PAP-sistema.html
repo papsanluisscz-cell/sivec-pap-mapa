@@ -409,10 +409,21 @@
   #loginBox { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 32px; width: 340px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
   #loginBox .field input { width: 100%; }
   #blocker button { background: var(--teal-700); color: #fff; border: none; padding: 9px 18px; border-radius: 7px; cursor: pointer; font-size: 13.5px; }
+  /* Impresión del Balance: se libera la altura fija de la pantalla para que salgan TODAS las hojas */
   @media print {
-    body * { visibility: hidden; }
-    #balancePrintArea, #balancePrintArea * { visibility: visible; }
-    #balancePrintArea { position: absolute; left: 0; top: 0; width: 100%; }
+    @page { size: A4 landscape; margin: 10mm; }
+    body.printingBalance, body.printingBalance #app, body.printingBalance #content, body.printingBalance #balanceView {
+      height: auto !important; min-height: 0 !important; overflow: visible !important; display: block !important; position: static !important; background: #fff !important; color: #000 !important; }
+    body.printingBalance > *:not(#app) { display: none !important; }
+    body.printingBalance #app > *:not(#content) { display: none !important; }
+    body.printingBalance #content > *:not(#balanceView) { display: none !important; }
+    body.printingBalance #balanceView > *:not(#balanceResultado) { display: none !important; }
+    body.printingBalance #balanceView { padding: 0 !important; }
+    body.printingBalance #balancePrintArea h3 { margin: 0 0 2px; font-size: 14pt; }
+    body.printingBalance #balancePrintArea table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+    body.printingBalance #balancePrintArea thead { display: table-header-group; } /* encabezado repetido en cada hoja */
+    body.printingBalance #balancePrintArea tr { page-break-inside: avoid; break-inside: avoid; }
+    body.printingBalance #balancePrintArea th, body.printingBalance #balancePrintArea td { border: 1px solid #999; padding: 3px 4px; color: #000; background: #fff; }
   }
 </style>
 </head>
@@ -1416,7 +1427,11 @@ async function loadBalance() {
   document.getElementById('balancePdfBtn').style.display = 'inline-block';
 }
 document.getElementById('balanceBuscarBtn').addEventListener('click', loadBalance);
-document.getElementById('balanceImprimirBtn').addEventListener('click', () => window.print());
+document.getElementById('balanceImprimirBtn').addEventListener('click', () => {
+  document.body.classList.add('printingBalance');
+  window.print();
+});
+window.addEventListener('afterprint', () => document.body.classList.remove('printingBalance'));
 document.getElementById('balancePdfBtn').addEventListener('click', generateBalancePdf);
 
 async function generateBalancePdf() {
@@ -1430,6 +1445,17 @@ async function generateBalancePdf() {
   let y = 0;
   let page;
 
+  // Las fuentes estándar del PDF no tienen todos los caracteres (emojis, acentos combinados, etc.):
+  // se normaliza el texto y se reemplaza lo que no se puede dibujar, para que el PDF nunca falle.
+  const okChar = {};
+  const safe = (s) => Array.from(String(s == null ? '' : s).normalize('NFC')
+    .replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/[\u2013\u2014]/g, '-').replace(/\s+/g, ' '))
+    .map(ch => {
+      if (!(ch in okChar)) { try { font.encodeText(ch); fontBold.encodeText(ch); okChar[ch] = true; } catch (e) { okChar[ch] = false; } }
+      return okChar[ch] ? ch : (ch.normalize('NFD').replace(/[\u0300-\u036f]/g, '') || '?');
+    }).map(ch => { if (!(ch in okChar)) { try { font.encodeText(ch); okChar[ch] = true; } catch (e) { okChar[ch] = false; } } return okChar[ch] ? ch : ''; }).join('');
+  const pages = [];
+
   const cols = [
     { label: '#', w: 22 }, { label: 'Nombre', w: 130 }, { label: 'Carnet', w: 60 },
     { label: 'Fecha nac.', w: 58 }, { label: 'Edad', w: 32 }, { label: 'Celular', w: 60 },
@@ -1439,6 +1465,7 @@ async function generateBalancePdf() {
 
   function newPage() {
     page = pdfDoc.addPage([pageW, pageH]);
+    pages.push(page);
     y = pageH - 40;
     page.drawText(`Balance Semanal — ${fmtFecha(lastBalanceRange.inicio)} a ${fmtFecha(lastBalanceRange.fin)}`, {
       x: marginX, y, size: 13, font: fontBold,
@@ -1467,13 +1494,15 @@ async function generateBalancePdf() {
     let x = marginX;
     vals.forEach((v, ci) => {
       const maxChars = Math.floor(cols[ci].w / 4.2);
-      const text = v.length > maxChars ? v.slice(0, maxChars - 1) + '…' : v;
+      const sv = safe(v);
+      const text = sv.length > maxChars ? sv.slice(0, maxChars - 1) + '...' : sv;
       page.drawText(text, { x, y, size: 7.5, font });
       x += cols[ci].w;
     });
     y -= 15;
   });
 
+  pages.forEach((pg, i) => pg.drawText(`Hoja ${i + 1} de ${pages.length}`, { x: pageW - marginX - 60, y: 20, size: 8, font, color: PDFLib.rgb(0.45, 0.45, 0.45) }));
   const bytes = await pdfDoc.save();
   const blob = new Blob([bytes], { type: 'application/pdf' });
   const url = URL.createObjectURL(blob);
