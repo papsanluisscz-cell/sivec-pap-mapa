@@ -24,20 +24,32 @@ No hace falta nada más: el sistema detecta las columnas solo. Si no se crean, t
 
 ---
 
-## Paso 2 — Proteger los datos de las pacientes (IMPORTANTE)
+## Paso 2 — Genotipo del VPH (recomendado, sin riesgo)
+
+Agrega el campo "Genotipo VPH" (16, 18, otros de alto riesgo) en Editar paciente cuando el VPH es positivo.
+
+```sql
+alter table pacientes add column if not exists vph_genotipo text;
+```
+
+Sin esta columna el campo aparece deshabilitado y todo lo demás funciona igual.
+
+---
+
+## Paso 3 — Proteger los datos de las pacientes (IMPORTANTE)
 
 Hoy cualquiera que tenga la URL y la clave *anon* de Supabase puede leer todos los datos.
 El login del sistema solo esconde la pantalla; la protección real son las reglas **RLS**.
 
-### 2.1 Crear las cuentas
+### 3.1 Crear las cuentas
 Supabase → **Authentication → Users → Add user → Create new user**: un correo y contraseña
 para cada doctora/persona que usa el sistema (marcar *Auto Confirm User*).
 
-### 2.2 Probar el login
+### 3.2 Probar el login
 En cada computadora: ⚙ Configuración → **Exigir inicio de sesión** → entrar con el correo y
 la contraseña creados. Verificar que todo carga bien.
 
-### 2.3 Activar RLS (recién cuando todas puedan entrar)
+### 3.3 Activar RLS (recién cuando todas puedan entrar)
 
 ```sql
 alter table pacientes enable row level security;

@@ -16,10 +16,11 @@
     --surface: #ffffff; --header-grad: linear-gradient(135deg, #6d2142 0%, #9c3a5f 100%);
   }
   body.dark {
-    --teal-900: #a855f7; --teal-700: #9333ea; --teal-500: #c084fc;
-    --paper: #0d0e21; --ink: #eeedf9; --ink-soft: #9795c0; --line: #2a2b4d;
-    --positiva: #c084fc; --positiva-vph: #f472b6; --negativa: #fb923c; --pendiente: #60a5fa;
-    --surface: #161830; --header-grad: linear-gradient(135deg, #0d0e21 0%, #3b0f6b 60%, #9333ea 100%);
+    /* Misma identidad bordó que el modo claro, en tonos oscuros */
+    --teal-900: #f1a7c3; --teal-700: #d9678f; --teal-500: #e88fb0;
+    --paper: #150c11; --ink: #f3e9ed; --ink-soft: #b596a3; --line: #3a2530;
+    --positiva: #a78bfa; --positiva-vph: #f87171; --negativa: #fb923c; --pendiente: #60a5fa;
+    --surface: #211419; --header-grad: linear-gradient(135deg, #1c0a13 0%, #4a1630 55%, #7d2a4c 100%);
   }
   body.dark #app { background: var(--paper); }
   body.dark .patientCard, body.dark #editModal, body.dark #colpModal, body.dark #birthdayModal,
@@ -63,7 +64,7 @@
   header h1.brandName { font-size: 24px; font-weight: 900; letter-spacing: 1.5px; line-height: 1.05; display: flex; align-items: center; gap: 8px; }
   header .brandMod { font-size: 11.5px; font-weight: 800; letter-spacing: 1px; padding: 3px 8px 3px 9px; border-radius: 7px; background: #fff; color: var(--teal-900); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
   header .brandMod i { font-style: normal; opacity: 0.45; margin: 0 1px; }
-  body.dark header .brandMod { color: #3b0f6b; }
+  body.dark header .brandMod { color: #7d2a4c; }
   header .brandSigla { font-size: 11.5px; letter-spacing: 0.3px; color: rgba(255,255,255,0.72); margin-top: 3px; }
   header .brandSigla b { color: #fff; font-weight: 800; font-size: 12.5px; }
   @media (max-width: 700px) { header .brandMark { display: none; } header h1.brandName { font-size: 20px; } header .brandSigla { font-size: 10.5px; } }
@@ -78,8 +79,11 @@
   nav button:active { transform: translateY(0) scale(0.95); }
   nav button.active { background: #fff; color: var(--teal-900); font-weight: 600; }
   nav button.active .navLabel { font-weight: 700; }
+  body.dark nav button.active { color: #7d2a4c; }
   .headerActions { display: flex; align-items: center; gap: 6px; }
   .headerActions button { background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 6px 9px; border-radius: 7px; cursor: pointer; font-size: 13px; white-space: nowrap; transition: transform .18s ease; line-height: 1; }
+  .headerActions button svg { width: 17px; height: 17px; display: block; }
+  .headerActions button { padding: 7px 8px; }
   #settingsBtn:hover { transform: rotate(20deg) scale(1.08); }
   #darkModeBtn:hover { transform: rotate(-14deg) scale(1.08); }
   #helpBtn:hover { transform: scale(1.1); }
@@ -162,7 +166,7 @@
 
   /* List view */
   #listView.active { padding: 0; display: flex; flex-direction: column; height: 100%; }
-  #statsBar { display: flex; gap: 10px; padding: 10px 22px; background: #fff; border-bottom: 1px solid var(--line); flex-wrap: wrap; flex-shrink: 0; }
+  #statsBar { display: flex; gap: 10px; padding: 10px 22px; background: var(--surface); border-bottom: 1px solid var(--line); flex-wrap: wrap; flex-shrink: 0; }
   .stat { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: var(--paper); font-size: 13px; border: 1px solid var(--line); }
   .statBtn { font-family: inherit; color: var(--ink); cursor: pointer; transition: box-shadow .15s, border-color .15s, transform .1s; }
   .statBtn:hover { border-color: var(--teal-500); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
@@ -202,6 +206,33 @@
   .pcMeta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
   .pcLabel { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin-bottom: 3px; font-weight: 600; }
   .pcValue { font-size: 13px; color: var(--ink); }
+  .kpiGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; margin: 6px 0 18px; }
+  .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .kpi .kv { font-size: 26px; font-weight: 800; color: var(--ink); line-height: 1.1; }
+  .kpi .kl { font-size: 12.5px; font-weight: 600; color: var(--ink); margin-top: 4px; }
+  .kpi .ks { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
+  .kpi .kbar { height: 5px; border-radius: 3px; background: var(--line); margin-top: 8px; overflow: hidden; }
+  .kpi .kbar i { display: block; height: 100%; border-radius: 3px; }
+  .pcName > span { white-space: nowrap; }
+  .pcMuted { font-size: 12px; color: var(--ink-soft); font-style: italic; }
+  .pcPaso { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 7px; border: 1px solid transparent; }
+  .pcPaso.tone-red { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+  .pcPaso.tone-amber { background: #fff4d6; color: #8a5300; border-color: #f7dd9c; }
+  .pcPaso.tone-blue { background: #e3eefb; color: #1e4f86; border-color: #c4dbf5; }
+  .pcPaso.tone-green { background: #dcf5e9; color: #0d6b47; border-color: #b8ead2; }
+  .pcPaso.tone-gray { background: var(--paper); color: var(--ink-soft); border-color: var(--line); }
+  body.dark .pcPaso.tone-red { background: #3b1219; color: #fca5a5; border-color: #5c1d27; }
+  body.dark .pcPaso.tone-amber { background: #3a2a0c; color: #fcd34d; border-color: #5a4212; }
+  body.dark .pcPaso.tone-blue { background: #132741; color: #93c5fd; border-color: #1f3d63; }
+  body.dark .pcPaso.tone-green { background: #0e2e22; color: #6ee7b7; border-color: #16493a; }
+  .edadWarn { margin-top: 5px; font-size: 12px; color: #7c2d12; background: #ffedd5; border: 1px solid #fed7aa; border-radius: 7px; padding: 5px 8px; }
+  body.dark .edadWarn { background: #3a1d0c; color: #fdba74; border-color: #5a2e12; }
+  .edadBadge { font-size: 11px; font-weight: 600; color: #7c2d12; background: #ffedd5; border-radius: 6px; padding: 1px 6px; margin-left: 4px; }
+  .betCode { font-weight: 700; font-size: 13px; }
+  .betCode.alto { color: #b91c1c; } .betCode.bajo { color: #b45309; } .betCode.neg { color: #15803d; } .betCode.insat { color: #6b7280; }
+  body.dark .betCode.alto { color: #fca5a5; } body.dark .betCode.bajo { color: #fcd34d; } body.dark .betCode.neg { color: #6ee7b7; }
+  .moreCardsBtn { display: block; margin: 14px auto 4px; padding: 10px 22px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .moreCardsBtn:hover { border-color: var(--teal-500); }
   .pcActions { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
   @media (max-width: 1100px) {
     .patientCard { grid-template-columns: 1fr 1fr; }
@@ -239,7 +270,7 @@
   .panelCard canvas { flex: 1; max-height: 240px; }
   #trashView { padding: 24px 32px; overflow-y: auto; }
   #metodosView { padding: 24px 32px; overflow-y: auto; }
-  #filterDoctora, #filterTomas { padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 13.5px; background: var(--surface); color: var(--ink); }
+  #filterDoctora, #filterTomas, #filterPaso { padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 13.5px; background: var(--surface); color: var(--ink); }
   #listView #listToolbar { margin: 12px 22px 12px; }
   #listView #overdueBanner, #listView #vencimientoBanner, #listView #birthdayBanner { margin-left: 22px; margin-right: 22px; }
   @media (max-width: 600px) { #listView #listToolbar, #listView #overdueBanner, #listView #vencimientoBanner, #listView #birthdayBanner { margin-left: 12px; margin-right: 12px; } }
@@ -463,10 +494,10 @@
       <button data-view="trash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span class="navLabel">Papelera</span></button>
     </nav>
     <div class="headerActions">
-      <button id="darkModeBtn" title="Modo oscuro">🌙</button>
-      <button id="helpBtn" title="Ayuda">❓</button>
-      <button id="settingsBtn" title="Configuración">⚙</button>
-      <button id="logoutBtn" title="Cerrar sesión" style="display:none">🚪</button>
+      <button id="darkModeBtn" title="Modo oscuro" aria-label="Modo oscuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></button>
+      <button id="helpBtn" title="Ayuda" aria-label="Ayuda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></button>
+      <button id="settingsBtn" title="Configuración" aria-label="Configuración"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.2 2h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7V4a2 2 0 0 0-2-2Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+      <button id="logoutBtn" title="Cerrar sesión" aria-label="Cerrar sesión" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg></button>
     </div>
   </header>
 
@@ -489,7 +520,7 @@
             </select>
           </div>
           <div class="field"><label>Fecha de toma *</label><input type="date" name="fecha_toma" required></div>
-          <div class="field"><label>Fecha de nacimiento</label><input type="date" name="fecha_nacimiento"></div>
+          <div class="field"><label>Fecha de nacimiento</label><input type="date" name="fecha_nacimiento"><div id="edadWarnReg" class="edadWarn" style="display:none"></div></div>
           <div class="field"><label>Celular</label><input name="celular"></div>
           <div class="field"><label>Estado civil</label>
             <select name="estado_civil">
@@ -597,6 +628,21 @@
           <option value="varias">🔁 Pacientes con varias tomas</option>
           <option value="duplicado">⚠️ Posibles duplicados (misma fecha)</option>
         </select>
+        <select id="filterPaso" title="Qué hay que hacer con cada paciente">
+          <option value="">Todos los próximos pasos</option>
+          <option value="urgente">🔴 Todo lo urgente</option>
+          <option value="buscar">🔴 Buscar resultado (atrasado)</option>
+          <option value="derivar">🔴 Derivar a colposcopia</option>
+          <option value="definir">🔴 Definir seguimiento</option>
+          <option value="entregar">🟠 Entregar resultado</option>
+          <option value="repetir">🟠 Repetir toma</option>
+          <option value="control_vencido">🟠 Control vencido</option>
+          <option value="revisar">🟠 Revisar datos (estado y resultado no coinciden)</option>
+          <option value="seguimiento">🔵 En seguimiento</option>
+          <option value="esperar">⚪ Esperando resultado</option>
+          <option value="control">🟢 Control al día</option>
+          <option value="edad">⚠️ Fuera del rango de edad</option>
+        </select>
         <button id="exportExcelBtn" class="rowBtn">📊 Descargar Excel</button>
       </div>
       <div id="overdueBanner" style="display:none"></div>
@@ -685,7 +731,10 @@
     <div id="panelView" class="view">
       <h2>Panel</h2>
       <p class="hint">Resumen visual de la base de pacientes.</p>
+      <div id="kpiGrid" class="kpiGrid"></div>
       <div class="panelGrid">
+        <div class="panelCard"><h3>Resultados PAP por clasificación (Bethesda)</h3><canvas id="chartBethesda"></canvas></div>
+        <div class="panelCard"><h3>Pacientes por edad</h3><canvas id="chartEdad"></canvas></div>
         <div class="panelCard"><h3>Estado del PAP</h3><canvas id="chartEstadoPap"></canvas></div>
         <div class="panelCard"><h3>VPH (entre testeadas)</h3><canvas id="chartVph"></canvas></div>
         <div class="panelCard"><h3>Tomas por mes (últimos 12 meses)</h3><canvas id="chartMensual"></canvas></div>
@@ -733,6 +782,18 @@
   <p class="hint" style="margin-top:0">Por defecto, el sistema crea sola una carpeta llamada "SIVEC-PAP Documentos" en la raíz de tu Drive. Si preferís usar otra carpeta que ya tengas, abrí esa carpeta en Drive, copiá el código que aparece al final de la URL (después de /folders/) y pegalo acá.</p>
   <input id="driveFolderInput" placeholder="Ej: 1A2bC3dEfGhIjKlmNoPQrstuVwxYZ">
   <button class="primary" onclick="saveDriveFolder()">Guardar carpeta</button>
+
+  <label style="margin-top:24px">Criterios clínicos</label>
+  <p class="hint" style="margin-top:0">Ajustalos según la norma nacional vigente. Se usan para el "Próximo control" y la alerta de edad.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;font-size:12.5px">
+    <span>Control tras PAP negativo (años)</span><input id="cfgPapAnios" type="number" min="0" max="10">
+    <span>Control tras VPH negativo (años)</span><input id="cfgVphAnios" type="number" min="0" max="10">
+    <span>Edad objetivo PAP: desde</span><input id="cfgPapMin" type="number" min="0" max="120">
+    <span>Edad objetivo PAP: hasta</span><input id="cfgPapMax" type="number" min="0" max="120">
+    <span>Edad objetivo VPH: desde</span><input id="cfgVphMin" type="number" min="0" max="120">
+    <span>Edad objetivo VPH: hasta</span><input id="cfgVphMax" type="number" min="0" max="120">
+  </div>
+  <button class="primary" onclick="saveClinCfg()">Guardar criterios</button>
 
   <label style="margin-top:24px">Seguridad</label>
   <label style="display:flex;gap:8px;align-items:center;font-weight:600"><input type="checkbox" id="requireLoginChk" style="width:auto"> Exigir inicio de sesión</label>
@@ -916,7 +977,9 @@
         <div class="field"><label>Estado del PAP<span class="helpTip" data-tip="Se queda en Pendiente hasta que edités la ficha con el resultado real del laboratorio. Cambialo a Positivo o Negativo apenas llegue el resultado.">ⓘ</span></label>
           <select name="estado_pap"><option>Pendiente</option><option>Positivo</option><option>Negativo</option></select>
         </div>
-        <div class="field"><label>Resultado del PAP</label><input name="resultado_pap" placeholder="ASC-US, LSIL, HSIL..."></div>
+        <div class="field"><label>Resultado del PAP<span class="helpTip" data-tip="Elegí la clasificación Bethesda: completa el resultado y cambia el Estado del PAP solo (NILM → Negativo; ASC-US, LSIL, ASC-H, HSIL, AGC, AIS, Carcinoma → Positivo). Podés agregar detalles escribiendo en el campo de texto.">ⓘ</span></label>
+          <select id="bethesdaSel" style="margin-bottom:6px"><option value="">Elegir clasificación Bethesda…</option></select>
+          <input name="resultado_pap" placeholder="Detalle del informe (opcional)"></div>
       </div>
       <div class="field"><label>Fecha estimada de resultado<span class="helpTip" data-tip="Se calcula sola (90 días después de la toma). Podés cambiarla si el laboratorio avisó un plazo distinto.">ⓘ</span></label><input type="date" name="fecha_estimada"></div>
       <div id="segPapFields" style="display:none">
@@ -933,6 +996,10 @@
         <div class="field"><label>Recibió tratamiento VPH</label>
           <select name="recibio_tratamiento_vph"><option value="false">No</option><option value="true">Sí</option></select>
         </div>
+      </div>
+      <div class="field" id="genotipoField" style="display:none"><label>Genotipo VPH</label>
+        <select id="vphGenotipoSel"><option value="">— Sin dato —</option><option>16</option><option>18</option><option>16 y 18</option><option>16 + otros de alto riesgo</option><option>18 + otros de alto riesgo</option><option>Otros de alto riesgo</option></select>
+        <div class="hint" id="genotipoHint" style="display:none;margin-top:4px">Para guardar el genotipo hay que ejecutar el Paso 2 de SUPABASE-SQL.md (una columna nueva).</div>
       </div>
       <div id="segVphFields" style="display:none">
         <div class="row2">
@@ -1095,7 +1162,7 @@ async function init() {
   document.getElementById('darkModeBtn').addEventListener('click', toggleDarkMode);
   if (localStorage.getItem('sivec_dark') === '1') {
     document.body.classList.add('dark');
-    document.getElementById('darkModeBtn').textContent = '☀️';
+    setDarkIcon(true);
   }
   document.querySelectorAll('.helpTip').forEach(el => {
     el.addEventListener('click', (e) => { e.stopPropagation(); e.preventDefault(); el.classList.toggle('show'); });
@@ -1111,6 +1178,7 @@ async function init() {
   document.getElementById('searchInput').addEventListener('input', applyListFilters);
   document.getElementById('filterDoctora').addEventListener('change', applyListFilters);
   document.getElementById('filterTomas').addEventListener('change', applyListFilters);
+  document.getElementById('filterPaso').addEventListener('change', applyListFilters);
   document.getElementById('exportExcelBtn').addEventListener('click', exportPatientsToExcel);
 
   const { url, key } = getConfig();
@@ -1118,6 +1186,8 @@ async function init() {
   document.getElementById('keyInput').value = key;
   document.getElementById('driveFolderInput').value = localStorage.getItem('sivecDriveFolderId') || '';
   document.getElementById('gmapsKeyInput').value = localStorage.getItem('sivec_gmaps_key') || '';
+  [['cfgPapAnios', 'papNegAnios'], ['cfgVphAnios', 'vphNegAnios'], ['cfgPapMin', 'papEdadMin'], ['cfgPapMax', 'papEdadMax'], ['cfgVphMin', 'vphEdadMin'], ['cfgVphMax', 'vphEdadMax']]
+    .forEach(([id, k]) => { document.getElementById(id).value = clinCfg[k]; });
   const reqChk = document.getElementById('requireLoginChk');
   reqChk.checked = localStorage.getItem('sivec_require_login') === '1';
   reqChk.addEventListener('change', () => {
@@ -1275,10 +1345,16 @@ function closeBirthdayModal() {
 function openHelpModal() { document.getElementById('helpOverlay').classList.add('open'); }
 function closeHelpModal() { document.getElementById('helpOverlay').classList.remove('open'); }
 
+const ICON_MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>', ICON_SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+function setDarkIcon(isDark) {
+  const b = document.getElementById('darkModeBtn');
+  b.innerHTML = isDark ? ICON_SUN : ICON_MOON;
+  b.title = isDark ? 'Modo claro' : 'Modo oscuro';
+}
 function toggleDarkMode() {
   const isDark = document.body.classList.toggle('dark');
   localStorage.setItem('sivec_dark', isDark ? '1' : '0');
-  document.getElementById('darkModeBtn').textContent = isDark ? '☀️' : '🌙';
+  setDarkIcon(isDark);
   if (typeof loadPanel === 'function' && document.getElementById('panelView').classList.contains('active')) {
     loadPanel();
   }
@@ -1612,6 +1688,128 @@ function renderBanners(data) {
   }
 }
 
+// ================= Lógica clínica: Bethesda, próximo paso, próximo control, edad objetivo =================
+// Los intervalos y rangos de edad son configurables (⚙ Configuración) para ajustarlos a la norma nacional vigente.
+const CLIN_DEFAULT = { papNegAnios: 3, vphNegAnios: 5, papEdadMin: 25, papEdadMax: 64, vphEdadMin: 30, vphEdadMax: 64 };
+let clinCfg = Object.assign({}, CLIN_DEFAULT);
+try { clinCfg = Object.assign(clinCfg, JSON.parse(localStorage.getItem('sivec_clin_cfg') || '{}')); } catch (e) {}
+
+const BETHESDA = [
+  { code: 'NILM', label: 'Negativo para lesión intraepitelial (NILM)', nivel: 'neg' },
+  { code: 'ASC-US', label: 'ASC-US — células escamosas atípicas de significado indeterminado', nivel: 'bajo' },
+  { code: 'LSIL', label: 'LSIL — lesión intraepitelial de bajo grado', nivel: 'bajo' },
+  { code: 'ASC-H', label: 'ASC-H — atípicas, no se descarta alto grado', nivel: 'alto' },
+  { code: 'HSIL', label: 'HSIL — lesión intraepitelial de alto grado', nivel: 'alto' },
+  { code: 'AGC', label: 'AGC — células glandulares atípicas', nivel: 'alto' },
+  { code: 'AIS', label: 'AIS — adenocarcinoma in situ', nivel: 'alto' },
+  { code: 'Carcinoma', label: 'Carcinoma (escamoso / adenocarcinoma)', nivel: 'alto' },
+  { code: 'Insatisfactoria', label: 'Muestra insatisfactoria', nivel: 'insat' },
+];
+const BETHESDA_BY_CODE = Object.fromEntries(BETHESDA.map(b => [b.code, b]));
+// Reconoce la categoría también en resultados escritos a mano ("lsil", "Bajo grado", "NIC 2", "ascus"...).
+function bethesdaDe(p) {
+  const t = normTxtGeo(p && p.resultado_pap);
+  if (!t) return null;
+  if (/carcinoma invasor|carcinoma escamoso|\bcarcinoma\b|\bcancer\b/.test(t) && !/in situ/.test(t)) return 'Carcinoma';
+  if (/\bais\b|adenocarcinoma in situ/.test(t)) return 'AIS';
+  if (/\bagc\b|\bagus\b|glandulares atipicas|atipias? glandular/.test(t)) return 'AGC';
+  if (/\bhsil\b|\bh sil\b|alto grado|\b(nic|cin) ?(2|3|ii|iii)\b|carcinoma in situ/.test(t)) return 'HSIL';
+  if (/\basc ?h\b/.test(t)) return 'ASC-H';
+  if (/\blsil\b|\bl sil\b|bajo grado|\b(nic|cin) ?(1|i)\b|coilocit/.test(t)) return 'LSIL';
+  if (/\basc ?us\b|\bascus\b/.test(t)) return 'ASC-US';
+  if (/insatisf|inadecuad|no valorable|no util/.test(t)) return 'Insatisfactoria';
+  if (/\bnilm\b|negativ|normal|inflamatori|sin lesion|dentro de limites/.test(t)) return 'NILM';
+  return null;
+}
+function addYears(fecha, n) {
+  if (!fecha) return null;
+  const d = new Date(fecha + 'T12:00:00'); d.setFullYear(d.getFullYear() + Number(n || 0));
+  return d.toISOString().slice(0, 10);
+}
+function hoyISO() { return new Date().toISOString().slice(0, 10); }
+function fueraDeRangoEdad(p) {
+  const edad = edadDe(p.fecha_nacimiento);
+  if (edad == null) return null;
+  const vph = p.tipo_examen === 'VPH';
+  const min = vph ? clinCfg.vphEdadMin : clinCfg.papEdadMin, max = vph ? clinCfg.vphEdadMax : clinCfg.papEdadMax;
+  return edad < min || edad > max ? { edad, min, max, tipo: vph ? 'VPH' : 'PAP' } : null;
+}
+// Estado PAP y resultado escrito que se contradicen (ej: Estado Negativo con resultado LSIL): suele ser un error de carga.
+function estadoContradice(p) {
+  if (esSoloVph(p)) return false;
+  const bet = bethesdaDe(p), nivel = bet && BETHESDA_BY_CODE[bet].nivel;
+  if (!nivel || nivel === 'insat') return false;
+  return (p.estado_pap === 'Negativo' && nivel !== 'neg') || (p.estado_pap === 'Positivo' && nivel === 'neg');
+}
+// Fecha del próximo control para una toma con resultado negativo.
+function proximoControlDe(p) {
+  if (!p.fecha_toma) return null;
+  const vphNeg = p.resultado_vph === 'Negativa';
+  const papNeg = !esSoloVph(p) && p.estado_pap === 'Negativo' && !estadoContradice(p);
+  if (esSoloVph(p) && vphNeg) return addYears(p.fecha_toma, clinCfg.vphNegAnios);
+  if (papNeg && vphNeg) return addYears(p.fecha_toma, Math.max(clinCfg.papNegAnios, clinCfg.vphNegAnios));
+  if (papNeg && !p.resultado_vph) return addYears(p.fecha_toma, clinCfg.papNegAnios);
+  return null;
+}
+const PASO_LABEL = {
+  buscar: '🔴 Buscar resultado (atrasado)', derivar: '🔴 Derivar a colposcopia', definir: '🔴 Definir seguimiento',
+  repetir: '🟠 Repetir toma', entregar: '🟠 Entregar resultado', control_vencido: '🟠 Control vencido',
+  revisar: '🟠 Revisar datos', seguimiento: '🔵 En seguimiento', esperar: '⚪ Esperando resultado', control: '🟢 Control al día', anterior: '⚪ Toma anterior',
+};
+// Qué hay que hacer ahora con esta toma. Solo la toma más reciente de cada paciente genera tareas.
+function proximoPaso(p) {
+  const info = tomasIndex.get(p.id);
+  if (info && info.grupo[info.grupo.length - 1] !== p) return { key: 'anterior', tone: 'gray', txt: 'Toma anterior (ver la más reciente)' };
+  const bet = bethesdaDe(p), nivel = bet && BETHESDA_BY_CODE[bet].nivel;
+  const soloVph = esSoloVph(p);
+  // Si ya hay un resultado escrito (aunque el Estado siga en Pendiente), se usa el resultado.
+  const papPend = !soloVph && (p.estado_pap || 'Pendiente') === 'Pendiente' && !bet;
+  const yEntregar = p.recibio_resultado ? '' : ' · entregar resultado';
+  if (nivel === 'insat') return { key: 'repetir', tone: 'amber', txt: 'Repetir toma (muestra insatisfactoria)' + yEntregar };
+  if (papPend) {
+    if (esAtrasada(p)) return { key: 'buscar', tone: 'red', txt: 'Buscar resultado (atrasado)' };
+    const est = p.fecha_estimada || addDays(p.fecha_toma, 90);
+    return { key: 'esperar', tone: 'gray', txt: 'Esperando resultado' + (est ? ' · hasta ' + fmtFecha(est) : '') };
+  }
+  if (soloVph && !p.resultado_vph) return { key: 'esperar', tone: 'gray', txt: 'Esperando resultado VPH' };
+  if (estadoContradice(p)) return { key: 'revisar', tone: 'amber', txt: `Revisar: Estado PAP "${p.estado_pap}" y resultado "${bet}" no coinciden` };
+  const papPos = !soloVph && (p.estado_pap === 'Positivo' || nivel === 'alto' || nivel === 'bajo');
+  if (papPos) {
+    if (p.derivacion_pap) return { key: 'seguimiento', tone: 'blue', txt: 'Derivada: ' + p.derivacion_pap + yEntregar };
+    if (nivel === 'alto') return { key: 'derivar', tone: 'red', txt: 'Derivar a colposcopia (' + bet + ')' + yEntregar };
+    if (!p.seguimiento_pap) return { key: 'definir', tone: 'red', txt: 'Definir seguimiento (' + (bet || 'PAP+') + ')' + yEntregar };
+    return { key: 'seguimiento', tone: 'blue', txt: 'En seguimiento: ' + p.seguimiento_pap + yEntregar };
+  }
+  if (p.resultado_vph === 'Positiva') {
+    const gen = p.vph_genotipo ? ' ' + p.vph_genotipo : '';
+    if (p.recibio_tratamiento_vph || p.seguimiento_vph) return { key: 'seguimiento', tone: 'blue', txt: 'En seguimiento VPH+' + gen + (p.seguimiento_vph ? ': ' + p.seguimiento_vph : '') + yEntregar };
+    return { key: 'definir', tone: 'red', txt: 'Definir seguimiento VPH+' + gen + yEntregar };
+  }
+  if (!p.recibio_resultado) return { key: 'entregar', tone: 'amber', txt: 'Entregar resultado' };
+  const ctrl = proximoControlDe(p);
+  if (ctrl && ctrl < hoyISO()) return { key: 'control_vencido', tone: 'amber', txt: 'Control vencido desde ' + fmtFecha(ctrl) };
+  if (ctrl) return { key: 'control', tone: 'green', txt: 'Próximo control: ' + fmtFecha(ctrl) };
+  return { key: 'control', tone: 'green', txt: 'Resultado entregado' };
+}
+
+// Columnas opcionales (se crean con el SQL de SUPABASE-SQL.md). Si no existen, el sistema funciona igual.
+const colCache = {};
+function columnOk(col) {
+  if (!sb) return Promise.resolve(false);
+  if (!(col in colCache)) colCache[col] = sb.from('pacientes').select(col).limit(1).then(({ error }) => !error, () => false);
+  return colCache[col];
+}
+
+function saveClinCfg() {
+  const v = id => Number(document.getElementById(id).value);
+  const cfg = { papNegAnios: v('cfgPapAnios'), vphNegAnios: v('cfgVphAnios'), papEdadMin: v('cfgPapMin'), papEdadMax: v('cfgPapMax'), vphEdadMin: v('cfgVphMin'), vphEdadMax: v('cfgVphMax') };
+  if (Object.values(cfg).some(x => !isFinite(x) || x < 0)) { alert('Revisá los números.'); return; }
+  clinCfg = cfg;
+  try { localStorage.setItem('sivec_clin_cfg', JSON.stringify(cfg)); } catch (e) {}
+  alert('Guardado. Los próximos controles y alertas de edad usan estos valores.');
+  if (allPatientsData.length) applyListFilters();
+}
+
 // ---- Filtro rápido (contadores y avisos de la lista) ----
 let listQuick = '';
 const QUICK_LABEL = { 'pap:Positivo': 'Positivo PAP', 'pap:Negativo': 'Negativo PAP', 'pap:Pendiente': 'Pendiente PAP', 'vph:Positiva': 'VPH+', atrasadas: 'Resultado atrasado', vencimientos: 'Método por vencer' };
@@ -1649,7 +1847,10 @@ document.addEventListener('click', e => {
   if (b) setListQuick(b.dataset.quick);
 });
 
-function applyListFilters() {
+const LIST_PAGE = 50;
+let listLimit = LIST_PAGE;
+function applyListFilters(keepLimit) {
+  if (keepLimit !== true) listLimit = LIST_PAGE;
   const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
   const doc = document.getElementById('filterDoctora').value;
   let filtered = allPatientsData;
@@ -1658,6 +1859,10 @@ function applyListFilters() {
   const tomasF = document.getElementById('filterTomas').value;
   if (tomasF === 'varias') filtered = filtered.filter(p => (tomasIndex.get(p.id) || {}).grupo?.length > 1);
   if (tomasF === 'duplicado') filtered = filtered.filter(p => (tomasIndex.get(p.id) || {}).mismaFecha);
+  const pasoF = document.getElementById('filterPaso').value;
+  if (pasoF === 'edad') filtered = filtered.filter(p => fueraDeRangoEdad(p) && proximoPaso(p).key !== 'anterior');
+  else if (pasoF === 'urgente') filtered = filtered.filter(p => ['buscar', 'derivar', 'definir'].includes(proximoPaso(p).key));
+  else if (pasoF) filtered = filtered.filter(p => proximoPaso(p).key === pasoF);
   const base = filtered; // los contadores muestran el total antes del filtro rápido
   if (listQuick) filtered = filtered.filter(pasaQuick);
   if (tomasF) filtered = filtered.slice().sort((a, b) => {
@@ -1677,13 +1882,15 @@ function renderPatientCards(data, base) {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
   const hoy = new Date().toISOString().slice(0, 10);
-  data.forEach(p => {
+  data.slice(0, listLimit).forEach(p => {
     const estado = estadoDe(p);
     const fechaEst = p.fecha_estimada || addDays(p.fecha_toma, 90);
     const atrasado = estado === 'Pendiente' && fechaEst && fechaEst < hoy;
     const card = document.createElement('div');
     card.className = 'patientCard';
     card.style.borderLeftColor = COLORS[estado];
+    const paso = proximoPaso(p), bet = bethesdaDe(p), fueraEdad = fueraDeRangoEdad(p);
+    const ctrl = paso.key === 'anterior' ? null : proximoControlDe(p);
     const tomaInfo = tomasIndex.get(p.id);
     let tomaBadge = '';
     if (tomaInfo && tomaInfo.grupo.length > 1) {
@@ -1695,7 +1902,8 @@ function renderPatientCards(data, base) {
     card.innerHTML = `
       <div>
         <div class="pcName">${esCumpleanosHoy(p.fecha_nacimiento) ? '🎂 ' : ''}${esc(p.nombre)}${tomaBadge}${p.recibio_resultado ? ' <span title="Recibió información de su resultado" style="font-size:11px;font-weight:600;color:#0d6b47;background:#dcf5e9;border-radius:6px;padding:1px 6px;margin-left:4px">✅ Informada</span>' : ''}</div>
-        <div class="pcMeta">${esc(p.carnet) || 'Sin carnet'}${edadDe(p.fecha_nacimiento) != null ? ' · ' + edadDe(p.fecha_nacimiento) + ' años' : ''} · ${esc(p.doctora) || '—'} · Toma: ${fmtFecha(p.fecha_toma) || '—'}</div>
+        <div class="pcMeta">${esc(p.carnet) || 'Sin carnet'}${edadDe(p.fecha_nacimiento) != null ? ' · ' + edadDe(p.fecha_nacimiento) + ' años' : ''}${fueraEdad ? ` <span class="edadBadge" title="Rango objetivo ${fueraEdad.tipo}: ${fueraEdad.min}–${fueraEdad.max} años (se cambia en Configuración)">fuera de rango ${fueraEdad.tipo}</span>` : ''} · ${esc(p.doctora) || '—'} · Toma: ${fmtFecha(p.fecha_toma) || '—'}</div>
+        <div class="pcPaso tone-${paso.tone}" title="Próximo paso">➜ ${esc(paso.txt)}</div>
       </div>
       <div>
         <div class="pcLabel">Estado PAP</div>
@@ -1703,19 +1911,20 @@ function renderPatientCards(data, base) {
       </div>
       <div>
         <div class="pcLabel">Resultado PAP</div>
-        <div class="pcValue">${esc(p.resultado_pap) || '—'}</div>
+        ${bet ? `<div class="betCode ${BETHESDA_BY_CODE[bet].nivel}" title="${esc(p.resultado_pap)}">${bet}</div>${normTxtGeo(p.resultado_pap) !== normTxtGeo(bet) ? `<div class="pcMuted" style="font-style:normal">${esc(String(p.resultado_pap).slice(0, 40))}</div>` : ''}` : (p.resultado_pap ? `<div class="pcValue">${esc(p.resultado_pap)}</div>` : `<div class="pcMuted">${esSoloVph(p) ? 'No aplica' : 'Sin resultado'}</div>`)}
       </div>
       <div>
-        <div class="pcLabel">Fecha estimada</div>
-        <div class="pcValue">${esSoloVph(p) ? 'No aplica' : (fechaEst ? `<span style="${atrasado ? 'color:#c62828;font-weight:600' : ''}">${fmtFecha(fechaEst)}${atrasado ? ' ⚠' : ''}</span>` : '—')}</div>
+        ${ctrl ? `<div class="pcLabel">Próximo control</div><div class="pcValue" style="${ctrl < hoy ? 'color:#c2410c;font-weight:600' : ''}">${fmtFecha(ctrl)}</div>`
+          : `<div class="pcLabel">Fecha estimada</div>
+        <div class="pcValue">${esSoloVph(p) ? '<span class="pcMuted">No aplica</span>' : (fechaEst ? `<span style="${atrasado ? 'color:#c62828;font-weight:600' : ''}">${fmtFecha(fechaEst)}${atrasado ? ' ⚠' : ''}</span>` : '<span class="pcMuted">Sin fecha</span>')}</div>`}
       </div>
       <div>
         <div class="pcLabel">VPH</div>
-        ${p.resultado_vph ? `<span class="badge" style="background:${COLORS_VPH[p.resultado_vph]}">${p.resultado_vph}</span>` : `<div class="pcValue">${p.hizo_prueba_vph ? 'Pendiente' : '—'}</div>`}
+        ${p.resultado_vph ? `<span class="badge" style="background:${COLORS_VPH[p.resultado_vph]}">${p.resultado_vph}</span>${p.vph_genotipo ? `<div class="pcMuted" style="font-style:normal">${esc(p.vph_genotipo)}</div>` : ''}` : `<div class="pcMuted">${p.hizo_prueba_vph || p.tipo_examen === 'VPH' ? 'Pendiente' : 'No realizado'}</div>`}
       </div>
       <div>
         <div class="pcLabel">Dirección</div>
-        <div class="pcValue">${esc(p.direccion) || '—'}</div>
+        ${p.direccion ? `<div class="pcValue">${esc(p.direccion)}</div>` : '<div class="pcMuted">Sin dirección</div>'}
       </div>
       <div class="pcActions">
         ${esCumpleanosHoy(p.fecha_nacimiento) ? `<button class="rowBtn bdayBtn" data-id="${p.id}" style="background:#fff3e0;border-color:#f3c98f">🎉 Felicitar</button>` : ''}
@@ -1732,6 +1941,13 @@ function renderPatientCards(data, base) {
     tbody.appendChild(card);
   });
   if (!data.length) tbody.innerHTML = `<div class="hint" style="padding:30px;text-align:center">No hay pacientes con este filtro.</div>`;
+  if (data.length > listLimit) {
+    const more = document.createElement('button');
+    more.type = 'button'; more.className = 'moreCardsBtn';
+    more.textContent = `Mostrar ${Math.min(LIST_PAGE, data.length - listLimit)} más · quedan ${data.length - listLimit} de ${data.length}`;
+    more.addEventListener('click', () => { const y = document.getElementById('tableWrap').scrollTop; listLimit += LIST_PAGE; applyListFilters(true); document.getElementById('tableWrap').scrollTop = y; });
+    tbody.appendChild(more);
+  }
   document.getElementById('cPos').textContent = counts.Positivo;
   document.getElementById('cVph').textContent = counts.VphPos;
   document.getElementById('cNeg').textContent = counts.Negativo;
@@ -2446,6 +2662,31 @@ document.getElementById('tableBody').addEventListener('click', (e) => {
 
 document.addEventListener('click', e => { if (!e.target.closest('.moreWrap')) document.querySelectorAll('.moreWrap.open').forEach(w => w.classList.remove('open')); });
 
+function checkEdadRegistro() {
+  const f = document.getElementById('patientForm');
+  const w = document.getElementById('edadWarnReg');
+  const fuera = fueraDeRangoEdad({ fecha_nacimiento: f.fecha_nacimiento.value, tipo_examen: f.tipo_examen ? f.tipo_examen.value : '' });
+  w.style.display = fuera ? 'block' : 'none';
+  if (fuera) w.textContent = `⚠️ ${fuera.edad} años: fuera del rango objetivo para ${fuera.tipo} (${fuera.min}–${fuera.max}). Se puede registrar igual.`;
+}
+['fecha_nacimiento', 'tipo_examen'].forEach(n => { const el = document.getElementById('patientForm')[n]; if (el) el.addEventListener('change', checkEdadRegistro); });
+document.getElementById('patientForm').addEventListener('reset', () => setTimeout(checkEdadRegistro, 0));
+
+document.getElementById('bethesdaSel').innerHTML += BETHESDA.map(b => `<option value="${b.code}">${esc(b.label)}</option>`).join('');
+document.getElementById('bethesdaSel').addEventListener('change', e => {
+  const form = document.getElementById('editForm'), b = BETHESDA_BY_CODE[e.target.value];
+  if (!b) return;
+  // Se conserva el detalle escrito si ya decía lo mismo; si no, se reemplaza por la categoría elegida.
+  if (bethesdaDe({ resultado_pap: form.resultado_pap.value }) !== b.code) form.resultado_pap.value = b.code;
+  if (b.nivel === 'neg') form.estado_pap.value = 'Negativo';
+  else if (b.nivel === 'alto' || b.nivel === 'bajo') form.estado_pap.value = 'Positivo';
+  form.estado_pap.dispatchEvent(new Event('change'));
+});
+function toggleGenotipo() {
+  const form = document.getElementById('editForm');
+  document.getElementById('genotipoField').style.display = form.resultado_vph.value === 'Positiva' ? 'block' : 'none';
+}
+
 function openEdit(p) {
   editingId = p.id;
   const form = document.getElementById('editForm');
@@ -2469,6 +2710,10 @@ function openEdit(p) {
   form.fecha_seguimiento_pap.value = p.fecha_seguimiento_pap || '';
   form.derivacion_pap.value = p.derivacion_pap || '';
   form.resultado_vph.value = p.resultado_vph || '';
+  document.getElementById('bethesdaSel').value = bethesdaDe(p) || '';
+  document.getElementById('vphGenotipoSel').value = p.vph_genotipo || '';
+  toggleGenotipo();
+  columnOk('vph_genotipo').then(ok => { document.getElementById('genotipoHint').style.display = ok ? 'none' : 'block'; document.getElementById('vphGenotipoSel').disabled = !ok; });
   form.recibio_tratamiento_vph.value = p.recibio_tratamiento_vph ? 'true' : 'false';
   form.seguimiento_vph.value = p.seguimiento_vph || '';
   form.fecha_seguimiento_vph.value = p.fecha_seguimiento_vph || '';
@@ -2500,6 +2745,7 @@ document.getElementById('editForm').estado_pap.addEventListener('change', (e) =>
 });
 document.getElementById('editForm').resultado_vph.addEventListener('change', (e) => {
   document.getElementById('segVphFields').style.display = (e.target.value === 'Positiva') ? 'block' : 'none';
+  toggleGenotipo();
 });
 document.getElementById('editForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -2516,6 +2762,7 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
   Object.keys(data).forEach(k => { if ((k.startsWith('fecha') || k.includes('fecha') || k.includes('proximo_control')) && data[k] === '') data[k] = null; });
   const original = (currentPatients || []).find(x => String(x.id) === String(editingId)) || (allPatientsData || []).find(x => String(x.id) === String(editingId));
   await applyGeoPick(e.target, data, original ? original.direccion : null);
+  if (await columnOk('vph_genotipo')) data.vph_genotipo = data.resultado_vph === 'Positiva' ? (document.getElementById('vphGenotipoSel').value || null) : null;
   const { error } = await sb.from('pacientes').update(data).eq('id', editingId);
   if (error) { showToast('Error al guardar: ' + error.message, 'err'); return; }
   closeEdit();
@@ -2570,10 +2817,50 @@ async function loadPanel() {
   });
   const metodoEntries = Object.entries(metodoCounts).sort((a, b) => b[1] - a[1]);
 
+  // ---- Indicadores ----
+  const idxP = buildTomasIndex(data);
+  const ultimas = data.filter(p => { const i = idxP.get(p.id); return !i || i.grupo[i.grupo.length - 1] === p; });
+  const conResultado = data.filter(p => esSoloVph(p) ? !!p.resultado_vph : (p.estado_pap === 'Positivo' || p.estado_pap === 'Negativo'));
+  const entregados = conResultado.filter(p => p.recibio_resultado);
+  const dias = data.filter(p => p.fecha_toma && p.fecha_recibio_resultado)
+    .map(p => Math.round((new Date(p.fecha_recibio_resultado) - new Date(p.fecha_toma)) / 86400000)).filter(d => d >= 0).sort((a, b) => a - b);
+  const mediana = dias.length ? dias[Math.floor(dias.length / 2)] : null;
+  const positivas = ultimas.filter(p => (!esSoloVph(p) && p.estado_pap === 'Positivo') || p.resultado_vph === 'Positiva');
+  const conSeg = positivas.filter(p => p.derivacion_pap || p.seguimiento_pap || p.seguimiento_vph || p.recibio_tratamiento_vph);
+  const conEdad = ultimas.filter(p => edadDe(p.fecha_nacimiento) != null);
+  const enRango = conEdad.filter(p => !fueraDeRangoEdad(p));
+  const atrasadasN = data.filter(esAtrasada).length;
+  const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+  const kpi = (valor, label, sub, pctBar, color) => `<div class="kpi"><div class="kv">${valor}</div><div class="kl">${label}</div><div class="ks">${sub}</div>${pctBar != null ? `<div class="kbar"><i style="width:${pctBar}%;background:${color}"></i></div>` : ''}</div>`;
+  document.getElementById('kpiGrid').innerHTML =
+    kpi(idxP.unicas, 'Pacientes únicas', `${data.length} tomas registradas`) +
+    kpi(pct(entregados.length, conResultado.length) + '%', 'Resultados entregados', `${entregados.length} de ${conResultado.length} con resultado`, pct(entregados.length, conResultado.length), '#16a34a') +
+    kpi(mediana != null ? mediana + ' días' : '—', 'Toma → entrega (mediana)', dias.length ? `sobre ${dias.length} pacientes con fecha de entrega` : 'falta cargar "fecha en que recibió el resultado"') +
+    kpi(pct(conSeg.length, positivas.length) + '%', 'Positivas con seguimiento', `${conSeg.length} de ${positivas.length} (PAP+ o VPH+)`, pct(conSeg.length, positivas.length), '#7c3aed') +
+    kpi(atrasadasN, 'Resultados atrasados', 'más de 90 días sin resultado', null) +
+    kpi(pct(enRango.length, conEdad.length) + '%', 'Dentro de la edad objetivo', `${enRango.length} de ${conEdad.length} pacientes · rango ${clinCfg.papEdadMin}–${clinCfg.papEdadMax}`, pct(enRango.length, conEdad.length), '#2f6fb0');
+
+  const betCounts = Object.fromEntries(BETHESDA.map(b => [b.code, 0]));
+  data.forEach(p => { const b = bethesdaDe(p); if (b) betCounts[b]++; });
+  const betColor = { neg: '#16a34a', bajo: '#ea8c2e', alto: '#dc2626', insat: '#9ca3af' };
+  const grupos = [['<25', 0, 24], ['25–34', 25, 34], ['35–44', 35, 44], ['45–54', 45, 54], ['55–64', 55, 64], ['65+', 65, 200]];
+  const edadCounts = grupos.map(([, a, b]) => conEdad.filter(p => { const e = edadDe(p.fecha_nacimiento); return e >= a && e <= b; }).length);
+
   const mk = (id, config) => {
     if (panelCharts[id]) panelCharts[id].destroy();
     panelCharts[id] = new Chart(document.getElementById(id), config);
   };
+
+  mk('chartBethesda', {
+    type: 'bar',
+    data: { labels: BETHESDA.map(b => b.code), datasets: [{ label: 'Tomas', data: BETHESDA.map(b => betCounts[b.code]), backgroundColor: BETHESDA.map(b => betColor[b.nivel]) }] },
+    options: { plugins: { legend: { display: false } }, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+  });
+  mk('chartEdad', {
+    type: 'bar',
+    data: { labels: grupos.map(g => g[0]), datasets: [{ label: 'Pacientes', data: edadCounts, backgroundColor: grupos.map(([, a, b]) => (a >= clinCfg.papEdadMin && b <= clinCfg.papEdadMax) ? '#2f6fb0' : '#cbd5e1') }] },
+    options: { plugins: { legend: { display: false } }, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+  });
 
   mk('chartEstadoPap', {
     type: 'doughnut',
