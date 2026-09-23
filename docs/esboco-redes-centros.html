@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esbozo Redes y Centros</title>
+<style>
+  :root { --wine-900:#6d2142; --wine-700:#7d2a4c; --wine-500:#9c3a5f; --paper:#fbf6f3; --ink:#40323a; --soft:#8a7078; --line:#ecdde3; --surface:#fff;
+          --pos:#7c3aed; --vph:#dc2626; --neg:#ea8c2e; --pend:#2f6fb0; --ok:#16a34a; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:-apple-system,"Segoe UI",Arial,sans-serif; background:#e9e2e5; color:var(--ink); }
+  .demoBar { background:#2b1520; color:#fff; padding:10px 16px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; position:sticky; top:0; z-index:10; }
+  .demoBar b { margin-right:6px; font-size:13px; opacity:.8 }
+  .demoBar button { border:1px solid rgba(255,255,255,.3); background:transparent; color:#fff; border-radius:8px; padding:7px 12px; cursor:pointer; font-size:13px; }
+  .demoBar button.on { background:#fff; color:var(--wine-900); font-weight:700; }
+  .note { max-width:1180px; margin:14px auto 0; background:#fff7e6; border:1px solid #f3d9a4; color:#6b4a00; border-radius:10px; padding:10px 14px; font-size:13px; line-height:1.5 }
+  .frame { max-width:1180px; margin:14px auto 40px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 10px 40px rgba(0,0,0,.15); }
+  header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 20px; background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; flex-wrap:wrap; }
+  .brand { display:flex; align-items:center; gap:12px; }
+  .mark { width:42px; height:42px; border-radius:12px; background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.35); display:flex; align-items:center; justify-content:center; }
+  .name { font-size:22px; font-weight:900; letter-spacing:1.5px; display:flex; align-items:center; gap:8px; }
+  .mod { font-size:11px; font-weight:800; background:#fff; color:var(--wine-900); border-radius:6px; padding:3px 8px; letter-spacing:1px }
+  .sigla { font-size:11px; color:rgba(255,255,255,.75) } .sigla b { color:#fff }
+  .ctx { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .ctxChip { background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.3); border-radius:10px; padding:6px 10px; font-size:12.5px; display:flex; flex-direction:column; line-height:1.2 }
+  .ctxChip small { font-size:10px; opacity:.75; text-transform:uppercase; letter-spacing:.5px }
+  .ctxSel { background:#fff; color:var(--ink); border:none; border-radius:9px; padding:8px 10px; font-size:13px; font-weight:600; min-width:190px; }
+  .user { display:flex; align-items:center; gap:8px; font-size:12.5px; }
+  .avatar { width:32px; height:32px; border-radius:50%; background:#fff; color:var(--wine-900); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px }
+  .role { font-size:10.5px; background:rgba(255,255,255,.2); border-radius:999px; padding:2px 8px; }
+  nav { display:flex; gap:4px; padding:8px 20px; background:#fff; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  nav span { padding:7px 12px; border-radius:8px; font-size:12.5px; color:var(--soft); }
+  nav span.on { background:var(--wine-700); color:#fff; font-weight:600 }
+  main { padding:20px; }
+  h2 { margin:0 0 4px; font-size:19px } .hint { color:var(--soft); font-size:13px; margin:0 0 14px }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:10px; margin-bottom:16px }
+  .kpi { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px } .kpi .v { font-size:24px; font-weight:800 } .kpi .l { font-size:12px; font-weight:600 } .kpi .s { font-size:11px; color:var(--soft) }
+  table { width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden; font-size:13px }
+  th { text-align:left; background:#f6eef1; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--soft); padding:9px 10px }
+  td { padding:9px 10px; border-top:1px solid var(--line) }
+  tr.click:hover td { background:#fbf3f6; cursor:pointer }
+  .bar { height:6px; background:var(--line); border-radius:3px; overflow:hidden; min-width:80px } .bar i { display:block; height:100% }
+  .pill { font-size:11px; font-weight:700; border-radius:999px; padding:2px 8px; display:inline-block }
+  .red { background:#fee2e2; color:#991b1b } .amber { background:#fff4d6; color:#8a5300 } .green { background:#dcf5e9; color:#0d6b47 } .gray { background:#eee; color:#555 }
+  .card { background:#fff; border:1px solid var(--line); border-left:5px solid var(--pos); border-radius:12px; padding:12px 16px; margin-bottom:8px; display:grid; grid-template-columns:1.6fr 1fr 1fr auto; gap:12px; align-items:center; font-size:13px }
+  .card .n { font-weight:700 } .card .m { font-size:12px; color:var(--soft) }
+  .centerTag { font-size:10.5px; font-weight:700; background:#efe7ff; color:#5b21b6; border-radius:6px; padding:1px 6px; margin-left:4px }
+  .login { min-height:520px; display:flex; align-items:center; justify-content:center; background:linear-gradient(160deg,#f7eef2,#fbf6f3) }
+  .loginBox { background:#fff; border:1px solid var(--line); border-radius:16px; padding:28px; width:360px; box-shadow:0 8px 30px rgba(109,33,66,.12) }
+  .loginBox label { display:block; font-size:12.5px; font-weight:600; margin:12px 0 5px } .loginBox input { width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; font-size:14px }
+  .btn { background:var(--wine-700); color:#fff; border:none; border-radius:9px; padding:11px 16px; font-weight:700; font-size:14px; cursor:pointer; width:100%; margin-top:18px }
+  .btn2 { background:#fff; color:var(--wine-700); border:1px solid var(--wine-500); border-radius:8px; padding:7px 12px; font-weight:600; font-size:12.5px; cursor:pointer }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px } @media (max-width:800px){ .grid2 { grid-template-columns:1fr } .card { grid-template-columns:1fr } }
+  .box { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px } .box h3 { margin:0 0 10px; font-size:14px }
+  .tree div { padding:6px 0; border-bottom:1px dashed var(--line); font-size:13px; display:flex; justify-content:space-between; align-items:center }
+  .tree .c { padding-left:18px; color:var(--ink) }
+  .explain { background:#f3eef9; border:1px solid #ddd0f3; color:#3b2a63; border-radius:10px; padding:10px 14px; font-size:12.5px; margin-top:14px; line-height:1.55 }
+  .screen { display:none } .screen.on { display:block }
+</style>
+</head>
+<body>
+<div class="demoBar"><b>ESBOZO — elegí una pantalla:</b>
+  <button data-s="login" class="on">1. Inicio de sesión</button>
+  <button data-s="centro">2. Responsable de centro</button>
+  <button data-s="red">3. Responsable de Red</button>
+  <button data-s="admin">4. Administración</button>
+</div>
+<div class="note">⚠️ Esto es solo un <b>dibujo para aprobar</b>: los nombres de centros, usuarios y números son de ejemplo. Nada de esto está aplicado todavía en el sistema.</div>
+
+<!-- 1. LOGIN -->
+<div class="frame screen on" id="s-login">
+  <div class="login">
+    <div class="loginBox">
+      <div class="brand" style="margin-bottom:6px"><div class="mark" style="background:var(--wine-700)"><svg width="24" height="24" viewBox="0 0 32 32"><path d="M16 4c-3.2 0-5.4 2.4-5.4 5.3 0 3.4 2.6 7 5.4 10.4 2.8-3.4 5.4-7 5.4-10.4C21.4 6.4 19.2 4 16 4Z" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M12.6 16.6 7 27.5M19.4 16.6 25 27.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg></div>
+        <div><div class="name" style="color:var(--wine-900);font-size:20px">SIVEC <span class="mod" style="background:var(--wine-700);color:#fff">PAP/VPH</span></div><div class="sigla" style="color:var(--soft)"><b style="color:var(--ink)">S</b>istema <b style="color:var(--ink)">I</b>ntegral de <b style="color:var(--ink)">V</b>igilancia y <b style="color:var(--ink)">E</b>nlace <b style="color:var(--ink)">C</b>línico</div></div></div>
+      <p class="hint" style="margin-top:10px">Entrá con el usuario que te dio el administrador. El sistema sabe solo a qué <b>centro</b> o <b>Red</b> pertenecés.</p>
+      <label>Correo</label><input value="sanluis@sivec.bo" readonly>
+      <label>Contraseña</label><input type="password" value="12345678" readonly>
+      <button class="btn">Iniciar sesión</button>
+      <p class="hint" style="margin:12px 0 0;font-size:12px">¿Olvidaste la contraseña? → la restablece el administrador o llega un correo para crear una nueva.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 2. RESPONSABLE DE CENTRO -->
+<div class="frame screen" id="s-centro">
+  <header>
+    <div class="brand"><div class="mark"><svg width="24" height="24" viewBox="0 0 32 32"><path d="M16 4c-3.2 0-5.4 2.4-5.4 5.3 0 3.4 2.6 7 5.4 10.4 2.8-3.4 5.4-7 5.4-10.4C21.4 6.4 19.2 4 16 4Z" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M12.6 16.6 7 27.5M19.4 16.6 25 27.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg></div>
+      <div><div class="name">SIVEC <span class="mod">PAP/VPH</span></div><div class="sigla"><b>S</b>istema <b>I</b>ntegral de <b>V</b>igilancia y <b>E</b>nlace <b>C</b>línico</div></div></div>
+    <div class="ctx">
+      <div class="ctxChip"><small>Red</small>Red Centro</div>
+      <div class="ctxChip"><small>Centro</small>C.S. San Luis</div>
+    </div>
+    <div class="user"><div class="avatar">SL</div><div>Resp. C.S. San Luis<br><span class="role">Responsable de centro</span></div></div>
+  </header>
+  <nav><span>Registrar</span><span class="on">Pacientes</span><span>PAP+</span><span>VPH+</span><span>Balance</span><span>Mapa</span><span>Panel</span><span>Métodos</span><span>Papelera</span></nav>
+  <main>
+    <h2>Pacientes — C.S. San Luis</h2>
+    <p class="hint">El responsable de centro <b>ve y registra solo las pacientes de su centro</b>. No hay selector: el centro queda fijo por su usuario. Todo lo que registra se guarda automáticamente con su centro.</p>
+    <div class="card"><div><div class="n">María Quispe</div><div class="m">7654321 SC · 38 años · Dra. Ortuño · Toma: 02/09/2026</div><span class="pill amber" style="margin-top:5px">➜ Entregar resultado</span></div><div><div class="m">RESULTADO PAP</div><b style="color:#15803d">NILM</b></div><div><div class="m">VPH</div><span class="pill green">Negativa</span></div><div><button class="btn2">Editar</button></div></div>
+    <div class="card" style="border-left-color:var(--vph)"><div><div class="n">Rosa Mamani <span class="centerTag" title="Esta paciente también tiene registros en otro centro">🔗 también en C.S. (ejemplo B)</span></div><div class="m">5123456 SC · 44 años · Dra. Aguilera · Toma: 20/08/2026</div><span class="pill red" style="margin-top:5px">➜ Definir seguimiento VPH+ 16</span></div><div><div class="m">RESULTADO PAP</div><span class="m">Sin resultado</span></div><div><div class="m">VPH</div><span class="pill red">Positiva</span></div><div><button class="btn2">Editar</button></div></div>
+    <div class="explain"><b>¿Qué cambia para el centro?</b><br>
+      • Entra con su usuario y contraseña; arriba se ve siempre <b>su Red y su centro</b>.<br>
+      • La lista, el mapa, el Panel y el Balance muestran <b>solo su centro</b>.<br>
+      • La lista de <b>doctoras</b> del formulario es la de su centro (se configura en Administración).<br>
+      • Aviso <b>🔗 "también en otro centro"</b>: si la paciente tiene tomas en otro centro, se avisa (sin mostrar sus datos clínicos). <i>Opcional, a decidir.</i></div>
+  </main>
+</div>
+
+<!-- 3. RESPONSABLE DE RED -->
+<div class="frame screen" id="s-red">
+  <header>
+    <div class="brand"><div class="mark"><svg width="24" height="24" viewBox="0 0 32 32"><path d="M16 4c-3.2 0-5.4 2.4-5.4 5.3 0 3.4 2.6 7 5.4 10.4 2.8-3.4 5.4-7 5.4-10.4C21.4 6.4 19.2 4 16 4Z" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M12.6 16.6 7 27.5M19.4 16.6 25 27.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg></div>
+      <div><div class="name">SIVEC <span class="mod">PAP/VPH</span></div><div class="sigla"><b>S</b>istema <b>I</b>ntegral de <b>V</b>igilancia y <b>E</b>nlace <b>C</b>línico</div></div></div>
+    <div class="ctx">
+      <div class="ctxChip"><small>Red</small>Red Centro</div>
+      <select class="ctxSel" id="redCentroSel"><option>🏥 Todos los centros de la Red</option><option>C.S. San Luis</option><option>C.S. (ejemplo B)</option><option>C.S. (ejemplo C)</option><option>C.S. (ejemplo D)</option></select>
+    </div>
+    <div class="user"><div class="avatar">RC</div><div>Resp. Red Centro<br><span class="role">Responsable de Red</span></div></div>
+  </header>
+  <nav><span>Pacientes</span><span>PAP+</span><span>VPH+</span><span>Balance</span><span>Mapa</span><span class="on">Panel de Red</span></nav>
+  <main>
+    <h2>Panel de Red — Red Centro</h2>
+    <p class="hint">El responsable de Red ve <b>todos los centros de su Red</b>. Con el selector de arriba elige "Todos" o un centro en particular; todas las pestañas (lista, mapa, balance, panel) se filtran igual.</p>
+    <div class="kpis">
+      <div class="kpi"><div class="v">2.140</div><div class="l">Pacientes únicas</div><div class="s">en 4 centros</div></div>
+      <div class="kpi"><div class="v">71%</div><div class="l">Resultados entregados</div><div class="bar"><i style="width:71%;background:var(--ok)"></i></div></div>
+      <div class="kpi"><div class="v">48 días</div><div class="l">Toma → entrega (mediana)</div><div class="s">meta: 30 días</div></div>
+      <div class="kpi"><div class="v">83%</div><div class="l">Positivas con seguimiento</div><div class="bar"><i style="width:83%;background:var(--pos)"></i></div></div>
+      <div class="kpi"><div class="v">96</div><div class="l">Resultados atrasados</div><div class="s">más de 90 días</div></div>
+    </div>
+    <table>
+      <thead><tr><th>Centro</th><th>Tomas (año)</th><th>Entregados</th><th>Toma → entrega</th><th>PAP+ / VPH+</th><th>Positivas sin seguimiento</th><th>Atrasadas</th></tr></thead>
+      <tbody>
+        <tr class="click"><td><b>C.S. San Luis</b></td><td>845</td><td><div class="bar"><i style="width:78%;background:var(--ok)"></i></div> 78%</td><td>41 d</td><td>13 / 16</td><td><span class="pill green">0</span></td><td><span class="pill amber">22</span></td></tr>
+        <tr class="click"><td><b>C.S. (ejemplo B)</b></td><td>512</td><td><div class="bar"><i style="width:65%;background:var(--ok)"></i></div> 65%</td><td>55 d</td><td>9 / 11</td><td><span class="pill red">4</span></td><td><span class="pill red">41</span></td></tr>
+        <tr class="click"><td><b>C.S. (ejemplo C)</b></td><td>430</td><td><div class="bar"><i style="width:74%;background:var(--ok)"></i></div> 74%</td><td>46 d</td><td>6 / 8</td><td><span class="pill amber">1</span></td><td><span class="pill amber">18</span></td></tr>
+        <tr class="click"><td><b>C.S. (ejemplo D)</b></td><td>353</td><td><div class="bar"><i style="width:60%;background:var(--ok)"></i></div> 60%</td><td>62 d</td><td>5 / 7</td><td><span class="pill red">3</span></td><td><span class="pill amber">15</span></td></tr>
+      </tbody>
+    </table>
+    <div class="explain"><b>¿Qué ve el responsable de Red?</b><br>
+      • Una <b>tabla comparativa por centro</b> (tocando un centro, se abre filtrado).<br>
+      • La lista de pacientes y el mapa muestran una etiqueta con el <b>centro</b> de cada paciente.<br>
+      • Puede <b>ver y exportar</b> todo; <i>a decidir</i>: si también puede <b>editar</b> pacientes de los centros o solo mirar.</div>
+  </main>
+</div>
+
+<!-- 4. ADMIN -->
+<div class="frame screen" id="s-admin">
+  <header>
+    <div class="brand"><div class="mark"><svg width="24" height="24" viewBox="0 0 32 32"><path d="M16 4c-3.2 0-5.4 2.4-5.4 5.3 0 3.4 2.6 7 5.4 10.4 2.8-3.4 5.4-7 5.4-10.4C21.4 6.4 19.2 4 16 4Z" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M12.6 16.6 7 27.5M19.4 16.6 25 27.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg></div>
+      <div><div class="name">SIVEC <span class="mod">PAP/VPH</span></div><div class="sigla"><b>S</b>istema <b>I</b>ntegral de <b>V</b>igilancia y <b>E</b>nlace <b>C</b>línico</div></div></div>
+    <div class="ctx"><select class="ctxSel"><option>🌐 Todas las Redes</option><option>Red Centro</option></select><select class="ctxSel"><option>🏥 Todos los centros</option></select></div>
+    <div class="user"><div class="avatar">AD</div><div>Administrador<br><span class="role">Administrador SIVEC</span></div></div>
+  </header>
+  <nav><span>Pacientes</span><span>Panel</span><span class="on">⚙ Administración</span></nav>
+  <main>
+    <h2>Administración</h2>
+    <p class="hint">Solo el <b>administrador</b> crea Redes, centros y usuarios. Así nadie puede darse permisos a sí mismo.</p>
+    <div class="grid2">
+      <div class="box"><h3>Redes y centros</h3>
+        <div class="tree">
+          <div><b>Red Centro</b> <button class="btn2">+ Centro</button></div>
+          <div class="c">C.S. San Luis <span class="pill green">activo</span></div>
+          <div class="c">C.S. (ejemplo B) <span class="pill green">activo</span></div>
+          <div class="c">C.S. (ejemplo C) <span class="pill gray">sin usuario</span></div>
+          <div><b>Red (otra, futuro)</b> <button class="btn2">+ Centro</button></div>
+        </div>
+        <button class="btn2" style="margin-top:10px">+ Nueva Red</button>
+        <p class="hint" style="margin:10px 0 0;font-size:12px">Cada centro tiene además su lista de <b>doctoras</b> para el formulario.</p>
+      </div>
+      <div class="box"><h3>Usuarios</h3>
+        <table>
+          <thead><tr><th>Usuario</th><th>Rol</th><th>Alcance</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>sanluis@sivec.bo</td><td>Responsable de centro</td><td>C.S. San Luis</td><td><button class="btn2">Editar</button></td></tr>
+            <tr><td>centrob@sivec.bo</td><td>Responsable de centro</td><td>C.S. (ejemplo B)</td><td><button class="btn2">Editar</button></td></tr>
+            <tr><td>redcentro@sivec.bo</td><td>Responsable de Red</td><td>Red Centro (todos)</td><td><button class="btn2">Editar</button></td></tr>
+          </tbody>
+        </table>
+        <button class="btn2" style="margin-top:10px">+ Nuevo usuario</button>
+      </div>
+    </div>
+    <div class="explain"><b>Cómo funciona por dentro (resumen):</b><br>
+      • Nuevas tablas: <b>redes</b>, <b>centros</b> y <b>perfiles</b> (cada usuario → rol + su Red o su centro).<br>
+      • Cada paciente queda con su <b>centro</b>. Las pacientes que ya existen se asignan a <b>C.S. San Luis</b>.<br>
+      • La protección la hace la <b>base de datos (RLS)</b>, no solo la pantalla: aunque alguien tenga la clave, un centro <b>no puede leer</b> los datos de otro.<br>
+      • Roles: <b>Responsable de centro</b> (su centro) · <b>Responsable de Red</b> (todos los centros de su Red) · <b>Administrador</b> (todo). Más adelante: SEDES.</div>
+  </main>
+</div>
+
+<script>
+document.querySelectorAll('.demoBar button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.demoBar button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === 's-' + b.dataset.s));
+  window.scrollTo(0, 0);
+}));
+</script>
+</body>
+</html>
