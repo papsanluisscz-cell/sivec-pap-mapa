@@ -133,3 +133,42 @@
   - Campos estruturados onde fizer sentido (ex.: medidas da eco) → permitem estatísticas e alertas.
   - Laudo **assinado** (nome, matrícula, data/hora); depois de assinado, qualquer correção fica registrada como **adendo** (não se apaga o original).
 - O laudo + imagens aparecem no **Historial** do paciente em qualquer centro, e o solicitante recebe o aviso "resultado disponível".
+
+### [23/09/2026] Códigos/números de registro gerados pelo próprio sistema
+
+**Ideia do autor:** depois de aprovado, o SIVEC deve **gerar seus próprios códigos** (N° de registro D1, D8, PAP, história clínica etc.) em vez de ter campos para digitar números de folio do papel.
+
+**Sugestão do Claude:**
+- Numeração automática, **sequencial por centro e por ano**, sem repetição, ex.: `SL-2026-PAP-000123` (SL = centro San Luis).
+- O código aparece impresso/QR nos documentos e serve para buscar o registro.
+- Durante a transição, manter o campo do folio de papel como **"folio anterior"** (só para consulta), para não perder a ligação com os arquivos físicos.
+
+### [23/09/2026] Foto do paciente
+
+**Pergunta do autor:** colocar foto da paciente já no SIVEC PAP/VPH ou deixar para o SIVEC completo (ficha / história clínica)?
+
+**Recomendação do Claude:** **deixar para o SIVEC completo**, na **recepção** (abertura da ficha), e não no PAP/VPH agora, porque:
+- a foto é dado pessoal sensível → precisa **consentimento** e **segurança ativa (login + RLS)** antes;
+- ocupa armazenamento e precisa de política (quem vê, por quanto tempo);
+- no PAP/VPH a identificação já se resolve com CI + nome + data de nascimento;
+- no SIVEC a foto será **uma só por pessoa**, compartilhada por todos os programas (não uma por módulo).
+
+### [23/09/2026] "Chat" / assistente com a história clínica
+
+**Ideia do autor:** um tipo de **chat** que apresente a **história clínica atual**, os **resultados de laboratório** e os **antecedentes** do paciente.
+
+**Como formular (sugestão do Claude)** — em três camadas, cada uma útil sozinha:
+1. **Dados organizados** (base obrigatória): antecedentes, alergias, resistências, medicação, estudos e resultados, atenções — tudo estruturado e com data/centro/autor. Sem isso, nenhum chat funciona bem.
+2. **"Resumo clínico" automático** (botão *Historial*): uma ficha de uma tela gerada pelo sistema, sempre igual e confiável:
+   - identificação (nome, idade, naturalidade, foto);
+   - **alertas** em destaque (alergias, resistência a medicamentos, gestação, valores críticos);
+   - problemas ativos e antecedentes (patológicos, cirúrgicos, gineco-obstétricos);
+   - últimos resultados com data e centro; programas em que está (PAP/VPH, TB…); pendências (estudos pedidos, derivações abertas).
+3. **Assistente em conversa (opcional, fase posterior)**: o profissional pergunta em linguagem natural, ex.: *"quais foram os últimos laboratórios da paciente?"*, *"teve algum PAP alterado?"*, *"resuma a evolução da glicemia"*, e o assistente responde **só com os dados da ficha**, **citando a data e o centro de cada dado**.
+
+**Regras para o assistente (a incluir na proposta):**
+- Responde apenas com o que está registrado; **se não houver dado, diz que não há** (não inventa).
+- Mostra sempre a **fonte** (qual registro, data, centro) para o profissional conferir.
+- **Não decide condutas**: apoia a leitura; a decisão é do profissional.
+- Cada consulta fica no **registro de auditoria**.
+- **Privacidade**: enviar dados de pacientes a um serviço de IA externo exige **autorização institucional** e acordo de proteção de dados; alternativa: rodar o modelo em servidor próprio. Decidir isso com a Red/SEDES.
