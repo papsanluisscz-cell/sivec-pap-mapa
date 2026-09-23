@@ -173,3 +173,20 @@
 - Cada consulta fica no **registro de auditoria**.
 - **Privacidade**: enviar dados de pacientes a um serviço de IA externo exige **autorização institucional** e acordo de proteção de dados; alternativa: rodar o modelo em servidor próprio. Decidir isso com a Red/SEDES.
 - **Decisão do autor (23/09/2026):** aprovado incluir no plano. Na proposta, apresentar o **Resumo clínico** como **entrega garantida** e o **assistente em conversa** como **evolução** (depende de autorização sobre privacidade/IA).
+
+### [23/09/2026] Redes, centros e usuários — APROVADO (implementar em breve)
+
+O autor aprovou o esboço `docs/esboco-redes-centros.html` (painel de administração e métricas por centro). **Implementar em breve, não agora.**
+- Login obrigatório; cada usuário pertence a um **centro** (vê só o seu) ou a uma **Rede** (vê todos os centros da Rede, com seletor "Todos / centro X").
+- **Panel de Red** com tabela comparativa por centro.
+- **Administração** (só o administrador): criar Redes, centros, usuários e a lista de doutoras de cada centro.
+- Proteção pelo banco (RLS); pacientes atuais → **C.S. San Luis**.
+- **Pendente de decisão do autor antes de implementar:**
+  1. responsável de Rede só vê ou também edita?
+  2. aviso "🔗 também em outro centro" (sem dados clínicos)?
+  3. quem é o Administrador?
+  4. lista exata dos centros da Red Centro e suas doutoras;
+  5. um usuário por centro ou um por profissional (recomendado: um por profissional).
+
+### [23/09/2026] Panel novo (esboço `docs/esboco-panel.html`, aguardando aprovação)
+Números animados com tendência, embudo "Del tamizaje al seguimiento", "Para hacer hoy", barras em vez de tortas, filtros de período e doutora, modo escuro.
