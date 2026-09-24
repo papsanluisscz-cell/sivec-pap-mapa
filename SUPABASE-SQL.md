@@ -50,6 +50,36 @@ alter table pacientes add column if not exists lote_envio text;
 
 ---
 
+## Paso 5 — Consulta (SOAP) aparte de la colposcopia (recomendado, sin riesgo)
+
+Crea la tabla `consultas` (nota S-O-A-P de cada atención). Al imprimir, la Historia clínica junta la consulta + la colposcopia.
+
+```sql
+create table if not exists consultas (
+  id bigint generated always as identity primary key,
+  paciente_id text not null,
+  fecha date not null default current_date,
+  doctora text,
+  subjetivo text,
+  objetivo_oce text,
+  objetivo_leucorrea text,
+  objetivo_color text,
+  objetivo text,
+  analisis text,
+  observaciones text,
+  plan jsonb,
+  plan_texto text,
+  derivacion text,
+  created_at timestamptz not null default now()
+);
+create index if not exists consultas_paciente_idx on consultas (paciente_id);
+alter table consultas enable row level security;
+create policy "consultas acceso del sistema" on consultas for all to anon, authenticated using (true) with check (true);
+grant select, insert, update, delete on consultas to anon, authenticated;
+```
+
+---
+
 ## Paso 3 — Proteger los datos de las pacientes (IMPORTANTE)
 
 Hoy cualquiera que tenga la URL y la clave *anon* de Supabase puede leer todos los datos.
@@ -74,6 +104,11 @@ create policy "Solo usuarias con sesión - pacientes"
 
 create policy "Solo usuarias con sesión - colposcopias"
   on colposcopias for all to authenticated using (true) with check (true);
+
+-- Si ya ejecutaste el Paso 5 (consultas):
+drop policy if exists "consultas acceso del sistema" on consultas;
+create policy "Solo usuarias con sesión - consultas"
+  on consultas for all to authenticated using (true) with check (true);
 ```
 
 Desde ese momento, sin iniciar sesión el sistema **no muestra ningún dato**

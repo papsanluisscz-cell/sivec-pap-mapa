@@ -442,7 +442,7 @@
   .fxEv::before { content: ""; position: absolute; left: 8px; top: 20px; bottom: 0; width: 2px; background: var(--line); }
   .fxEv:last-of-type::before { display: none; }
   .fxEv > i { position: absolute; left: 0; top: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--surface); border: 3px solid currentColor; }
-  .fxEv.alto { color: #dc2626; } .fxEv.bajo { color: #d97706; } .fxEv.neg { color: #16a34a; } .fxEv.pend { color: #2f6fb0; } .fxEv.colpo { color: #7c3aed; } .fxEv.met { color: #9a8690; }
+  .fxEv.soap { color: #0e7490; } .fxEv.alto { color: #dc2626; } .fxEv.bajo { color: #d97706; } .fxEv.neg { color: #16a34a; } .fxEv.pend { color: #2f6fb0; } .fxEv.colpo { color: #7c3aed; } .fxEv.met { color: #9a8690; }
   .fxDate { font-size: 11.5px; color: var(--ink-soft); } .fxTit { font-size: 13.5px; font-weight: 700; color: var(--ink); margin: 1px 0 3px; }
   .fxLine { font-size: 12.5px; color: var(--ink); margin-top: 2px; }
   .fxRes { font-weight: 700; } .fxRes.alto { color: #dc2626; } .fxRes.bajo { color: #b45309; } .fxRes.neg { color: #15803d; } .fxRes.pend { color: #2f6fb0; }
@@ -475,6 +475,22 @@
   .regBorr button, .regExist button { border: 1px solid currentColor; background: transparent; color: inherit; border-radius: 7px; padding: 4px 10px; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
   .regOk { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .regOk button { border: none; background: var(--teal-700); color: #fff; border-radius: 8px; padding: 7px 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  /* ===== Consulta (SOAP) ===== */
+  #consultaOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 960; padding: 16px; }
+  #consultaOverlay.open { display: flex; }
+  #consultaModal { background: var(--surface); color: var(--ink); border-radius: 12px; padding: 22px 24px; width: 640px; max-width: 100%; max-height: 90vh; overflow-y: auto; }
+  #consultaModal h2 { margin: 0 0 14px; font-size: 18px; }
+  #consultaModal .field, #regSoap .field { margin-bottom: 10px; }
+  #consultaModal textarea, #consultaModal select, #consultaModal input, #regSoap textarea, #regSoap select, #regSoap input:not([type=checkbox]) { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 7px; font-size: 13.5px; font-family: inherit; background: var(--surface); color: var(--ink); }
+  .soapO { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .soapPlan { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; border: 1px solid var(--line); border-radius: 6px; padding: 10px; font-size: 13px; }
+  #consultaModal .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+  .regSoapBody { padding: 10px 4px 0; }
+  .soapPlan label { display: flex !important; align-items: center; gap: 7px; font-weight: 500 !important; margin: 0 !important; cursor: pointer; }
+  .soapPlan input[type=checkbox] { width: auto !important; margin: 0; }
+  #consultaModal .actions button { padding: 9px 16px; border-radius: 7px; border: none; cursor: pointer; font-size: 13.5px; font-weight: 600; font-family: inherit; }
+  #consultaModal .cancelBtn { background: var(--paper); color: var(--ink); } #consultaModal .saveBtn { background: var(--teal-700); color: #fff; }
+  @media (max-width: 600px) { .soapO, .soapPlan { grid-template-columns: 1fr; } }
   /* ===== Balance: envíos ===== */
   .balTiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin: 4px 0 12px; }
   .balTile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
@@ -1148,6 +1164,8 @@
       </div>
       <div class="field"><label>Otros hallazgos</label><input name="otros_hallazgos"></div>
 
+      <div id="colpSoapNota" class="segNote" style="display:none">La nota de consulta (SOAP) ahora se carga aparte: tarjeta de la paciente → ⋯ → <b>Consulta (SOAP)</b>. Al imprimir, la Historia clínica junta la consulta y esta colposcopia.</div>
+      <div id="colpSoapBlock">
       <h3>SOAP</h3>
       <div class="field"><label>S — Subjetivo</label><textarea name="soap_subjetivo" rows="2" placeholder="Motivo de consulta / síntomas referidos"></textarea></div>
       <div class="row2">
@@ -1171,6 +1189,7 @@
           <label><input type="checkbox" name="plan" value="Orientación sexual"> Orientación sexual</label>
           <label><input type="checkbox" name="plan" value="Cauterización"> Cauterización</label>
         </div>
+      </div>
       </div>
       <div class="field"><label>Derivación</label>
         <select name="derivacion"><option value="">— Ninguna —</option><option>Oncología</option><option>Ginecología</option><option>Control en 6 meses</option><option>Control en 1 año</option></select>
@@ -1930,7 +1949,7 @@ async function onSubmit(e) {
     const nueva = insertado && insertado[0];
     msg.innerHTML = `<span class="regOk">✅ ${esc(data.nombre)} guardada correctamente.${nueva ? ' <button type="button" id="regPrint">🖨 Imprimir documentos</button>' : ''}</span>`;
     msg.className = 'ok';
-    if (nueva) document.getElementById('regPrint').onclick = () => printPatientDocs(nueva);
+    if (nueva) { await guardarSoapDeRegistro(nueva); document.getElementById('regPrint').onclick = () => printPatientDocs(nueva); }
     showToast('Paciente guardada correctamente ✔', 'ok');
     allPatientsData = []; // se vuelve a leer en el próximo registro, así también avisa de la toma recién guardada
     form.reset();
@@ -2303,6 +2322,7 @@ function renderPatientCards(data, base) {
         <button class="rowBtn printBtn" data-id="${p.id}">Imprimir</button>
         <span class="moreWrap"><button class="rowBtn moreBtn" title="Más acciones" aria-label="Más acciones">⋯</button>
           <span class="moreMenu">
+            <button class="rowBtn soapBtn" data-id="${p.id}">📝 Consulta (SOAP)</button>
             <button class="rowBtn colpBtn" data-id="${p.id}">🔬 Colposcopia</button>
             <hr>
             <button class="rowBtn delBtn danger" data-id="${p.id}">🗑 Excluir paciente</button>
@@ -3103,6 +3123,7 @@ document.getElementById('tableBody').addEventListener('click', (e) => {
   if (btn.classList.contains('editBtn')) openEdit(patient);
   if (btn.classList.contains('delBtn')) deletePatient(patient);
   if (btn.classList.contains('colpBtn')) openColposcopia(patient);
+  if (btn.classList.contains('soapBtn')) openConsulta(patient);
   if (btn.classList.contains('bdayBtn')) openBirthdayModal(patient);
 });
 
@@ -3268,6 +3289,7 @@ async function deletePatient(p) {
     nav.querySelector('.regNext').style.display = n < 3 ? '' : 'none';
     nav.querySelector('.regNext').textContent = n === 1 ? 'Siguiente: Toma →' : 'Siguiente: Consentimientos →';
     const v = document.getElementById('formView'); if (v && v.scrollTop > 120) v.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.onRegPaso) window.onRegPaso(n);
   }
   head.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) irA(+b.dataset.go, true); });
   nav.querySelector('.regBack').addEventListener('click', () => irA(Math.max(1, paso - 1)));
@@ -3343,10 +3365,172 @@ async function deletePatient(p) {
   form.fecha_nacimiento.addEventListener('change', () => { if (form.nombre.value) buscarExistente(); });
 })();
 
+// ================= Consulta (SOAP) =================
+// La nota de consulta (S-O-A-P) se guarda aparte de la colposcopia (tabla "consultas", Paso 5 del SQL).
+// Al imprimir, la Historia clínica junta la consulta + los hallazgos de la colposcopia.
+// Si la tabla todavía no existe, todo sigue como antes (el SOAP va dentro de la colposcopia).
+const SOAP_PLAN_OPC = ['Metronidazol 500mg VV x10 noches', 'Clotrimazol 500mg VV x10 noches', 'Aseo vulvoperineal', 'Orientación sexual', 'Cauterización'];
+let consultasTablaPromise = null;
+function consultasOk() {
+  if (!sb) return Promise.resolve(false);
+  if (!consultasTablaPromise) consultasTablaPromise = sb.from('consultas').select('id').limit(1).then(({ error }) => !error, () => false);
+  return consultasTablaPromise;
+}
+function soapCamposHTML() {
+  const sel = (k, ops) => `<select data-s="${k}"><option value="">— Seleccionar —</option>${ops.map(o => `<option>${o}</option>`).join('')}</select>`;
+  return `
+    <div class="field"><label>S — Subjetivo</label><textarea data-s="subjetivo" rows="2" placeholder="Motivo de consulta / síntomas referidos"></textarea></div>
+    <div class="soapO">
+      <div class="field"><label>O — Aspecto del cuello uterino</label>${sel('objetivo_oce', ['Íntegro', 'Eritematoso', 'Erosionado', 'Con Pólipo', 'Friable', 'Con Quiste de Naboth', 'Leucoplasia'])}</div>
+      <div class="field"><label>O — Leucorrea</label>${sel('objetivo_leucorrea', ['Ausente', 'Escasa', 'Moderada', 'Abundante'])}</div>
+      <div class="field"><label>O — Color</label>${sel('objetivo_color', ['Blanquecina', 'Amarillenta', 'Verdosa', 'Sanguinolenta'])}</div>
+    </div>
+    <div class="field"><label>O — Otros hallazgos del examen</label><textarea data-s="objetivo" rows="2" placeholder="Signos vitales, examen físico, especuloscopía…"></textarea></div>
+    <div class="field"><label>A — Análisis (diagnóstico)</label><textarea data-s="analisis" rows="2"></textarea></div>
+    <div class="field"><label>P — Plan (marcar los que correspondan)</label>
+      <div class="soapPlan">${SOAP_PLAN_OPC.map(o => `<label><input type="checkbox" data-s="plan" value="${esc(o)}"> ${esc(o)}</label>`).join('')}</div>
+      <textarea data-s="plan_texto" rows="2" placeholder="Otras indicaciones, receta, controles…" style="margin-top:6px"></textarea></div>
+    <div class="row2">
+      <div class="field"><label>Derivación</label>${sel('derivacion', ['Oncología', 'Ginecología', 'Colposcopia', 'Control en 6 meses', 'Control en 1 año'])}</div>
+      <div class="field"><label>Observaciones</label><input data-s="observaciones"></div>
+    </div>`;
+}
+function soapLeer(root) {
+  const v = {};
+  root.querySelectorAll('[data-s]').forEach(el => {
+    if (el.type === 'checkbox') { if (el.checked) (v[el.dataset.s] = v[el.dataset.s] || []).push(el.value); }
+    else v[el.dataset.s] = el.value.trim() || null;
+  });
+  v.plan = v.plan || [];
+  return v;
+}
+function soapEscribir(root, c) {
+  root.querySelectorAll('[data-s]').forEach(el => {
+    const k = el.dataset.s;
+    if (el.type === 'checkbox') el.checked = Array.isArray(c && c.plan) && c.plan.includes(el.value);
+    else el.value = (c && c[k]) || '';
+  });
+}
+function soapVacio(v) { return !['subjetivo', 'objetivo_oce', 'objetivo_leucorrea', 'objetivo_color', 'objetivo', 'analisis', 'plan_texto', 'derivacion', 'observaciones'].some(k => v[k]) && !(v.plan || []).length; }
+async function getLatestConsulta(pacienteId) {
+  if (!(await consultasOk())) return null;
+  const { data, error } = await sb.from('consultas').select('*').eq('paciente_id', String(pacienteId)).order('fecha', { ascending: false }).order('created_at', { ascending: false }).limit(1);
+  return error || !data || !data.length ? null : data[0];
+}
+// Arma los 4 campos S-O-A-P de la Historia clínica con la consulta + la colposcopia
+function hcSoapDatos(consulta, colp) {
+  const up = s => (s || '').toUpperCase();
+  const arr = v => Array.isArray(v) ? v : (v ? [v] : []); // lista o texto suelto
+  const c = consulta || {};
+  const S = c.subjetivo || (colp && colp.soap_subjetivo) || '';
+  const O = [];
+  const oce = c.objetivo_oce || (!consulta && colp && colp.soap_objetivo_oce);
+  const leu = c.objetivo_leucorrea || (!consulta && colp && colp.soap_objetivo_leucorrea);
+  const col = c.objetivo_color || (!consulta && colp && colp.soap_objetivo_color);
+  if (oce) O.push('Cuello uterino: ' + oce + '.'); if (leu) O.push('Leucorrea: ' + leu + '.'); if (col) O.push('Color: ' + col + '.');
+  if (c.objetivo) O.push(c.objetivo.replace(/\.?$/, '.'));
+  if (colp && (colp.prueba_schiller || colp.zona_afectada || colp.otros_hallazgos) && consulta) {
+    O.push('Colposcopia' + (colp.fecha ? ' (' + fmtFecha(colp.fecha) + ')' : '') + ':' + (colp.prueba_schiller ? ' Schiller ' + colp.prueba_schiller.toLowerCase() + '.' : '') + (colp.otros_hallazgos ? ' ' + colp.otros_hallazgos + '.' : ''));
+  }
+  const A = [];
+  if (colp && arr(colp.lesion).length) A.push(arr(colp.lesion).join(', ') + '.');
+  if (colp && colp.zona_afectada) A.push(colp.zona_afectada + '.');
+  const an = c.analisis || (!consulta && colp && colp.soap_analisis);
+  if (an) A.push(an);
+  const P = [];
+  const planes = [...new Set([...arr(c.plan), ...arr(colp && colp.plan)])];
+  if (planes.length) P.push(planes.join('. ') + '.');
+  if (c.plan_texto) P.push(c.plan_texto.replace(/\.?$/, '.'));
+  const derivs = [...new Set([c.derivacion, colp && colp.derivacion].filter(Boolean))];
+  if (derivs.length) P.push('Derivación: ' + derivs.join(', ') + '.');
+  return { colp_fecha: fmtFecha((consulta && consulta.fecha) || (colp && colp.fecha)) || '', colp_subjetivo: up(S), colp_objetivo: up(O.join(' ')), colp_analisis: up(A.join(' ')), colp_plan: up(P.join(' ')) };
+}
+async function completarHc(data, p) {
+  const [colp, consulta] = await Promise.all([getLatestColposcopia(p.id), getLatestConsulta(p.id)]);
+  if (colp || consulta) Object.assign(data, hcSoapDatos(consulta, colp));
+  return { colp, consulta };
+}
+
+// ---- Modal de consulta ----
+let consultaPaciente = null, consultaEditId = null;
+function consultaModalEl() {
+  let ov = document.getElementById('consultaOverlay');
+  if (ov) return ov;
+  ov = document.createElement('div'); ov.id = 'consultaOverlay';
+  ov.innerHTML = `<div id="consultaModal"><h2>📝 Consulta (SOAP) — <span id="consultaNombre"></span></h2>
+    <form id="consultaForm"><div class="row2"><div class="field"><label>Fecha</label><input type="date" data-s="fecha" required></div>
+      <div class="field"><label>Profesional</label><select data-s="doctora">${DOCTORAS_BASE.map(d => `<option>${esc(d)}</option>`).join('')}</select></div></div>
+      ${soapCamposHTML()}
+      <div class="actions"><button type="button" class="cancelBtn" id="consultaCancel">Cancelar</button><button type="submit" class="saveBtn">Guardar consulta</button></div>
+    </form></div>`;
+  document.body.appendChild(ov);
+  ov.querySelector('#consultaCancel').onclick = () => ov.classList.remove('open');
+  ov.querySelector('#consultaForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const v = soapLeer(e.target);
+    if (soapVacio(v)) { alert('La consulta está vacía.'); return; }
+    const row = Object.assign(v, { paciente_id: String(consultaPaciente.id) });
+    const q = consultaEditId ? sb.from('consultas').update(row).eq('id', consultaEditId) : sb.from('consultas').insert([row]);
+    const { error } = await q;
+    if (error) { alert('Error al guardar la consulta: ' + error.message); return; }
+    ov.classList.remove('open');
+    const p = consultaPaciente;
+    showToast('Consulta guardada ✔', 'ok');
+    if (confirm('Consulta guardada. ¿Imprimir los documentos (con la Historia clínica) ahora?')) printPatientDocs(p);
+    if (fichaPaciente && document.getElementById('fichaDrawer')?.classList.contains('open')) openFicha(fichaPaciente);
+  });
+  return ov;
+}
+async function openConsulta(p) {
+  if (!(await consultasOk())) {
+    alert('Para registrar consultas (SOAP) aparte, primero hay que ejecutar el Paso 5 del SQL en Supabase.\nMientras tanto, el SOAP se carga dentro de "Colposcopia".');
+    return;
+  }
+  const ov = consultaModalEl(), form = ov.querySelector('#consultaForm');
+  consultaPaciente = p; consultaEditId = null;
+  const prev = await getLatestConsulta(p.id);
+  if (prev && confirm(`${p.nombre} ya tiene una consulta del ${fmtFecha(prev.fecha) || '—'} para esta toma.\n\nAceptar = modificar esa consulta · Cancelar = crear una nueva`)) {
+    consultaEditId = prev.id; soapEscribir(form, prev);
+  } else {
+    soapEscribir(form, null);
+    form.querySelector('[data-s="fecha"]').value = hoyISO();
+    form.querySelector('[data-s="doctora"]').value = p.doctora || DOCTORAS_BASE[0];
+  }
+  ov.querySelector('#consultaNombre').textContent = p.nombre || '';
+  ov.classList.add('open');
+}
+
+// En "Colposcopia", el bloque SOAP se oculta cuando existe la tabla de consultas (queda solo el procedimiento)
+async function ajustarColposcopiaSoap() {
+  const b = document.getElementById('colpSoapBlock'); if (!b) return;
+  const ok = await consultasOk();
+  b.style.display = ok ? 'none' : '';
+  const n = document.getElementById('colpSoapNota'); if (n) n.style.display = ok ? '' : 'none';
+}
+
+// Registrar: nota de consulta opcional en el paso 3; se guarda después de crear la toma
+(function () {
+  const form = document.getElementById('patientForm');
+  const det = document.createElement('details'); det.className = 'consentBox'; det.id = 'regSoap'; det.dataset.step = '3';
+  det.innerHTML = `<summary>Nota de consulta — SOAP (opcional) <span class="helpTip" data-tip="Si la completás acá, la Historia clínica sale con el SOAP al imprimir. También se puede cargar después desde la tarjeta de la paciente (⋯ → Consulta).">ⓘ</span></summary><div class="regSoapBody">${soapCamposHTML()}</div>`;
+  const primero = form.querySelector('details.consentBox');
+  form.insertBefore(det, primero || document.getElementById('formMsg'));
+  det.style.display = 'none';
+  window.onRegPaso = n => { if (n === 3) consultasOk().then(ok => { det.style.display = ok ? '' : 'none'; }); };
+})();
+async function guardarSoapDeRegistro(nueva) {
+  const det = document.getElementById('regSoap'); if (!det || !nueva || !(await consultasOk())) return;
+  const v = soapLeer(det); if (soapVacio(v)) return;
+  const row = Object.assign(v, { paciente_id: String(nueva.id), fecha: nueva.fecha_toma || hoyISO(), doctora: nueva.doctora || null });
+  const { error } = await sb.from('consultas').insert([row]);
+  if (error) showToast('La toma se guardó, pero la consulta no: ' + error.message, 'err');
+  soapEscribir(det, null); det.open = false;
+}
+
 // ================= Ficha de la paciente (línea de tiempo) =================
 // Base del futuro "Historial" del SIVEC: todas las tomas, resultados, entregas, seguimientos y colposcopias
 // de la misma paciente (agrupadas por carnet o nombre + nacimiento), de la más reciente a la más antigua.
-let fichaPaciente = null;
+let fichaPaciente = null, fichaConsultas = [];
 function fichaEl() {
   let d = document.getElementById('fichaDrawer');
   if (!d) {
@@ -3388,6 +3572,9 @@ function fichaEventos(grupo, colpos) {
     ev.push({ fecha: p.fecha_toma || '', tono, titulo: tipo, meta: [p.doctora, p.numero_folio_pap ? 'N° ' + p.numero_folio_pap : ''].filter(Boolean).join(' · '), lineas, id: p.id });
     if (p.anticonceptivo_metodo && p.anticonceptivo_fecha_inicio) ev.push({ fecha: p.anticonceptivo_fecha_inicio, tono: 'met', titulo: 'Método anticonceptivo: ' + esc(p.anticonceptivo_metodo), meta: '', lineas: p.anticonceptivo_proximo_control ? [`<span class="fxMut">Próximo control: ${fmtFecha(p.anticonceptivo_proximo_control)}</span>`] : [] });
   });
+  (fichaConsultas || []).filter(c => grupo.some(g => String(g.id) === String(c.paciente_id))).forEach(c => ev.push({ fecha: c.fecha || '', tono: 'soap', titulo: 'Consulta (SOAP)', meta: c.doctora || '', lineas: [
+    c.subjetivo ? '<b>S:</b> ' + esc(c.subjetivo) : '', c.analisis ? '<b>A:</b> ' + esc(c.analisis) : '',
+    (Array.isArray(c.plan) && c.plan.length) || c.plan_texto ? '<b>P:</b> ' + esc([...(Array.isArray(c.plan) ? c.plan : []), c.plan_texto].filter(Boolean).join('. ')) : '', c.derivacion ? '➡️ Derivación: ' + esc(c.derivacion) : ''].filter(Boolean) }));
   (colpos || []).forEach(c => ev.push({ fecha: c.fecha || '', tono: 'colpo', titulo: 'Colposcopia', meta: '', lineas: [c.lesion ? 'Lesión: ' + esc(c.lesion) : '', c.zona_afectada ? 'Zona: ' + esc(c.zona_afectada) : '', c.prueba_schiller ? 'Schiller: ' + esc(c.prueba_schiller) : ''].filter(Boolean) }));
   return ev.sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
 }
@@ -3416,7 +3603,7 @@ async function openFicha(p) {
           ${e.lineas.map(l => `<div class="fxLine">${l}</div>`).join('')}</div>`).join('')}
         ${colpos === null ? '<div class="fxMut" style="padding-left:26px">Cargando colposcopias…</div>' : ''}
       </div>
-      <div class="fxFoot"><button type="button" class="fxBtn primary" data-act="edit">Editar</button><button type="button" class="fxBtn" data-act="print">Imprimir</button><button type="button" class="fxBtn" data-act="nueva">+ Nueva toma</button></div>`;
+      <div class="fxFoot"><button type="button" class="fxBtn primary" data-act="edit">Editar</button><button type="button" class="fxBtn" data-act="soap">📝 Consulta</button><button type="button" class="fxBtn" data-act="print">Imprimir</button><button type="button" class="fxBtn" data-act="nueva">+ Nueva toma</button></div>`;
   };
   render(null);
   d.classList.add('open');
@@ -3427,9 +3614,14 @@ async function openFicha(p) {
     const b = e.target.closest('[data-act]'); if (!b) return;
     if (b.dataset.act === 'edit') { closeFicha(); openEdit(ultima); }
     if (b.dataset.act === 'print') printPatientDocs(ultima);
+    if (b.dataset.act === 'soap') openConsulta(ultima);
     if (b.dataset.act === 'nueva') { closeFicha(); nuevaTomaDe(ultima); }
   };
-  const { data } = await sb.from('colposcopias').select('*').in('paciente_id', grupo.map(x => x.id)).order('fecha', { ascending: false });
+  const [{ data }, cons] = await Promise.all([
+    sb.from('colposcopias').select('*').in('paciente_id', grupo.map(x => x.id)).order('fecha', { ascending: false }),
+    consultasOk().then(ok => ok ? sb.from('consultas').select('*').in('paciente_id', grupo.map(x => String(x.id))) : { data: [] }),
+  ]);
+  fichaConsultas = (cons && cons.data) || [];
   if (fichaPaciente === p) render(data || []);
 }
 // "+ Nueva toma": abre Registrar con los datos personales ya completados.
@@ -3830,6 +4022,7 @@ function fillColpForm(form, colp) {
 }
 
 async function openColposcopia(p) {
+  ajustarColposcopiaSoap();
   const form = document.getElementById('colpForm');
   const existing = await getLatestColposcopia(p.id);
   if (existing) {
@@ -4050,25 +4243,7 @@ async function printPatientDocs(p) {
   data.sexo_f = 'X';
   data.sexo_f2 = 'X';
 
-  const colp = await getLatestColposcopia(p.id);
-  if (colp) {
-    data.colp_fecha = fmtFecha(colp.fecha);
-    data.colp_subjetivo = (colp.soap_subjetivo || '').toUpperCase();
-    const objParts = [];
-    if (colp.soap_objetivo_oce) objParts.push('Cuello uterino: ' + colp.soap_objetivo_oce + '.');
-    if (colp.soap_objetivo_leucorrea) objParts.push('Leucorrea: ' + colp.soap_objetivo_leucorrea + '.');
-    if (colp.soap_objetivo_color) objParts.push('Color: ' + colp.soap_objetivo_color + '.');
-    data.colp_objetivo = objParts.join(' ').toUpperCase();
-    const analisisParts = [];
-    if (colp.lesion && colp.lesion.length) analisisParts.push(colp.lesion.join(', ') + '.');
-    if (colp.zona_afectada) analisisParts.push(colp.zona_afectada + '.');
-    if (colp.soap_analisis) analisisParts.push(colp.soap_analisis);
-    data.colp_analisis = analisisParts.join(' ').toUpperCase();
-    const planParts = [];
-    if (colp.plan && colp.plan.length) planParts.push(colp.plan.join('. ') + '.');
-    if (colp.derivacion) planParts.push('Derivación: ' + colp.derivacion + '.');
-    data.colp_plan = planParts.join(' ').toUpperCase();
-  }
+  await completarHc(data, p); // consulta (SOAP) + colposcopia
   document.getElementById('printTitle').textContent = 'Documentos — ' + (p.nombre || '');
   document.getElementById('printOverlay').classList.add('open');
   document.getElementById('printLoading').style.display = 'block';
@@ -4209,25 +4384,7 @@ async function saveDocsToDrive() {
     const data = buildTemplateData(p);
     data.sexo_f = 'X';
     data.sexo_f2 = 'X';
-    const colp = await getLatestColposcopia(p.id);
-    if (colp) {
-      data.colp_fecha = fmtFecha(colp.fecha);
-      data.colp_subjetivo = (colp.soap_subjetivo || '').toUpperCase();
-      const objParts = [];
-      if (colp.soap_objetivo_oce) objParts.push('Cuello uterino: ' + colp.soap_objetivo_oce + '.');
-      if (colp.soap_objetivo_leucorrea) objParts.push('Leucorrea: ' + colp.soap_objetivo_leucorrea + '.');
-      if (colp.soap_objetivo_color) objParts.push('Color: ' + colp.soap_objetivo_color + '.');
-      data.colp_objetivo = objParts.join(' ').toUpperCase();
-      const analisisParts = [];
-      if (colp.lesion && colp.lesion.length) analisisParts.push(colp.lesion.join(', ') + '.');
-      if (colp.zona_afectada) analisisParts.push(colp.zona_afectada + '.');
-      if (colp.soap_analisis) analisisParts.push(colp.soap_analisis);
-      data.colp_analisis = analisisParts.join(' ').toUpperCase();
-      const planParts = [];
-      if (colp.plan && colp.plan.length) planParts.push(colp.plan.join('. ') + '.');
-      if (colp.derivacion) planParts.push('Derivación: ' + colp.derivacion + '.');
-      data.colp_plan = planParts.join(' ').toUpperCase();
-    }
+    await completarHc(data, p); // consulta (SOAP) + colposcopia
 
     const targets = [
       { tpl: PDFTPL_D1, numero: p.numero_folio_d1 },
