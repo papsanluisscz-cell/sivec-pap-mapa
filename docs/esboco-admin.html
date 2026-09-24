@@ -148,6 +148,8 @@
   table.mx2 td.on { color:#15803d; font-size:18px; } table.mx2 td.pi { color:#c2410c; font-size:18px; } table.mx2 td { color:#c9bcc2; font-size:18px; } table.mx2 td:first-child { font-size:13.5px; color:var(--ink); }
   .catl { padding:8px 10px; border-radius:9px; font-size:13.5px; margin-bottom:4px; display:flex; justify-content:space-between; } .catl small { color:var(--soft); } .catl.on { background:var(--tint); font-weight:700; }
   table.mx2 { table-layout:fixed; } table.mx2 th { font-size:10px; padding:6px 3px; letter-spacing:.02em; white-space:normal; text-align:center; } table.mx2 th:first-child { width:170px; } table.mx2 td { padding:8px 3px; }
+  td.num2 { font-size:18px; font-weight:800; text-align:center; }
+  .svcg { display:flex; flex-wrap:wrap; gap:6px; } .svcg span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; background:#f3eef0; color:#9c8b92; } .svcg .on { background:#dcf3e5; color:#15803d; }
 </style>
 </head>
 <body>
@@ -160,6 +162,8 @@
   <button class="tab" data-t="a6">6. Catálogos</button>
   <button class="tab" data-t="a7">7. Auditoría y seguridad</button>
   <button class="tab" data-t="a8">8. Equipos y configuración</button>
+  <button class="tab" data-t="a9">9. Capacidad del centro</button>
+  <button class="tab" data-t="a10">10. Internación en 1er nivel</button>
 </div>
 <div class="warn">⚠️ Dibujo para aprobar, con datos inventados. El Admin es la base: sin él no hay usuarios, centros ni permisos.</div>
 
@@ -372,6 +376,68 @@
   </div>
 </section>
 
+<!-- ============ A9 ============ -->
+<section class="scr" id="a9">
+  <div class="app"><div class="brand">SIVEC <span>ADMIN</span></div><div class="who">🏥 Capacidad y servicios · C.S. San Luis (1er nivel)</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Camas — cuántas tiene y para qué</div>
+        <table class="l"><thead><tr><th>Área</th><th>Camas</th><th>Uso</th><th>Estancia máxima sugerida</th></tr></thead><tbody>
+          <tr><td>🛏 Observación</td><td class="num2">3</td><td>hidratación, nebulización, control</td><td>12 h</td></tr>
+          <tr><td>🛏 Internación corta</td><td class="num2">4</td><td>adultos y niños</td><td>72 h → si no mejora, referir</td></tr>
+          <tr><td>🤰 Sala de partos</td><td class="num2">1</td><td>parto normal</td><td>—</td></tr>
+          <tr><td>🛏 Puerperio</td><td class="num2">2</td><td>madre + RN (cuna)</td><td>24–48 h</td></tr>
+          <tr><td>👶 Cunas / RN</td><td class="num2">2</td><td>alojamiento conjunto</td><td>—</td></tr>
+          <tr><td>🩹 Curaciones / procedimientos</td><td class="num2">1</td><td>camilla</td><td>—</td></tr>
+        </tbody></table>
+        <div class="row" style="margin-top:8px"><span class="btn">＋ Área</span><span class="mini">Total: <b>11 camas + 2 cunas</b> · cada cama con número y estado (libre, ocupada, limpieza, fuera de servicio)</span></div></div>
+      <div>
+        <div class="card"><div class="lbl">Servicios que habilitan cada módulo</div>
+          <div class="svcg"><span class="on">✓ Consulta externa</span><span class="on">✓ Internación</span><span class="on">✓ Partos</span><span class="on">✓ Farmacia</span><span class="on">✓ Laboratorio básico</span><span class="on">✓ Vacunatorio</span><span>○ Quirófano</span><span>○ Rayos X</span><span class="on">✓ Ecografía</span><span>○ Ambulancia propia</span></div>
+          <div class="mini" style="margin-top:6px">Si marca “Internación”, se activa el mapa de camas para este centro.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Otros datos del centro</div>
+          <div class="kv2"><span>Atención</span><b>24 h (guardia)</b></div>
+          <div class="kv2"><span>Consultorios</span><b>4</b></div>
+          <div class="kv2"><span>Médicos de guardia</span><b>1 por turno</b></div>
+          <div class="kv2"><span>Enfermeras por turno</span><b>2</b></div>
+          <div class="kv2"><span>Oxígeno</span><b>2 tubos · alerta si &lt; 25%</b></div>
+          <div class="kv2"><span>Población asignada</span><b>18.400 hab.</b></div>
+          <div class="kv2"><span>Hospital de referencia</span><b>Hospital municipal</b></div>
+          <div class="kv2"><span>Ambulancia</span><b>de la red (central)</b></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ A10 ============ -->
+<section class="scr" id="a10">
+  <div class="app"><div class="brand">SIVEC <span>INTERNACIÓN</span></div><div class="who">🛏 C.S. San Luis · camas del centro · guardia nocturna</div></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:1.4fr 1fr">
+      <div class="card"><div class="lbl">Mapa de camas — 1er nivel</div>
+        <div class="beds" style="grid-template-columns:repeat(4,1fr)">
+          <div class="bed g"><b>O1</b>Pedro L.<small>observación · nebulización · 3 h</small></div>
+          <div class="bed free"><b>O2</b>libre<small>observación</small></div>
+          <div class="bed free"><b>O3</b>libre<small>observación</small></div>
+          <div class="bed clean"><b>C1</b>en limpieza<small>camilla de procedimientos</small></div>
+          <div class="bed a"><b>I1</b>Juana M.<small>deshidratación · 30 h</small></div>
+          <div class="bed a"><b>I2</b>Tomás G. (3 a)<small>neumonía · 58 h ⏳</small></div>
+          <div class="bed free"><b>I3</b>libre<small>internación</small></div>
+          <div class="bed free"><b>I4</b>libre<small>internación</small></div>
+          <div class="bed p"><b>P1</b>Rosa V. + RN<small>puerperio · 18 h</small></div>
+          <div class="bed free"><b>P2</b>libre<small>puerperio</small></div>
+          <div class="bed p"><b>SP</b>Carla T.<small>trabajo de parto · 5 cm</small></div>
+        </div>
+        <div class="mini" style="margin-top:6px">O = observación · I = internación corta · P = puerperio · SP = sala de partos · C = curaciones</div></div>
+      <div>
+        <div class="card alertc"><div class="lbl">Alertas del centro</div><div style="font-size:13.5px;line-height:1.6">⏳ <b>Tomás G.</b>: 58 h internado (máximo 72 h) — si no mejora, <b>referir</b> al hospital (botón Derivar, pide ambulancia).<br>🤰 <b>Carla T.</b>: partograma en curso · alerta si cruza la línea.<br>🫁 Oxígeno: tubo 2 al 30%.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Lo mismo que en el hospital, en pequeño</div><div style="font-size:13.5px;line-height:1.6">✓ Nota de ingreso y evolución · ✓ control de signos vitales · ✓ kárdex de medicamentos · ✓ alta con indicaciones · ✓ o <b>referencia</b> si se complica. Todo en la línea de tiempo.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">La red lo ve</div><div style="font-size:13.5px">El responsable de Red ve las camas libres de <b>todos</b> los centros: puede mandar una paciente a un centro cercano en vez de al hospital.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <div class="note" id="note"></div>
 <script>
   const NOTES = {
@@ -382,6 +448,8 @@
     a5: '<b>Módulos por centro:</b> cada estabelecimento liga só o que usa — é a forma de vender por pacotes (Centro de saúde, Hospital, Rede).',
     a6: '<b>Catálogos:</b> medicamentos (LINAME), exames, CIE-10, procedimentos, modelos por especialidade, códigos do D-1 e textos de SMS, iguais para toda a rede e com versão. O que um centro cria vira proposta para aprovar.',
     a7: '<b>Auditoria e segurança:</b> quem viu o quê e onde, alertas de uso estranho (ex.: muitas histórias de madrugada), backups e regras de segurança.',
+    a9: '<b>Capacidade do centro:</b> quantas camas tem e para quê (observação, internação curta, partos, puerpério, berços), estância máxima sugerida, serviços habilitados (marcar Internação ativa o mapa de camas) e outros dados: atenção 24 h, plantão, oxigênio, população, hospital de referência.',
+    a10: '<b>Internação no 1º nível:</b> o mesmo mapa de camas do hospital, em pequeno — observação, internação curta, puerpério e sala de partos, com alertas de tempo máximo e de referência. A Rede vê as camas livres de todos os centros.',
     a8: '<b>Equipamentos e configuração:</b> leitores de digital, câmera, TV, impressoras e celular do centro com seu estado; regras clínicas e de mensagens do centro.',
   };
   const tabs = document.querySelectorAll('.tab');

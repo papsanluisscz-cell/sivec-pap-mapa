@@ -412,3 +412,6 @@ Respostas às 5 decisões pendentes de Redes/centros ficam propostas no desenho:
 - **Fila mista do médico:** citas na sua hora; entre elas fichas por ordem de chegada; prioridade (grávida, idoso, criança < 5, deficiência, alarme) sobe.
 - **Ficha pelo celular** (Mi salud/WhatsApp) com hora aproximada; parte das fichas sempre reservada para a janela (quem não tem celular).
 - Indicadores de fichas: entregues, % por celular, foram embora sem atenção, espera média, dias em que acabam cedo.
+**Ajuste pedido pelo autor — camas no 1º nível:** centros de 1º nível também internam (poucas camas). Acrescentado ao Admin (`admin-09`, `admin-10`):
+- **Capacidade do centro** (configuração no painel administrador): camas por área (observação, internação curta, sala de partos, puerpério, berços, curativos) com estância máxima sugerida; serviços habilitados (marcar "Internação" ativa o mapa de camas); atenção 24 h, consultórios, plantão, enfermeiras por turno, oxigênio com alerta, população assignada, hospital de referência, ambulância.
+- **Internação no 1º nível:** mapa de camas pequeno, alertas (tempo máximo → referir, partograma, oxigênio), nota de ingresso/evolução, sinais vitais, kárdex, alta ou referência; a Rede vê as camas livres de todos os centros.
