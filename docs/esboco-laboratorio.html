@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIVEC Laboratorio</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
+    --n1:#2f6fb0; --n2:#0e7490; --n3:#7c3aed; --n4:#b4235a; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .topbar { position:sticky; top:0; z-index:5; background:#2a1720; color:#fff; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; }
+  .topbar b { margin-right:6px; font-size:15px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; border:1px solid #6b4a58; background:transparent; color:#fff; border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tab.on { background:#fff; color:var(--wine-d); border-color:#fff; }
+  .warn { max-width:1100px; margin:14px auto 0; background:#fff7e0; border:1px solid #ecd9a0; border-radius:10px; padding:10px 14px; font-size:14px; color:#5b4712; }
+  .scr { display:none; max-width:1100px; margin:14px auto 30px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,.14); }
+  .scr.on { display:block; }
+  .app { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; }
+  .app .brand { font-weight:800; font-size:20px; letter-spacing:.04em; } .app .brand span { font-size:11px; background:#fff; color:var(--wine-d); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:3px; letter-spacing:.08em; }
+  .app .who { font-size:14px; opacity:.95; }
+  .body { padding:18px 22px 22px; }
+  h2 { margin:0 0 4px; font-size:20px; } .sub { color:var(--soft); font-size:14px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cols { display:grid; gap:14px; } .c2 { grid-template-columns:1fr 1fr; } .c3 { grid-template-columns:1fr 1fr 1fr; } .c21 { grid-template-columns:1.6fr 1fr; }
+  .lbl { font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); margin:10px 0 5px; }
+  .lbl:first-child { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:13px; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .chip.on { background:var(--tint); border-color:var(--wine); color:var(--wine-d); font-weight:700; }
+  .inp { border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13.5px; background:#fff; min-height:36px; }
+  .inp.tall { min-height:62px; line-height:1.45; }
+  .pri { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pri div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; }
+  .pri div b { display:block; font-size:14px; } .pri div.on { border:2px solid var(--wine); background:var(--tint); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .auto { background:#f3f7fb; border:1px dashed #b9cde3; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.55; }
+  .auto b { color:#1e4f8a; }
+  .att { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; } .att span { font-size:12.5px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13.5px; font-weight:700; border-radius:9px; padding:8px 14px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .btn.p { background:var(--wine); border-color:var(--wine); color:#fff; } .btn.g { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fp { width:26px; height:30px; vertical-align:middle; }
+  table.l { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; border-radius:12px; overflow:hidden; }
+  table.l th { text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); padding:9px 10px; border-bottom:1px solid var(--line); background:#fff; }
+  table.l td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .st { font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .st.bad { background:var(--badbg); color:var(--bad); } .st.warn { background:var(--warnbg); color:var(--warn); } .st.ok { background:var(--okbg); color:var(--ok); } .st.info { background:#e0ecfa; color:#1e4f8a; } .st.mut { background:#eee; color:#555; }
+  .lvl { font-size:11px; font-weight:800; color:#fff; border-radius:6px; padding:2px 7px; }
+  .mini { font-size:12px; color:var(--soft); }
+  .note { max-width:1100px; margin:-16px auto 30px; background:#fff; border-radius:10px; padding:12px 16px; font-size:14px; line-height:1.5; color:#3b3035; border-left:4px solid var(--wine); }
+  /* flujo */
+  .levels { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin:6px 0 4px; }
+  .lv { text-align:center; padding:0 8px; }
+  .lv .ic { width:74px; height:74px; border-radius:18px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; }
+  .lv b { display:block; font-size:15px; } .lv span { font-size:12.5px; color:var(--soft); }
+  .arrows { position:relative; height:74px; margin-top:-120px; margin-bottom:60px; pointer-events:none; }
+  .loop { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+  .loop div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12.3px; text-align:center; position:relative; }
+  .loop div b { display:block; font-size:13px; } .loop i { font-style:normal; display:block; font-size:18px; }
+  .loop div:not(:last-child)::after { content:"›"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--soft); font-size:18px; }
+  .world { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .world div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:12.3px; line-height:1.4; }
+  .world b { display:block; font-size:13px; color:var(--wine-d); }
+  /* seguimiento */
+  .steps { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin:8px 0 4px; }
+  .steps div { text-align:center; font-size:12px; position:relative; padding-top:30px; }
+  .steps div::before { content:""; position:absolute; top:9px; left:0; right:0; height:4px; background:#e3d6dc; }
+  .steps div:first-child::before { left:50%; } .steps div:last-child::before { right:50%; }
+  .steps div.done::before { background:var(--ok); } .steps div.cur::before { background:linear-gradient(90deg,var(--ok) 50%,#e3d6dc 50%); }
+  .steps i { position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:50%; background:#e3d6dc; color:#fff; font-style:normal; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:3px solid var(--paper); }
+  .steps .done i { background:var(--ok); } .steps .cur i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .steps b { display:block; font-size:12.5px; } .steps small { color:var(--soft); }
+  .tl { border-left:3px solid var(--line); margin-left:8px; padding-left:14px; }
+  .tl div { position:relative; font-size:13px; margin-bottom:10px; line-height:1.4; }
+  .tl div::before { content:""; position:absolute; left:-21px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--c,#999); border:2px solid #fff; }
+  .kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:600; } .kpi b { font-size:28px; letter-spacing:-.01em; } .kpi span { font-size:12px; color:var(--soft); }
+  .bars div.r { display:grid; grid-template-columns:170px 1fr 54px; align-items:center; gap:10px; font-size:13px; margin:7px 0; }
+  .bars .trk { height:14px; border-radius:0 4px 4px 0; background:transparent; position:relative; }
+  .bars .fill { height:14px; border-radius:0 4px 4px 0; background:var(--wine); }
+  .bars .ref { position:absolute; top:-3px; bottom:-3px; width:2px; background:#2d2429; }
+  .bars .v { font-weight:700; text-align:right; }
+  .alertc { border-left:4px solid var(--bad); }
+
+  .role .rh { display:flex; gap:10px; align-items:center; margin-bottom:8px; } .role .rh b { display:block; font-size:15px; } .role .rh small { color:var(--soft); font-size:12px; }
+  .ri { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .todo { display:flex; align-items:center; gap:10px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .todo:last-child { border-bottom:none; }
+  .todo .st { min-width:30px; text-align:center; font-size:13px; }
+  .mini2 { font-size:13px; line-height:1.5; } .mini2 b { display:block; margin-bottom:2px; }
+  .flowbar { display:flex; gap:6px; margin-bottom:12px; } .flowbar span { flex:1; text-align:center; font-size:13px; font-weight:700; padding:7px; border-radius:9px; background:#fff; border:1px solid var(--line); color:var(--soft); }
+  .flowbar span.on { background:var(--okbg); color:var(--ok); border-color:#b8e3c7; } .flowbar span.cur { background:var(--wine); color:#fff; border-color:var(--wine); }
+  .found { display:flex; gap:12px; align-items:center; margin-top:10px; padding:10px; border-radius:10px; background:#f3f9f5; border:1px solid #cfe9d8; }
+  .photo2 { width:64px; height:72px; border-radius:10px; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:24px; flex:none; }
+  .k2 { display:block; font-size:10.5px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.04em; }
+  .scanner { width:150px; height:160px; margin:6px auto 0; border-radius:18px; background:radial-gradient(circle at 50% 45%, #fff 0, #f7e9ef 70%); border:3px solid #d9b9c6; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -6px 12px rgba(125,42,76,.12); }
+  .ticket { margin-top:12px; text-align:center; }
+  .tk { border:2px dashed var(--wine); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:2px; font-size:13.5px; } .tk b { font-size:40px; color:var(--wine-d); letter-spacing:.04em; line-height:1.1; } .tk small { color:var(--soft); font-size:11.5px; }
+  .q2 { padding:8px 10px; border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:13.5px; background:#fff; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; } .q2 .mini { width:100%; }
+  .q2.cur { border:2px solid var(--wine); background:var(--tint); } .q2 .st { margin-left:auto; }
+  .vit2 { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .vit2 div { background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 8px; font-size:16px; font-weight:800; } .vit2 small { display:block; font-size:10.5px; color:var(--soft); font-weight:700; text-transform:uppercase; }
+  .tv { background:#120810; border-radius:16px; padding:14px; color:#fff; border:8px solid #2a2a2a; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
+  .tvh { display:flex; justify-content:space-between; font-size:13px; color:#cfb7c2; font-weight:700; letter-spacing:.08em; }
+  .tvnow { background:linear-gradient(135deg,#7d2a4c,#b4235a); border-radius:12px; padding:16px; text-align:center; } .tvnow small { display:block; font-size:13px; letter-spacing:.2em; font-weight:800; color:#ffe4ee; }
+  .tvnow b { display:block; font-size:64px; line-height:1.05; letter-spacing:.04em; } .tvnow span { display:block; font-size:24px; font-weight:700; } .tvnow em { display:block; font-style:normal; font-size:20px; margin-top:4px; color:#ffe4ee; }
+  .tvlist div { display:flex; gap:12px; align-items:baseline; font-size:18px; padding:6px 4px; border-bottom:1px solid #3a2530; } .tvlist b { color:#f1a7c3; min-width:70px; } .tvlist span { margin-left:auto; color:#cfb7c2; font-size:15px; }
+  .tvf { font-size:13px; color:#cfb7c2; }
+  .doc { display:grid; grid-template-columns:34px 1fr auto auto; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--line); font-size:13.5px; } .di { font-size:22px; text-align:center; } .dest { font-size:12.5px; color:var(--soft); font-weight:600; }
+  .st.warn { margin:0; max-width:none; padding:2px 9px; border:none; font-size:11.5px; }
+  .todo .st.warn { font-size:13px; }
+
+  .svc { display:flex; flex-wrap:wrap; gap:8px; } .svc span { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 12px; font-size:13.5px; font-weight:600; }
+  .prob { display:flex; align-items:center; gap:8px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .prob .mini { margin-left:auto; }
+  .dotc { width:10px; height:10px; border-radius:50%; flex:none; }
+  .tpl { border:1px solid; border-left-width:5px; border-radius:10px; padding:9px 11px; font-size:13px; line-height:1.45; background:#fff; } .tpl b { display:block; font-size:14px; margin-bottom:2px; }
+  .opt { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; } .opt span { border:1px solid var(--line); border-radius:12px; padding:10px; font-size:22px; background:#fff; text-align:center; } .opt b { display:block; font-size:14px; margin-top:4px; } .opt small { display:block; font-size:12px; color:var(--soft); }
+  .opt .sel { border:2px solid var(--wine); background:var(--tint); }
+  .side { border-left:4px solid var(--line); padding:5px 10px; margin-bottom:8px; font-size:13.5px; line-height:1.45; } .side b { display:block; }
+  .stk { display:grid; grid-template-columns:150px 1fr auto; gap:8px; align-items:center; font-size:13px; margin:6px 0; } .stk div { height:10px; background:#eee4e8; border-radius:5px; overflow:hidden; } .stk i { display:block; height:100%; background:#15803d; border-radius:5px; } .stk b { font-size:12.5px; }
+  .phn { background:#e5ddd5; border:9px solid #1f1f1f; border-radius:26px; padding:10px; display:flex; flex-direction:column; gap:8px; min-height:430px; }
+  .phh { background:#075e54; color:#fff; font-size:13px; font-weight:700; margin:-10px -10px 4px; padding:10px 12px; border-radius:16px 16px 0 0; }
+  .msg { font-size:13px; line-height:1.4; border-radius:10px; padding:7px 9px; max-width:88%; box-shadow:0 1px 1px rgba(0,0,0,.12); } .msg.in { background:#fff; align-self:flex-start; } .msg.out { background:#dcf8c6; align-self:flex-end; font-weight:800; }
+  .ck { font-size:13.5px; line-height:1.45; } .ck b { display:block; font-size:15px; margin-bottom:3px; }
+
+  .kv2 { display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:4px 0; border-bottom:1px dashed var(--line); } .kv2 span { color:var(--soft); }
+  .req { display:flex; flex-wrap:wrap; gap:6px; } .req span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .req .ok { background:var(--okbg); color:var(--ok); } .req .no { background:var(--warnbg); color:var(--warn); }
+  .qx { position:relative; height:30px; background:#f3eef0; border-radius:8px; margin:6px 0; padding-left:34px; } .qx b { position:absolute; left:8px; top:6px; font-size:13px; }
+  .qx span { position:absolute; top:3px; bottom:3px; margin-left:34px; border-radius:6px; color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; padding:0 6px; white-space:nowrap; overflow:hidden; }
+  .who2 { display:grid; gap:6px; } .who2 div { border:1px solid var(--line); border-radius:8px; padding:6px 9px; background:#f7fbf8; font-size:12.5px; } .who2 b { display:block; color:var(--wine-d); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; } .who2 span { color:#166534; }
+  .beds { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .bed { border-radius:10px; padding:8px; font-size:13px; font-weight:700; border:1px solid var(--line); min-height:76px; } .bed b { display:block; font-size:18px; } .bed small { display:block; font-weight:500; font-size:11.5px; color:var(--soft); }
+  .bed.p { background:#fbe4ee; } .bed.a { background:#fde2e2; } .bed.g { background:#ede4fb; } .bed.free { background:#ecf8f1; color:#15803d; } .bed.clean { background:#fdf0d5; color:#8a5a00; } .bed.sel { outline:3px solid var(--wine); }
+  .leg2 { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-left:6px; border:1px solid var(--line); }
+  .dose { border:1px solid var(--line); border-radius:10px; padding:7px 9px; margin-bottom:6px; font-size:13px; display:flex; flex-direction:column; } .dose span { color:var(--soft); font-size:12px; } .dose em { font-style:normal; margin-top:2px; }
+  .srch { border-left:4px solid #c2410c; background:#fff7f0; border-radius:6px; padding:6px 9px; margin-bottom:6px; font-size:13px; } .srch b { display:block; font-size:12px; color:#c2410c; text-transform:uppercase; letter-spacing:.04em; }
+  .amb { border:9px solid #1f1f1f; border-radius:26px; background:#fff; overflow:hidden; min-height:420px; display:flex; flex-direction:column; }
+  .ah { background:#ea580c; color:#fff; font-weight:800; font-size:14px; padding:10px 12px; } .ab { padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .big2 { font-size:40px; font-weight:900; text-align:center; color:#ea580c; margin-top:6px; }
+
+  .tree div { padding:6px 8px; border-radius:8px; font-size:13.5px; } .tree small { color:var(--soft); margin-left:4px; }
+  .tree .t0 { font-weight:800; } .tree .t1 { padding-left:18px; font-weight:700; } .tree .t2 { padding-left:32px; font-weight:700; } .tree .t3 { padding-left:50px; } .tree .mut { color:var(--soft); }
+  .tree .on { background:#f3eef0; } .tree .sel { background:var(--tint); outline:2px solid var(--wine); }
+  .fing { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:8px; } .fing span { font-size:12px; font-weight:700; border-radius:999px; padding:3px 9px; background:#f3eef0; } .fing .done { background:var(--okbg); color:var(--ok); } .fing .cur { background:var(--wine); color:#fff; }
+  table.mx td, table.mx th { text-align:center; font-size:12.5px; padding:8px 6px; } table.mx td:first-child, table.mx th:first-child { text-align:left; }
+  table.mx2 td, table.mx2 th { text-align:center; font-size:12.5px; } table.mx2 td:first-child, table.mx2 th:first-child { text-align:left; }
+  table.mx2 td.on { color:#15803d; font-size:18px; } table.mx2 td.pi { color:#c2410c; font-size:18px; } table.mx2 td { color:#c9bcc2; font-size:18px; } table.mx2 td:first-child { font-size:13.5px; color:var(--ink); }
+  .catl { padding:8px 10px; border-radius:9px; font-size:13.5px; margin-bottom:4px; display:flex; justify-content:space-between; } .catl small { color:var(--soft); } .catl.on { background:var(--tint); font-weight:700; }
+  table.mx2 { table-layout:fixed; } table.mx2 th { font-size:10px; padding:6px 3px; letter-spacing:.02em; white-space:normal; text-align:center; } table.mx2 th:first-child { width:170px; } table.mx2 td { padding:8px 3px; }
+  .lab { border:1.5px solid #2a2026; border-radius:6px; padding:8px 10px; font-size:12px; font-family:"Source Sans 3",monospace; background:#fff; text-align:left; } .lab b { font-size:13px; } .barc { margin:6px 0 4px; }
+  .bth { display:flex; flex-wrap:wrap; gap:5px; } .bth span { font-size:13px; font-weight:700; border-radius:8px; padding:6px 10px; border:1px solid var(--line); background:#fff; } .bth .on { background:#dcf3e5; border-color:#15803d; color:#15803d; }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — 3 · Laboratorio:</b>
+  <button class="tab on" data-t="l1">1. El circuito</button>
+  <button class="tab" data-t="l2">2. Toma de muestras</button>
+  <button class="tab" data-t="l3">3. Lote de envío</button>
+  <button class="tab" data-t="l4">4. Recepción en el laboratorio</button>
+  <button class="tab" data-t="l5">5. Mesa de trabajo</button>
+  <button class="tab" data-t="l6">6. Portal PAP (citología)</button>
+  <button class="tab" data-t="l7">7. Resultado al médico</button>
+  <button class="tab" data-t="l8">8. Indicadores</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Sirve para el laboratorio del centro, el del hospital y el laboratorio de patología que lee los PAP.</div>
+
+<!-- ============ L1 ============ -->
+<section class="scr on" id="l1">
+  <div class="app"><div class="brand">SIVEC <span>LABORATORIO</span></div><div class="who">🧪 Del pedido al resultado — sin papel</div></div>
+  <div class="body">
+    <div class="card">
+      <div class="lbl">Cada muestra tiene un código de barras y pasa por estos pasos (con hora y responsable)</div>
+      <div class="steps" style="grid-template-columns:repeat(8,1fr)">
+        <div class="done"><i>✓</i><b>Pedido</b><small>médico · D-8 digital</small></div>
+        <div class="done"><i>✓</i><b>Toma</b><small>etiqueta con código</small></div>
+        <div class="done"><i>✓</i><b>En lote</b><small>envío al laboratorio</small></div>
+        <div class="done"><i>✓</i><b>Recibida</b><small>escaneo en el lab</small></div>
+        <div class="cur"><i>5</i><b>En proceso</b><small>equipo / lectura</small></div>
+        <div><i>6</i><b>Validada</b><small>firma del bioquímico / patólogo</small></div>
+        <div><i>7</i><b>Liberada</b><small>al médico y a la línea de tiempo</small></div>
+        <div><i>8</i><b>Entregada</b><small>a la paciente</small></div>
+      </div>
+    </div>
+    <div class="cols c3" style="margin-top:12px;gap:12px">
+      <div class="card mini2"><b>🏥 Laboratorio del centro</b>hemograma, glicemia, orina, pruebas rápidas (VIH, sífilis, embarazo). Resultado en el día.</div>
+      <div class="card mini2"><b>🏨 Laboratorio del hospital</b>química, coagulación, cultivos, hormonas. Equipos conectados al SIVEC.</div>
+      <div class="card mini2"><b>🔬 Patología / citología</b>lee los <strong>PAP</strong>, biopsias y VPH que mandan todos los centros de la red — con su propio portal.</div>
+    </div>
+    <div class="card" style="margin-top:12px;font-size:14px;line-height:1.55">✅ Se acaba el resultado en papel que se pierde · ✅ el centro sabe en qué paso está cada muestra · ✅ el tiempo toma→resultado se mide solo · ✅ un resultado crítico avisa al médico en el momento.</div>
+  </div>
+</section>
+
+<!-- ============ L2 ============ -->
+<section class="scr" id="l2">
+  <div class="app"><div class="brand">SIVEC <span>LABORATORIO</span></div><div class="who">💉 Toma de muestras · C.S. San Luis · Lic. Rojas</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Pedidos de hoy (llegan solos desde el consultorio)</div>
+        <table class="l"><thead><tr><th>Paciente</th><th>Pedido por</th><th>Exámenes</th><th>Tubo / muestra</th><th></th></tr></thead><tbody>
+          <tr style="background:#fbf3f7"><td><b>María Quispe</b><div class="mini">ficha A-023</div></td><td>Dra. Aguilera</td><td>PAP · VPH</td><td>🟫 lámina · 🧫 medio líquido</td><td><span class="st ok">tomada 08:25</span></td></tr>
+          <tr><td><b>Pedro López</b></td><td>Dr. Tola</td><td>Glicemia · creatinina · orina</td><td>🟡 tapa amarilla · 🧪 frasco</td><td><span class="btn p">Tomar</span></td></tr>
+          <tr><td><b>Carla Torres</b><div class="mini">🤰 28 sem</div></td><td>Dra. Aguilera</td><td>Hemograma · grupo y Rh · VIH/sífilis rápida</td><td>🟣 tapa lila · 🟡 amarilla</td><td><span class="btn p">Tomar</span></td></tr>
+          <tr><td><b>Tomás G.</b><div class="mini">3 años</div></td><td>Dr. Rivas</td><td>Hemoglobina</td><td>🟣 capilar</td><td><span class="btn p">Tomar</span></td></tr></tbody></table>
+        <div class="mini" style="margin-top:6px">Recepción ya confirmó la identidad con huella. Antes de pinchar, la enfermera escanea la pulsera/ficha y el tubo: si no coinciden, el sistema avisa.</div></div>
+      <div>
+        <div class="card" style="text-align:center"><div class="lbl" style="text-align:left">Etiqueta que se imprime</div>
+          <div class="lab"><div style="display:flex;justify-content:space-between"><b>QUISPE MAMANI MARÍA</b><span>F · 38 a</span></div><div class="barc" id="bc1"></div><div style="display:flex;justify-content:space-between"><span>M-26-004821</span><span>PAP · lámina</span></div><div style="display:flex;justify-content:space-between"><span>C.S. San Luis</span><span>24/09 08:25</span></div></div>
+          <div class="mini" style="margin-top:8px">Una etiqueta por tubo/lámina. Con impresora pequeña de etiquetas.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Datos que viajan con la muestra</div><div style="font-size:13px;line-height:1.6">FUM · embarazo · método anticonceptivo · PAP anterior · aspecto del cuello (de la consulta con figuras) — el citólogo ya no tiene que adivinar.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ L3 ============ -->
+<section class="scr" id="l3">
+  <div class="app"><div class="brand">SIVEC <span>LABORATORIO</span></div><div class="who">📦 Lote de envío · C.S. San Luis → Laboratorio de patología (Red Centro)</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Lote L-2026-39 · 28 muestras</div>
+        <table class="l"><thead><tr><th>Código</th><th>Paciente</th><th>Tipo</th><th>Tomada</th><th>Escaneada al cerrar</th></tr></thead><tbody>
+          <tr><td>M-26-004821</td><td>María Quispe</td><td>PAP + VPH</td><td>24/09</td><td><span class="st ok">✓</span></td></tr>
+          <tr><td>M-26-004819</td><td>Ana Vaca</td><td>PAP</td><td>24/09</td><td><span class="st ok">✓</span></td></tr>
+          <tr><td>M-26-004815</td><td>Elena S.</td><td>PAP</td><td>23/09</td><td><span class="st ok">✓</span></td></tr>
+          <tr><td>M-26-004812</td><td>Irma F.</td><td>VPH</td><td>23/09</td><td><span class="st bad">falta ✗</span></td></tr>
+          <tr><td colspan="5" class="mini">+ 24 más</td></tr></tbody></table>
+        <div class="mini" style="margin-top:6px">Al cerrar el lote se escanea cada lámina: si falta una, no se puede despachar sin explicar por qué.</div></div>
+      <div>
+        <div class="card"><div class="lbl">Envío</div>
+          <div class="kv2"><span>Destino</span><b>Lab. de patología</b></div><div class="kv2"><span>Transporte</span><b>mensajero de la red</b></div><div class="kv2"><span>Salió</span><b>25/09 10:00</b></div><div class="kv2"><span>Firma entrega</span><b>🖐 Lic. Rojas</b></div><div class="kv2"><span>Firma recibe</span><b>🖐 al llegar</b></div>
+          <div class="lab" style="margin-top:10px;text-align:center"><b>LOTE L-2026-39</b><div class="barc" id="bc2"></div><span>28 muestras · C.S. San Luis</span></div></div>
+        <div class="card" style="margin-top:12px"><div class="mini2"><b>Ya existe hoy en el SIVEC PAP</b>“Balance envíos” (fecha y lote). Esto lo convierte en código de barras + firma de entrega y recepción.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ L4 ============ -->
+<section class="scr" id="l4">
+  <div class="app"><div class="brand">SIVEC <span>LABORATORIO</span></div><div class="who">📥 Recepción de muestras · Laboratorio de patología · 25/09</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Lotes que llegan hoy</div>
+        <table class="l"><thead><tr><th>Lote</th><th>Centro</th><th>Muestras</th><th>Recibidas</th><th>Rechazadas</th><th>Estado</th></tr></thead><tbody>
+          <tr style="background:#fbf3f7"><td><b>L-2026-39</b></td><td>C.S. San Luis</td><td>28</td><td>27</td><td>1</td><td><span class="st ok">recibido 11:20</span></td></tr>
+          <tr><td>L-2026-12</td><td>C.S. El Bajío</td><td>19</td><td>—</td><td>—</td><td><span class="st warn">en camino</span></td></tr>
+          <tr><td>L-2026-08</td><td>C.S. Los Lotes</td><td>34</td><td>34</td><td>0</td><td><span class="st ok">recibido</span></td></tr></tbody></table>
+        <div class="lbl">Muestra rechazada — vuelve al centro con el motivo</div>
+        <div class="card alertc" style="padding:10px 12px"><b>M-26-004806 · Rosa Mamani</b> — lámina rota<div class="mini">→ El centro recibe tarea: <b>repetir toma</b> (cita sugerida). La paciente recibe WhatsApp.</div></div></div>
+      <div class="card"><div class="lbl">Motivos de rechazo (catálogo)</div>
+        <div class="chips"><span class="chip">Lámina rota</span><span class="chip">Sin identificar</span><span class="chip">Datos no coinciden</span><span class="chip">Fijación inadecuada</span><span class="chip">Muestra insuficiente</span><span class="chip">Fuera de tiempo</span></div>
+        <div class="mini" style="margin-top:10px">Cada rechazo cuenta en los indicadores del centro que tomó la muestra → sirve para capacitar.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ L5 ============ -->
+<section class="scr" id="l5">
+  <div class="app"><div class="brand">SIVEC <span>LABORATORIO</span></div><div class="who">🔬 Mesa de trabajo · Laboratorio del Hospital municipal · Química</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Resultados que llegan del equipo (analizador conectado)</div>
+        <table class="l"><thead><tr><th>Muestra</th><th>Paciente</th><th>Examen</th><th>Resultado</th><th>Referencia</th><th></th></tr></thead><tbody>
+          <tr><td>M-26-005102</td><td>Pedro López</td><td>Glicemia</td><td><b>126</b> mg/dL</td><td>70–100</td><td><span class="st warn">alto</span></td></tr>
+          <tr><td>M-26-005102</td><td>Pedro López</td><td>Creatinina</td><td>1,1 mg/dL</td><td>0,6–1,2</td><td><span class="st ok">normal</span></td></tr>
+          <tr style="background:#fff0f0"><td>M-26-005110</td><td>Juan Pérez</td><td>Potasio</td><td><b>6,4</b> mEq/L</td><td>3,5–5,1</td><td><span class="st bad">⚠ CRÍTICO</span></td></tr>
+          <tr><td>M-26-005115</td><td>Carla Torres</td><td>Hemoglobina</td><td>10,8 g/dL</td><td>11–15 (emb.)</td><td><span class="st warn">bajo</span></td></tr></tbody></table>
+        <div class="row" style="justify-content:flex-end;margin-top:10px"><span class="btn">Repetir</span><span class="btn g">🖐 Validar y liberar (4)</span></div></div>
+      <div>
+        <div class="card alertc"><div class="lbl">Valor crítico</div><div style="font-size:13.5px;line-height:1.6"><b>Juan Pérez · K⁺ 6,4</b><br>🔔 Aviso inmediato al Dr. Suárez (Cardio) y al jefe de piso<br>☎️ El bioquímico debe registrar <b>a quién avisó y a qué hora</b></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Control de calidad</div><div style="font-size:13px;line-height:1.6">Control diario del equipo ✓ · reactivos por vencer: 2 · temperatura de la heladera ✓</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Sin equipo conectado</div><div style="font-size:13px">se cargan a mano con valores de referencia por edad y sexo; los fuera de rango se marcan solos.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ L6 ============ -->
+<section class="scr" id="l6">
+  <div class="app"><div class="brand">SIVEC <span>PATOLOGÍA</span></div><div class="who">🔬 Portal de citología · Lic. Paz (citotecnóloga) · Dr. Méndez (patólogo)</div></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:280px 1fr">
+      <div class="card"><div class="lbl">Por leer · 142</div>
+        <div class="q2 cur"><b>M-26-004821</b> María Quispe<div class="mini">C.S. San Luis · PAP + VPH · 1 día</div></div>
+        <div class="q2"><b>M-26-004819</b> Ana Vaca<div class="mini">C.S. San Luis · PAP · 1 día</div></div>
+        <div class="q2"><b>M-26-003990</b> Juana R.<div class="mini">C.S. Los Lotes · PAP · <span style="color:#c2410c">18 días ⚠</span></div></div>
+        <div class="mini" style="margin-top:6px">Ordenado por antigüedad; los de más de 15 días se marcan.</div></div>
+      <div class="card">
+        <div class="row"><b style="font-size:16px">María Quispe Mamani · 38 a</b><span class="mini">FUM 02/09 · no embarazada · inyectable · PAP 2023 NILM · cuello eritematoso</span></div>
+        <div class="cols c2" style="gap:10px;margin-top:10px">
+          <div><div class="lbl">Calidad de la muestra</div><div class="chips"><span class="chip on">Satisfactoria</span><span class="chip">Insatisfactoria</span></div><div class="chips" style="margin-top:6px"><span class="chip on">ZT presente</span><span class="chip">Hemorrágica</span><span class="chip">Inflamación</span></div>
+            <div class="lbl">Resultado (Bethesda)</div>
+            <div class="bth"><span class="on">NILM · negativo</span><span>ASC-US</span><span>ASC-H</span><span>LSIL</span><span>HSIL</span><span>Carcinoma</span><span>AGC</span></div>
+            <div class="lbl">Hallazgos no neoplásicos</div><div class="chips"><span class="chip on">Candida</span><span class="chip">Trichomonas</span><span class="chip">Cambio de flora</span><span class="chip">Cambios reactivos</span></div></div>
+          <div><div class="lbl">VPH</div><div class="chips"><span class="chip on">Negativo</span><span class="chip">Positivo 16</span><span class="chip">Positivo 18</span><span class="chip">Otros alto riesgo</span></div>
+            <div class="lbl">Doble lectura</div><div style="font-size:13px;line-height:1.6">🖐 Lectura: Lic. Paz · 26/09<br>🖐 Validación: Dr. Méndez (obligatoria si no es NILM)<br>📋 10% de los NILM se relee al azar (control de calidad)</div>
+            <div class="row" style="justify-content:flex-end;margin-top:12px"><span class="btn g">🖐 Firmar y liberar</span></div></div>
+        </div>
+        <div class="card" style="margin-top:10px;background:#f3f7fb;border-color:#c5d8f0;font-size:13px">↩ Al liberar: el resultado aparece <b>en el SIVEC PAP del centro</b> (estado, Bethesda, genotipo), se calcula el próximo paso y la fecha del próximo control. Si es positivo → tarea de búsqueda activa y cita sugerida.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ L7 ============ -->
+<section class="scr" id="l7">
+  <div class="app"><div class="brand">SIVEC <span>CONSULTORIO</span></div><div class="who">🔔 Resultados nuevos · Dra. Aguilera</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Mis resultados por revisar</div>
+        <table class="l"><thead><tr><th></th><th>Paciente</th><th>Examen</th><th>Resultado</th><th>Próximo paso (sugerido)</th><th></th></tr></thead><tbody>
+          <tr style="background:#fff0f0"><td>🔴</td><td><b>Rosa Mamani</b></td><td>PAP</td><td>ASC-H</td><td>derivar a colposcopia</td><td><span class="btn p">Derivar</span></td></tr>
+          <tr><td>🟠</td><td><b>Carla Torres</b> 🤰</td><td>Hemoglobina</td><td>10,8 g/dL</td><td>sulfato ferroso</td><td><span class="btn">Recetar</span></td></tr>
+          <tr><td>🟢</td><td><b>María Quispe</b></td><td>PAP · VPH</td><td>NILM · Candida · VPH neg.</td><td>control en 5 años · avisar</td><td><span class="btn g">✓ Visto</span></td></tr>
+          <tr><td>🟢</td><td><b>Ana Vaca</b></td><td>PAP</td><td>NILM</td><td>control en 3 años</td><td><span class="btn g">✓ Visto</span></td></tr></tbody></table>
+        <div class="mini" style="margin-top:6px">El médico marca “visto”; los normales pueden avisarse solos a la paciente (Mi salud/WhatsApp). Los alterados nunca: la paciente recibe “venga, ya tiene cita”.</div></div>
+      <div>
+        <div class="card"><div class="lbl">Comparar con el anterior</div><div style="font-size:13.5px;line-height:1.6">Hemoglobina · Carla Torres<br>03/2026 <b>11,6</b> → 09/2026 <b>10,8</b> ↓</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Informe oficial</div><div style="font-size:13px">PDF firmado del laboratorio, con código de verificación. Se imprime solo si la paciente lo pide.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ L8 ============ -->
+<section class="scr" id="l8">
+  <div class="app"><div class="brand">SIVEC <span>LABORATORIO</span></div><div class="who">📊 Indicadores · Laboratorio de patología · Red Centro · septiembre</div></div>
+  <div class="body">
+    <div class="kpi"><div><small>PAP leídos</small><b>1.312</b></div><div><small>Días toma → resultado</small><b>21</b><span> mediana · meta ≤ 30</span></div><div><small>Muestras rechazadas</small><b>2,4%</b></div><div><small>Positivos (≥ ASC-US)</small><b>6,8%</b></div></div>
+    <div class="cols c2" style="margin-top:12px">
+      <div class="card bars"><div class="lbl">Días toma → resultado, por centro</div>
+        <div class="r"><span>C.S. San Luis</span><div class="trk"><div class="fill" style="width:50%"></div><div class="ref" style="left:75%"></div></div><span class="v">20 d</span></div>
+        <div class="r"><span>C.S. Los Lotes</span><div class="trk"><div class="fill" style="width:55%"></div><div class="ref" style="left:75%"></div></div><span class="v">22 d</span></div>
+        <div class="r"><span>C.S. El Bajío</span><div class="trk"><div class="fill" style="width:88%"></div><div class="ref" style="left:75%"></div></div><span class="v">35 d</span></div>
+        <div class="mini">Escala 0–40 días · línea = meta 30 días.</div></div>
+      <div class="card bars"><div class="lbl">Rechazos por centro</div>
+        <div class="r"><span>C.S. San Luis</span><div class="trk"><div class="fill" style="width:20%"></div></div><span class="v">1,0%</span></div>
+        <div class="r"><span>C.S. Los Lotes</span><div class="trk"><div class="fill" style="width:40%"></div></div><span class="v">2,0%</span></div>
+        <div class="r"><span>C.S. El Bajío</span><div class="trk"><div class="fill" style="width:96%"></div></div><span class="v">4,8%</span></div>
+        <div class="mini">Escala 0–5% · El Bajío: 70% por “fijación inadecuada” → capacitación.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  function bc(el, seed) { let x = seed, h = '', pos = 0; const r = () => (x = (x * 9301 + 49297) % 233280) / 233280;
+    while (pos < 200) { const w = 1 + Math.floor(r() * 3); if (r() > .45) h += `<rect x="${pos}" y="0" width="${w}" height="40"/>`; pos += w + 1; }
+    el.innerHTML = `<svg viewBox="0 0 200 40" width="100%" height="40" fill="#2a2026">${h}</svg>`; }
+  bc(document.getElementById('bc1'), 11); bc(document.getElementById('bc2'), 5);
+  const NOTES = {
+    l1: '<b>O circuito:</b> cada amostra tem código de barras e passa por 8 passos com hora e responsável: pedido, coleta, lote, recebida, em processo, validada, liberada e entregue. Serve para o laboratório do centro, o do hospital e o de patologia (PAP).',
+    l2: '<b>Coleta de amostras:</b> os pedidos chegam sozinhos do consultório, com o tubo certo; a etiqueta com código se imprime; escaneia-se ficha e tubo para não trocar amostras. Os dados clínicos viajam com a amostra.',
+    l3: '<b>Lote de envio:</b> ao fechar o lote se escaneia cada lâmina; se falta uma, não sai. Entrega e recebimento com digital. É a evolução do “Balance envíos” que já existe no SIVEC PAP.',
+    l4: '<b>Recepção no laboratório:</b> os lotes do dia de todos os centros; a amostra rejeitada volta ao centro com o motivo e vira tarefa “repetir coleta” com cita sugerida.',
+    l5: '<b>Mesa de trabalho:</b> resultados vindos do equipamento, com faixas de referência; valor crítico avisa o médico na hora e exige registrar a quem se avisou. Controle de qualidade.',
+    l6: '<b>Portal PAP (citologia):</b> o laboratório de patologia lê e carrega o resultado Bethesda, VPH e genótipo por toques, com dupla leitura e assinatura. Ao liberar, o resultado aparece direto no SIVEC PAP do centro e calcula o próximo passo.',
+    l7: '<b>Resultado ao médico:</b> lista por prioridade com o próximo passo sugerido (derivar, receitar, controle). Normais podem ser avisados sozinhos; alterados só com “venha, já tem cita”.',
+    l8: '<b>Indicadores:</b> PAP lidos, dias coleta→resultado por centro, amostras rejeitadas e o motivo (para capacitar), percentagem de positivos.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 'l1');
+</script>
+
+</body>
+</html>

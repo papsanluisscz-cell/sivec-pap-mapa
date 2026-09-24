@@ -398,7 +398,7 @@ Trabalho "um por um, com imagens de tudo" para as apresentações de venda.
 8. Equipamentos e configuração do centro (leitores, câmera, TV, impressoras, celular; regras clínicas).
 Respostas às 5 decisões pendentes de Redes/centros ficam propostas no desenho: responsável de Rede **vê** (edita só a regulação); um usuário **por profissional**; o administrador não vê dados clínicos.
 
-### [24/09/2026] Módulo 2 · Agenda e citas — DESENHADO (esboço `docs/esboco-agenda.html`, imagens `agenda-01..07.png`)
+### [24/09/2026] Módulo 2 · Agenda e citas — APROVADO ("melhor que o Zero Fila, sem papelada") (esboço `docs/esboco-agenda.html`, imagens `agenda-01..07.png`)
 1. Agenda do dia (médicos em colunas; estados: confirmada, chegou, em atendimento, atendida, faltou, encaixe, livre) — a mesma agenda alimenta recepção, fila do médico, TV e Mi salud.
 2. Dar uma cita (sistema avisa o que falta à paciente, sugere os primeiros horários livres, confirmação por WhatsApp com indicações e lembrete).
 3. Agenda do médico (semana tipo por atividade, bloqueios, duração por tipo, vagas reservadas para referências, encaixes e Mi salud; vagas de referência liberadas 48 h antes).
@@ -421,3 +421,13 @@ Respostas às 5 decisões pendentes de Redes/centros ficam propostas no desenho:
 - No dia: chega 30 min antes e só dá **C.I. ou digital** (totem, recepção ou triagem) → ficha do consultório → chamada pela TV do piso. O especialista já tem tudo; a contrarreferência volta sozinha.
 - Hospital reparte os cupos diários (ex.: 50% referências da rede, 20% controles, 15% interconsultas, 15% fichas do dia) e divide entre redes; não usados se liberam 48 h antes; urgências não usam cupo.
 - Referência em papel de fora da rede: digitaliza uma vez (recepção ou foto pelo Mi salud) e recebe cita por mensagem. Sem celular: comprovante impresso no centro + ligação.
+
+### [24/09/2026] Módulo 3 · Laboratório — DESENHADO (esboço `docs/esboco-laboratorio.html`, imagens `laboratorio-01..08.png`)
+1. Circuito com código de barras: pedido → coleta → lote → recebida → em processo → validada → liberada → entregue (hora e responsável em cada passo); laboratório do centro, do hospital e de patologia/citologia.
+2. Coleta de amostras: pedidos chegam do consultório com o tubo certo; etiqueta com código; escaneia ficha + tubo para não trocar; dados clínicos viajam com a amostra.
+3. Lote de envio (evolução do "Balance envíos"): escaneia cada lâmina ao fechar; entrega e recebimento com digital.
+4. Recepção no laboratório: lotes do dia; amostra rejeitada volta ao centro com motivo → tarefa "repetir coleta" + WhatsApp.
+5. Mesa de trabalho: equipamentos conectados, faixas de referência, **valor crítico** com aviso imediato e registro de a quem se avisou, controle de qualidade.
+6. **Portal PAP (citologia):** o laboratório de patologia carrega Bethesda, VPH e genótipo por toques, dupla leitura (validação obrigatória se não é NILM, 10% de NILM relidos), e o resultado entra direto no SIVEC PAP do centro com o próximo passo calculado.
+7. Resultado ao médico: lista por prioridade com próximo passo sugerido; normais podem ser avisados sozinhos, alterados só com "venha, já tem cita".
+8. Indicadores: PAP lidos, dias coleta→resultado por centro, rejeições e motivo, % positivos.
