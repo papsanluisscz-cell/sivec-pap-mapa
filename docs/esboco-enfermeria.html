@@ -155,7 +155,7 @@
   .scanbox { border:2px dashed #b9cde3; border-radius:12px; padding:18px; text-align:center; font-weight:700; color:#1e4f8a; background:#f3f7fb; margin-top:6px; }
   .five { display:grid; grid-template-columns:26px 1fr; gap:2px 8px; padding:6px 0; border-bottom:1px dashed var(--line); font-size:12.5px; color:var(--soft); } .five span { grid-row:span 2; width:22px; height:22px; border-radius:50%; background:#dcf3e5; color:#15803d; font-weight:800; display:flex; align-items:center; justify-content:center; } .five b { color:var(--ink); font-size:14px; }
   .dh { position:relative; height:170px; display:flex; align-items:flex-end; gap:10px; padding:0 4px 18px; border-bottom:1px solid var(--line); } .dh div { flex:1; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; position:relative; } .dh i { width:70%; background:#0e7490; border-radius:4px 4px 0 0; } .dh span { position:absolute; bottom:-18px; font-size:11px; color:var(--soft); }
-  .dh em { position:absolute; left:0; right:0; border-top:2px dashed #991b1b; font-style:normal; font-size:11px; color:#991b1b; text-align:right; }
+  .dh em { position:absolute; left:0; right:0; border-top:2px dashed #991b1b; font-style:normal; font-size:11px; color:#991b1b; text-align:left; padding-left:4px; } .dh em { top:auto; } .dh em::before { content:""; }
   .dv { font-size:13px; padding:6px 0; border-bottom:1px dashed var(--line); } .ck2 { font-size:13.5px; padding:5px 0; }
   .sbar { font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .sbar b { display:block; color:var(--wine-d); font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
 </style>
@@ -274,10 +274,10 @@
         <div class="lbl">Egresos</div>
         <div class="kv2"><span>Diuresis (sonda)</span><b>1.450 mL</b></div><div class="kv2"><span>Vómito</span><b>100 mL</b></div><div class="kv2"><span>Pérdidas insensibles (calculadas)</span><b>700 mL</b></div><div class="kv2" style="font-size:15px"><span><b>Total egresos</b></span><b>2.250 mL</b></div>
         <div style="margin-top:10px;font-size:22px;font-weight:900">Balance: <span style="color:#c2410c">+250 mL</span></div></div>
-      <div class="card"><div class="lbl">Diuresis por hora (mL)</div>
+      <div class="card"><div class="lbl">Diuresis por hora (mL) · <span style="color:#991b1b;text-transform:none">- - - mínimo 30 mL/h</span></div>
         <div class="dh">
           <div><i style="height:62%"></i><span>02</span></div><div><i style="height:58%"></i><span>03</span></div><div><i style="height:55%"></i><span>04</span></div><div><i style="height:48%"></i><span>05</span></div><div><i style="height:40%"></i><span>06</span></div><div><i style="height:32%;background:#c2410c"></i><span>07</span></div><div><i style="height:25%;background:#991b1b"></i><span>08</span></div>
-          <em style="bottom:30%">mínimo 30 mL/h</em></div>
+          <em style="bottom:36%"></em></div>
         <div class="mini" style="margin-top:8px">⚠ Bajo 30 mL/h dos horas seguidas → aviso al médico (riesgo con sulfato de magnesio).</div>
         <div class="mini">Los sueros e infusiones registrados en el kárdex suman solos al ingreso.</div></div>
     </div>
