@@ -385,3 +385,15 @@ Fase 2 (a fase 1 é SMS/WhatsApp). Grátis para a paciente, Android e iPhone, e 
 - **Falta desenhar (ordem sugerida):** 1 SIVEC Admin (redes/centros/usuários/perfis/catálogos) · 2 Agenda e citas · 3 Laboratório (e portal do laboratório de PAP) · 4 Enfermagem de piso (kárdex, administração de medicamentos, balanço) · 5 Emergências (triagem por cores) · 6 Painel do gestor + informes SNIS · 7 Materno (CLAP, partograma) · 8 Vacinas · 9 Imagem · 10 Odonto · 11 Almoxarifado/logística · 12 Pessoal e plantões · 13 Epidemiologia · 14 Telessaúde · 15 App do profissional · 16 TB, Chagas, Zoonoses, Nutrição, Saúde mental.
 - **Base (não aparece, mas sem ela não se vende):** segurança e proteção de dados, infraestrutura (nuvem/servidor, sem internet), integrações (SEGIP, SNIS, SUS, HL7 FHIR), legal (Ministério/SEDES, ADSIB, SENAPI), hardware por centro, implantação (piloto, migração, capacitação), suporte, qualidade.
 - **Fases:** 0 agora (PAP/VPH + login seguro + redes/centros) → 1 núcleo do centro → 2 rede e hospital → 3 apps e especialidades.
+
+### [24/09/2026] Módulo 1 · SIVEC Admin — DESENHADO (esboço `docs/esboco-admin.html`, imagens `admin-01..08.png`)
+Trabalho "um por um, com imagens de tudo" para as apresentações de venda.
+1. Rede e estabelecimentos (árvore Ministério → SEDES → Rede → centros/hospitais; quem vê o quê).
+2. Usuários (um por pessoa; profissão, especialidade e código, perfil, centros, digital, último acesso; desativar, nunca apagar).
+3. Cadastro de profissional (SEGIP, matrícula, código D-1, 3 dedos + PIN, perfil e centros).
+4. Perfis e permissões (ver/registrar/assinar/administrar por módulo; o administrador não vê dados clínicos).
+5. Módulos por centro = **pacotes de venda** (Centro de saúde, Hospital, Rede).
+6. Catálogos compartilhados (LINAME, exames, CIE-10, procedimentos, modelos, códigos D-1, textos SMS) com versão; o que um centro cria vira proposta.
+7. Auditoria e segurança (quem viu o quê, alertas de uso estranho, backups).
+8. Equipamentos e configuração do centro (leitores, câmera, TV, impressoras, celular; regras clínicas).
+Respostas às 5 decisões pendentes de Redes/centros ficam propostas no desenho: responsável de Rede **vê** (edita só a regulação); um usuário **por profissional**; o administrador não vê dados clínicos.

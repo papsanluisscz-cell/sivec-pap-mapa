@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIVEC Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
+    --n1:#2f6fb0; --n2:#0e7490; --n3:#7c3aed; --n4:#b4235a; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .topbar { position:sticky; top:0; z-index:5; background:#2a1720; color:#fff; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; }
+  .topbar b { margin-right:6px; font-size:15px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; border:1px solid #6b4a58; background:transparent; color:#fff; border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tab.on { background:#fff; color:var(--wine-d); border-color:#fff; }
+  .warn { max-width:1100px; margin:14px auto 0; background:#fff7e0; border:1px solid #ecd9a0; border-radius:10px; padding:10px 14px; font-size:14px; color:#5b4712; }
+  .scr { display:none; max-width:1100px; margin:14px auto 30px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,.14); }
+  .scr.on { display:block; }
+  .app { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; }
+  .app .brand { font-weight:800; font-size:20px; letter-spacing:.04em; } .app .brand span { font-size:11px; background:#fff; color:var(--wine-d); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:3px; letter-spacing:.08em; }
+  .app .who { font-size:14px; opacity:.95; }
+  .body { padding:18px 22px 22px; }
+  h2 { margin:0 0 4px; font-size:20px; } .sub { color:var(--soft); font-size:14px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cols { display:grid; gap:14px; } .c2 { grid-template-columns:1fr 1fr; } .c3 { grid-template-columns:1fr 1fr 1fr; } .c21 { grid-template-columns:1.6fr 1fr; }
+  .lbl { font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); margin:10px 0 5px; }
+  .lbl:first-child { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:13px; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .chip.on { background:var(--tint); border-color:var(--wine); color:var(--wine-d); font-weight:700; }
+  .inp { border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13.5px; background:#fff; min-height:36px; }
+  .inp.tall { min-height:62px; line-height:1.45; }
+  .pri { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pri div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; }
+  .pri div b { display:block; font-size:14px; } .pri div.on { border:2px solid var(--wine); background:var(--tint); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .auto { background:#f3f7fb; border:1px dashed #b9cde3; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.55; }
+  .auto b { color:#1e4f8a; }
+  .att { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; } .att span { font-size:12.5px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13.5px; font-weight:700; border-radius:9px; padding:8px 14px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .btn.p { background:var(--wine); border-color:var(--wine); color:#fff; } .btn.g { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fp { width:26px; height:30px; vertical-align:middle; }
+  table.l { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; border-radius:12px; overflow:hidden; }
+  table.l th { text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); padding:9px 10px; border-bottom:1px solid var(--line); background:#fff; }
+  table.l td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .st { font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .st.bad { background:var(--badbg); color:var(--bad); } .st.warn { background:var(--warnbg); color:var(--warn); } .st.ok { background:var(--okbg); color:var(--ok); } .st.info { background:#e0ecfa; color:#1e4f8a; } .st.mut { background:#eee; color:#555; }
+  .lvl { font-size:11px; font-weight:800; color:#fff; border-radius:6px; padding:2px 7px; }
+  .mini { font-size:12px; color:var(--soft); }
+  .note { max-width:1100px; margin:-16px auto 30px; background:#fff; border-radius:10px; padding:12px 16px; font-size:14px; line-height:1.5; color:#3b3035; border-left:4px solid var(--wine); }
+  /* flujo */
+  .levels { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin:6px 0 4px; }
+  .lv { text-align:center; padding:0 8px; }
+  .lv .ic { width:74px; height:74px; border-radius:18px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; }
+  .lv b { display:block; font-size:15px; } .lv span { font-size:12.5px; color:var(--soft); }
+  .arrows { position:relative; height:74px; margin-top:-120px; margin-bottom:60px; pointer-events:none; }
+  .loop { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+  .loop div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12.3px; text-align:center; position:relative; }
+  .loop div b { display:block; font-size:13px; } .loop i { font-style:normal; display:block; font-size:18px; }
+  .loop div:not(:last-child)::after { content:"›"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--soft); font-size:18px; }
+  .world { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .world div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:12.3px; line-height:1.4; }
+  .world b { display:block; font-size:13px; color:var(--wine-d); }
+  /* seguimiento */
+  .steps { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin:8px 0 4px; }
+  .steps div { text-align:center; font-size:12px; position:relative; padding-top:30px; }
+  .steps div::before { content:""; position:absolute; top:9px; left:0; right:0; height:4px; background:#e3d6dc; }
+  .steps div:first-child::before { left:50%; } .steps div:last-child::before { right:50%; }
+  .steps div.done::before { background:var(--ok); } .steps div.cur::before { background:linear-gradient(90deg,var(--ok) 50%,#e3d6dc 50%); }
+  .steps i { position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:50%; background:#e3d6dc; color:#fff; font-style:normal; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:3px solid var(--paper); }
+  .steps .done i { background:var(--ok); } .steps .cur i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .steps b { display:block; font-size:12.5px; } .steps small { color:var(--soft); }
+  .tl { border-left:3px solid var(--line); margin-left:8px; padding-left:14px; }
+  .tl div { position:relative; font-size:13px; margin-bottom:10px; line-height:1.4; }
+  .tl div::before { content:""; position:absolute; left:-21px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--c,#999); border:2px solid #fff; }
+  .kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:600; } .kpi b { font-size:28px; letter-spacing:-.01em; } .kpi span { font-size:12px; color:var(--soft); }
+  .bars div.r { display:grid; grid-template-columns:170px 1fr 54px; align-items:center; gap:10px; font-size:13px; margin:7px 0; }
+  .bars .trk { height:14px; border-radius:0 4px 4px 0; background:transparent; position:relative; }
+  .bars .fill { height:14px; border-radius:0 4px 4px 0; background:var(--wine); }
+  .bars .ref { position:absolute; top:-3px; bottom:-3px; width:2px; background:#2d2429; }
+  .bars .v { font-weight:700; text-align:right; }
+  .alertc { border-left:4px solid var(--bad); }
+
+  .role .rh { display:flex; gap:10px; align-items:center; margin-bottom:8px; } .role .rh b { display:block; font-size:15px; } .role .rh small { color:var(--soft); font-size:12px; }
+  .ri { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .todo { display:flex; align-items:center; gap:10px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .todo:last-child { border-bottom:none; }
+  .todo .st { min-width:30px; text-align:center; font-size:13px; }
+  .mini2 { font-size:13px; line-height:1.5; } .mini2 b { display:block; margin-bottom:2px; }
+  .flowbar { display:flex; gap:6px; margin-bottom:12px; } .flowbar span { flex:1; text-align:center; font-size:13px; font-weight:700; padding:7px; border-radius:9px; background:#fff; border:1px solid var(--line); color:var(--soft); }
+  .flowbar span.on { background:var(--okbg); color:var(--ok); border-color:#b8e3c7; } .flowbar span.cur { background:var(--wine); color:#fff; border-color:var(--wine); }
+  .found { display:flex; gap:12px; align-items:center; margin-top:10px; padding:10px; border-radius:10px; background:#f3f9f5; border:1px solid #cfe9d8; }
+  .photo2 { width:64px; height:72px; border-radius:10px; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:24px; flex:none; }
+  .k2 { display:block; font-size:10.5px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.04em; }
+  .scanner { width:150px; height:160px; margin:6px auto 0; border-radius:18px; background:radial-gradient(circle at 50% 45%, #fff 0, #f7e9ef 70%); border:3px solid #d9b9c6; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -6px 12px rgba(125,42,76,.12); }
+  .ticket { margin-top:12px; text-align:center; }
+  .tk { border:2px dashed var(--wine); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:2px; font-size:13.5px; } .tk b { font-size:40px; color:var(--wine-d); letter-spacing:.04em; line-height:1.1; } .tk small { color:var(--soft); font-size:11.5px; }
+  .q2 { padding:8px 10px; border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:13.5px; background:#fff; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; } .q2 .mini { width:100%; }
+  .q2.cur { border:2px solid var(--wine); background:var(--tint); } .q2 .st { margin-left:auto; }
+  .vit2 { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .vit2 div { background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 8px; font-size:16px; font-weight:800; } .vit2 small { display:block; font-size:10.5px; color:var(--soft); font-weight:700; text-transform:uppercase; }
+  .tv { background:#120810; border-radius:16px; padding:14px; color:#fff; border:8px solid #2a2a2a; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
+  .tvh { display:flex; justify-content:space-between; font-size:13px; color:#cfb7c2; font-weight:700; letter-spacing:.08em; }
+  .tvnow { background:linear-gradient(135deg,#7d2a4c,#b4235a); border-radius:12px; padding:16px; text-align:center; } .tvnow small { display:block; font-size:13px; letter-spacing:.2em; font-weight:800; color:#ffe4ee; }
+  .tvnow b { display:block; font-size:64px; line-height:1.05; letter-spacing:.04em; } .tvnow span { display:block; font-size:24px; font-weight:700; } .tvnow em { display:block; font-style:normal; font-size:20px; margin-top:4px; color:#ffe4ee; }
+  .tvlist div { display:flex; gap:12px; align-items:baseline; font-size:18px; padding:6px 4px; border-bottom:1px solid #3a2530; } .tvlist b { color:#f1a7c3; min-width:70px; } .tvlist span { margin-left:auto; color:#cfb7c2; font-size:15px; }
+  .tvf { font-size:13px; color:#cfb7c2; }
+  .doc { display:grid; grid-template-columns:34px 1fr auto auto; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--line); font-size:13.5px; } .di { font-size:22px; text-align:center; } .dest { font-size:12.5px; color:var(--soft); font-weight:600; }
+  .st.warn { margin:0; max-width:none; padding:2px 9px; border:none; font-size:11.5px; }
+  .todo .st.warn { font-size:13px; }
+
+  .svc { display:flex; flex-wrap:wrap; gap:8px; } .svc span { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 12px; font-size:13.5px; font-weight:600; }
+  .prob { display:flex; align-items:center; gap:8px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .prob .mini { margin-left:auto; }
+  .dotc { width:10px; height:10px; border-radius:50%; flex:none; }
+  .tpl { border:1px solid; border-left-width:5px; border-radius:10px; padding:9px 11px; font-size:13px; line-height:1.45; background:#fff; } .tpl b { display:block; font-size:14px; margin-bottom:2px; }
+  .opt { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; } .opt span { border:1px solid var(--line); border-radius:12px; padding:10px; font-size:22px; background:#fff; text-align:center; } .opt b { display:block; font-size:14px; margin-top:4px; } .opt small { display:block; font-size:12px; color:var(--soft); }
+  .opt .sel { border:2px solid var(--wine); background:var(--tint); }
+  .side { border-left:4px solid var(--line); padding:5px 10px; margin-bottom:8px; font-size:13.5px; line-height:1.45; } .side b { display:block; }
+  .stk { display:grid; grid-template-columns:150px 1fr auto; gap:8px; align-items:center; font-size:13px; margin:6px 0; } .stk div { height:10px; background:#eee4e8; border-radius:5px; overflow:hidden; } .stk i { display:block; height:100%; background:#15803d; border-radius:5px; } .stk b { font-size:12.5px; }
+  .phn { background:#e5ddd5; border:9px solid #1f1f1f; border-radius:26px; padding:10px; display:flex; flex-direction:column; gap:8px; min-height:430px; }
+  .phh { background:#075e54; color:#fff; font-size:13px; font-weight:700; margin:-10px -10px 4px; padding:10px 12px; border-radius:16px 16px 0 0; }
+  .msg { font-size:13px; line-height:1.4; border-radius:10px; padding:7px 9px; max-width:88%; box-shadow:0 1px 1px rgba(0,0,0,.12); } .msg.in { background:#fff; align-self:flex-start; } .msg.out { background:#dcf8c6; align-self:flex-end; font-weight:800; }
+  .ck { font-size:13.5px; line-height:1.45; } .ck b { display:block; font-size:15px; margin-bottom:3px; }
+
+  .kv2 { display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:4px 0; border-bottom:1px dashed var(--line); } .kv2 span { color:var(--soft); }
+  .req { display:flex; flex-wrap:wrap; gap:6px; } .req span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .req .ok { background:var(--okbg); color:var(--ok); } .req .no { background:var(--warnbg); color:var(--warn); }
+  .qx { position:relative; height:30px; background:#f3eef0; border-radius:8px; margin:6px 0; padding-left:34px; } .qx b { position:absolute; left:8px; top:6px; font-size:13px; }
+  .qx span { position:absolute; top:3px; bottom:3px; margin-left:34px; border-radius:6px; color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; padding:0 6px; white-space:nowrap; overflow:hidden; }
+  .who2 { display:grid; gap:6px; } .who2 div { border:1px solid var(--line); border-radius:8px; padding:6px 9px; background:#f7fbf8; font-size:12.5px; } .who2 b { display:block; color:var(--wine-d); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; } .who2 span { color:#166534; }
+  .beds { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .bed { border-radius:10px; padding:8px; font-size:13px; font-weight:700; border:1px solid var(--line); min-height:76px; } .bed b { display:block; font-size:18px; } .bed small { display:block; font-weight:500; font-size:11.5px; color:var(--soft); }
+  .bed.p { background:#fbe4ee; } .bed.a { background:#fde2e2; } .bed.g { background:#ede4fb; } .bed.free { background:#ecf8f1; color:#15803d; } .bed.clean { background:#fdf0d5; color:#8a5a00; } .bed.sel { outline:3px solid var(--wine); }
+  .leg2 { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-left:6px; border:1px solid var(--line); }
+  .dose { border:1px solid var(--line); border-radius:10px; padding:7px 9px; margin-bottom:6px; font-size:13px; display:flex; flex-direction:column; } .dose span { color:var(--soft); font-size:12px; } .dose em { font-style:normal; margin-top:2px; }
+  .srch { border-left:4px solid #c2410c; background:#fff7f0; border-radius:6px; padding:6px 9px; margin-bottom:6px; font-size:13px; } .srch b { display:block; font-size:12px; color:#c2410c; text-transform:uppercase; letter-spacing:.04em; }
+  .amb { border:9px solid #1f1f1f; border-radius:26px; background:#fff; overflow:hidden; min-height:420px; display:flex; flex-direction:column; }
+  .ah { background:#ea580c; color:#fff; font-weight:800; font-size:14px; padding:10px 12px; } .ab { padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .big2 { font-size:40px; font-weight:900; text-align:center; color:#ea580c; margin-top:6px; }
+
+  .tree div { padding:6px 8px; border-radius:8px; font-size:13.5px; } .tree small { color:var(--soft); margin-left:4px; }
+  .tree .t0 { font-weight:800; } .tree .t1 { padding-left:18px; font-weight:700; } .tree .t2 { padding-left:32px; font-weight:700; } .tree .t3 { padding-left:50px; } .tree .mut { color:var(--soft); }
+  .tree .on { background:#f3eef0; } .tree .sel { background:var(--tint); outline:2px solid var(--wine); }
+  .fing { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:8px; } .fing span { font-size:12px; font-weight:700; border-radius:999px; padding:3px 9px; background:#f3eef0; } .fing .done { background:var(--okbg); color:var(--ok); } .fing .cur { background:var(--wine); color:#fff; }
+  table.mx td, table.mx th { text-align:center; font-size:12.5px; padding:8px 6px; } table.mx td:first-child, table.mx th:first-child { text-align:left; }
+  table.mx2 td, table.mx2 th { text-align:center; font-size:12.5px; } table.mx2 td:first-child, table.mx2 th:first-child { text-align:left; }
+  table.mx2 td.on { color:#15803d; font-size:18px; } table.mx2 td.pi { color:#c2410c; font-size:18px; } table.mx2 td { color:#c9bcc2; font-size:18px; } table.mx2 td:first-child { font-size:13.5px; color:var(--ink); }
+  .catl { padding:8px 10px; border-radius:9px; font-size:13.5px; margin-bottom:4px; display:flex; justify-content:space-between; } .catl small { color:var(--soft); } .catl.on { background:var(--tint); font-weight:700; }
+  table.mx2 { table-layout:fixed; } table.mx2 th { font-size:10px; padding:6px 3px; letter-spacing:.02em; white-space:normal; text-align:center; } table.mx2 th:first-child { width:170px; } table.mx2 td { padding:8px 3px; }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — 1 · SIVEC Admin:</b>
+  <button class="tab on" data-t="a1">1. Red y establecimientos</button>
+  <button class="tab" data-t="a2">2. Usuarios</button>
+  <button class="tab" data-t="a3">3. Alta de profesional</button>
+  <button class="tab" data-t="a4">4. Perfiles y permisos</button>
+  <button class="tab" data-t="a5">5. Módulos por centro</button>
+  <button class="tab" data-t="a6">6. Catálogos</button>
+  <button class="tab" data-t="a7">7. Auditoría y seguridad</button>
+  <button class="tab" data-t="a8">8. Equipos y configuración</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos inventados. El Admin es la base: sin él no hay usuarios, centros ni permisos.</div>
+
+<!-- ============ A1 ============ -->
+<section class="scr on" id="a1">
+  <div class="app"><div class="brand">SIVEC <span>ADMIN</span></div><div class="who">🛠 Administración · SEDES Santa Cruz</div></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:330px 1fr">
+      <div class="card"><div class="lbl">Estructura</div>
+        <div class="tree">
+          <div class="t0">🏛 Ministerio de Salud</div>
+          <div class="t1">🏢 SEDES Santa Cruz</div>
+          <div class="t2 on">🔗 Red Centro <small>12 establecimientos</small></div>
+          <div class="t3 sel">🏥 C.S. San Luis <small>1er nivel</small></div>
+          <div class="t3">🏥 C.S. El Bajío <small>1er nivel</small></div>
+          <div class="t3">🏥 C.S. Los Lotes <small>1er nivel</small></div>
+          <div class="t3">🏨 Hospital municipal <small>2º nivel</small></div>
+          <div class="t3 mut">+ 8 más</div>
+          <div class="t2">🔗 Red Norte <small>15</small></div>
+          <div class="t2">🔗 Red Sur <small>18</small></div>
+          <div class="t2">🔗 Red Este <small>11</small></div>
+          <div class="t2">🔗 Red Oeste <small>13</small></div>
+          <div class="t1">🏨 3er y 4º nivel <small>hospitales de referencia</small></div>
+        </div>
+        <div class="row" style="margin-top:10px"><span class="btn">＋ Red</span><span class="btn p">＋ Establecimiento</span></div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="row"><div class="ri" style="background:#2f6fb0;font-size:22px">🏥</div><div><b style="font-size:19px">C.S. San Luis</b><div class="mini">Red Centro · 1er nivel · código SNIS 700123 · B. San Luis, C. Muchiri</div></div><span class="st ok" style="margin-left:auto">activo</span></div>
+          <div class="cols c3" style="gap:10px;margin-top:12px">
+            <div class="mini2"><b>Servicios</b>Medicina general · Ginecología · Enfermería · Farmacia · Vacunas · Laboratorio básico</div>
+            <div class="mini2"><b>Espacios</b>4 consultorios · 1 triaje · 1 sala de espera con TV · 1 farmacia</div>
+            <div class="mini2"><b>Horario</b>Lun a vie 07:00–19:00 · sáb 08:00–12:00</div>
+          </div>
+        </div>
+        <div class="kpi" style="grid-template-columns:repeat(4,1fr);margin-top:12px">
+          <div><small>Usuarios</small><b>18</b><span> 16 con huella</span></div>
+          <div><small>Pacientes</small><b>4.812</b></div>
+          <div><small>Módulos activos</small><b>7</b><span> de 28</span></div>
+          <div><small>Equipos</small><b>9</b><span> todos en línea</span></div>
+        </div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Quién ve qué</div>
+          <div style="font-size:13.5px;line-height:1.6">👩‍⚕️ Personal del centro → <b>solo C.S. San Luis</b> · 🔗 Responsable de Red → <b>los 12 centros de la Red Centro</b> · 🏢 SEDES → <b>todas las redes</b> (indicadores; datos clínicos solo si hace falta y queda registrado).</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ A2 ============ -->
+<section class="scr" id="a2">
+  <div class="app"><div class="brand">SIVEC <span>ADMIN</span></div><div class="who">👥 Usuarios · C.S. San Luis</div></div>
+  <div class="body">
+    <div class="row" style="margin-bottom:10px"><div class="inp" style="flex:1">🔎 Buscar por nombre, C.I. o matrícula</div><span class="chip on">Todos (18)</span><span class="chip">Sin huella (2)</span><span class="chip">Inactivos (1)</span><span class="btn p">＋ Nuevo profesional</span></div>
+    <table class="l"><thead><tr><th>Profesional</th><th>Profesión · especialidad</th><th>Perfil</th><th>Establecimientos</th><th>Huella</th><th>Último acceso</th><th>Estado</th></tr></thead><tbody>
+      <tr><td><div class="row"><div class="photo2" style="width:36px;height:40px;font-size:15px">👩‍⚕️</div><div><b>Dra. Aguilera</b><div class="mini">C.I. 5544332 · Mat. M-4521</div></div></div></td><td>Médica · Ginecología <span class="mini">17576012</span></td><td><span class="st info">Médico</span></td><td>C.S. San Luis</td><td><span class="st ok">✓</span></td><td>hoy 08:21</td><td><span class="st ok">activa</span></td></tr>
+      <tr><td><div class="row"><div class="photo2" style="width:36px;height:40px;font-size:15px">👩‍⚕️</div><div><b>Dra. Ortuño</b><div class="mini">C.I. 4433221 · Mat. M-3310</div></div></div></td><td>Médica · Medicina general <span class="mini">17576016</span></td><td><span class="st info">Médico</span> <span class="st warn">Jefa de centro</span></td><td>C.S. San Luis</td><td><span class="st ok">✓</span></td><td>hoy 07:55</td><td><span class="st ok">activa</span></td></tr>
+      <tr><td><div class="row"><div class="photo2" style="width:36px;height:40px;font-size:15px">🧑‍⚕️</div><div><b>Lic. Rojas</b><div class="mini">C.I. 6677001</div></div></div></td><td>Enfermería</td><td><span class="st info">Triaje</span></td><td>C.S. San Luis</td><td><span class="st ok">✓</span></td><td>hoy 07:40</td><td><span class="st ok">activa</span></td></tr>
+      <tr><td><div class="row"><div class="photo2" style="width:36px;height:40px;font-size:15px">🧾</div><div><b>Lic. Cruz</b><div class="mini">C.I. 7788112</div></div></div></td><td>Administrativa</td><td><span class="st info">Recepción</span></td><td>C.S. San Luis</td><td><span class="st ok">✓</span></td><td>hoy 07:30</td><td><span class="st ok">activa</span></td></tr>
+      <tr><td><div class="row"><div class="photo2" style="width:36px;height:40px;font-size:15px">💊</div><div><b>Aux. Mendoza</b><div class="mini">C.I. 8899223</div></div></div></td><td>Aux. de farmacia</td><td><span class="st info">Farmacia</span></td><td>C.S. San Luis</td><td><span class="st bad">falta</span></td><td>ayer</td><td><span class="st ok">activa</span></td></tr>
+      <tr><td><div class="row"><div class="photo2" style="width:36px;height:40px;font-size:15px">👨‍⚕️</div><div><b>Dr. Tola</b><div class="mini">C.I. 3322114 · Mat. M-2987</div></div></div></td><td>Médico · Medicina general</td><td><span class="st info">Médico</span></td><td>C.S. San Luis · C.S. El Bajío</td><td><span class="st ok">✓</span></td><td>hace 3 días</td><td><span class="st ok">activo</span></td></tr>
+      <tr style="opacity:.6"><td><div class="row"><div class="photo2" style="width:36px;height:40px;font-size:15px">👩‍⚕️</div><div><b>Dra. Delina</b><div class="mini">C.I. 2211009</div></div></div></td><td>Médica</td><td><span class="st info">Médico</span></td><td>—</td><td><span class="st ok">✓</span></td><td>hace 2 meses</td><td><span class="st mut">inactiva · traslado</span></td></tr>
+    </tbody></table>
+    <div class="mini" style="margin-top:8px">Un usuario <b>por persona</b> (no por centro). Una persona puede trabajar en varios centros. Al irse, se <b>desactiva</b> (nunca se borra: su firma en las historias sigue valiendo).</div>
+  </div>
+</section>
+
+<!-- ============ A3 ============ -->
+<section class="scr" id="a3">
+  <div class="app"><div class="brand">SIVEC <span>ADMIN</span></div><div class="who">＋ Alta de profesional</div></div>
+  <div class="body">
+    <div class="flowbar"><span class="on">1 · Identidad</span><span class="on">2 · Profesión</span><span class="on cur">3 · Huella y PIN</span><span>4 · Perfil y centros</span></div>
+    <div class="cols c3" style="gap:12px">
+      <div class="card"><div class="lbl">1 · Identidad (SEGIP)</div>
+        <div class="inp" style="margin-bottom:8px">C.I.: <b>9988776 SC</b> 🔎</div>
+        <div class="found" style="margin-top:0"><div class="photo2" style="width:54px;height:60px">👩‍⚕️</div><div><b>ROCÍO SUÁREZ PAZ</b><div class="mini">nac. 10/02/1990 · datos del SEGIP ✓</div></div></div>
+        <div class="inp" style="margin-top:8px"><small class="k2">Celular</small>7 654 3210</div>
+        <div class="inp" style="margin-top:6px"><small class="k2">Correo</small>rsuarez@…</div></div>
+      <div class="card"><div class="lbl">2 · Profesión</div>
+        <div class="chips"><span class="chip on">Médico/a</span><span class="chip">Enfermería</span><span class="chip">Aux. enfermería</span><span class="chip">Farmacia</span><span class="chip">Laboratorio</span><span class="chip">Recepción</span><span class="chip">Chofer/paramédico</span><span class="chip">Odontología</span><span class="chip">Nutrición</span></div>
+        <div class="inp" style="margin-top:8px"><small class="k2">Especialidad · código D-1</small>Ginecología y obstetricia · 17576012</div>
+        <div class="inp" style="margin-top:6px"><small class="k2">Matrícula profesional</small>M-6120 <span class="st ok">verificada</span></div>
+        <div class="inp" style="margin-top:6px"><small class="k2">Firma y sello digital</small>se genera con la huella</div></div>
+      <div class="card" style="text-align:center"><div class="lbl" style="text-align:left">3 · Registrar huella y PIN</div>
+        <div class="fing"><span class="done">👆 índice der. ✓</span><span class="done">👆 medio der. ✓</span><span class="cur">👆 índice izq. …</span></div>
+        <div class="scanner" style="width:130px;height:140px"><svg viewBox="0 0 40 48" width="80" height="96"><g fill="none" stroke="#7d2a4c" stroke-width="1.5" stroke-linecap="round"><path d="M8 18a12 12 0 0 1 24 0v6"/><path d="M12 19a8 8 0 0 1 16 0v8c0 5-2 9-5 12"/><path d="M16 20a4 4 0 0 1 8 0v7c0 6-2 10-6 14"/><path d="M20 21v7c0 5-2 9-5 12"/><path d="M5 12a18 18 0 0 1 30 0"/></g></svg></div>
+        <div class="mini" style="margin-top:8px">3 dedos por si uno falla · PIN de 6 números para firmar recetas y documentos legales.</div></div>
+    </div>
+    <div class="card" style="margin-top:12px"><div class="lbl">4 · Perfil y centros</div>
+      <div class="row"><span class="chip on">Médico</span><span class="chip">Jefe de piso</span><span class="chip">Responsable de Red</span> <span class="mini" style="margin:0 8px">en</span> <span class="chip on">Hospital municipal · Ginecología</span><span class="chip">＋ otro centro</span><span class="btn p" style="margin-left:auto">✓ Crear usuario</span></div>
+      <div class="mini" style="margin-top:6px">Recibe un SMS para crear su contraseña. Queda registrado quién la dio de alta y cuándo.</div></div>
+  </div>
+</section>
+
+<!-- ============ A4 ============ -->
+<section class="scr" id="a4">
+  <div class="app"><div class="brand">SIVEC <span>ADMIN</span></div><div class="who">🔐 Perfiles y permisos</div></div>
+  <div class="body">
+    <div class="card">
+      <div class="lbl">Qué puede hacer cada perfil — ver 👁 · registrar ✏️ · firmar 🖐 · administrar ⚙️</div>
+      <table class="l mx"><thead><tr><th>Perfil</th><th>Recepción</th><th>Triaje</th><th>Consulta / HC</th><th>Receta</th><th>Derivar</th><th>Farmacia</th><th>Laboratorio</th><th>Camas</th><th>Tránsito</th><th>Indicadores</th><th>Admin</th></tr></thead><tbody>
+        <tr><td><b>Recepción</b></td><td>✏️</td><td>👁</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>👁</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td><b>Enfermería / triaje</b></td><td>👁</td><td>✏️🖐</td><td>👁 ✏️ notas</td><td>👁</td><td>—</td><td>—</td><td>✏️ muestras</td><td>✏️</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr style="background:#fbf3f7"><td><b>Médico</b></td><td>👁</td><td>👁</td><td>✏️🖐</td><td>✏️🖐</td><td>✏️🖐</td><td>👁 stock</td><td>✏️ pedir · 👁</td><td>✏️</td><td>✏️ pedir</td><td>👁 propios</td><td>—</td></tr>
+        <tr><td><b>Jefe de piso / centro</b></td><td>👁</td><td>👁</td><td>✏️🖐</td><td>✏️🖐</td><td>✏️🖐</td><td>👁</td><td>👁</td><td>⚙️</td><td>👁</td><td>👁 su sector</td><td>—</td></tr>
+        <tr><td><b>Farmacia</b></td><td>—</td><td>—</td><td>—</td><td>👁</td><td>—</td><td>✏️🖐 ⚙️ stock</td><td>—</td><td>—</td><td>—</td><td>👁 stock</td><td>—</td></tr>
+        <tr><td><b>Laboratorio</b></td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✏️🖐</td><td>—</td><td>—</td><td>👁 lab</td><td>—</td></tr>
+        <tr><td><b>Chofer / paramédico</b></td><td>—</td><td>—</td><td>👁 resumen</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✏️🖐</td><td>—</td><td>—</td></tr>
+        <tr><td><b>Responsable de Red</b></td><td>👁</td><td>👁</td><td>👁 *</td><td>👁</td><td>👁 ⚙️ regulación</td><td>👁</td><td>👁</td><td>👁</td><td>⚙️</td><td>👁 toda la red</td><td>—</td></tr>
+        <tr><td><b>Administrador</b></td><td colspan="10" class="mini">no ve datos clínicos — solo estructura, usuarios, catálogos y auditoría</td><td>⚙️</td></tr>
+      </tbody></table>
+      <div class="mini" style="margin-top:6px">* acceso a datos clínicos de otra persona solo con motivo, y queda registrado (auditoría). Los perfiles se pueden ajustar por hospital.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ A5 ============ -->
+<section class="scr" id="a5">
+  <div class="app"><div class="brand">SIVEC <span>ADMIN</span></div><div class="who">🧩 Módulos activos por establecimiento</div></div>
+  <div class="body">
+    <div class="card">
+      <div class="lbl">Cada centro enciende solo lo que usa — así se vende por partes</div>
+      <table class="l mx2"><thead><tr><th>Establecimiento</th><th>PAP/VPH</th><th>Recepción</th><th>Triaje · TV</th><th>Consultorio</th><th>Farmacia</th><th>Laboratorio</th><th>Referencias</th><th>Hospital · camas</th><th>Quirófano</th><th>Tránsito</th><th>Mi salud</th></tr></thead><tbody>
+        <tr><td><b>C.S. San Luis</b> <span class="mini">1er</span></td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td>○</td><td>○</td><td>○</td><td class="pi">◐</td></tr>
+        <tr><td><b>C.S. El Bajío</b> <span class="mini">1er</span></td><td class="on">●</td><td class="on">●</td><td>○</td><td class="on">●</td><td class="on">●</td><td>○</td><td class="on">●</td><td>○</td><td>○</td><td>○</td><td>○</td></tr>
+        <tr><td><b>Hospital municipal</b> <span class="mini">2º</span></td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="pi">◐</td></tr>
+        <tr><td><b>Central de ambulancias</b> <span class="mini">red</span></td><td>○</td><td>○</td><td>○</td><td>○</td><td>○</td><td>○</td><td class="on">●</td><td>○</td><td>○</td><td class="on">●</td><td>○</td></tr>
+      </tbody></table>
+      <div class="mini" style="margin-top:6px">● activo · ◐ en piloto · ○ no contratado. Al encender un módulo aparece en el menú de los usuarios con permiso.</div>
+    </div>
+    <div class="cols c3" style="margin-top:12px;gap:12px">
+      <div class="card mini2"><b>📦 Paquete Centro de salud</b>Recepción, triaje/TV, consultorio, farmacia, laboratorio básico, referencias, PAP/VPH.</div>
+      <div class="card mini2"><b>🏥 Paquete Hospital</b>todo lo del centro + hospital/camas, quirófano, anestesia, enfermería de piso, jefe de piso.</div>
+      <div class="card mini2"><b>🔗 Paquete Red</b>regulación de referencias, tránsito/ambulancias, tablero del gestor, informes SNIS.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ A6 ============ -->
+<section class="scr" id="a6">
+  <div class="app"><div class="brand">SIVEC <span>ADMIN</span></div><div class="who">📚 Catálogos compartidos por toda la red</div></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:260px 1fr">
+      <div class="card"><div class="lbl">Catálogos</div>
+        <div class="catl on">💊 Medicamentos <small>LINAME · 612</small></div>
+        <div class="catl">🧪 Exámenes de laboratorio <small>184</small></div>
+        <div class="catl">🩻 Estudios de imagen <small>46</small></div>
+        <div class="catl">🩺 Diagnósticos CIE-10 <small>14.400</small></div>
+        <div class="catl">🔪 Procedimientos <small>820</small></div>
+        <div class="catl">📝 Plantillas por especialidad <small>22</small></div>
+        <div class="catl">🏷 Códigos de especialidad (D-1) <small>31</small></div>
+        <div class="catl">💬 Textos de mensajes SMS <small>18</small></div>
+      </div>
+      <div class="card"><div class="row"><div class="inp" style="flex:1">🔎 clotrimazol</div><span class="btn p">＋ Agregar</span></div>
+        <table class="l" style="margin-top:10px"><thead><tr><th>Medicamento</th><th>Forma</th><th>Nivel</th><th>Dosis habitual (tarjeta)</th><th>Ícono</th><th>Estado</th></tr></thead><tbody>
+          <tr><td><b>Clotrimazol</b> 500 mg</td><td>óvulo vaginal</td><td>1er</td><td>1 c/noche x 10</td><td>🥚</td><td><span class="st ok">activo</span></td></tr>
+          <tr><td><b>Clotrimazol</b> 1%</td><td>crema vaginal</td><td>1er</td><td>c/noche x 7 días</td><td>🧴</td><td><span class="st ok">activo</span></td></tr>
+          <tr><td><b>Clotrimazol</b> 100 mg</td><td>óvulo vaginal</td><td>1er</td><td>1 c/noche x 6</td><td>🥚</td><td><span class="st mut">propuesto por C.S. El Bajío</span></td></tr></tbody></table>
+        <div class="mini" style="margin-top:8px">Los medicamentos que cada centro agregaba en su computadora (consulta con figuras) pasan a ser <b>propuestas</b>: el administrador las aprueba y quedan para toda la red. Cada cambio guarda versión, fecha y quién lo hizo.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ A7 ============ -->
+<section class="scr" id="a7">
+  <div class="app"><div class="brand">SIVEC <span>ADMIN</span></div><div class="who">🕵 Auditoría y seguridad</div></div>
+  <div class="body">
+    <div class="kpi" style="grid-template-columns:repeat(4,1fr)">
+      <div><small>Accesos hoy</small><b>1.284</b></div><div><small>Alertas abiertas</small><b style="color:#991b1b">2</b></div><div><small>Última copia de seguridad</small><b style="font-size:22px">hoy 03:00 ✓</b></div><div><small>Sesiones activas</small><b>57</b></div>
+    </div>
+    <div class="cols c21" style="margin-top:12px">
+      <div class="card"><div class="lbl">Registro de accesos — quién vio qué</div>
+        <table class="l"><thead><tr><th>Hora</th><th>Usuario</th><th>Acción</th><th>Paciente</th><th>Dónde</th></tr></thead><tbody>
+          <tr><td>08:21</td><td>Dra. Aguilera</td><td>firmó D-1 y HC 🖐</td><td>María Quispe</td><td>C.S. San Luis · consultorio 3</td></tr>
+          <tr><td>08:05</td><td>Lic. Rojas</td><td>registró signos vitales</td><td>María Quispe</td><td>triaje</td></tr>
+          <tr style="background:#fff5f5"><td>02:14</td><td>Aux. Pérez</td><td>abrió 34 historias</td><td>varias</td><td>fuera de su turno ⚠</td></tr>
+          <tr><td>ayer</td><td>Dr. Vaca</td><td>vio resumen (referencia)</td><td>María Quispe</td><td>Hospital municipal</td></tr></tbody></table></div>
+      <div>
+        <div class="card alertc"><div class="lbl">Alertas</div><div style="font-size:13.5px;line-height:1.6">🔴 Aux. Pérez abrió <b>34 historias</b> a las 02:14, fuera de turno → sesión bloqueada, aviso al jefe.<br>🟠 3 intentos de huella fallidos en farmacia.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Reglas de seguridad</div><div style="font-size:13px;line-height:1.6">🔐 Sesión se cierra a los 15 min sin uso · 🖐 huella + PIN para firmar · 🔒 datos cifrados · 💾 copia diaria en otro lugar · 👩 la paciente ve sus accesos en Mi salud</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ A8 ============ -->
+<section class="scr" id="a8">
+  <div class="app"><div class="brand">SIVEC <span>ADMIN</span></div><div class="who">⚙️ Equipos y configuración · C.S. San Luis</div></div>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card"><div class="lbl">Equipos registrados</div>
+        <table class="l"><thead><tr><th>Equipo</th><th>Lugar</th><th>Estado</th></tr></thead><tbody>
+          <tr><td>🖐 Lector de huella</td><td>Recepción · ventanilla 1</td><td><span class="st ok">en línea</span></td></tr>
+          <tr><td>🖐 Lector de huella</td><td>Consultorio 3</td><td><span class="st ok">en línea</span></td></tr>
+          <tr><td>🖐 Lector de huella</td><td>Farmacia</td><td><span class="st warn">lento</span></td></tr>
+          <tr><td>📷 Cámara</td><td>Recepción</td><td><span class="st ok">en línea</span></td></tr>
+          <tr><td>📺 TV de turnos</td><td>Sala de espera</td><td><span class="st ok">en línea</span></td></tr>
+          <tr><td>🖨 Impresora</td><td>Consultorio 3</td><td><span class="st bad">sin papel</span></td></tr>
+          <tr><td>📱 Celular institucional</td><td>Recepción · 7 123 0000</td><td><span class="st ok">WhatsApp activo</span></td></tr></tbody></table></div>
+      <div class="card"><div class="lbl">Configuración del centro</div>
+        <div class="kv2"><span>PAP negativo → próximo control</span><b>3 años</b></div>
+        <div class="kv2"><span>VPH negativo → próximo control</span><b>5 años</b></div>
+        <div class="kv2"><span>Edad de tamizaje PAP / VPH</span><b>25–64 / 30–64</b></div>
+        <div class="kv2"><span>Días para buscar resultado atrasado</span><b>90</b></div>
+        <div class="kv2"><span>Recordatorio de cita</span><b>1 día antes, 18:00</b></div>
+        <div class="kv2"><span>Voz de la TV</span><b>español · quechua</b></div>
+        <div class="kv2"><span>Médico responsable de Telesalud</span><b>configurado</b></div>
+        <div class="mini" style="margin-top:6px">Reglas de la red con posibilidad de ajuste por centro; cada cambio queda con fecha y autor.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  const NOTES = {
+    a1: '<b>Rede e estabelecimentos:</b> a árvore Ministério → SEDES → Rede → centros e hospitais, com serviços, espaços e horário. Define quem vê o quê: o centro vê o seu, a Rede vê os seus centros, o SEDES vê tudo em indicadores.',
+    a2: '<b>Usuários:</b> um usuário por pessoa (não por centro), com profissão, especialidade e código, perfil, centros, digital cadastrada e último acesso. Quem sai é desativado, nunca apagado.',
+    a3: '<b>Cadastro de profissional:</b> C.I. com dados do SEGIP, profissão e matrícula, especialidade com código do D-1, cadastro de 3 dedos + PIN e, por fim, perfil e centros.',
+    a4: '<b>Perfis e permissões:</b> o que cada perfil pode ver, registrar, assinar ou administrar. O administrador não vê dados clínicos.',
+    a5: '<b>Módulos por centro:</b> cada estabelecimento liga só o que usa — é a forma de vender por pacotes (Centro de saúde, Hospital, Rede).',
+    a6: '<b>Catálogos:</b> medicamentos (LINAME), exames, CIE-10, procedimentos, modelos por especialidade, códigos do D-1 e textos de SMS, iguais para toda a rede e com versão. O que um centro cria vira proposta para aprovar.',
+    a7: '<b>Auditoria e segurança:</b> quem viu o quê e onde, alertas de uso estranho (ex.: muitas histórias de madrugada), backups e regras de segurança.',
+    a8: '<b>Equipamentos e configuração:</b> leitores de digital, câmera, TV, impressoras e celular do centro com seu estado; regras clínicas e de mensagens do centro.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 'a1');
+</script>
+
+</body>
+</html>
