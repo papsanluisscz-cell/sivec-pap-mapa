@@ -409,6 +409,92 @@
   #loginBox { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 32px; width: 340px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
   #loginBox .field input { width: 100%; }
   #blocker button { background: var(--teal-700); color: #fff; border: none; padding: 9px 18px; border-radius: 7px; cursor: pointer; font-size: 13.5px; }
+  /* ===== Panel ===== */
+  #panelView { --pn-grid: color-mix(in srgb, var(--line) 70%, transparent); --pn-one: #7d2a4c; --pn-good: #16a34a; --pn-warn: #d97706; --pn-crit: #dc2626; --pn-mute: #9a8690; }
+  body.dark #panelView { --pn-one: #e88fb0; --pn-good: #4ade80; --pn-warn: #fbbf24; --pn-crit: #f87171; --pn-mute: #9d8490; }
+  .pnTop { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .pnFilters { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pnSeg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
+  .pnSeg button { border: none; background: none; color: var(--ink-soft); padding: 6px 11px; border-radius: 7px; font-size: 12.5px; cursor: pointer; font-family: inherit; }
+  .pnSeg button.on { background: var(--pn-one); color: #fff; font-weight: 600; }
+  body.dark .pnSeg button.on { color: #2a0f1c; }
+  #pnDoctora { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 7px 10px; font-size: 12.5px; }
+  .pnCard { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 2px rgba(64,50,58,.05), 0 6px 20px rgba(109,33,66,.06); padding: 16px 18px; position: relative; overflow: hidden; }
+  .pnAnim .pnCard { animation: pnRise .6s cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes pnRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .pnCard h3 { margin: 0; font-size: 14px; } .pnCap { font-size: 12px; color: var(--ink-soft); margin: 2px 0 12px; }
+  .pnKpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .pnKpi .lab { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; padding-right: 60px; }
+  .pnKpi .ico { width: 26px; height: 26px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; background: color-mix(in srgb, var(--pn-one) 12%, transparent); flex-shrink: 0; }
+  .pnKpi .val { font-size: 32px; font-weight: 800; letter-spacing: -.5px; margin-top: 8px; font-variant-numeric: tabular-nums; }
+  .pnKpi .val small { font-size: 15px; font-weight: 700; color: var(--ink-soft); }
+  .pnKpi .delta { font-size: 12px; font-weight: 600; margin-top: 2px; color: var(--ink-soft); }
+  .pnKpi .delta.up { color: var(--pn-good); } .pnKpi .delta.down { color: var(--pn-crit); }
+  .pnKpi svg.spark { position: absolute; right: 12px; bottom: 12px; width: 96px; height: 34px; overflow: visible; }
+  .pnKpi .spark path.l { fill: none; stroke: var(--pn-one); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 300; stroke-dashoffset: 300; animation: pnDraw 1.4s .3s ease forwards; }
+  .pnKpi .spark path.a { fill: var(--pn-one); opacity: .1; }
+  @keyframes pnDraw { to { stroke-dashoffset: 0; } }
+  .pnKpi svg.ring { position: absolute; right: 14px; top: 46px; width: 58px; height: 58px; }
+  .ring circle { fill: none; stroke-width: 7; } .ring .bg { stroke: var(--pn-grid); }
+  .ring .fg { stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 1.3s cubic-bezier(.2,.7,.2,1); }
+  .pnGrid2 { display: grid; grid-template-columns: 1.35fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .pnGrid4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+  @media (max-width: 900px) { .pnGrid2 { grid-template-columns: 1fr; } }
+  .pnFun { display: grid; gap: 9px; }
+  .pnFrow { display: grid; grid-template-columns: 150px 1fr 64px; align-items: center; gap: 10px; font-size: 13px; }
+  .pnFrow .n { color: var(--ink-soft); }
+  .pnTrack { height: 26px; background: var(--pn-grid); border-radius: 7px; overflow: hidden; }
+  .pnBar { height: 100%; width: 0; border-radius: 0 7px 7px 0; background: var(--pn-one); transition: width 1.2s cubic-bezier(.2,.7,.2,1); }
+  .pnFrow .v { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+  .pnFrow .v small { display: block; font-weight: 500; font-size: 11px; color: var(--ink-soft); }
+  .pnDrop { font-size: 11.5px; color: var(--pn-crit); padding-left: 160px; margin-top: -4px; }
+  @media (max-width: 600px) { .pnFrow { grid-template-columns: 105px 1fr 54px; } .pnDrop { padding-left: 0; } }
+  .pnCols { position: relative; height: 200px; display: flex; align-items: flex-end; gap: 6px; padding: 0 2px 22px; border-bottom: 1px solid var(--line); margin-top: 18px; }
+  .pnCols .gl { position: absolute; left: 0; right: 0; border-top: 1px dashed var(--pn-grid); font-size: 10px; color: var(--ink-soft); }
+  .pnCol { flex: 1; position: relative; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+  .pnCol .b { height: 0; background: var(--pn-one); border-radius: 4px 4px 0 0; transition: height 1s cubic-bezier(.2,.7,.2,1); opacity: .55; }
+  .pnCol.cur .b, .pnCol:hover .b { opacity: 1; }
+  .pnCol .m { position: absolute; bottom: -19px; left: 0; right: 0; text-align: center; font-size: 10.5px; color: var(--ink-soft); }
+  .pnCol .lbl { text-align: center; font-size: 10.5px; font-weight: 700; color: var(--ink-soft); margin-bottom: 3px; visibility: hidden; }
+  .pnCol.show .lbl, .pnCol:hover .lbl { visibility: visible; }
+  .pnStack { display: flex; height: 34px; border-radius: 8px; overflow: hidden; gap: 2px; }
+  .pnStack div { width: 0; transition: width 1.1s cubic-bezier(.2,.7,.2,1); }
+  .pnLegend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 12.5px; }
+  .pnLegend span { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-soft); } .pnLegend b { color: var(--ink); }
+  .pnLegend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .pnHb { display: grid; gap: 8px; }
+  .pnHrow { display: grid; grid-template-columns: 112px 1fr 44px; gap: 8px; align-items: center; font-size: 12.5px; }
+  .pnHrow > div:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pnHrow .t { height: 14px; background: var(--pn-grid); border-radius: 4px; overflow: hidden; }
+  .pnHrow .f { height: 100%; width: 0; border-radius: 0 4px 4px 0; transition: width 1.1s cubic-bezier(.2,.7,.2,1); }
+  .pnHrow .num { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+  .pnWho { display: inline-flex; align-items: center; gap: 7px; }
+  .pnAv { width: 24px; height: 24px; border-radius: 50%; background: color-mix(in srgb, var(--pn-one) 15%, var(--surface)); color: var(--pn-one); font-size: 10.5px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pnAlerts { display: grid; gap: 8px; }
+  .pnAl { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; cursor: pointer; transition: transform .15s, box-shadow .15s; background: var(--surface); color: var(--ink); font-family: inherit; text-align: left; width: 100%; }
+  .pnAl:hover { transform: translateX(3px); box-shadow: 0 4px 14px rgba(0,0,0,.08); }
+  .pnAl .dot { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .pnAl .tx { flex: 1; font-size: 13px; } .pnAl .tx small { display: block; color: var(--ink-soft); font-size: 11.5px; }
+  .pnAl .c { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; } .pnAl .go { color: var(--ink-soft); font-size: 18px; }
+  .pnAl.crit .dot { background: color-mix(in srgb, var(--pn-crit) 15%, transparent); } .pnAl.warn .dot { background: color-mix(in srgb, var(--pn-warn) 18%, transparent); } .pnAl.ok .dot { background: color-mix(in srgb, var(--pn-good) 15%, transparent); }
+  .pnSinDoc { margin-top: 12px; font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px dashed var(--line); padding-top: 10px; }
+  .pnSinDoc button { border: 1px solid var(--pn-one); color: var(--pn-one); background: none; border-radius: 8px; padding: 5px 10px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .pnEmpty { font-size: 12.5px; color: var(--ink-soft); font-style: italic; }
+  #pnTip { position: fixed; pointer-events: none; background: #2b1520; color: #fff; font-size: 12px; padding: 7px 9px; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.25); opacity: 0; transition: opacity .12s; z-index: 5000; white-space: nowrap; }
+  @media (prefers-reduced-motion: reduce) { #panelView *, #panelView *::before { animation: none !important; transition: none !important; } }
+  /* Asignar doctora */
+  #asigOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 3000; align-items: center; justify-content: center; padding: 16px; }
+  #asigOverlay.open { display: flex; }
+  #asigBox { background: var(--surface); color: var(--ink); border-radius: 14px; width: min(720px, 100%); max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,.3); }
+  #asigBox .asigHead, #asigBox .asigFoot { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  #asigBox .asigFoot { border-top: 1px solid var(--line); border-bottom: none; }
+  #asigBox h3 { margin: 0; font-size: 16px; flex: 1; }
+  #asigList { overflow-y: auto; padding: 6px 16px; flex: 1; }
+  .asigRow { display: grid; grid-template-columns: 24px 1fr 100px; gap: 8px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .asigRow small { color: var(--ink-soft); }
+  #asigBox select, #asigBox input[type=date] { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 6px 8px; font-size: 13px; }
+  #asigBox button { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 8px; padding: 7px 12px; font-size: 13px; cursor: pointer; font-family: inherit; }
+  #asigBox button.primary { background: #7d2a4c; border-color: #7d2a4c; color: #fff; font-weight: 600; }
   /* Impresión del Balance: se libera la altura fija de la pantalla para que salgan TODAS las hojas */
   @media print {
     @page { size: A4 landscape; margin: 10mm; }
@@ -740,17 +826,28 @@
 
     <!-- PANEL -->
     <div id="panelView" class="view">
-      <h2>Panel</h2>
-      <p class="hint">Resumen visual de la base de pacientes.</p>
-      <div id="kpiGrid" class="kpiGrid"></div>
-      <div class="panelGrid">
-        <div class="panelCard"><h3>Resultados PAP por clasificación (Bethesda)</h3><canvas id="chartBethesda"></canvas></div>
-        <div class="panelCard"><h3>Pacientes por edad</h3><canvas id="chartEdad"></canvas></div>
-        <div class="panelCard"><h3>Estado del PAP</h3><canvas id="chartEstadoPap"></canvas></div>
-        <div class="panelCard"><h3>VPH (entre testeadas)</h3><canvas id="chartVph"></canvas></div>
-        <div class="panelCard"><h3>Tomas por mes (últimos 12 meses)</h3><canvas id="chartMensual"></canvas></div>
-        <div class="panelCard"><h3>Pacientes por doctora</h3><canvas id="chartDoctora"></canvas></div>
-        <div class="panelCard"><h3>Métodos anticonceptivos</h3><canvas id="chartMetodos"></canvas></div>
+      <div class="pnTop">
+        <div><h2 style="margin:0">Panel</h2><div id="pnSub" style="margin:3px 0 0;font-size:13px;color:var(--ink-soft)">Resumen de la base de pacientes</div></div>
+        <div class="pnFilters">
+          <div class="pnSeg" id="pnPeriodo"><button data-p="1">Este mes</button><button data-p="3">3 meses</button><button data-p="12" class="on">12 meses</button><button data-p="0">Todo</button></div>
+          <select id="pnDoctora"><option value="">Todas las doctoras</option></select>
+        </div>
+      </div>
+      <div class="pnKpis" id="pnKpis"></div>
+      <div class="pnGrid2">
+        <div class="pnCard"><h3>Del tamizaje al seguimiento</h3><div class="pnCap">Dónde se quedan las pacientes en el camino</div><div class="pnFun" id="pnFunnel"></div></div>
+        <div class="pnCard"><h3>Para hacer hoy</h3><div class="pnCap">Tocá para abrir la lista filtrada</div><div class="pnAlerts" id="pnAlerts"></div></div>
+      </div>
+      <div class="pnGrid2">
+        <div class="pnCard"><h3>Tomas por mes</h3><div class="pnCap">Últimos 12 meses · el mes actual resaltado</div><div class="pnCols" id="pnCols"></div></div>
+        <div class="pnCard"><h3>Resultados del PAP</h3><div class="pnCap" id="pnPapCap"></div><div class="pnStack" id="pnStackPap"></div><div class="pnLegend" id="pnLegPap"></div>
+          <h3 style="margin-top:22px">VPH (entre testeadas)</h3><div class="pnCap" id="pnVphCap"></div><div class="pnStack" id="pnStackVph"></div><div class="pnLegend" id="pnLegVph"></div></div>
+      </div>
+      <div class="pnGrid4">
+        <div class="pnCard"><h3>Clasificación Bethesda</h3><div class="pnCap">PAP con resultado</div><div class="pnHb" id="pnBeth"></div></div>
+        <div class="pnCard"><h3>Tomas por doctora</h3><div class="pnCap" id="pnDocsCap">En el período</div><div class="pnHb" id="pnDocs"></div><div id="pnSinDoc"></div></div>
+        <div class="pnCard"><h3>Pacientes por edad</h3><div class="pnCap" id="pnEdadCap"></div><div class="pnHb" id="pnEdad"></div></div>
+        <div class="pnCard"><h3>Métodos anticonceptivos</h3><div class="pnCap">Pacientes que usan un método</div><div class="pnHb" id="pnMetodos"></div></div>
       </div>
     </div>
 
@@ -2807,119 +2904,236 @@ async function deletePatient(p) {
   loadList();
 }
 
-let panelCharts = {};
+// ================= Panel =================
+let pnData = [];
+let pnPeriodo = 12;
+const DOCTORAS_BASE = ['Dra. Ortuño', 'Dra. Aguilera', 'Dra. Delina', 'Dr. Tola'];
+const pnTip = (() => { const t = document.createElement('div'); t.id = 'pnTip'; document.body.appendChild(t); return t; })();
+function pnHover(el, html) {
+  el.addEventListener('mousemove', e => { pnTip.innerHTML = html; pnTip.style.opacity = 1; pnTip.style.left = Math.min(e.clientX + 14, innerWidth - 220) + 'px'; pnTip.style.top = (e.clientY - 10) + 'px'; });
+  el.addEventListener('mouseleave', () => { pnTip.style.opacity = 0; });
+}
+const pnReduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+function pnCount(el, target, dec) {
+  const t0 = performance.now(), dur = pnReduce() ? 0 : 1100;
+  const fmt = n => dec ? n.toFixed(dec) : Math.round(n).toLocaleString('es');
+  (function step(t) { const k = dur ? Math.min(1, (t - t0) / dur) : 1; el.textContent = fmt(target * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); })(t0);
+}
+const pnLater = (fn, ms) => setTimeout(fn, pnReduce() ? 0 : ms);
+function mesKey(d) { return d.toISOString().slice(0, 7); }
+function pnDesde() { if (!pnPeriodo) return null; const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - (pnPeriodo - 1)); return d.toISOString().slice(0, 10); }
+function sinDoctora(p) { return !p.doctora || !String(p.doctora).trim() || p.doctora === 'Sin asignar'; }
+
 async function loadPanel() {
   const { data, error } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null));
   if (error) { alert('Error al cargar panel: ' + error.message); return; }
+  pnData = data;
+  tomasIndex = buildTomasIndex(data); // "Para hacer hoy" usa la toma más reciente de cada paciente
+  const sel = document.getElementById('pnDoctora'), cur = sel.value;
+  const docs = [...new Set([...DOCTORAS_BASE, ...data.filter(p => !sinDoctora(p)).map(p => p.doctora)])];
+  sel.innerHTML = '<option value="">Todas las doctoras</option>' + docs.map(d => `<option${d === cur ? ' selected' : ''}>${esc(d)}</option>`).join('');
+  renderPanel(true);
+}
+document.getElementById('pnPeriodo').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  pnPeriodo = Number(b.dataset.p);
+  document.querySelectorAll('#pnPeriodo button').forEach(x => x.classList.toggle('on', x === b));
+  renderPanel(true);
+});
+document.getElementById('pnDoctora').addEventListener('change', () => renderPanel(true));
 
-  const estadoCounts = { Positivo: 0, Negativo: 0, Pendiente: 0 };
-  data.forEach(p => {
-    if (esSoloVph(p)) return;
-    const k = p.estado_pap || 'Pendiente';
-    estadoCounts[k] = (estadoCounts[k] || 0) + 1;
-  });
-
-  const vphCounts = { Positiva: 0, Negativa: 0 };
-  data.forEach(p => { if (p.resultado_vph) vphCounts[p.resultado_vph] = (vphCounts[p.resultado_vph] || 0) + 1; });
-
-  const meses = [];
-  const now = new Date();
-  for (let i = 11; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    meses.push({ key: d.toISOString().slice(0, 7), label: d.toLocaleDateString('es', { month: 'short', year: '2-digit' }) });
-  }
-  const mensualCounts = Object.fromEntries(meses.map(m => [m.key, 0]));
-  data.forEach(p => {
-    if (!p.fecha_toma) return;
-    const key = p.fecha_toma.slice(0, 7);
-    if (key in mensualCounts) mensualCounts[key]++;
-  });
-
-  const doctoraCounts = {};
-  data.forEach(p => { const d = p.doctora || 'Sin asignar'; doctoraCounts[d] = (doctoraCounts[d] || 0) + 1; });
-  const doctoraEntries = Object.entries(doctoraCounts).sort((a, b) => b[1] - a[1]);
-
-  const metodoCounts = {};
-  data.forEach(p => {
-    if (!p.anticonceptivo_metodo) return;
-    metodoCounts[p.anticonceptivo_metodo] = (metodoCounts[p.anticonceptivo_metodo] || 0) + 1;
-  });
-  const metodoEntries = Object.entries(metodoCounts).sort((a, b) => b[1] - a[1]);
-
-  // ---- Indicadores ----
-  const idxP = buildTomasIndex(data);
-  const ultimas = data.filter(p => { const i = idxP.get(p.id); return !i || i.grupo[i.grupo.length - 1] === p; });
-  const conResultado = data.filter(p => esSoloVph(p) ? !!p.resultado_vph : (p.estado_pap === 'Positivo' || p.estado_pap === 'Negativo'));
-  const entregados = conResultado.filter(p => p.recibio_resultado);
-  const dias = data.filter(p => p.fecha_toma && p.fecha_recibio_resultado)
-    .map(p => Math.round((new Date(p.fecha_recibio_resultado) - new Date(p.fecha_toma)) / 86400000)).filter(d => d >= 0).sort((a, b) => a - b);
-  const mediana = dias.length ? dias[Math.floor(dias.length / 2)] : null;
-  const positivas = ultimas.filter(p => (!esSoloVph(p) && p.estado_pap === 'Positivo') || p.resultado_vph === 'Positiva');
-  const conSeg = positivas.filter(p => p.derivacion_pap || p.seguimiento_pap || p.seguimiento_vph || p.recibio_tratamiento_vph);
-  const conEdad = ultimas.filter(p => edadDe(p.fecha_nacimiento) != null);
-  const enRango = conEdad.filter(p => !fueraDeRangoEdad(p));
-  const atrasadasN = data.filter(esAtrasada).length;
+function renderPanel(animar) {
+  const view = document.getElementById('panelView');
+  view.classList.remove('pnAnim'); void view.offsetWidth; if (animar && !pnReduce()) view.classList.add('pnAnim');
+  const doc = document.getElementById('pnDoctora').value;
+  const base = pnData.filter(p => !doc || p.doctora === doc);           // todo el historial (para tareas y tendencias)
+  const desde = pnDesde();
+  const data = base.filter(p => !desde || (p.fecha_toma && p.fecha_toma >= desde)); // período elegido
+  const nombrePeriodo = { 1: 'este mes', 3: 'últimos 3 meses', 12: 'últimos 12 meses', 0: 'todo el historial' }[pnPeriodo];
+  document.getElementById('pnSub').textContent = `${doc || 'Todas las doctoras'} · ${nombrePeriodo} · ${data.length} tomas`;
   const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
-  const kpi = (valor, label, sub, pctBar, color) => `<div class="kpi"><div class="kv">${valor}</div><div class="kl">${label}</div><div class="ks">${sub}</div>${pctBar != null ? `<div class="kbar"><i style="width:${pctBar}%;background:${color}"></i></div>` : ''}</div>`;
-  document.getElementById('kpiGrid').innerHTML =
-    kpi(idxP.unicas, 'Pacientes únicas', `${data.length} tomas registradas`) +
-    kpi(pct(entregados.length, conResultado.length) + '%', 'Resultados entregados', `${entregados.length} de ${conResultado.length} con resultado`, pct(entregados.length, conResultado.length), '#16a34a') +
-    kpi(mediana != null ? mediana + ' días' : '—', 'Toma → entrega (mediana)', dias.length ? `sobre ${dias.length} pacientes con fecha de entrega` : 'falta cargar "fecha en que recibió el resultado"') +
-    kpi(pct(conSeg.length, positivas.length) + '%', 'Positivas con seguimiento', `${conSeg.length} de ${positivas.length} (PAP+ o VPH+)`, pct(conSeg.length, positivas.length), '#7c3aed') +
-    kpi(atrasadasN, 'Resultados atrasados', 'más de 90 días sin resultado', null) +
-    kpi(pct(enRango.length, conEdad.length) + '%', 'Dentro de la edad objetivo', `${enRango.length} de ${conEdad.length} pacientes · rango ${clinCfg.papEdadMin}–${clinCfg.papEdadMax}`, pct(enRango.length, conEdad.length), '#2f6fb0');
 
-  const betCounts = Object.fromEntries(BETHESDA.map(b => [b.code, 0]));
-  data.forEach(p => { const b = bethesdaDe(p); if (b) betCounts[b]++; });
-  const betColor = { neg: '#16a34a', bajo: '#ea8c2e', alto: '#dc2626', insat: '#9ca3af' };
-  const grupos = [['<25', 0, 24], ['25–34', 25, 34], ['35–44', 35, 44], ['45–54', 45, 54], ['55–64', 55, 64], ['65+', 65, 200]];
-  const edadCounts = grupos.map(([, a, b]) => conEdad.filter(p => { const e = edadDe(p.fecha_nacimiento); return e >= a && e <= b; }).length);
+  // ---- meses (siempre 12, para tendencias) ----
+  const hoy = new Date(), meses = [];
+  for (let i = 11; i >= 0; i--) { const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1); meses.push({ key: mesKey(new Date(d.getTime() + 43200000)), label: d.toLocaleDateString('es', { month: 'short' }).replace('.', '') }); }
+  const porMes = k => base.filter(p => (p.fecha_toma || '').slice(0, 7) === k);
+  const tomasMes = meses.map(m => porMes(m.key).length);
+  const esteMes = meses[11].key, mesAnt = meses[10].key;
 
-  const mk = (id, config) => {
-    if (panelCharts[id]) panelCharts[id].destroy();
-    panelCharts[id] = new Chart(document.getElementById(id), config);
+  // ---- indicadores ----
+  const idx = buildTomasIndex(data);
+  const conResultado = p => esSoloVph(p) ? !!p.resultado_vph : (p.estado_pap === 'Positivo' || p.estado_pap === 'Negativo' || !!bethesdaDe(p));
+  const conRes = data.filter(conResultado), entregados = conRes.filter(p => p.recibio_resultado);
+  const pctEntregMes = k => { const r = porMes(k).filter(conResultado); return r.length ? pct(r.filter(p => p.recibio_resultado).length, r.length) : null; };
+  const diasDe = p => (p.fecha_toma && p.fecha_recibio_resultado) ? Math.round((new Date(p.fecha_recibio_resultado) - new Date(p.fecha_toma)) / 86400000) : null;
+  const mediana = arr => { const a = arr.filter(x => x != null && x >= 0).sort((x, y) => x - y); return a.length ? a[Math.floor(a.length / 2)] : null; };
+  const med = mediana(data.map(diasDe));
+  const medMes = meses.map(m => mediana(porMes(m.key).map(diasDe)));
+  const esPos = p => (!esSoloVph(p) && (p.estado_pap === 'Positivo' || ['alto', 'bajo'].includes((BETHESDA_BY_CODE[bethesdaDe(p)] || {}).nivel))) || p.resultado_vph === 'Positiva';
+  const tieneSeg = p => !!(p.derivacion_pap || p.seguimiento_pap || p.seguimiento_vph || p.recibio_tratamiento_vph);
+  const positivas = data.filter(esPos), conSeg = positivas.filter(tieneSeg);
+  const nuevasMes = new Set(porMes(esteMes).map(p => p.id)).size;
+  const dEnt = (pctEntregMes(esteMes) != null && pctEntregMes(mesAnt) != null) ? pctEntregMes(esteMes) - pctEntregMes(mesAnt) : null;
+  const kpis = document.getElementById('pnKpis');
+  kpis.innerHTML = `
+    <div class="pnCard pnKpi"><div class="lab"><span class="ico">👩</span>Pacientes únicas</div><div class="val"><span data-c="${idx.unicas}">0</span></div>
+      <div class="delta ${nuevasMes ? 'up' : ''}">${nuevasMes ? '▲ ' + nuevasMes + ' tomas este mes' : 'Sin tomas este mes'}</div><svg class="spark" viewBox="0 0 96 34" data-s="${tomasMes.join(',')}"></svg></div>
+    <div class="pnCard pnKpi"><div class="lab"><span class="ico">📬</span>Resultados entregados</div><div class="val"><span data-c="${pct(entregados.length, conRes.length)}">0</span><small>%</small></div>
+      <div class="delta ${dEnt > 0 ? 'up' : dEnt < 0 ? 'down' : ''}">${dEnt == null ? `${entregados.length} de ${conRes.length} con resultado` : (dEnt === 0 ? 'Igual que el mes anterior' : (dEnt > 0 ? '▲ ' : '▼ ') + Math.abs(dEnt) + ' pts vs mes anterior')}</div>
+      <svg class="ring" viewBox="0 0 58 58" data-r="${pct(entregados.length, conRes.length)}" data-col="var(--pn-good)"><circle class="bg" cx="29" cy="29" r="24"/><circle class="fg" cx="29" cy="29" r="24"/></svg></div>
+    <div class="pnCard pnKpi"><div class="lab"><span class="ico">⏱</span>Toma → entrega (mediana)</div><div class="val">${med == null ? '—' : `<span data-c="${med}">0</span><small> días</small>`}</div>
+      <div class="delta">${med == null ? 'Cargá la fecha en que recibió el resultado' : 'sobre ' + data.filter(p => diasDe(p) != null).length + ' pacientes'}</div>${medMes.filter(x => x != null).length > 2 ? `<svg class="spark" viewBox="0 0 96 34" data-s="${medMes.map(x => x == null ? '' : x).join(',')}"></svg>` : ''}</div>
+    <div class="pnCard pnKpi"><div class="lab"><span class="ico">🩺</span>Positivas con seguimiento</div><div class="val"><span data-c="${pct(conSeg.length, positivas.length)}">0</span><small>%</small></div>
+      <div class="delta ${positivas.length - conSeg.length ? 'down' : 'up'}">${positivas.length ? (positivas.length - conSeg.length ? (positivas.length - conSeg.length) + ' sin seguimiento' : 'Todas con seguimiento ✔') : 'Sin positivas en el período'}</div>
+      <svg class="ring" viewBox="0 0 58 58" data-r="${pct(conSeg.length, positivas.length)}" data-col="var(--positiva)"><circle class="bg" cx="29" cy="29" r="24"/><circle class="fg" cx="29" cy="29" r="24"/></svg></div>`;
+  kpis.querySelectorAll('[data-c]').forEach(el => pnCount(el, Number(el.dataset.c)));
+  kpis.querySelectorAll('svg.spark').forEach(s => {
+    const raw = s.dataset.s.split(','), v = raw.map(x => x === '' ? null : Number(x)), ok = v.filter(x => x != null);
+    const mn = Math.min(...ok), mx = Math.max(...ok);
+    const pts = v.map((y, i) => y == null ? null : [i / (v.length - 1) * 96, 30 - (y - mn) / (mx - mn || 1) * 26]).filter(Boolean);
+    const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+    s.innerHTML = `<path class="a" d="${d} L${pts.at(-1)[0]} 34 L${pts[0][0]} 34 Z"/><path class="l" d="${d}"/><circle cx="${pts.at(-1)[0]}" cy="${pts.at(-1)[1]}" r="3" fill="var(--pn-one)"/>`;
+  });
+  kpis.querySelectorAll('svg.ring').forEach(r => {
+    const c = r.querySelector('.fg'), L = 2 * Math.PI * 24;
+    c.style.stroke = r.dataset.col; c.style.strokeDasharray = L; c.style.strokeDashoffset = L;
+    pnLater(() => c.style.strokeDashoffset = L * (1 - Number(r.dataset.r) / 100), 200);
+  });
+
+  // ---- embudo ----
+  const fun = [['Tomas realizadas', data.length], ['Con resultado', conRes.length], ['Resultado entregado', entregados.length], ['Positivas (PAP o VPH)', positivas.length], ['Con seguimiento', conSeg.length]];
+  const f = document.getElementById('pnFunnel'); f.innerHTML = '';
+  fun.forEach(([n, v], i) => {
+    const p = pct(v, fun[0][1]), prev = i ? fun[i - 1][1] : null;
+    const row = document.createElement('div'); row.className = 'pnFrow';
+    row.innerHTML = `<div class="n">${n}</div><div class="pnTrack"><div class="pnBar" style="opacity:${1 - i * 0.12}"></div></div><div class="v">${v.toLocaleString('es')}<small>${p}%</small></div>`;
+    f.appendChild(row);
+    pnHover(row, `<b>${n}</b><br>${v} · ${p}% de las tomas${prev ? `<br>${pct(v, prev)}% del paso anterior` : ''}`);
+    pnLater(() => row.querySelector('.pnBar').style.width = (v ? Math.max(p, 1.5) : 0) + '%', 250 + i * 120);
+    if (i === 2 && conRes.length - entregados.length > 0) f.insertAdjacentHTML('beforeend', `<div class="pnDrop">⚠ ${conRes.length - entregados.length} resultados todavía sin entregar</div>`);
+    if (i === 4 && positivas.length - conSeg.length > 0) f.insertAdjacentHTML('beforeend', `<div class="pnDrop">⚠ ${positivas.length - conSeg.length} positivas sin seguimiento registrado</div>`);
+  });
+
+  // ---- para hacer hoy (toda la base, toma más reciente de cada paciente) ----
+  const pasos = {}; base.forEach(p => { const k = proximoPaso(p).key; pasos[k] = (pasos[k] || 0) + 1; });
+  const items = [
+    ['derivar', 'crit', '🔴', 'Derivar a colposcopia', 'HSIL / ASC-H / AGC sin derivación'],
+    ['definir', 'crit', '🩺', 'Definir seguimiento', 'positivas sin conducta registrada'],
+    ['buscar', 'crit', '⏰', 'Resultados atrasados', 'más de 90 días sin resultado'],
+    ['entregar', 'warn', '📬', 'Entregar resultado', 'ya llegó, falta avisar a la paciente'],
+    ['repetir', 'warn', '🔁', 'Repetir toma', 'muestra insatisfactoria'],
+    ['control_vencido', 'warn', '📅', 'Control vencido', 'les toca un nuevo PAP/VPH'],
+    ['revisar', 'warn', '📝', 'Revisar datos', 'estado y resultado no coinciden'],
+    ['control', 'ok', '✅', 'Al día', 'resultado entregado y control vigente'],
+  ].filter(([k]) => pasos[k] || k === 'control');
+  const al = document.getElementById('pnAlerts');
+  al.innerHTML = items.map(([k, tone, ic, t, s]) => `<button type="button" class="pnAl ${tone}" data-paso="${k}"><div class="dot">${ic}</div><div class="tx"><b>${t}</b><small>${s}</small></div><div class="c" data-c="${pasos[k] || 0}">0</div><div class="go">›</div></button>`).join('');
+  al.querySelectorAll('[data-c]').forEach(el => pnCount(el, Number(el.dataset.c)));
+
+  // ---- tomas por mes ----
+  const cols = document.getElementById('pnCols'); cols.innerHTML = '';
+  const top = Math.max(10, Math.ceil(Math.max(...tomasMes) / 10) * 10);
+  [0.5, 1].forEach(g => cols.insertAdjacentHTML('beforeend', `<div class="gl" style="bottom:calc(22px + ${g} * (100% - 22px))">${Math.round(top * g)}</div>`));
+  const maxI = tomasMes.indexOf(Math.max(...tomasMes));
+  meses.forEach((m, i) => {
+    const c = document.createElement('div'); c.className = 'pnCol' + (i === 11 ? ' cur show' : '') + (i === maxI ? ' show' : '');
+    c.innerHTML = `<div class="lbl">${tomasMes[i]}</div><div class="b"></div><div class="m">${m.label}</div>`;
+    cols.appendChild(c);
+    pnHover(c, `<b>${m.label}</b><br>${tomasMes[i]} tomas`);
+    pnLater(() => c.querySelector('.b').style.height = (tomasMes[i] / top * 100) + '%', 300 + i * 45);
+  });
+
+  // ---- barras apiladas ----
+  const stack = (id, legId, capId, arr, cap) => {
+    const s = document.getElementById(id), lg = document.getElementById(legId), tot = arr.reduce((a, x) => a + x[1], 0);
+    document.getElementById(capId).textContent = cap(tot);
+    s.innerHTML = ''; lg.innerHTML = '';
+    if (!tot) { lg.innerHTML = '<span class="pnEmpty">Sin datos en el período</span>'; return; }
+    arr.filter(a => a[1]).forEach(([n, v, col], i) => {
+      const d = document.createElement('div'); d.style.background = col; s.appendChild(d);
+      pnHover(d, `<b>${n}</b><br>${v} · ${pct(v, tot)}%`);
+      pnLater(() => d.style.width = (v / tot * 100) + '%', 350 + i * 100);
+      lg.insertAdjacentHTML('beforeend', `<span><i style="background:${col}"></i>${n} <b>${v}</b> (${pct(v, tot)}%)</span>`);
+    });
   };
+  const papCount = k => data.filter(p => !esSoloVph(p) && (p.estado_pap || 'Pendiente') === k).length;
+  stack('pnStackPap', 'pnLegPap', 'pnPapCap', [['Negativo', papCount('Negativo'), 'var(--negativa)'], ['Pendiente', papCount('Pendiente'), 'var(--pendiente)'], ['Positivo', papCount('Positivo'), 'var(--positiva)']], t => `De ${t} tomas de PAP`);
+  stack('pnStackVph', 'pnLegVph', 'pnVphCap', [['Negativa', data.filter(p => p.resultado_vph === 'Negativa').length, 'var(--pn-good)'], ['Positiva', data.filter(p => p.resultado_vph === 'Positiva').length, 'var(--positiva-vph)']], t => `De ${t} pruebas con resultado`);
 
-  mk('chartBethesda', {
-    type: 'bar',
-    data: { labels: BETHESDA.map(b => b.code), datasets: [{ label: 'Tomas', data: BETHESDA.map(b => betCounts[b.code]), backgroundColor: BETHESDA.map(b => betColor[b.nivel]) }] },
-    options: { plugins: { legend: { display: false } }, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
-  });
-  mk('chartEdad', {
-    type: 'bar',
-    data: { labels: grupos.map(g => g[0]), datasets: [{ label: 'Pacientes', data: edadCounts, backgroundColor: grupos.map(([, a, b]) => (a >= clinCfg.papEdadMin && b <= clinCfg.papEdadMax) ? '#2f6fb0' : '#cbd5e1') }] },
-    options: { plugins: { legend: { display: false } }, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
-  });
+  // ---- barras horizontales ----
+  const hb = (id, arr, colorFn, labelFn) => {
+    const el = document.getElementById(id); el.innerHTML = '';
+    const mx = Math.max(0, ...arr.map(a => a[1])), tot = arr.reduce((a, x) => a + x[1], 0);
+    if (!tot) { el.innerHTML = '<div class="pnEmpty">Sin datos en el período</div>'; return; }
+    arr.forEach((a, i) => {
+      const r = document.createElement('div'); r.className = 'pnHrow';
+      r.innerHTML = `<div title="${esc(a[0])}">${labelFn ? labelFn(a) : esc(a[0])}</div><div class="t"><div class="f" style="background:${colorFn(a)}"></div></div><div class="num">${a[1]}</div>`;
+      el.appendChild(r);
+      pnHover(r, `<b>${esc(a[0])}</b><br>${a[1]} · ${pct(a[1], tot)}%`);
+      pnLater(() => r.querySelector('.f').style.width = (a[1] ? Math.max(a[1] / mx * 100, 2) : 0) + '%', 400 + i * 80);
+    });
+  };
+  const betCol = { neg: 'var(--pn-good)', bajo: 'var(--pn-warn)', alto: 'var(--pn-crit)', insat: 'var(--pn-mute)' };
+  hb('pnBeth', BETHESDA.map(b => [b.code, data.filter(p => bethesdaDe(p) === b.code).length, b.nivel]).filter(a => a[1] || ['NILM', 'ASC-US', 'LSIL', 'HSIL'].includes(a[0])), a => betCol[a[2]]);
+  const docCount = {}; data.filter(p => !sinDoctora(p)).forEach(p => docCount[p.doctora] = (docCount[p.doctora] || 0) + 1);
+  hb('pnDocs', Object.entries(docCount).sort((a, b) => b[1] - a[1]), () => 'var(--pn-one)', a => `<span class="pnWho"><span class="pnAv">${esc(a[0].replace(/^Dra?\.\s*/, '').slice(0, 2).toUpperCase())}</span>${esc(a[0])}</span>`);
+  const nSin = pnData.filter(sinDoctora).length;
+  document.getElementById('pnSinDoc').innerHTML = nSin ? `<div class="pnSinDoc"><span>${nSin} toma${nSin > 1 ? 's' : ''} sin doctora registrada</span><button type="button" onclick="openAsignarDoctora()">Asignar doctora</button></div>` : '';
+  const unicasEdad = data.filter(p => { const i = idx.get(p.id); return !i || i.grupo[i.grupo.length - 1] === p; }).filter(p => edadDe(p.fecha_nacimiento) != null);
+  const grupos = [['< 25', 0, 24], ['25–34', 25, 34], ['35–44', 35, 44], ['45–54', 45, 54], ['55–64', 55, 64], ['65 +', 65, 200]];
+  document.getElementById('pnEdadCap').textContent = `En color: rango objetivo (${clinCfg.papEdadMin}–${clinCfg.papEdadMax})`;
+  hb('pnEdad', grupos.map(([n, a, b]) => [n, unicasEdad.filter(p => { const e = edadDe(p.fecha_nacimiento); return e >= a && e <= b; }).length, a >= clinCfg.papEdadMin && b <= clinCfg.papEdadMax]), a => a[2] ? 'var(--pn-one)' : 'var(--pn-mute)');
+  const met = {}; data.forEach(p => { if (p.anticonceptivo_metodo) met[p.anticonceptivo_metodo] = (met[p.anticonceptivo_metodo] || 0) + 1; });
+  const metArr = Object.entries(met).sort((a, b) => b[1] - a[1]);
+  hb('pnMetodos', metArr.length > 6 ? [...metArr.slice(0, 5), ['Otros', metArr.slice(5).reduce((s, x) => s + x[1], 0)]] : metArr, () => 'var(--pn-one)');
+}
+// "Para hacer hoy" → abre la lista filtrada por ese próximo paso
+document.getElementById('pnAlerts').addEventListener('click', e => {
+  const b = e.target.closest('[data-paso]'); if (!b) return;
+  const doc = document.getElementById('pnDoctora').value;
+  document.getElementById('filterPaso').value = b.dataset.paso;
+  document.getElementById('filterDoctora').value = doc;
+  listQuick = ''; document.querySelectorAll('.statBtn').forEach(x => x.classList.remove('on'));
+  document.getElementById('quickFilterTag').style.display = 'none';
+  switchView('list');
+});
 
-  mk('chartEstadoPap', {
-    type: 'doughnut',
-    data: { labels: Object.keys(estadoCounts), datasets: [{ data: Object.values(estadoCounts), backgroundColor: Object.keys(estadoCounts).map(k => COLORS_PAP[k]) }] },
-    options: { plugins: { legend: { position: 'bottom' } }, maintainAspectRatio: false },
-  });
-
-  mk('chartVph', {
-    type: 'doughnut',
-    data: { labels: Object.keys(vphCounts), datasets: [{ data: Object.values(vphCounts), backgroundColor: Object.keys(vphCounts).map(k => COLORS_VPH[k]) }] },
-    options: { plugins: { legend: { position: 'bottom' } }, maintainAspectRatio: false },
-  });
-
-  mk('chartMensual', {
-    type: 'bar',
-    data: { labels: meses.map(m => m.label), datasets: [{ label: 'Tomas', data: meses.map(m => mensualCounts[m.key]), backgroundColor: '#2f6fb0' }] },
-    options: { plugins: { legend: { display: false } }, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } },
-  });
-
-  mk('chartDoctora', {
-    type: 'bar',
-    data: { labels: doctoraEntries.map(e => e[0]), datasets: [{ label: 'Pacientes', data: doctoraEntries.map(e => e[1]), backgroundColor: '#7c3aed' }] },
-    options: { indexAxis: 'y', plugins: { legend: { display: false } }, maintainAspectRatio: false, scales: { x: { beginAtZero: true } } },
-  });
-
-  mk('chartMetodos', {
-    type: 'doughnut',
-    data: { labels: metodoEntries.map(e => e[0]), datasets: [{ data: metodoEntries.map(e => e[1]), backgroundColor: ['#7c3aed', '#dc2626', '#ea8c2e', '#2f6fb0', '#16a34a', '#f472b6', '#9333ea', '#60a5fa'] }] },
-    options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 11, font: { size: 10.5 } } } }, maintainAspectRatio: false },
-  });
+// ================= Asignar doctora (tomas sin doctora registrada) =================
+function openAsignarDoctora() {
+  const pend = pnData.filter(sinDoctora).sort((a, b) => String(a.fecha_toma || '').localeCompare(String(b.fecha_toma || '')));
+  const docs = [...new Set([...DOCTORAS_BASE, ...pnData.filter(p => !sinDoctora(p)).map(p => p.doctora)])];
+  let ov = document.getElementById('asigOverlay');
+  if (!ov) { ov = document.createElement('div'); ov.id = 'asigOverlay'; document.body.appendChild(ov); }
+  ov.innerHTML = `<div id="asigBox">
+    <div class="asigHead"><h3>Asignar doctora</h3><button type="button" onclick="document.getElementById('asigOverlay').classList.remove('open')">✕</button></div>
+    <div style="padding:10px 16px 0;font-size:12.5px;color:var(--ink-soft)">Marcá las tomas y elegí <b>la doctora que realmente las hizo</b>. Podés marcar varias juntas por rango de fechas.</div>
+    <div class="asigHead" style="border-bottom:none;padding-bottom:4px">
+      <span style="font-size:12.5px">Marcar desde</span><input type="date" id="asigDesde"><span style="font-size:12.5px">hasta</span><input type="date" id="asigHasta"><button type="button" id="asigMarcarRango">Marcar rango</button><button type="button" id="asigTodas">Todas</button><button type="button" id="asigNinguna">Ninguna</button>
+    </div>
+    <div id="asigList">${pend.map(p => `<label class="asigRow"><input type="checkbox" value="${esc(p.id)}" data-f="${esc(p.fecha_toma || '')}"><span><b>${esc(p.nombre)}</b> <small>${esc(p.carnet || 'Sin carnet')}</small></span><small>${fmtFecha(p.fecha_toma) || 'sin fecha'}</small></label>`).join('') || '<p class="pnEmpty">No hay tomas sin doctora.</p>'}</div>
+    <div class="asigFoot"><span id="asigN" style="font-size:12.5px;flex:1">0 marcadas</span><select id="asigDoc">${docs.map(d => `<option>${esc(d)}</option>`).join('')}</select><button type="button" class="primary" id="asigOk">Asignar a las marcadas</button></div>
+  </div>`;
+  ov.classList.add('open');
+  const boxes = () => [...ov.querySelectorAll('#asigList input[type=checkbox]')];
+  const upd = () => { ov.querySelector('#asigN').textContent = boxes().filter(b => b.checked).length + ' marcadas'; };
+  ov.querySelector('#asigList').addEventListener('change', upd);
+  ov.querySelector('#asigTodas').onclick = () => { boxes().forEach(b => b.checked = true); upd(); };
+  ov.querySelector('#asigNinguna').onclick = () => { boxes().forEach(b => b.checked = false); upd(); };
+  ov.querySelector('#asigMarcarRango').onclick = () => {
+    const d = ov.querySelector('#asigDesde').value, h = ov.querySelector('#asigHasta').value;
+    boxes().forEach(b => { const f = b.dataset.f; if (f && (!d || f >= d) && (!h || f <= h)) b.checked = true; }); upd();
+  };
+  ov.querySelector('#asigOk').onclick = async () => {
+    const ids = boxes().filter(b => b.checked).map(b => b.value), doc = ov.querySelector('#asigDoc').value;
+    if (!ids.length) { alert('Marcá al menos una toma.'); return; }
+    if (!confirm(`¿Registrar a ${doc} como la doctora de ${ids.length} toma${ids.length > 1 ? 's' : ''}?`)) return;
+    const idVals = pnData.filter(p => ids.includes(String(p.id))).map(p => p.id);
+    const { error } = await sb.from('pacientes').update({ doctora: doc }).in('id', idVals);
+    if (error) { alert('Error al guardar: ' + error.message); return; }
+    showToast(`${ids.length} toma${ids.length > 1 ? 's' : ''} asignada${ids.length > 1 ? 's' : ''} a ${doc} ✔`, 'ok');
+    ov.classList.remove('open');
+    loadPanel();
+  };
 }
 
 async function loadMetodos() {
