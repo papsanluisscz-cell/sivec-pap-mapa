@@ -504,3 +504,21 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
   - la línea de tiempo de la mamá muestra “nació su bebé” con enlace;
   - el RN tiene su ficha propia, que hereda los datos del embarazo.
 - Imágenes: docs/perinatal-01..09.png · esboco-carnet-perinatal.html
+
+### Módulo 8 · Vacunas — dibujado, para aprobar
+- **Carnet de vacunas** en grilla (aplicada / toca hoy / atrasada / próxima).
+  - El SIVEC calcula edad e intervalos mínimos y dice todo lo que puede recibir hoy.
+  - Sirve para todas las edades: embarazada (desde Materno), VPH escolar, adultos, 60+ y personal de salud.
+  - Carnet impreso con QR, sin app.
+- **Vacunatorio del día:** fila que llega de recepción, consulta, control prenatal y búsqueda activa (“no se pierde ninguna oportunidad”). Incluye observación de 30 min con reloj, botón ESAVI y frascos abiertos con hora.
+- **Registro en 3 toques:**
+  1. confirmar las vacunas sugeridas;
+  2. escanear el frasco (lote y vencimiento; un lote vencido o retirado se bloquea);
+  3. marcar el sitio en la figura y firmar con huella (vacunadora y mamá).
+  - Al firmar: se descuenta del stock, se imprime el carnet, se agenda la próxima dosis y sale el SMS de recordatorio.
+- **Atrasados y búsqueda activa:** lista por urgencia, aviso de edad máxima (rotavirus), ruta de visitas y SMS automáticos (sin mensajes uno por uno).
+- **Campañas y brigadas:** meta, ritmo necesario, avance por centro, brigada casa por casa que funciona sin internet, y escuelas (VPH) con consentimiento.
+- **Cadena de frío:** temperatura 2 veces al día o por sensor, rango 2–8 °C, alerta con acción y firma, y estado de toda la red.
+- **Stock y lotes:** cuántos días alcanza, lote más próximo a vencer y pérdidas. El pedido al SEDES se arma solo; un lote retirado se bloquea en la red, con la lista de quién lo recibió.
+- **Coberturas y ESAVI:** cobertura acumulada contra lo esperado, deserción Penta 1→3, ESAVI con lote, e informe mensual PAI automático (SNIS y gestor).
+- Imágenes: docs/vacunas-01..08.png · esboco-vacunas.html
