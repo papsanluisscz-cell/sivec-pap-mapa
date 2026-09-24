@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esbozo Consulta PAP</title>
+<style>
+  :root { --wine:#7d2a4c; --wine2:#9c3a5f; --paper:#fbf6f3; --surface:#fff; --line:#ecdde3; --ink:#40323a; --ink2:#6b5760; --ink3:#9a8690; --good:#16a34a; --warn:#d97706; --crit:#dc2626; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, "Segoe UI", Arial, sans-serif; background: #e9e2e5; color: var(--ink); }
+  .demoBar { background: #2b1520; color: #fff; padding: 10px 14px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 20; }
+  .demoBar b { font-size: 12.5px; opacity: .8; margin-right: 4px; }
+  .demoBar button { border: 1px solid rgba(255,255,255,.3); background: transparent; color: #fff; border-radius: 8px; padding: 6px 11px; cursor: pointer; font-size: 12.5px; }
+  .demoBar button.on { background: #fff; color: var(--wine); font-weight: 700; }
+  .note { max-width: 1180px; margin: 12px auto 0; background: #fff7e6; border: 1px solid #f3d9a4; color: #6b4a00; border-radius: 10px; padding: 9px 14px; font-size: 12.5px; }
+  .frame { max-width: 1180px; margin: 12px auto 40px; background: var(--paper); border-radius: 14px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,.15); display: none; }
+  .frame.on { display: block; }
+  .hdr { background: linear-gradient(135deg, #6d2142, #9c3a5f); color: #fff; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .hdr .n { font-weight: 900; letter-spacing: 1.5px; font-size: 18px; } .hdr .n span { font-size: 10.5px; background: #fff; color: var(--wine); border-radius: 6px; padding: 2px 7px; margin-left: 6px; }
+  .hdr .who { font-size: 13px; } .hdr .who b { font-size: 14px; }
+  main { padding: 16px 20px 24px; }
+  .soapTabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .soapTabs span { border: 1.5px solid var(--line); background: #fff; border-radius: 10px; padding: 7px 14px; font-weight: 700; font-size: 13px; color: var(--ink2); }
+  .soapTabs span b { display: inline-flex; width: 22px; height: 22px; border-radius: 6px; background: var(--line); color: var(--ink); align-items: center; justify-content: center; margin-right: 6px; }
+  .soapTabs span.on { border-color: var(--wine); color: var(--wine); } .soapTabs span.on b { background: var(--wine); color: #fff; }
+  .soapTabs span.done b { background: var(--good); color: #fff; }
+  .grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(64,50,58,.05); }
+  .card h3 { margin: 0 0 4px; font-size: 14.5px; display: flex; align-items: center; gap: 8px; }
+  .card h3 .L { width: 24px; height: 24px; border-radius: 7px; background: var(--wine); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
+  .cap { font-size: 12px; color: var(--ink3); margin: 0 0 10px; }
+  .lab { font-size: 12px; font-weight: 700; color: var(--ink2); margin: 12px 0 6px; text-transform: uppercase; letter-spacing: .3px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { border: 1.5px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 12.5px; cursor: pointer; user-select: none; transition: all .15s; }
+  .chip.on { border-color: var(--wine); background: color-mix(in srgb, var(--wine) 10%, #fff); color: var(--wine); font-weight: 700; }
+  .ta { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit; min-height: 40px; color: var(--ink2); background: #fff; }
+  /* cervix */
+  .cervixWrap { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+  svg.cervix { width: 280px; height: 280px; flex-shrink: 0; }
+  .hour { cursor: pointer; } .hour path { fill: transparent; stroke: none; transition: fill .15s; } .hour:hover path { fill: rgba(125,42,76,.08); }
+  .hour.sel path { fill: var(--sel, rgba(220,38,38,.35)); }
+  .hlabel { font-size: 11px; fill: var(--ink3); font-weight: 700; pointer-events: none; }
+  .legend { font-size: 12px; color: var(--ink2); line-height: 1.8; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .paint { display: flex; flex-direction: column; gap: 6px; }
+  .pbtn { display: flex; align-items: center; gap: 8px; border: 1.5px solid var(--line); background: #fff; border-radius: 10px; padding: 6px 10px; font-size: 12.5px; cursor: pointer; }
+  .pbtn i { width: 16px; height: 16px; border-radius: 4px; display: inline-block; }
+  .pbtn.on { border-color: var(--wine); font-weight: 700; box-shadow: 0 0 0 3px color-mix(in srgb, var(--wine) 15%, transparent); }
+  /* leucorrea / color */
+  .scale { display: flex; gap: 6px; }
+  .drop { flex: 1; border: 1.5px solid var(--line); background: #fff; border-radius: 10px; padding: 8px 4px; text-align: center; font-size: 11.5px; cursor: pointer; }
+  .drop .d { font-size: 16px; letter-spacing: -2px; color: #7aa7d8; height: 22px; }
+  .drop.on { border-color: var(--wine); background: color-mix(in srgb, var(--wine) 8%, #fff); font-weight: 700; color: var(--wine); }
+  .swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sw { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11.5px; cursor: pointer; width: 74px; }
+  .sw i { width: 38px; height: 38px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 1.5px var(--line); }
+  .sw.on i { box-shadow: 0 0 0 3px var(--wine); } .sw.on { font-weight: 700; color: var(--wine); }
+  /* treatments */
+  .tx { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .txc { border: 1.5px solid var(--line); background: #fff; border-radius: 12px; padding: 9px 11px; cursor: pointer; display: flex; gap: 9px; align-items: flex-start; }
+  .txc .ic { font-size: 20px; } .txc b { font-size: 12.5px; display: block; } .txc small { font-size: 11px; color: var(--ink3); }
+  .txc.on { border-color: var(--good); background: #f0fbf5; } .txc.on b::after { content: " ✓"; color: var(--good); }
+  .sugg { background: #f3eef9; border: 1px solid #ddd0f3; color: #3b2a63; border-radius: 10px; padding: 8px 10px; font-size: 12px; margin-top: 8px; }
+  .auto { background: var(--paper); border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; line-height: 1.6; }
+  .auto b { color: var(--wine); }
+  .explain { background: #f3eef9; border: 1px solid #ddd0f3; color: #3b2a63; border-radius: 10px; padding: 10px 14px; font-size: 12.5px; margin-top: 14px; line-height: 1.6; }
+  .foot { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; }
+  .btn { background: var(--wine); color: #fff; border: none; border-radius: 9px; padding: 9px 16px; font-weight: 700; font-size: 13px; }
+  .btn2 { background: #fff; color: var(--wine); border: 1px solid var(--wine2); border-radius: 9px; padding: 8px 14px; font-weight: 600; font-size: 13px; }
+  /* HC print preview */
+  .paper { width: 780px; max-width: 100%; margin: 0 auto; background: #fff; border: 1px solid #ddd; box-shadow: 0 4px 16px rgba(0,0,0,.12); padding: 26px 30px; font-family: "Times New Roman", serif; color: #111; }
+  .paper h2 { text-align: center; font-size: 16px; margin: 0 0 4px; letter-spacing: .5px; } .paper .sub { text-align: center; font-size: 11.5px; margin-bottom: 12px; }
+  .paper table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .paper td { border: 1px solid #333; padding: 5px 7px; vertical-align: top; }
+  .paper td.k { width: 42px; font-weight: 700; text-align: center; font-size: 15px; }
+  .paper .fig { display: flex; gap: 14px; align-items: center; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .tx { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="demoBar"><b>ESBOZO — Consulta del PAP con figuras:</b>
+  <button data-s="so" class="on">1. S + O (examen con figuras)</button>
+  <button data-s="ap">2. A + P (diagnóstico y tratamiento)</button>
+  <button data-s="colpo">3. Colposcopia (reloj del cuello)</button>
+  <button data-s="hc">4. Cómo sale impreso (HC)</button>
+</div>
+<div class="note">⚠️ Dibujo para aprobar. <b>Podés tocar las figuras</b> (horas del cuello, gotas, colores, tratamientos) para ver cómo se marcarían. Nada está aplicado todavía.</div>
+
+<!-- ===== 1. S + O ===== -->
+<section class="frame on" id="s-so">
+  <div class="hdr"><div class="n">SIVEC<span>PAP/VPH</span></div><div class="who">📝 Consulta — <b>María Quispe</b> · 38 años · Dra. Ortuño · 24/09/2026</div></div>
+  <main>
+    <div class="soapTabs"><span class="on"><b>S</b>Subjetivo</span><span class="on"><b>O</b>Objetivo</span><span><b>A</b>Análisis</span><span><b>P</b>Plan</span></div>
+    <div class="grid">
+      <div class="card"><h3><span class="L">S</span>¿Qué refiere la paciente?</h3><p class="cap">Tocá lo que corresponda; se escribe solo. Podés agregar texto.</p>
+        <div class="chips tog"><span class="chip on">Flujo vaginal</span><span class="chip on">Prurito</span><span class="chip">Mal olor</span><span class="chip">Ardor al orinar</span><span class="chip">Dolor pélvico</span><span class="chip">Sangrado postcoital</span><span class="chip">Sangrado intermenstrual</span><span class="chip">Dispareunia</span><span class="chip">Asintomática (control)</span></div>
+        <div class="lab">Tiempo de evolución</div>
+        <div class="chips one"><span class="chip">&lt; 1 semana</span><span class="chip on">1–4 semanas</span><span class="chip">1–6 meses</span><span class="chip">&gt; 6 meses</span></div>
+        <div class="lab">Datos gineco-obstétricos</div>
+        <div class="chips"><span class="chip">FUM: 02/09/2026</span><span class="chip">G3 P2 C1 A0</span><span class="chip">IRS: 17 años</span><span class="chip">Parejas: 2</span><span class="chip">Último PAP: 2023 (NILM)</span></div>
+        <div class="lab">Texto libre</div>
+        <div class="ta">Refiere flujo blanquecino con prurito de 2 semanas…</div>
+      </div>
+      <div class="card"><h3><span class="L">O</span>Especuloscopía</h3><p class="cap">Marcá el aspecto, la secreción y su color tocando las figuras.</p>
+        <div class="lab">Aspecto del cuello</div>
+        <div class="chips one"><span class="chip">Íntegro</span><span class="chip on">Eritematoso</span><span class="chip">Erosionado</span><span class="chip">Con pólipo</span><span class="chip">Friable</span><span class="chip">Quiste de Naboth</span><span class="chip">Leucoplasia</span><span class="chip">Ectropión</span></div>
+        <div class="lab">Cantidad de secreción (leucorrea)</div>
+        <div class="scale one">
+          <div class="drop"><div class="d">·</div>Ausente</div>
+          <div class="drop"><div class="d">💧</div>Escasa</div>
+          <div class="drop on"><div class="d">💧💧</div>Moderada</div>
+          <div class="drop"><div class="d">💧💧💧</div>Abundante</div>
+        </div>
+        <div class="lab">Color / aspecto de la secreción</div>
+        <div class="swatches one">
+          <div class="sw on"><i style="background:#f4f1ea"></i>Blanquecina</div>
+          <div class="sw"><i style="background:#fbfbf6;background-image:radial-gradient(#fff 30%,#ece6d2 32%);background-size:8px 8px"></i>Grumosa</div>
+          <div class="sw"><i style="background:#e8d66a"></i>Amarillenta</div>
+          <div class="sw"><i style="background:#9cb86a"></i>Verdosa</div>
+          <div class="sw"><i style="background:#c9c9c2"></i>Grisácea</div>
+          <div class="sw"><i style="background:#b24a4a"></i>Sanguinolenta</div>
+        </div>
+        <div class="lab">Otros</div>
+        <div class="chips tog"><span class="chip">Mal olor</span><span class="chip">Test de aminas +</span><span class="chip">Toma de PAP realizada ✓</span><span class="chip on">Toma de VPH realizada ✓</span></div>
+      </div>
+    </div>
+    <div class="explain">• Todo se marca con <b>toques</b>: nada de escribir lo mismo cada vez.<br>• Lo que marcás se convierte en texto para la Historia clínica (ver pestaña 4).<br>• Los datos gineco-obstétricos se completan solos con la última consulta (se pueden corregir).</div>
+  </main>
+</section>
+
+<!-- ===== 2. A + P ===== -->
+<section class="frame" id="s-ap">
+  <div class="hdr"><div class="n">SIVEC<span>PAP/VPH</span></div><div class="who">📝 Consulta — <b>María Quispe</b> · 38 años · Dra. Ortuño · 24/09/2026</div></div>
+  <main>
+    <div class="soapTabs"><span class="done"><b>S</b>Subjetivo</span><span class="done"><b>O</b>Objetivo</span><span class="on"><b>A</b>Análisis</span><span class="on"><b>P</b>Plan</span></div>
+    <div class="grid">
+      <div class="card"><h3><span class="L">A</span>Diagnóstico</h3><p class="cap">Elegí uno o varios. El sistema te <b>sugiere</b> según lo que marcaste (vos decidís).</p>
+        <div class="chips tog"><span class="chip">Sin patología</span><span class="chip on">Cervicitis</span><span class="chip on">Candidiasis (micosis)</span><span class="chip">Vaginosis bacteriana</span><span class="chip">Tricomoniasis</span><span class="chip">Cervicovaginitis</span><span class="chip">Ectropión</span><span class="chip">Pólipo cervical</span><span class="chip">Lesión sospechosa → colposcopia</span></div>
+        <div class="sugg">💡 Sugerencia por lo marcado (flujo blanquecino + prurito + cuello eritematoso): <b>considerar candidiasis / cervicitis</b>. Es solo una ayuda para no olvidar opciones.</div>
+        <div class="lab">Resultado del PAP / VPH (cuando llega)</div>
+        <div class="chips"><span class="chip">PAP: pendiente</span><span class="chip">VPH: pendiente</span></div>
+        <div class="lab">Texto libre</div><div class="ta">—</div>
+      </div>
+      <div class="card"><h3><span class="L">P</span>Tratamiento e indicaciones</h3><p class="cap">Tocá las tarjetas. Cada una trae la dosis habitual (editable).</p>
+        <div class="tx tog2">
+          <div class="txc"><span class="ic">💊</span><div><b>Metronidazol</b><small>500 mg óvulo VV · 10 noches</small></div></div>
+          <div class="txc on"><span class="ic">💊</span><div><b>Clotrimazol</b><small>500 mg óvulo VV · dosis única / 10 noches</small></div></div>
+          <div class="txc"><span class="ic">💊</span><div><b>Nistatina</b><small>óvulos VV · 14 noches</small></div></div>
+          <div class="txc on"><span class="ic">🧼</span><div><b>Aseo vulvoperineal</b><small>indicaciones de higiene</small></div></div>
+          <div class="txc"><span class="ic">🗣️</span><div><b>Orientación sexual</b><small>preservativo, tratar a la pareja</small></div></div>
+          <div class="txc"><span class="ic">🔥</span><div><b>Cauterización</b><small>programar</small></div></div>
+        </div>
+        <div class="lab">Derivación</div>
+        <div class="chips one"><span class="chip on">Ninguna</span><span class="chip">Colposcopia</span><span class="chip">Ginecología</span><span class="chip">Oncología</span></div>
+        <div class="lab">Próximo control</div>
+        <div class="chips one"><span class="chip">15 días</span><span class="chip on">Al resultado del PAP</span><span class="chip">6 meses</span><span class="chip">1 año</span></div>
+        <div class="lab">Receta</div>
+        <div class="chips"><span class="chip">🧾 Generar receta con lo marcado</span></div>
+      </div>
+    </div>
+    <div class="foot"><button class="btn2">← Volver a S y O</button><button class="btn">Guardar consulta e imprimir</button></div>
+    <div class="explain">Las sugerencias del Análisis son <b>solo ayuda-memoria</b> (reglas simples, configurables); el diagnóstico siempre lo elige la profesional. Las dosis de cada tarjeta se editan en Configuración según la norma del centro.</div>
+  </main>
+</section>
+
+<!-- ===== 3. COLPOSCOPIA ===== -->
+<section class="frame" id="s-colpo">
+  <div class="hdr"><div class="n">SIVEC<span>PAP/VPH</span></div><div class="who">🔬 Colposcopia — <b>Rosa Mamani</b> · 44 años · Dra. Aguilera · 24/09/2026</div></div>
+  <main>
+    <div class="grid">
+      <div class="card"><h3>🕐 Cuello uterino — marcá las lesiones en las horas del reloj</h3><p class="cap">1) Elegí el tipo de hallazgo a la derecha · 2) tocá las horas donde está. Se pueden mezclar varios.</p>
+        <div class="cervixWrap">
+          <svg class="cervix" viewBox="-150 -150 300 300" id="cx"></svg>
+          <div class="paint" id="paint">
+            <div class="pbtn on" data-c="rgba(220,38,38,.38)" data-n="Epitelio acetoblanco"><i style="background:rgba(220,38,38,.55)"></i>Acetoblanco</div>
+            <div class="pbtn" data-c="rgba(124,58,237,.35)" data-n="Mosaico"><i style="background:rgba(124,58,237,.55)"></i>Mosaico</div>
+            <div class="pbtn" data-c="rgba(234,140,46,.4)" data-n="Puntillado"><i style="background:rgba(234,140,46,.6)"></i>Puntillado</div>
+            <div class="pbtn" data-c="rgba(120,120,120,.35)" data-n="Leucoplasia"><i style="background:rgba(120,120,120,.55)"></i>Leucoplasia</div>
+            <div class="pbtn" data-c="rgba(22,163,74,.3)" data-n="Vasos atípicos"><i style="background:rgba(22,163,74,.5)"></i>Vasos atípicos</div>
+            <div class="pbtn" data-c="rgba(47,111,176,.35)" data-n="Biopsia tomada"><i style="background:rgba(47,111,176,.55)"></i>📍 Biopsia</div>
+            <div class="legend" id="hsum" style="margin-top:6px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card"><h3>Hallazgos</h3>
+        <div class="lab">Prueba de Schiller</div>
+        <div class="chips one"><span class="chip on">Positiva (yodo negativa)</span><span class="chip">Negativa</span></div>
+        <div class="lab">Unión escamo-columnar / Zona de transformación</div>
+        <div class="chips one"><span class="chip on">Tipo 1 (visible)</span><span class="chip">Tipo 2 (parcial)</span><span class="chip">Tipo 3 (no visible)</span></div>
+        <div class="lab">Impresión colposcópica</div>
+        <div class="chips one"><span class="chip">Normal</span><span class="chip">Cambios menores (bajo grado)</span><span class="chip on">Cambios mayores (alto grado)</span><span class="chip">Sospecha de invasión</span></div>
+        <div class="lab">Conducta</div>
+        <div class="chips tog"><span class="chip on">Biopsia dirigida</span><span class="chip">LEEP / cono</span><span class="chip">Crioterapia</span><span class="chip">Control 6 meses</span><span class="chip on">Derivación a Oncología</span></div>
+        <div class="auto" style="margin-top:12px"><b>Se escribe solo:</b> Schiller positiva. ZT tipo 1. Epitelio acetoblanco denso en 11 y 1 h y mosaico en 5–7 h. Biopsia en 12 h. Impresión: cambios mayores. Conducta: biopsia dirigida, derivación a Oncología.</div>
+      </div>
+    </div>
+    <div class="explain">La figura del cuello se guarda con la colposcopia y <b>sale dibujada en la Historia clínica impresa</b>. En la próxima consulta se ve la figura anterior para comparar.</div>
+  </main>
+</section>
+
+<!-- ===== 4. HC ===== -->
+<section class="frame" id="s-hc">
+  <div class="hdr"><div class="n">SIVEC<span>PAP/VPH</span></div><div class="who">🖨 Vista previa — Historia clínica</div></div>
+  <main>
+    <div class="paper">
+      <h2>HISTORIA CLÍNICA — EVOLUCIÓN</h2><div class="sub">C.S. San Luis · Fecha: 24/09/2026 · Paciente: MARÍA QUISPE · CI 7654321 · 38 años</div>
+      <table>
+        <tr><td class="k">S</td><td>REFIERE FLUJO VAGINAL Y PRURITO DE 1–4 SEMANAS DE EVOLUCIÓN. FUM 02/09/2026. G3 P2 C1 A0. ÚLTIMO PAP 2023 (NILM). REFIERE FLUJO BLANQUECINO CON PRURITO DE 2 SEMANAS.</td></tr>
+        <tr><td class="k">O</td><td><div class="fig"><div>ESPECULOSCOPÍA: CUELLO ERITEMATOSO. LEUCORREA MODERADA, BLANQUECINA. SE REALIZA TOMA DE PAP Y VPH.<br><br>COLPOSCOPIA (si hubo): SCHILLER POSITIVA, ZT TIPO 1, ACETOBLANCO 11 Y 1 H, MOSAICO 5–7 H, BIOPSIA 12 H.</div>
+          <svg width="120" height="120" viewBox="-150 -150 300 300" id="cxPrint"></svg></div></td></tr>
+        <tr><td class="k">A</td><td>CERVICITIS. CANDIDIASIS (MICOSIS). PAP Y VPH PENDIENTES.</td></tr>
+        <tr><td class="k">P</td><td>CLOTRIMAZOL 500 MG ÓVULO VV. ASEO VULVOPERINEAL. CONTROL AL RESULTADO DEL PAP.</td></tr>
+      </table>
+      <div style="margin-top:30px;text-align:right;font-size:12px">_______________________<br>Dra. Ortuño · Matrícula ______</div>
+    </div>
+    <div class="explain">Todo lo marcado con toques se convierte en <b>texto clínico ordenado</b> en el formato de la HC que ya usan, más la <b>figura del cuello</b> cuando hubo colposcopia. Los demás documentos (D1, D8, PAP, Consentimiento) salen igual que hoy, todos juntos.</div>
+  </main>
+</section>
+
+<script>
+// Reloj del cuello uterino: 12 sectores clicables + orificio cervical + zona de transformación
+function drawCervix(svg, marks, interactive) {
+  const R = 120, r0 = 22, ns = 'http://www.w3.org/2000/svg';
+  let html = `<circle r="${R + 12}" fill="#f8e3e8" stroke="#e3b8c5" stroke-width="2"/><circle r="${R}" fill="#f4cdd7"/>
+    <circle r="72" fill="none" stroke="#d9a0b2" stroke-width="1.5" stroke-dasharray="4 4"/>`;
+  for (let h = 1; h <= 12; h++) {
+    const a0 = ((h - 0.5) / 12) * 2 * Math.PI - Math.PI / 2, a1 = ((h + 0.5) / 12) * 2 * Math.PI - Math.PI / 2;
+    const p = (a, rr) => `${(Math.cos(a) * rr).toFixed(1)} ${(Math.sin(a) * rr).toFixed(1)}`;
+    const d = `M ${p(a0, r0)} L ${p(a0, R)} A ${R} ${R} 0 0 1 ${p(a1, R)} L ${p(a1, r0)} A ${r0} ${r0} 0 0 0 ${p(a0, r0)} Z`;
+    const col = marks[h];
+    html += `<g class="hour${col ? ' sel' : ''}" data-h="${h}" style="--sel:${col || 'transparent'}"><path d="${d}"/></g>`;
+    const am = (h / 12) * 2 * Math.PI - Math.PI / 2;
+    html += `<text class="hlabel" x="${(Math.cos(am) * (R + 24)).toFixed(1)}" y="${(Math.sin(am) * (R + 24) + 4).toFixed(1)}" text-anchor="middle">${h}</text>`;
+  }
+  for (let h = 1; h <= 12; h++) { const a = ((h - 0.5) / 12) * 2 * Math.PI - Math.PI / 2; html += `<line x1="${Math.cos(a) * r0}" y1="${Math.sin(a) * r0}" x2="${Math.cos(a) * R}" y2="${Math.sin(a) * R}" stroke="#e7b3c3" stroke-width="1"/>`; }
+  html += `<ellipse rx="16" ry="7" fill="#8a3552"/>`;
+  if (!interactive) html = html.replace(/class="hlabel"/g, 'class="hlabel" style="font-size:22px"');
+  svg.innerHTML = html;
+}
+const marks = { 11: 'rgba(220,38,38,.38)', 12: 'rgba(47,111,176,.35)', 1: 'rgba(220,38,38,.38)', 5: 'rgba(124,58,237,.35)', 6: 'rgba(124,58,237,.35)', 7: 'rgba(124,58,237,.35)' };
+const names = { 'rgba(220,38,38,.38)': 'Acetoblanco', 'rgba(124,58,237,.35)': 'Mosaico', 'rgba(234,140,46,.4)': 'Puntillado', 'rgba(120,120,120,.35)': 'Leucoplasia', 'rgba(22,163,74,.3)': 'Vasos atípicos', 'rgba(47,111,176,.35)': 'Biopsia' };
+let brush = 'rgba(220,38,38,.38)';
+function sum() {
+  const by = {}; Object.entries(marks).forEach(([h, c]) => (by[c] = by[c] || []).push(+h));
+  document.getElementById('hsum').innerHTML = Object.entries(by).map(([c, hs]) => `<div><i style="background:${c}"></i>${names[c]}: ${hs.sort((a, b) => a - b).join(', ')} h</div>`).join('') || 'Sin marcas';
+}
+function redraw() { drawCervix(document.getElementById('cx'), marks, true); drawCervix(document.getElementById('cxPrint'), marks, false); sum(); }
+document.getElementById('cx').addEventListener('click', e => { const g = e.target.closest('.hour'); if (!g) return; const h = +g.dataset.h; if (marks[h] === brush) delete marks[h]; else marks[h] = brush; redraw(); });
+document.getElementById('paint').addEventListener('click', e => { const b = e.target.closest('.pbtn'); if (!b) return; document.querySelectorAll('.pbtn').forEach(x => x.classList.toggle('on', x === b)); brush = b.dataset.c; });
+redraw();
+// chips
+document.addEventListener('click', e => {
+  const c = e.target.closest('.chip, .drop, .sw, .txc'); if (!c) return;
+  const grp = c.parentElement;
+  if (grp.classList.contains('one')) grp.querySelectorAll(':scope > *').forEach(x => x.classList.toggle('on', x === c));
+  else if (grp.classList.contains('tog') || grp.classList.contains('tog2')) c.classList.toggle('on');
+});
+document.querySelectorAll('.demoBar button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.demoBar button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.frame').forEach(s => s.classList.toggle('on', s.id === 's-' + b.dataset.s));
+  scrollTo(0, 0);
+}));
+</script>
+</body>
+</html>
