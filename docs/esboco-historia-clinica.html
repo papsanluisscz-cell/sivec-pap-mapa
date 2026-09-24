@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Historia clínica SIVEC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --wine: #7d2a4c; --wine-d: #5a1c36; --ink: #1f1a1c; --soft: #6b5f64; --line: #2b2326; --hair: #cfc3c8; --tint: #f7eef2; --bg: #e9e4e6; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); font-family: "Source Sans 3", "Segoe UI", Arial, sans-serif; color: var(--ink); }
+  .topbar { position: sticky; top: 0; z-index: 5; background: #2a1720; color: #fff; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px 16px; }
+  .topbar b { margin-right: 6px; font-size: 15px; }
+  .tab { font: inherit; font-size: 14px; font-weight: 600; border: 1px solid #6b4a58; background: transparent; color: #fff; border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+  .tab.on { background: #fff; color: var(--wine-d); border-color: #fff; }
+  .warn { max-width: 900px; margin: 14px auto 0; background: #fff7e0; border: 1px solid #ecd9a0; border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #5b4712; }
+  .note { max-width: 794px; margin: 14px auto 30px; background: #fff; border-radius: 10px; padding: 12px 16px; font-size: 14px; line-height: 1.5; color: #3b3035; border-left: 4px solid var(--wine); }
+  .note b { color: var(--wine-d); }
+  .sheet { width: 794px; min-height: 1123px; margin: 16px auto 0; background: #fff; box-shadow: 0 4px 24px rgba(0,0,0,.14); padding: 40px 44px 36px; display: none; position: relative; font-size: 12.5px; }
+  .sheet.on { display: block; }
+  @media (max-width: 830px) { .sheet { transform-origin: top left; } }
+  /* encabezado común */
+  .hd { display: grid; grid-template-columns: 90px 1fr 150px; gap: 12px; align-items: center; border-bottom: 2.5px solid var(--wine); padding-bottom: 10px; }
+  .logo { height: 62px; border: 1.5px dashed var(--hair); border-radius: 8px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; color: var(--soft); line-height: 1.2; padding: 4px; }
+  .hd h1 { margin: 0; font-size: 19px; font-weight: 800; letter-spacing: .01em; text-align: center; line-height: 1.15; }
+  .hd h1 small { display: block; font-size: 12.5px; font-weight: 600; color: var(--soft); letter-spacing: 0; margin-top: 3px; }
+  .hdR { text-align: right; }
+  .code { display: inline-block; background: var(--wine); color: #fff; font-weight: 800; border-radius: 6px; padding: 3px 10px; font-size: 15px; }
+  .folio { margin-top: 6px; font-size: 12px; color: var(--soft); }
+  .folio b { color: var(--ink); font-size: 15px; letter-spacing: .03em; }
+  .ctx { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 11.5px; color: var(--soft); margin: 7px 0 12px; }
+  .ctx b { color: var(--ink); font-weight: 700; }
+  /* bloques */
+  .sec { margin-top: 12px; }
+  .secT { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--wine-d); border-bottom: 1px solid var(--hair); padding-bottom: 3px; margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .secT span { font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--soft); }
+  .grid { display: grid; gap: 0; border: 1.2px solid var(--line); border-radius: 4px; overflow: hidden; }
+  .cell { padding: 5px 8px 6px; border-right: 1px solid var(--hair); border-bottom: 1px solid var(--hair); min-height: 38px; }
+  .cell .k { display: block; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--soft); }
+  .cell .v { display: block; font-size: 14px; font-weight: 700; margin-top: 1px; }
+  .cell .v.n { font-weight: 400; }
+  .chk { display: inline-flex; align-items: center; vertical-align: top; gap: 5px; margin-right: 12px; white-space: nowrap; font-size: 12.5px; }
+  .bx { flex: none; overflow: hidden; width: 13px; height: 13px; border: 1.3px solid var(--line); border-radius: 2px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; line-height: 1; }
+  .bx.x::after { content: "✕"; }
+  table.t { width: 100%; border-collapse: collapse; border: 1.2px solid var(--line); }
+  table.t th { background: var(--tint); font-size: 10px; text-transform: uppercase; letter-spacing: .05em; text-align: left; padding: 5px 7px; border: 1px solid var(--hair); color: var(--wine-d); }
+  table.t td { border: 1px solid var(--hair); padding: 6px 7px; font-size: 12.5px; height: 26px; vertical-align: middle; }
+  table.t td.num { text-align: center; font-weight: 700; font-size: 14px; }
+  table.t td.med { font-weight: 700; }
+  .ico { font-size: 14px; margin-right: 5px; }
+  .firmas { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 26px; margin-top: 34px; text-align: center; font-size: 11.5px; color: var(--soft); }
+  .firmas div { border-top: 1.2px solid var(--line); padding-top: 5px; }
+  .firmas b { display: block; color: var(--ink); font-size: 12.5px; }
+  .foot { position: absolute; left: 44px; right: 44px; bottom: 18px; display: flex; justify-content: space-between; font-size: 10px; color: var(--soft); border-top: 1px solid var(--hair); padding-top: 5px; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 700; background: var(--tint); color: var(--wine-d); border-radius: 999px; padding: 1px 9px; }
+  .muted { color: var(--soft); }
+  /* HC SOAP */
+  .soapT { width: 100%; border-collapse: collapse; border: 1.4px solid var(--line); }
+  .soapT td { border: 1px solid var(--hair); vertical-align: top; padding: 8px 10px; }
+  .soapT .l { width: 38px; text-align: center; font-size: 22px; font-weight: 800; color: #fff; background: var(--wine); border-color: var(--wine); vertical-align: middle; }
+  .soapT .l small { display: block; font-size: 8.5px; font-weight: 700; letter-spacing: .04em; }
+  .soapT .tx { font-size: 13.5px; line-height: 1.5; }
+  .soapT .tx b { color: var(--wine-d); }
+  .vit { display: grid; grid-template-columns: repeat(8, 1fr); border: 1.2px solid var(--line); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+  .vit div { padding: 4px 6px; border-right: 1px solid var(--hair); }
+  .vit div:last-child { border-right: none; }
+  .vit .k { display: block; font-size: 9px; font-weight: 700; color: var(--soft); text-transform: uppercase; letter-spacing: .05em; }
+  .vit .v { font-size: 14px; font-weight: 700; }
+  .fig { float: right; width: 190px; margin: -2px 0 6px 14px; border: 1px solid var(--hair); border-radius: 8px; padding: 6px 6px 4px; text-align: center; background: #fff; }
+  .fig .cap { font-size: 10px; color: var(--soft); margin-top: 2px; line-height: 1.3; text-align: left; }
+  .leg { display: flex; flex-wrap: wrap; gap: 3px 9px; font-size: 10px; margin-top: 3px; text-align: left; }
+  .leg i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 3px; vertical-align: -1px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .tag { font-size: 11px; border: 1px solid var(--hair); border-radius: 999px; padding: 0 8px; }
+  /* consentimiento */
+  .q { display: grid; grid-template-columns: 26px 1fr 200px; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--hair); font-size: 13.2px; line-height: 1.4; }
+  .q .n { width: 22px; height: 22px; border-radius: 50%; background: var(--wine); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .q .ans { display: flex; gap: 12px; justify-content: flex-end; }
+  .intro { font-size: 13px; line-height: 1.5; background: var(--tint); border-radius: 8px; padding: 9px 12px; }
+  .huella { border: 1.2px solid var(--line); border-radius: 6px; height: 88px; display: flex; align-items: flex-end; justify-content: center; font-size: 11px; color: var(--soft); padding-bottom: 5px; }
+  .map { height: 210px; border: 1.2px solid var(--line); border-radius: 6px; overflow: hidden; position: relative; }
+  .copias { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .copias td { padding: 3px 6px; border-bottom: 1px solid var(--hair); }
+  .cols3 { columns: 3; column-gap: 16px; font-size: 11.5px; }
+  .cols3 .chk { display: flex; margin: 0 0 4px; white-space: normal; }
+  .hl { background: #fff3c4; border-radius: 3px; padding: 0 3px; font-weight: 700; }
+
+  table.t.sm td { height:auto; padding:4px 7px; font-size:12px; } table.t.sm th { padding:4px 7px; }
+  .cols2 { columns:2; column-gap:16px; font-size:12px; } .cols2 .chk { display:flex; margin:0 0 4px; white-space:normal; gap:4px; }
+  .evo { display:grid; grid-template-columns:92px 1fr; border:1.4px solid var(--line); border-radius:4px; margin-bottom:10px; min-height:250px; }
+  .evL { border-right:1.4px solid var(--line); background:var(--tint); display:grid; grid-auto-rows:1fr; }
+  .evL div { padding:3px 7px; border-bottom:1px solid var(--hair); font-size:13px; } .evL div:last-child { border-bottom:none; }
+  .evL .k { display:block; font-size:9px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.05em; }
+  .evR { padding:8px 12px; display:flex; flex-direction:column; } .evR p { margin:0 0 7px; font-size:13.3px; line-height:1.45; min-height:26px; border-bottom:1px dotted var(--hair); padding-bottom:5px; }
+  .evR .L { display:inline-flex; width:20px; height:20px; border-radius:5px; background:var(--wine); color:#fff; align-items:center; justify-content:center; font-size:12px; margin-right:6px; }
+  .evR .sig { margin-top:auto; text-align:right; font-size:11.5px; color:var(--soft); border-top:1px solid var(--line); padding-top:4px; width:260px; align-self:flex-end; }
+  .photo { width:78px; height:88px; border-radius:10px; background:var(--tint); border:1.5px dashed var(--hair); display:flex; align-items:center; justify-content:center; text-align:center; font-size:10px; color:var(--soft); }
+  .alertRow { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 2px; } .al { font-size:11.5px; font-weight:700; border-radius:6px; padding:3px 9px; background:#f1eef0; color:var(--ink); }
+  .al.red { background:#fde2e2; color:#991b1b; } .al.amb { background:#fdf0d5; color:#8a5a00; } .al.ok { background:#dcf3e5; color:#166534; }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .st { font-size:10.5px; font-weight:700; border-radius:999px; padding:1px 8px; white-space:nowrap; } .st.act { background:#fde2e2; color:#991b1b; } .st.pend { background:#e0ecfa; color:#1e4f8a; } .st.res { background:#eee; color:#555; } .st.ok { background:#dcf3e5; color:#166534; } .st.due { background:#fdf0d5; color:#8a5a00; }
+  .kv { font-size:12px; line-height:1.55; } .kv b { color:var(--wine-d); }
+  .spk { display:grid; grid-template-columns:1fr; gap:4px; } .spk div { display:grid; grid-template-columns:86px 120px 44px 1fr; align-items:center; gap:8px; font-size:12px; } .spk svg { width:120px; height:30px; } .spk b { font-size:15px; } .spk small { color:var(--soft); } .spk .k { font-size:10px; font-weight:700; color:var(--soft); text-transform:uppercase; }
+  .tl { display:flex; flex-wrap:wrap; gap:6px 14px; font-size:11.5px; } .tl i { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:5px; }
+  .nb { margin-top:8px; } .nb h3 { margin:0 0 3px; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--wine-d); border-bottom:1px solid var(--hair); padding-bottom:2px; display:flex; justify-content:space-between; } .nb h3 span { font-weight:600; letter-spacing:0; text-transform:none; color:var(--soft); }
+  .nb p { margin:0; font-size:13px; line-height:1.5; } .rs { display:flex; flex-wrap:wrap; gap:4px 14px; }
+  .plan { display:grid; grid-template-columns:1fr 1fr; gap:8px; } .plan div { border:1px solid var(--hair); border-radius:8px; padding:7px 9px; font-size:12.3px; line-height:1.45; }
+  .sigBox { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-top:16px; border-top:1.2px solid var(--line); padding-top:6px; font-size:12.5px; }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — Historia clínica:</b>
+  <button class="tab on" data-t="a1">A1 · Actual rediseñada — hoja 1</button>
+  <button class="tab" data-t="a2">A2 · Actual rediseñada — evolución</button>
+  <button class="tab" data-t="b1">B1 · Completa (estándar internacional) — resumen</button>
+  <button class="tab" data-t="b2">B2 · Completa — nota de atención</button>
+</div>
+<div class="warn">⚠️ Dibujo para comparar, con datos inventados. <b>Modelo A</b> = la HC que usamos hoy (R.A. SALUD INE 101/2010), mismas secciones A–J, ordenada y legible. <b>Modelo B</b> = cómo se arma hoy una HC completa en el mundo (resumen del paciente tipo <i>International Patient Summary</i>, registro orientado a problemas, diagnósticos codificados CIE-10).</div>
+
+<!-- ============ A1 ============ -->
+<section class="sheet on" id="a1">
+  <div class="hd"><div class="logo">Escudo<br>Ministerio de Salud</div>
+    <h1>HISTORIA CLÍNICA<small>Código R.A. SALUD INE 101/2010 · Hoja 1 de 2</small></h1>
+    <div class="hdR"><div class="folio">Nº H.C. <b>0418</b></div><div class="folio">Nº SUMI <b>—</b></div></div></div>
+  <div class="sec"><div class="secT">A. Datos administrativos</div>
+    <div class="grid" style="grid-template-columns:1fr 1fr 1fr 1fr">
+      <div class="cell"><span class="k">Establecimiento</span><span class="v">C.S. San Luis</span></div><div class="cell"><span class="k">Red de salud</span><span class="v">Centro</span></div><div class="cell"><span class="k">Municipio</span><span class="v">Santa Cruz</span></div><div class="cell" style="border-right:none"><span class="k">Provincia</span><span class="v">Andrés Ibáñez</span></div>
+      <div class="cell" style="grid-column:1/3;border-bottom:none"><span class="k">Responsable de familia</span><span class="v">QUISPE ROCA, JUAN · 12/08/1984 · M</span></div><div class="cell" style="border-bottom:none"><span class="k">Ocupación</span><span class="v n">Albañil</span></div><div class="cell" style="border-bottom:none;border-right:none"><span class="k">Comunidad</span><span class="v n">B. San Luis</span></div>
+    </div></div>
+  <div class="sec"><div class="secT">B. Identificación de la paciente / usuaria</div>
+    <div class="grid" style="grid-template-columns:1.1fr 1.1fr 1.4fr .9fr .6fr">
+      <div class="cell"><span class="k">Apellido paterno</span><span class="v">QUISPE</span></div><div class="cell"><span class="k">Apellido materno</span><span class="v">MAMANI</span></div><div class="cell"><span class="k">Nombres</span><span class="v">MARÍA</span></div><div class="cell"><span class="k">Nacimiento</span><span class="v">14/03/1988</span></div><div class="cell" style="border-right:none"><span class="k">Sexo</span><span class="v">F</span></div>
+      <div class="cell"><span class="k">C.I.</span><span class="v">7654321 SC</span></div><div class="cell"><span class="k">Teléfono</span><span class="v">7 123 4567</span></div><div class="cell"><span class="k">Procedencia</span><span class="v n">Santa Cruz</span></div><div class="cell"><span class="k">Fecha de ingreso</span><span class="v n">05/01/2026</span></div><div class="cell" style="border-right:none"><span class="k">Grupo/Rh</span><span class="v">O+</span></div>
+      <div class="cell"><span class="k">Idioma hablado / materno</span><span class="v n">Castellano / Quechua</span></div><div class="cell"><span class="k">Autopertenencia cultural</span><span class="v n">Quechua</span></div><div class="cell"><span class="k">Ocupación (productiva · reproductiva · comunitaria)</span><span class="v n">Comerciante · ama de casa · —</span></div><div class="cell" style="grid-column:4/6;border-right:none"><span class="k">¿Quién decidió que acuda?</span><span class="v n">Usted misma</span></div>
+      <div class="cell" style="grid-column:1/3;border-bottom:none"><span class="k">Estado civil</span><span class="chk"><span class="bx"></span>Soltera</span><span class="chk"><span class="bx"></span>Conviviente</span><span class="chk"><span class="bx x"></span>Casada</span><span class="chk"><span class="bx"></span>Viuda</span><span class="chk"><span class="bx"></span>Divorciada</span></div><div class="cell" style="grid-column:3/6;border-bottom:none;border-right:none"><span class="k">Escolaridad</span><span class="chk"><span class="bx"></span>Sin instrucción</span><span class="chk"><span class="bx"></span>Básico</span><span class="chk"><span class="bx x"></span>Intermedio</span><span class="chk"><span class="bx"></span>Medio</span><span class="chk"><span class="bx"></span>Superior</span></div>
+    </div></div>
+  <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:12px">
+    <div class="sec"><div class="secT">C. Pediátricos · D. Vacunas</div>
+      <table class="t sm"><thead><tr><th>Vacuna</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead><tbody>
+        <tr><td>dT (adulto)</td><td>✓ 2019</td><td>✓ 2020</td><td>✓ 2021</td><td></td><td></td></tr><tr><td>VPH</td><td class="muted" colspan="5">No corresponde por edad</td></tr><tr><td>Influenza</td><td>✓ 2025</td><td></td><td></td><td></td><td></td></tr><tr><td>COVID-19</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr><tr><td>Hepatitis B</td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table>
+      <p class="muted" style="font-size:10.5px;margin:4px 0 0">C. Antecedentes pediátricos: no corresponde (adulta). En menores sale peso RN, parto y lactancia.</p></div>
+    <div class="sec"><div class="secT">E. Antecedentes gineco-obstétricos</div>
+      <div class="grid" style="grid-template-columns:repeat(6,1fr)"><div class="cell"><span class="k">G</span><span class="v">3</span></div><div class="cell"><span class="k">P</span><span class="v">2</span></div><div class="cell"><span class="k">C</span><span class="v">1</span></div><div class="cell"><span class="k">A</span><span class="v">0</span></div><div class="cell"><span class="k">FUM</span><span class="v">02/09/26</span></div><div class="cell" style="border-right:none"><span class="k">IRS</span><span class="v">17 a</span></div></div>
+      <table class="t sm" style="margin-top:6px"><thead><tr><th>PAP · fecha</th><th>Resultado</th><th>Anticoncepción · inicio</th><th>Método</th></tr></thead><tbody>
+        <tr><td>2023</td><td>NILM</td><td>2024</td><td>Inyectable trimestral</td></tr><tr><td>24/09/2026</td><td class="muted">Pendiente</td><td></td><td></td></tr></tbody></table></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="sec"><div class="secT">F. Antecedentes patológicos</div>
+      <table class="t sm"><thead><tr><th>Hospitalización por</th><th>Año</th><th>Evolución</th></tr></thead><tbody><tr><td>Cesárea</td><td>2016</td><td>Sin complicaciones</td></tr><tr><td></td><td></td><td></td></tr></tbody></table>
+      <div class="cell" style="border:1.2px solid var(--line);border-radius:4px;margin-top:6px"><span class="k">Alergias</span><span class="v" style="color:#b91c1c">Penicilina (urticaria)</span></div></div>
+    <div class="sec"><div class="secT">G. Medicamentos en enf. crónicas</div>
+      <table class="t sm"><thead><tr><th>Inicio</th><th>Medicamento</th><th>Dosificación</th><th>Fin</th></tr></thead><tbody><tr><td class="muted" colspan="4">Ninguno</td></tr><tr><td></td><td></td><td></td><td></td></tr></tbody></table></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:12px">
+    <div class="sec"><div class="secT">H. Factores de riesgo <span>personal · familiar</span></div>
+      <div class="cols2">
+        <span class="chk"><span class="bx"></span><span class="bx"></span> Hipertensión arterial</span><span class="chk"><span class="bx"></span><span class="bx x"></span> Diabetes (madre)</span><span class="chk"><span class="bx x"></span><span class="bx"></span> Sobrepeso</span><span class="chk"><span class="bx"></span><span class="bx"></span> Alcohol</span><span class="chk"><span class="bx"></span><span class="bx"></span> Tabaco</span><span class="chk"><span class="bx"></span><span class="bx"></span> Transfusiones</span><span class="chk"><span class="bx x"></span><span class="bx"></span> Cirugías</span><span class="chk"><span class="bx"></span><span class="bx"></span> Trastornos SNC</span><span class="chk"><span class="bx"></span><span class="bx"></span> Tuberculosis</span><span class="chk"><span class="bx"></span><span class="bx"></span> Desnutrición</span><span class="chk"><span class="bx"></span><span class="bx"></span> Drogas</span><span class="chk"><span class="bx"></span><span class="bx"></span> Sífilis</span></div></div>
+    <div class="sec"><div class="secT">I. Riesgo social · J. Observaciones</div>
+      <div class="grid" style="grid-template-columns:1fr"><div class="cell"><span class="k">Procedencia · viajes</span><span class="v n">Urbana · Cochabamba (2025)</span></div><div class="cell" style="border-bottom:none;border-right:none;min-height:54px"><span class="k">Observaciones</span><span class="v n">Tamizaje PAP + VPH. Acude con su hija.</span></div></div></div>
+  </div>
+  <div class="foot"><span>SIVEC · Modelo A (formato actual rediseñado)</span><span>Hoja 1 de 2</span></div>
+</section>
+
+<!-- ============ A2 ============ -->
+<section class="sheet" id="a2">
+  <div class="hd"><div class="logo">Escudo<br>Ministerio de Salud</div>
+    <h1>HISTORIA CLÍNICA — EVOLUCIÓN<small>Nota S-O-A-P · R.A. SALUD INE 101/2010 · Hoja 2 de 2</small></h1>
+    <div class="hdR"><div class="folio">Nº H.C. <b>0418</b></div></div></div>
+  <div class="ctx"><span>Paciente: <b>MARÍA QUISPE MAMANI</b></span><span>C.I.: <b>7654321 SC</b></span><span>Instructivo: <b>S</b> síntomas referidos · <b>O</b> examen y exámenes · <b>A</b> problemas y diagnóstico · <b>P</b> tratamiento, orientación y seguimiento</span></div>
+  <div class="evo">
+    <div class="evL"><div><span class="k">Fecha</span><b>24/09/26</b></div><div><span class="k">Edad</span><b>38</b></div><div><span class="k">Talla</span><b>1,56</b></div><div><span class="k">Peso</span><b>62 kg</b></div><div><span class="k">Temp.</span><b>36,5°</b></div><div><span class="k">FC</span><b>78</b></div><div><span class="k">PA</span><b>110/70</b></div><div><span class="k">FR</span><b>18</b></div></div>
+    <div class="evR">
+      <p><b class="L">S</b> Refiere flujo vaginal y prurito de 1–4 semanas. FUM 02/09/2026. G3 P2 C1 A0. Último PAP 2023 (NILM).</p>
+      <p><b class="L">O</b> Especuloscopía: cuello eritematoso, leucorrea moderada blanquecina. Toma de PAP y VPH.</p>
+      <p><b class="L">A</b> Cervicitis. Candidiasis vaginal.</p>
+      <p><b class="L">P</b> Clotrimazol 500 mg óvulo c/noche x 10 · Fluconazol 150 mg VO dosis única · aseo vulvoperineal · control al resultado del PAP.</p>
+      <div class="sig">Dra. Aguilera · Ginecología · 17576012</div></div>
+  </div>
+  <div class="evo">
+    <div class="evL"><div><span class="k">Fecha</span><b>15/10/26</b></div><div><span class="k">Edad</span><b>38</b></div><div><span class="k">Talla</span><b></b></div><div><span class="k">Peso</span><b>61 kg</b></div><div><span class="k">Temp.</span><b>36,4°</b></div><div><span class="k">FC</span><b>74</b></div><div><span class="k">PA</span><b>110/70</b></div><div><span class="k">FR</span><b>17</b></div></div>
+    <div class="evR">
+      <p><b class="L">S</b> Acude por resultado. Remisión del prurito.</p>
+      <p><b class="L">O</b> PAP: NILM. VPH: negativo.</p>
+      <p><b class="L">A</b> Tamizaje negativo. Candidiasis resuelta.</p>
+      <p><b class="L">P</b> Entrega de resultado. Próximo tamizaje en 5 años (09/2031). Orientación.</p>
+      <div class="sig">Dra. Ortuño · Medicina general · 17576016</div></div>
+  </div>
+  <div class="evo">
+    <div class="evL"><div><span class="k">Fecha</span></div><div><span class="k">Edad</span></div><div><span class="k">Talla</span></div><div><span class="k">Peso</span></div><div><span class="k">Temp.</span></div><div><span class="k">FC</span></div><div><span class="k">PA</span></div><div><span class="k">FR</span></div></div>
+    <div class="evR"><p><b class="L">S</b></p><p><b class="L">O</b></p><p><b class="L">A</b></p><p><b class="L">P</b></p><div class="sig">Nombre y firma</div></div>
+  </div>
+  <p class="muted" style="font-size:11px">Igual que la hoja oficial: 3 evoluciones por hoja, signos vitales a la izquierda. Cambios: letra legible, cada evolución firmada con especialidad y código, y las vacías quedan para escribir a mano.</p>
+  <div class="foot"><span>SIVEC · Modelo A (formato actual rediseñado)</span><span>Hoja 2 de 2</span></div>
+</section>
+
+<!-- ============ B1 ============ -->
+<section class="sheet" id="b1">
+  <div class="hd"><div class="photo">Foto<br>(recepción)</div>
+    <h1 style="text-align:left">MARÍA QUISPE MAMANI<small style="text-align:left">F · 38 años (14/03/1988) · C.I. 7654321 SC · HC 0418 · Grupo O+ · Tel. 7 123 4567</small></h1>
+    <div class="hdR"><span class="code">RESUMEN</span><div class="folio">Actualizado <b>24/09/26</b></div></div></div>
+  <div class="alertRow"><span class="al red">⚠ Alergia: PENICILINA (urticaria)</span><span class="al amb">Riesgo: sobrepeso · DM familiar</span><span class="al ok">Consentimiento Telesalud ✓</span><span class="al">Idioma: castellano / quechua</span></div>
+  <div class="two">
+    <div>
+      <div class="sec"><div class="secT">Problemas <span>activos · CIE-10</span></div>
+        <table class="t sm"><tbody>
+          <tr><td><b>N72</b></td><td>Cervicitis</td><td class="muted">desde 24/09/26</td><td><span class="st act">Activo</span></td></tr>
+          <tr><td><b>B37.3</b></td><td>Candidiasis vaginal</td><td class="muted">24/09/26</td><td><span class="st act">Activo</span></td></tr>
+          <tr><td><b>E66.9</b></td><td>Sobrepeso/obesidad (IMC 25,5)</td><td class="muted">2025</td><td><span class="st act">Activo</span></td></tr>
+          <tr><td><b>Z12.4</b></td><td>Tamizaje cáncer de cuello</td><td class="muted">en curso</td><td><span class="st pend">Pendiente</span></td></tr>
+          <tr class="muted"><td>O82</td><td>Cesárea (antecedente)</td><td>2016</td><td><span class="st res">Resuelto</span></td></tr></tbody></table></div>
+      <div class="sec"><div class="secT">Medicación actual</div>
+        <table class="t sm"><tbody><tr><td>🥚 Clotrimazol 500 mg óvulo</td><td>c/noche x 10 (hasta 04/10)</td></tr><tr><td>💉 Medroxiprogesterona 150 mg</td><td>IM trimestral · próx. 12/11</td></tr></tbody></table></div>
+      <div class="sec"><div class="secT">Antecedentes</div>
+        <div class="kv"><b>Personales:</b> sin crónicos. <b>Quirúrgicos:</b> cesárea 2016. <b>Familiares:</b> madre DM2. <b>Gineco-obstétricos:</b> G3 P2 C1 A0 · FUM 02/09/26 · IRS 17 · anticoncepción inyectable. <b>Hábitos:</b> no fuma, no alcohol. <b>Social:</b> comerciante, vive con esposo e hijos, agua y luz.</div></div>
+      <div class="sec"><div class="secT">Vacunas</div><div class="kv">dT 3/3 ✓ · Influenza 2025 ✓ · COVID-19 2 dosis ✓ · <span style="color:#b45309;font-weight:700">Hepatitis B: sin registro</span></div></div>
+    </div>
+    <div>
+      <div class="sec"><div class="secT">Prevención y tamizajes</div>
+        <table class="t sm"><tbody>
+          <tr><td>PAP</td><td>24/09/26</td><td><span class="st pend">Esperando</span></td></tr><tr><td>VPH</td><td>24/09/26</td><td><span class="st pend">Esperando</span></td></tr>
+          <tr><td>Mamografía / examen mamario</td><td class="muted">nunca</td><td><span class="st due">Toca</span></td></tr><tr><td>Glicemia</td><td>2025 · 98 mg/dL</td><td><span class="st ok">Al día</span></td></tr><tr><td>Presión arterial</td><td>24/09/26</td><td><span class="st ok">Al día</span></td></tr></tbody></table></div>
+      <div class="sec"><div class="secT">Signos vitales <span>últimas 4 atenciones</span></div>
+        <div class="spk">
+          <div><span class="k">Peso (kg)</span><svg viewBox="0 0 120 30"><polyline points="4,8 42,12 80,18 116,22" fill="none" stroke="#7d2a4c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="116" cy="22" r="3.5" fill="#7d2a4c"/></svg><b>62</b><small>65 → 62</small></div>
+          <div><span class="k">PA sistólica</span><svg viewBox="0 0 120 30"><polyline points="4,14 42,10 80,16 116,15" fill="none" stroke="#7d2a4c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="116" cy="15" r="3.5" fill="#7d2a4c"/></svg><b>110</b><small>estable</small></div>
+          <div><span class="k">IMC</span><svg viewBox="0 0 120 30"><polyline points="4,8 42,11 80,17 116,20" fill="none" stroke="#7d2a4c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="116" cy="20" r="3.5" fill="#7d2a4c"/></svg><b>25,5</b><small>bajando</small></div>
+        </div></div>
+      <div class="sec"><div class="secT">Resultados recientes</div>
+        <table class="t sm"><tbody><tr><td>Hemoglobina</td><td>12,8 g/dL</td><td class="muted">03/2026</td></tr><tr><td>Glicemia</td><td>98 mg/dL</td><td class="muted">2025</td></tr><tr><td>PAP</td><td>NILM</td><td class="muted">2023</td></tr></tbody></table></div>
+      <div class="sec"><div class="secT">Pendientes y equipo</div>
+        <div class="kv">⏳ <b>Resultado PAP/VPH</b> (lote L-2026-39, 0 días) · 📅 Control al resultado · 💉 Inyectable 12/11.<br>👩‍⚕️ Dra. Aguilera (Ginecología) · Dra. Ortuño (Medicina general) · C.S. San Luis, Red Centro.</div></div>
+    </div>
+  </div>
+  <div class="sec"><div class="secT">Línea de tiempo <span>todos los centros</span></div>
+    <div class="tl"><span><i style="background:#7d2a4c"></i>24/09/26 Consulta gineco + PAP/VPH</span><span><i style="background:#2f6fb0"></i>03/2026 Laboratorio: Hb</span><span><i style="background:#0e7490"></i>01/2026 Registro en SIVEC</span><span><i style="background:#6b5f64"></i>2023 PAP NILM</span><span><i style="background:#6b5f64"></i>2016 Cesárea (Maternidad)</span></div></div>
+  <div class="foot"><span>SIVEC · Modelo B — Resumen de la paciente (según International Patient Summary, ISO 27269)</span><span>Hoja 1</span></div>
+</section>
+
+<!-- ============ B2 ============ -->
+<section class="sheet" id="b2">
+  <div class="hd"><div class="logo">Escudo<br>Ministerio de Salud</div>
+    <h1>NOTA DE ATENCIÓN<small>Consulta externa · Ginecología · C.S. San Luis</small></h1>
+    <div class="hdR"><div class="folio">24/09/2026 · 09:40</div><div class="folio">Ficha <b>A-023</b></div></div></div>
+  <div class="ctx"><span>Paciente: <b>MARÍA QUISPE MAMANI</b></span><span>38 a · F · C.I. <b>7654321 SC</b></span><span style="color:#b91c1c;font-weight:700">⚠ Alergia: penicilina</span><span>Acompañante: hija</span></div>
+  <div class="vit"><div><span class="k">PA</span><span class="v">110/70</span></div><div><span class="k">FC</span><span class="v">78</span></div><div><span class="k">FR</span><span class="v">18</span></div><div><span class="k">Temp.</span><span class="v">36,5°</span></div><div><span class="k">SatO₂</span><span class="v">97%</span></div><div><span class="k">Peso</span><span class="v">62 kg</span></div><div><span class="k">Talla</span><span class="v">1,56</span></div><div><span class="k">IMC</span><span class="v">25,5</span></div></div>
+  <p class="muted" style="font-size:10.5px;margin:-2px 0 6px">Signos vitales tomados en triaje 09:22 (Lic. Rojas).</p>
+  <div class="nb"><h3>Motivo de consulta</h3><p>"Flujo y picazón hace 2 semanas" · Tamizaje de cuello uterino.</p></div>
+  <div class="nb"><h3>Enfermedad actual</h3><p>Cuadro de 2 semanas de flujo vaginal blanquecino con prurito vulvar, sin mal olor ni fiebre. Niega sangrado postcoital. Último PAP 2023 (NILM).</p></div>
+  <div class="nb"><h3>Revisión por sistemas</h3><p class="rs"><span>General: s/p</span><span>Urinario: niega disuria</span><span>Mamas: s/p</span><span>Abdomen: s/p</span><span>Otros: negativo</span></p></div>
+  <div class="nb"><h3>Examen físico</h3><p><b>General:</b> lúcida, hidratada. <b>Abdomen:</b> blando, no doloroso. <b>Genitales:</b> vulva eritematosa. <b>Especuloscopía:</b> cuello eritematoso, leucorrea moderada blanquecina grumosa. Se toma PAP y VPH.</p></div>
+  <div class="nb"><h3>Evaluación <span>diagnósticos codificados</span></h3>
+    <table class="t sm"><tbody><tr><td style="width:70px"><b>B37.3</b></td><td>Candidiasis de vulva y vagina</td><td><span class="st act">Principal</span></td></tr><tr><td><b>N72</b></td><td>Enfermedad inflamatoria del cuello uterino</td><td><span class="st act">Secundario</span></td></tr><tr><td><b>Z12.4</b></td><td>Examen de pesquisa de tumor maligno del cuello uterino</td><td><span class="st pend">Tamizaje</span></td></tr></tbody></table></div>
+  <div class="nb"><h3>Plan</h3>
+    <div class="plan">
+      <div><b>💊 Receta</b> (enviada a farmacia · <span style="color:#15803d">disponible</span>)<br>Clotrimazol 500 mg óvulo c/noche x 10<br>Fluconazol 150 mg VO dosis única</div>
+      <div><b>🧪 Órdenes</b><br>PAP (lote L-2026-39)<br>VPH ADN alto riesgo</div>
+      <div><b>🗣 Educación</b><br>Aseo vulvoperineal · uso de preservativo · signos de alarma</div>
+      <div><b>📅 Seguimiento</b><br>Control al resultado del PAP (~3 semanas)<br>Derivación: ninguna</div>
+    </div></div>
+  <div class="sigBox"><div><b>Dra. Aguilera</b> · Ginecología · 17576012 · Mat. ______<br><span class="muted">Firmado electrónicamente 24/09/2026 10:02</span></div><div class="muted" style="text-align:right;font-size:10.5px">Registro de auditoría: creada 09:41 · modificada 10:02 · vista por Lic. Rojas (triaje)</div></div>
+  <div class="foot"><span>SIVEC · Modelo B — Nota orientada a problemas (SOAP ampliado)</span><span>Hoja 2</span></div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  const NOTES = {
+    a1: '<b>Modelo A, hoja 1:</b> son las mismas secciones A–J de la HC oficial, pero cada dato en su casilla y con letra grande. Lo que el SIVEC ya sabe (Registrar, métodos anticonceptivos, PAP anteriores) sale impreso solo.',
+    a2: '<b>Modelo A, evolución:</b> igual a la hoja 2 oficial (3 notas por hoja), legible y firmada con especialidad y código.',
+    b1: '<b>Modelo B, resumen:</b> lo que el mundo recomienda que el médico vea primero: <b>alertas</b> (alergias), <b>lista de problemas</b> con código CIE-10, medicación actual, antecedentes, vacunas, tamizajes pendientes, tendencia de signos vitales, resultados y la línea de tiempo de todos los centros.',
+    b2: '<b>Modelo B, nota de atención:</b> SOAP ampliado: motivo, enfermedad actual, revisión por sistemas, examen físico, diagnósticos <b>codificados</b>, plan separado (receta, órdenes, educación, seguimiento), firma electrónica y <b>auditoría</b>. Los signos vitales vienen del triaje.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.sheet').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 'a1');
+</script>
+
+</body>
+</html>

@@ -263,3 +263,19 @@ Números animados com tendência, embudo "Del tamizaje al seguimiento", "Para ha
   - Ao liberar: aviso automático ao centro, "próximo passo" calculado na hora (positivo → busca ativa/derivação) e o indicador **tempo toma → resultado** passa a ser real.
   - **Oncológico/maternidade:** recebem a derivação no sistema e devolvem a **contrarreferência**, que aparece na linha do tempo.
   - Base técnica: identificação única da paciente (C.I. + SEGIP), padrões de interoperabilidade (**HL7 FHIR**), registro de acesso (quem viu o quê), consentimento da paciente, e funcionamento com internet ruim (fila offline).
+
+### [24/09/2026] SIVEC Recepção → Triagem → Fila com painel na TV → Consultório (fluxo sem papel)
+**Ideia do autor:**
+1. **Recepção** coleta os primeiros dados da paciente (com C.I.). No SIVEC PAP, ao buscar a paciente pelo nome, a aba **Registrar se completa sozinha** com os dados da recepção.
+2. A recepção **deriva para o doutor/área** (medicina geral, ginecologia, nutrição…).
+3. **Triagem** registra os **sinais vitais** (entram direto na HC da consulta).
+4. Gera **ficha/número de atendimento**; uma **TV grande** na sala de espera mostra o nome, o consultório e a área, com **aviso sonoro**.
+5. No consultório, o SIVEC do doutor já abre com a **linha do tempo completa** da paciente (trajetória até ali).
+
+**Sugestões do Claude:**
+- Estados da fila visíveis para todos: *Na recepção → Triagem → Esperando → Chamada → Em atendimento → Finalizada / Derivada*, com tempo em cada etapa (indicador de tempo de espera por área).
+- Painel da TV: mostrar **nome curto** (ex.: "María Q.") ou só o número, por privacidade; chamada com som + voz sintetizada ("Ficha A-023, consultorio 3"). Botão "chamar de novo" e "não compareceu".
+- Triagem com classificação de prioridade (gestante, idosa, sinais de alarme) que reordena a fila.
+- Recepção evita duplicados buscando pela C.I. (e, no futuro, SEGIP); foto opcional.
+- Ao terminar a consulta, o doutor pode **derivar** para outra área do mesmo centro (vai para outra fila) ou para farmácia/laboratório.
+- Funciona em rede local mesmo se a internet cair (a TV e as filas não podem parar).
