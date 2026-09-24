@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIVEC Gestor de red</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
+    --n1:#2f6fb0; --n2:#0e7490; --n3:#7c3aed; --n4:#b4235a; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .topbar { position:sticky; top:0; z-index:5; background:#2a1720; color:#fff; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; }
+  .topbar b { margin-right:6px; font-size:15px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; border:1px solid #6b4a58; background:transparent; color:#fff; border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tab.on { background:#fff; color:var(--wine-d); border-color:#fff; }
+  .warn { max-width:1100px; margin:14px auto 0; background:#fff7e0; border:1px solid #ecd9a0; border-radius:10px; padding:10px 14px; font-size:14px; color:#5b4712; }
+  .scr { display:none; max-width:1100px; margin:14px auto 30px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,.14); }
+  .scr.on { display:block; }
+  .app { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; }
+  .app .brand { font-weight:800; font-size:20px; letter-spacing:.04em; } .app .brand span { font-size:11px; background:#fff; color:var(--wine-d); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:3px; letter-spacing:.08em; }
+  .app .who { font-size:14px; opacity:.95; }
+  .body { padding:18px 22px 22px; }
+  h2 { margin:0 0 4px; font-size:20px; } .sub { color:var(--soft); font-size:14px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cols { display:grid; gap:14px; } .c2 { grid-template-columns:1fr 1fr; } .c3 { grid-template-columns:1fr 1fr 1fr; } .c21 { grid-template-columns:1.6fr 1fr; }
+  .lbl { font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); margin:10px 0 5px; }
+  .lbl:first-child { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:13px; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .chip.on { background:var(--tint); border-color:var(--wine); color:var(--wine-d); font-weight:700; }
+  .inp { border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13.5px; background:#fff; min-height:36px; }
+  .inp.tall { min-height:62px; line-height:1.45; }
+  .pri { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pri div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; }
+  .pri div b { display:block; font-size:14px; } .pri div.on { border:2px solid var(--wine); background:var(--tint); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .auto { background:#f3f7fb; border:1px dashed #b9cde3; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.55; }
+  .auto b { color:#1e4f8a; }
+  .att { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; } .att span { font-size:12.5px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13.5px; font-weight:700; border-radius:9px; padding:8px 14px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .btn.p { background:var(--wine); border-color:var(--wine); color:#fff; } .btn.g { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fp { width:26px; height:30px; vertical-align:middle; }
+  table.l { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; border-radius:12px; overflow:hidden; }
+  table.l th { text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); padding:9px 10px; border-bottom:1px solid var(--line); background:#fff; }
+  table.l td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .st { font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .st.bad { background:var(--badbg); color:var(--bad); } .st.warn { background:var(--warnbg); color:var(--warn); } .st.ok { background:var(--okbg); color:var(--ok); } .st.info { background:#e0ecfa; color:#1e4f8a; } .st.mut { background:#eee; color:#555; }
+  .lvl { font-size:11px; font-weight:800; color:#fff; border-radius:6px; padding:2px 7px; }
+  .mini { font-size:12px; color:var(--soft); }
+  .note { max-width:1100px; margin:-16px auto 30px; background:#fff; border-radius:10px; padding:12px 16px; font-size:14px; line-height:1.5; color:#3b3035; border-left:4px solid var(--wine); }
+  /* flujo */
+  .levels { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin:6px 0 4px; }
+  .lv { text-align:center; padding:0 8px; }
+  .lv .ic { width:74px; height:74px; border-radius:18px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; }
+  .lv b { display:block; font-size:15px; } .lv span { font-size:12.5px; color:var(--soft); }
+  .arrows { position:relative; height:74px; margin-top:-120px; margin-bottom:60px; pointer-events:none; }
+  .loop { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+  .loop div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12.3px; text-align:center; position:relative; }
+  .loop div b { display:block; font-size:13px; } .loop i { font-style:normal; display:block; font-size:18px; }
+  .loop div:not(:last-child)::after { content:"›"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--soft); font-size:18px; }
+  .world { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .world div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:12.3px; line-height:1.4; }
+  .world b { display:block; font-size:13px; color:var(--wine-d); }
+  /* seguimiento */
+  .steps { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin:8px 0 4px; }
+  .steps div { text-align:center; font-size:12px; position:relative; padding-top:30px; }
+  .steps div::before { content:""; position:absolute; top:9px; left:0; right:0; height:4px; background:#e3d6dc; }
+  .steps div:first-child::before { left:50%; } .steps div:last-child::before { right:50%; }
+  .steps div.done::before { background:var(--ok); } .steps div.cur::before { background:linear-gradient(90deg,var(--ok) 50%,#e3d6dc 50%); }
+  .steps i { position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:50%; background:#e3d6dc; color:#fff; font-style:normal; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:3px solid var(--paper); }
+  .steps .done i { background:var(--ok); } .steps .cur i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .steps b { display:block; font-size:12.5px; } .steps small { color:var(--soft); }
+  .tl { border-left:3px solid var(--line); margin-left:8px; padding-left:14px; }
+  .tl div { position:relative; font-size:13px; margin-bottom:10px; line-height:1.4; }
+  .tl div::before { content:""; position:absolute; left:-21px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--c,#999); border:2px solid #fff; }
+  .kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:600; } .kpi b { font-size:28px; letter-spacing:-.01em; } .kpi span { font-size:12px; color:var(--soft); }
+  .bars div.r { display:grid; grid-template-columns:170px 1fr 54px; align-items:center; gap:10px; font-size:13px; margin:7px 0; }
+  .bars .trk { height:14px; border-radius:0 4px 4px 0; background:transparent; position:relative; }
+  .bars .fill { height:14px; border-radius:0 4px 4px 0; background:var(--wine); }
+  .bars .ref { position:absolute; top:-3px; bottom:-3px; width:2px; background:#2d2429; }
+  .bars .v { font-weight:700; text-align:right; }
+  .alertc { border-left:4px solid var(--bad); }
+
+  .role .rh { display:flex; gap:10px; align-items:center; margin-bottom:8px; } .role .rh b { display:block; font-size:15px; } .role .rh small { color:var(--soft); font-size:12px; }
+  .ri { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .todo { display:flex; align-items:center; gap:10px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .todo:last-child { border-bottom:none; }
+  .todo .st { min-width:30px; text-align:center; font-size:13px; }
+  .mini2 { font-size:13px; line-height:1.5; } .mini2 b { display:block; margin-bottom:2px; }
+  .flowbar { display:flex; gap:6px; margin-bottom:12px; } .flowbar span { flex:1; text-align:center; font-size:13px; font-weight:700; padding:7px; border-radius:9px; background:#fff; border:1px solid var(--line); color:var(--soft); }
+  .flowbar span.on { background:var(--okbg); color:var(--ok); border-color:#b8e3c7; } .flowbar span.cur { background:var(--wine); color:#fff; border-color:var(--wine); }
+  .found { display:flex; gap:12px; align-items:center; margin-top:10px; padding:10px; border-radius:10px; background:#f3f9f5; border:1px solid #cfe9d8; }
+  .photo2 { width:64px; height:72px; border-radius:10px; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:24px; flex:none; }
+  .k2 { display:block; font-size:10.5px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.04em; }
+  .scanner { width:150px; height:160px; margin:6px auto 0; border-radius:18px; background:radial-gradient(circle at 50% 45%, #fff 0, #f7e9ef 70%); border:3px solid #d9b9c6; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -6px 12px rgba(125,42,76,.12); }
+  .ticket { margin-top:12px; text-align:center; }
+  .tk { border:2px dashed var(--wine); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:2px; font-size:13.5px; } .tk b { font-size:40px; color:var(--wine-d); letter-spacing:.04em; line-height:1.1; } .tk small { color:var(--soft); font-size:11.5px; }
+  .q2 { padding:8px 10px; border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:13.5px; background:#fff; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; } .q2 .mini { width:100%; }
+  .q2.cur { border:2px solid var(--wine); background:var(--tint); } .q2 .st { margin-left:auto; }
+  .vit2 { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .vit2 div { background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 8px; font-size:16px; font-weight:800; } .vit2 small { display:block; font-size:10.5px; color:var(--soft); font-weight:700; text-transform:uppercase; }
+  .tv { background:#120810; border-radius:16px; padding:14px; color:#fff; border:8px solid #2a2a2a; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
+  .tvh { display:flex; justify-content:space-between; font-size:13px; color:#cfb7c2; font-weight:700; letter-spacing:.08em; }
+  .tvnow { background:linear-gradient(135deg,#7d2a4c,#b4235a); border-radius:12px; padding:16px; text-align:center; } .tvnow small { display:block; font-size:13px; letter-spacing:.2em; font-weight:800; color:#ffe4ee; }
+  .tvnow b { display:block; font-size:64px; line-height:1.05; letter-spacing:.04em; } .tvnow span { display:block; font-size:24px; font-weight:700; } .tvnow em { display:block; font-style:normal; font-size:20px; margin-top:4px; color:#ffe4ee; }
+  .tvlist div { display:flex; gap:12px; align-items:baseline; font-size:18px; padding:6px 4px; border-bottom:1px solid #3a2530; } .tvlist b { color:#f1a7c3; min-width:70px; } .tvlist span { margin-left:auto; color:#cfb7c2; font-size:15px; }
+  .tvf { font-size:13px; color:#cfb7c2; }
+  .doc { display:grid; grid-template-columns:34px 1fr auto auto; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--line); font-size:13.5px; } .di { font-size:22px; text-align:center; } .dest { font-size:12.5px; color:var(--soft); font-weight:600; }
+  .st.warn { margin:0; max-width:none; padding:2px 9px; border:none; font-size:11.5px; }
+  .todo .st.warn { font-size:13px; }
+
+  .svc { display:flex; flex-wrap:wrap; gap:8px; } .svc span { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 12px; font-size:13.5px; font-weight:600; }
+  .prob { display:flex; align-items:center; gap:8px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .prob .mini { margin-left:auto; }
+  .dotc { width:10px; height:10px; border-radius:50%; flex:none; }
+  .tpl { border:1px solid; border-left-width:5px; border-radius:10px; padding:9px 11px; font-size:13px; line-height:1.45; background:#fff; } .tpl b { display:block; font-size:14px; margin-bottom:2px; }
+  .opt { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; } .opt span { border:1px solid var(--line); border-radius:12px; padding:10px; font-size:22px; background:#fff; text-align:center; } .opt b { display:block; font-size:14px; margin-top:4px; } .opt small { display:block; font-size:12px; color:var(--soft); }
+  .opt .sel { border:2px solid var(--wine); background:var(--tint); }
+  .side { border-left:4px solid var(--line); padding:5px 10px; margin-bottom:8px; font-size:13.5px; line-height:1.45; } .side b { display:block; }
+  .stk { display:grid; grid-template-columns:150px 1fr auto; gap:8px; align-items:center; font-size:13px; margin:6px 0; } .stk div { height:10px; background:#eee4e8; border-radius:5px; overflow:hidden; } .stk i { display:block; height:100%; background:#15803d; border-radius:5px; } .stk b { font-size:12.5px; }
+  .phn { background:#e5ddd5; border:9px solid #1f1f1f; border-radius:26px; padding:10px; display:flex; flex-direction:column; gap:8px; min-height:430px; }
+  .phh { background:#075e54; color:#fff; font-size:13px; font-weight:700; margin:-10px -10px 4px; padding:10px 12px; border-radius:16px 16px 0 0; }
+  .msg { font-size:13px; line-height:1.4; border-radius:10px; padding:7px 9px; max-width:88%; box-shadow:0 1px 1px rgba(0,0,0,.12); } .msg.in { background:#fff; align-self:flex-start; } .msg.out { background:#dcf8c6; align-self:flex-end; font-weight:800; }
+  .ck { font-size:13.5px; line-height:1.45; } .ck b { display:block; font-size:15px; margin-bottom:3px; }
+
+  .kv2 { display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:4px 0; border-bottom:1px dashed var(--line); } .kv2 span { color:var(--soft); }
+  .req { display:flex; flex-wrap:wrap; gap:6px; } .req span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .req .ok { background:var(--okbg); color:var(--ok); } .req .no { background:var(--warnbg); color:var(--warn); }
+  .qx { position:relative; height:30px; background:#f3eef0; border-radius:8px; margin:6px 0; padding-left:34px; } .qx b { position:absolute; left:8px; top:6px; font-size:13px; }
+  .qx span { position:absolute; top:3px; bottom:3px; margin-left:34px; border-radius:6px; color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; padding:0 6px; white-space:nowrap; overflow:hidden; }
+  .who2 { display:grid; gap:6px; } .who2 div { border:1px solid var(--line); border-radius:8px; padding:6px 9px; background:#f7fbf8; font-size:12.5px; } .who2 b { display:block; color:var(--wine-d); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; } .who2 span { color:#166534; }
+  .beds { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .bed { border-radius:10px; padding:8px; font-size:13px; font-weight:700; border:1px solid var(--line); min-height:76px; } .bed b { display:block; font-size:18px; } .bed small { display:block; font-weight:500; font-size:11.5px; color:var(--soft); }
+  .bed.p { background:#fbe4ee; } .bed.a { background:#fde2e2; } .bed.g { background:#ede4fb; } .bed.free { background:#ecf8f1; color:#15803d; } .bed.clean { background:#fdf0d5; color:#8a5a00; } .bed.sel { outline:3px solid var(--wine); }
+  .leg2 { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-left:6px; border:1px solid var(--line); }
+  .dose { border:1px solid var(--line); border-radius:10px; padding:7px 9px; margin-bottom:6px; font-size:13px; display:flex; flex-direction:column; } .dose span { color:var(--soft); font-size:12px; } .dose em { font-style:normal; margin-top:2px; }
+  .srch { border-left:4px solid #c2410c; background:#fff7f0; border-radius:6px; padding:6px 9px; margin-bottom:6px; font-size:13px; } .srch b { display:block; font-size:12px; color:#c2410c; text-transform:uppercase; letter-spacing:.04em; }
+  .amb { border:9px solid #1f1f1f; border-radius:26px; background:#fff; overflow:hidden; min-height:420px; display:flex; flex-direction:column; }
+  .ah { background:#ea580c; color:#fff; font-weight:800; font-size:14px; padding:10px 12px; } .ab { padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .big2 { font-size:40px; font-weight:900; text-align:center; color:#ea580c; margin-top:6px; }
+
+  .tree div { padding:6px 8px; border-radius:8px; font-size:13.5px; } .tree small { color:var(--soft); margin-left:4px; }
+  .tree .t0 { font-weight:800; } .tree .t1 { padding-left:18px; font-weight:700; } .tree .t2 { padding-left:32px; font-weight:700; } .tree .t3 { padding-left:50px; } .tree .mut { color:var(--soft); }
+  .tree .on { background:#f3eef0; } .tree .sel { background:var(--tint); outline:2px solid var(--wine); }
+  .fing { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:8px; } .fing span { font-size:12px; font-weight:700; border-radius:999px; padding:3px 9px; background:#f3eef0; } .fing .done { background:var(--okbg); color:var(--ok); } .fing .cur { background:var(--wine); color:#fff; }
+  table.mx td, table.mx th { text-align:center; font-size:12.5px; padding:8px 6px; } table.mx td:first-child, table.mx th:first-child { text-align:left; }
+  table.mx2 td, table.mx2 th { text-align:center; font-size:12.5px; } table.mx2 td:first-child, table.mx2 th:first-child { text-align:left; }
+  table.mx2 td.on { color:#15803d; font-size:18px; } table.mx2 td.pi { color:#c2410c; font-size:18px; } table.mx2 td { color:#c9bcc2; font-size:18px; } table.mx2 td:first-child { font-size:13.5px; color:var(--ink); }
+  .catl { padding:8px 10px; border-radius:9px; font-size:13.5px; margin-bottom:4px; display:flex; justify-content:space-between; } .catl small { color:var(--soft); } .catl.on { background:var(--tint); font-weight:700; }
+  table.mx2 { table-layout:fixed; } table.mx2 th { font-size:10px; padding:6px 3px; letter-spacing:.02em; white-space:normal; text-align:center; } table.mx2 th:first-child { width:170px; } table.mx2 td { padding:8px 3px; }
+  table.cmp td, table.cmp th { text-align:center; font-size:12.8px; } table.cmp td:first-child, table.cmp th:first-child { text-align:left; }
+  table.cmp td.g { background:#ecf8f1; color:#15803d; font-weight:700; } table.cmp td.y { background:#fdf6e3; color:#8a5a00; font-weight:700; } table.cmp td.r { background:#fdecec; color:#991b1b; font-weight:700; }
+  table.cmp tr.meta td { color:var(--soft); font-size:12px; font-style:italic; }
+  .warn2 { color:#c2410c; font-weight:700; }
+  .paper { background:#fff; border:1px solid var(--line); border-radius:6px; padding:22px 26px; box-shadow:0 6px 20px rgba(0,0,0,.08); max-width:900px; margin:0 auto; }
+  .ph2 { display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid var(--wine); padding-bottom:8px; margin-bottom:12px; } .ph2 b { display:block; font-size:18px; } .ph2 span { font-size:12.5px; color:var(--soft); } .lg2 { background:var(--wine); color:#fff; font-weight:900; letter-spacing:.08em; border-radius:8px; padding:6px 12px; }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — 6 · Tablero del gestor de red:</b>
+  <button class="tab on" data-t="t1">1. La red hoy</button>
+  <button class="tab" data-t="t2">2. Comparar centros</button>
+  <button class="tab" data-t="t3">3. Programas y metas</button>
+  <button class="tab" data-t="t4">4. Recursos en vivo</button>
+  <button class="tab" data-t="t5">5. Alertas para actuar</button>
+  <button class="tab" data-t="t6">6. Tendencias</button>
+  <button class="tab" data-t="t7">7. Informes SNIS automáticos</button>
+  <button class="tab" data-t="t8">8. Informe mensual</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Lo usa el responsable de Red (y el SEDES para todas las redes). Ve números, no historias clínicas.</div>
+
+<!-- ============ T1 ============ -->
+<section class="scr on" id="t1">
+  <div class="app"><div class="brand">SIVEC <span>RED</span></div><div class="who">🔗 Red Centro · 12 establecimientos · jueves 24/09 · 11:00</div></div>
+  <div class="body">
+    <div class="kpi" style="grid-template-columns:repeat(6,1fr)">
+      <div><small>Atenciones hoy</small><b>1.284</b><span> ↑ 6% vs jueves pasado</span></div>
+      <div><small>Esperando ahora</small><b>212</b><span> espera media 41 min</span></div>
+      <div><small>Camas ocupadas</small><b>82%</b><span> 74 de 90</span></div>
+      <div><small>Referencias abiertas</small><b>63</b><span> 9 trabadas</span></div>
+      <div><small>Ambulancias disponibles</small><b>6/14</b></div>
+      <div><small>Medicamentos en falta</small><b>4</b><span> en 3 centros</span></div>
+    </div>
+    <div class="cols" style="grid-template-columns:1.3fr 1fr;margin-top:12px">
+      <div class="card" style="padding:8px"><div class="lbl" style="padding:6px 8px 0">Mapa de la red · semáforo por centro</div>
+        <svg viewBox="0 0 600 320" width="100%" role="img" aria-label="Mapa de centros de la red">
+          <rect width="600" height="320" rx="10" fill="#eef1ec"/>
+          <g stroke="#fff" stroke-width="9"><path d="M0 110h600M0 230h600M170 0v320M400 0v320"/></g>
+          <path d="M40 40 Q300 -10 560 60 L580 290 Q300 330 30 280 Z" fill="none" stroke="#c9b3bd" stroke-width="2" stroke-dasharray="6 6"/>
+          <g font-family="Source Sans 3, sans-serif" font-size="11.5" font-weight="700">
+            <g><circle cx="210" cy="170" r="11" fill="#15803d"/><text x="226" y="174">San Luis</text></g>
+            <g><circle cx="110" cy="80" r="11" fill="#c2410c"/><text x="126" y="84">El Bajío</text></g>
+            <g><circle cx="460" cy="90" r="11" fill="#15803d"/><text x="476" y="94">Los Lotes</text></g>
+            <g><circle cx="330" cy="260" r="11" fill="#15803d"/><text x="346" y="264">Villa 1° Mayo</text></g>
+            <g><circle cx="520" cy="220" r="11" fill="#991b1b"/><text x="470" y="250">Plan 3000</text></g>
+            <g><circle cx="90" cy="250" r="11" fill="#15803d"/><text x="106" y="254">Palmasola</text></g>
+            <g><rect x="296" y="140" width="22" height="22" rx="5" fill="#b91c1c"/><text x="324" y="156">Hosp. municipal</text></g>
+            <g><circle cx="250" cy="60" r="8" fill="#15803d"/><circle cx="420" cy="170" r="8" fill="#15803d"/><circle cx="160" cy="130" r="8" fill="#c2410c"/><circle cx="560" cy="130" r="8" fill="#15803d"/><circle cx="380" cy="40" r="8" fill="#15803d"/></g>
+          </g>
+        </svg>
+        <div class="mini" style="padding:0 8px 6px">🟢 normal · 🟠 atención (espera larga o falta de stock) · 🔴 problema (sin médico, fichas agotadas, equipo caído)</div></div>
+      <div>
+        <div class="card alertc"><div class="lbl">Qué mirar hoy</div><div style="font-size:13.5px;line-height:1.65">🔴 <b>Plan 3000:</b> 1 médico faltó, 60 personas esperando<br>🟠 <b>El Bajío:</b> sin clotrimazol y amoxicilina<br>🟠 Hospital municipal: <b>Medicina interna 100%</b> ocupada<br>🟠 9 referencias sin cita hace &gt; 3 días</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Qué ve y qué no</div><div style="font-size:13px;line-height:1.55">👁 Indicadores, recursos y listas agregadas.<br>🔒 No abre historias clínicas; si hace falta ver un caso (auditoría), pide acceso con motivo y queda registrado.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ T2 ============ -->
+<section class="scr" id="t2">
+  <div class="app"><div class="brand">SIVEC <span>RED</span></div><div class="who">📊 Comparar centros · Red Centro · septiembre</div></div>
+  <div class="body">
+    <div class="card">
+      <table class="l cmp"><thead><tr><th>Establecimiento</th><th>Atenciones</th><th>Espera media</th><th>Faltas a citas</th><th>Cobertura PAP</th><th>Prenatal ≥ 4 controles</th><th>Vacunas al día &lt; 5 a</th><th>Días toma → resultado PAP</th><th>Contrarref. aplicadas</th></tr></thead><tbody>
+        <tr><td><b>C.S. San Luis</b></td><td>4.120</td><td class="g">32 min</td><td class="g">7%</td><td class="g">54%</td><td class="g">82%</td><td class="g">91%</td><td class="g">20 d</td><td class="g">94%</td></tr>
+        <tr><td><b>C.S. Los Lotes</b></td><td>3.880</td><td class="g">38 min</td><td class="g">9%</td><td class="y">41%</td><td class="g">78%</td><td class="g">88%</td><td class="g">22 d</td><td class="y">81%</td></tr>
+        <tr><td><b>C.S. El Bajío</b></td><td>3.210</td><td class="y">55 min</td><td class="r">15%</td><td class="r">28%</td><td class="y">64%</td><td class="y">76%</td><td class="r">35 d</td><td class="r">58%</td></tr>
+        <tr><td><b>C.S. Plan 3000</b></td><td>5.340</td><td class="r">1 h 20</td><td class="y">12%</td><td class="y">36%</td><td class="y">70%</td><td class="g">85%</td><td class="y">27 d</td><td class="y">77%</td></tr>
+        <tr><td><b>C.S. Villa 1° Mayo</b></td><td>2.960</td><td class="g">29 min</td><td class="g">8%</td><td class="g">49%</td><td class="g">84%</td><td class="g">93%</td><td class="g">19 d</td><td class="g">91%</td></tr>
+        <tr style="background:#f7f2f4;font-weight:700"><td>Red Centro</td><td>41.300</td><td>47 min</td><td>10%</td><td>42%</td><td>76%</td><td>87%</td><td>24 d</td><td>82%</td></tr>
+        <tr class="meta"><td>Meta</td><td>—</td><td>≤ 45 min</td><td>≤ 10%</td><td>≥ 50%</td><td>≥ 80%</td><td>≥ 90%</td><td>≤ 30 d</td><td>≥ 90%</td></tr>
+      </tbody></table>
+      <div class="mini" style="margin-top:8px">🟢 cumple la meta · 🟡 cerca · 🔴 lejos. Tocar una celda abre el detalle (sin nombres de pacientes). Las metas se configuran por red.</div>
+    </div>
+    <div class="card" style="margin-top:12px;font-size:14px;line-height:1.55">💡 <b>Lectura rápida:</b> El Bajío está lejos en casi todo → no es falta de voluntad: tiene 1 médico menos y el mensajero de lotes pasa 1 vez por semana. El tablero ayuda a <b>ver la causa</b>, no solo el número.</div>
+  </div>
+</section>
+
+<!-- ============ T3 ============ -->
+<section class="scr" id="t3">
+  <div class="app"><div class="brand">SIVEC <span>RED</span></div><div class="who">🎯 Programas de salud y metas · Red Centro · acumulado 2026</div></div>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card bars"><div class="lbl">Avance hacia la meta anual (línea = meta)</div>
+        <div class="r"><span>🧾 PAP/VPH · mujeres 25–64</span><div class="trk"><div class="fill" style="width:62%"></div><div class="ref" style="left:75%"></div></div><span class="v">62%</span></div>
+        <div class="r"><span>🤰 Prenatal ≥ 4 controles</span><div class="trk"><div class="fill" style="width:76%"></div><div class="ref" style="left:80%"></div></div><span class="v">76%</span></div>
+        <div class="r"><span>🏥 Parto institucional</span><div class="trk"><div class="fill" style="width:88%"></div><div class="ref" style="left:90%"></div></div><span class="v">88%</span></div>
+        <div class="r"><span>💉 Pentavalente 3ª dosis</span><div class="trk"><div class="fill" style="width:84%"></div><div class="ref" style="left:95%"></div></div><span class="v">84%</span></div>
+        <div class="r"><span>🫁 TB · éxito de tratamiento</span><div class="trk"><div class="fill" style="width:81%"></div><div class="ref" style="left:90%"></div></div><span class="v">81%</span></div>
+        <div class="r"><span>🧸 Niño sano &lt; 2 a con control</span><div class="trk"><div class="fill" style="width:69%"></div><div class="ref" style="left:80%"></div></div><span class="v">69%</span></div>
+        <div class="mini">Escala 0–100% · proporción de lo esperado a septiembre.</div></div>
+      <div>
+        <div class="card"><div class="lbl">PAP/VPH — el programa piloto</div>
+          <div class="kv2"><span>Tomas 2026</span><b>6.840</b></div><div class="kv2"><span>Positivos (≥ ASC-US / VPH+)</span><b>512 · 7,5%</b></div><div class="kv2"><span>Positivos con colposcopia</span><b>81%</b></div><div class="kv2"><span>Positivos sin seguimiento</span><b style="color:#991b1b">97 → búsqueda activa</b></div><div class="kv2"><span>Resultados entregados</span><b>89%</b></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">De dónde sale cada número</div><div style="font-size:13px;line-height:1.55">Del trabajo diario: tomas registradas, resultados del portal de patología, citas y contrarreferencias. <b>Nadie llena planillas</b> para el tablero.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ T4 ============ -->
+<section class="scr" id="t4">
+  <div class="app"><div class="brand">SIVEC <span>RED</span></div><div class="who">🧰 Recursos de la red en vivo</div></div>
+  <div class="body">
+    <div class="cols c3" style="gap:12px">
+      <div class="card"><div class="lbl">🛏 Camas libres ahora</div>
+        <div class="kv2"><span>Hospital municipal · GO</span><b>2</b></div><div class="kv2"><span>Hospital municipal · Cirugía</span><b>1</b></div><div class="kv2"><span>Hospital municipal · Medicina</span><b style="color:#991b1b">0</b></div><div class="kv2"><span>C.S. San Luis (internación corta)</span><b>2</b></div><div class="kv2"><span>C.S. Plan 3000 (observación)</span><b>1</b></div>
+        <div class="mini" style="margin-top:6px">Sirve para decidir a dónde referir sin llamar a nadie.</div></div>
+      <div class="card"><div class="lbl">🚑 Ambulancias</div>
+        <div class="kv2"><span>Disponibles</span><b style="color:#15803d">6</b></div><div class="kv2"><span>En servicio</span><b>5</b></div><div class="kv2"><span>Mantenimiento</span><b>2</b></div><div class="kv2"><span>Fuera de servicio</span><b style="color:#991b1b">1</b></div><div class="kv2"><span>Tiempo medio pedido → llegada</span><b>18 min</b></div></div>
+      <div class="card"><div class="lbl">👥 Personal hoy</div>
+        <div class="kv2"><span>Médicos</span><b>38 de 41</b></div><div class="kv2"><span>Enfermeras</span><b>72 de 75</b></div><div class="kv2"><span>Faltas sin reemplazo</span><b style="color:#991b1b">Plan 3000 · 1 médico</b></div><div class="kv2"><span>Internos / residentes</span><b>46</b></div></div>
+    </div>
+    <div class="card" style="margin-top:12px"><div class="lbl">💊 Stock crítico en la red — y quién tiene de más</div>
+      <table class="l"><thead><tr><th>Medicamento</th><th>Faltan en</th><th>Sobran en</th><th>Días de stock en la red</th><th></th></tr></thead><tbody>
+        <tr><td><b>Clotrimazol óvulo</b></td><td>El Bajío (0) · San Luis (4)</td><td>Los Lotes (120)</td><td>18 d</td><td><span class="btn p">Transferir 40</span></td></tr>
+        <tr><td><b>Amoxicilina 500</b></td><td>El Bajío (0)</td><td>Hospital (900)</td><td>34 d</td><td><span class="btn p">Transferir 100</span></td></tr>
+        <tr><td><b>Sulfato ferroso</b></td><td>—</td><td>—</td><td class="warn2">9 d ⚠</td><td><span class="btn">Pedir a CEASS</span></td></tr></tbody></table></div>
+  </div>
+</section>
+
+<!-- ============ T5 ============ -->
+<section class="scr" id="t5">
+  <div class="app"><div class="brand">SIVEC <span>RED</span></div><div class="who">🔔 Alertas para actuar — el “Para hacer hoy” del gestor</div></div>
+  <div class="body">
+    <table class="l"><thead><tr><th>Prioridad</th><th>Qué pasa</th><th>Dónde</th><th>Desde</th><th>Acción sugerida</th><th>Responsable</th></tr></thead><tbody>
+      <tr><td><span class="st bad">Alta</span></td><td>Médico ausente, 60 personas esperando</td><td>C.S. Plan 3000</td><td>07:30</td><td>Mover al Dr. Tola 4 h desde San Luis</td><td>Jefe de red</td></tr>
+      <tr><td><span class="st bad">Alta</span></td><td>9 referencias sin cita &gt; 3 días</td><td>Hospital municipal · Neurología</td><td>3 días</td><td>Abrir cupos extra / e-consulta</td><td>Director hospital</td></tr>
+      <tr><td><span class="st warn">Media</span></td><td>97 PAP positivos sin seguimiento</td><td>5 centros</td><td>—</td><td>Campaña de búsqueda activa</td><td>Programa PAP</td></tr>
+      <tr><td><span class="st warn">Media</span></td><td>Clotrimazol en 0</td><td>C.S. El Bajío</td><td>ayer</td><td>Transferir desde Los Lotes</td><td>Farmacia de red</td></tr>
+      <tr><td><span class="st warn">Media</span></td><td>Heladera de vacunas a 9 °C</td><td>C.S. Palmasola</td><td>40 min</td><td>Verificar cadena de frío</td><td>Enf. vacunas</td></tr>
+      <tr><td><span class="st info">Baja</span></td><td>Tasa de rechazo de muestras 4,8%</td><td>C.S. El Bajío</td><td>septiembre</td><td>Capacitación en toma de PAP</td><td>Lab. patología</td></tr></tbody></table>
+    <div class="mini" style="margin-top:8px">Cada alerta se asigna a una persona, tiene estado (abierta → en curso → resuelta) y queda como historial de gestión.</div>
+  </div>
+</section>
+
+<!-- ============ T6 ============ -->
+<section class="scr" id="t6">
+  <div class="app"><div class="brand">SIVEC <span>RED</span></div><div class="who">📈 Tendencias · Red Centro · enero – septiembre 2026</div></div>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card"><div class="lbl">Tomas de PAP/VPH por mes</div>
+        <svg viewBox="0 0 520 220" width="100%" role="img" aria-label="Tomas de PAP por mes"><g font-family="Source Sans 3" font-size="11" fill="#7a6a71"><text x="30" y="210">ene</text><text x="84" y="210">feb</text><text x="138" y="210">mar</text><text x="192" y="210">abr</text><text x="246" y="210">may</text><text x="300" y="210">jun</text><text x="354" y="210">jul</text><text x="408" y="210">ago</text><text x="462" y="210">sep</text></g>
+          <path d="M20 190H510" stroke="#e3d6dc"/>
+          <g fill="#7d2a4c"><rect x="26" y="130" width="34" height="60" rx="4"/><rect x="80" y="122" width="34" height="68" rx="4"/><rect x="134" y="110" width="34" height="80" rx="4"/><rect x="188" y="104" width="34" height="86" rx="4"/><rect x="242" y="92" width="34" height="98" rx="4"/><rect x="296" y="86" width="34" height="104" rx="4"/><rect x="350" y="70" width="34" height="120" rx="4"/><rect x="404" y="58" width="34" height="132" rx="4"/><rect x="458" y="44" width="34" height="146" rx="4"/></g>
+          <text x="475" y="38" text-anchor="middle" font-family="Source Sans 3" font-size="12" font-weight="700" fill="#2d2429">1.020</text><text x="43" y="124" text-anchor="middle" font-family="Source Sans 3" font-size="12" font-weight="700" fill="#2d2429">420</text></svg>
+        <div class="mini">+143% desde que empezó el SIVEC PAP (búsqueda activa + recordatorios).</div></div>
+      <div class="card"><div class="lbl">Días toma → resultado PAP (mediana)</div>
+        <svg viewBox="0 0 520 220" width="100%" role="img" aria-label="Días hasta el resultado del PAP"><g font-family="Source Sans 3" font-size="11" fill="#7a6a71"><text x="30" y="210">ene</text><text x="246" y="210">may</text><text x="462" y="210">sep</text><text x="4" y="64">60</text><text x="4" y="124">40</text><text x="4" y="184">20</text></g>
+          <path d="M20 60H510M20 120H510M20 180H510" stroke="#efe6ea"/><path d="M20 150H510" stroke="#15803d" stroke-dasharray="5 4"/><text x="506" y="144" text-anchor="end" font-family="Source Sans 3" font-size="11" fill="#15803d">meta 30 d</text>
+          <polyline points="43,54 97,60 151,72 205,84 259,102 313,120 367,138 421,156 475,168" fill="none" stroke="#7d2a4c" stroke-width="2.5"/><circle cx="475" cy="168" r="5" fill="#7d2a4c"/><text x="475" y="160" text-anchor="middle" font-family="Source Sans 3" font-size="12" font-weight="700" fill="#2d2429">24 d</text><text x="43" y="46" text-anchor="middle" font-family="Source Sans 3" font-size="12" font-weight="700" fill="#2d2429">62 d</text></svg>
+        <div class="mini">De 62 a 24 días con lotes con código de barras y el portal de patología.</div></div>
+    </div>
+    <div class="mini" style="margin-top:8px">Se puede filtrar por centro, programa y período. Los gráficos se descargan para presentaciones.</div>
+  </div>
+</section>
+
+<!-- ============ T7 ============ -->
+<section class="scr" id="t7">
+  <div class="app"><div class="brand">SIVEC <span>RED</span></div><div class="who">📑 Informes oficiales · se arman solos con lo que ya se registró</div></div>
+  <div class="body">
+    <table class="l"><thead><tr><th>Informe</th><th>Período</th><th>Establecimientos</th><th>Estado</th><th></th></tr></thead><tbody>
+      <tr><td><b>SNIS · Formulario 301 (producción de servicios)</b></td><td>septiembre</td><td>12 de 12 listos</td><td><span class="st ok">listo para enviar</span></td><td><span class="btn">👁 Revisar</span> <span class="btn p">📤 Enviar</span></td></tr>
+      <tr><td><b>SNIS · Formulario 302 (vigilancia epidemiológica semanal)</b></td><td>semana 39</td><td>11 de 12</td><td><span class="st warn">falta Palmasola</span></td><td><span class="btn">Recordar al centro</span></td></tr>
+      <tr><td><b>Prestaciones SUS</b> (para reembolso)</td><td>septiembre</td><td>12 de 12</td><td><span class="st ok">listo · 38.412 prestaciones</span></td><td><span class="btn p">📤 Exportar</span></td></tr>
+      <tr><td><b>Programa de cáncer de cuello uterino</b></td><td>3er trimestre</td><td>12 de 12</td><td><span class="st ok">listo</span></td><td><span class="btn p">📄 PDF</span></td></tr>
+      <tr><td><b>Notificación inmediata</b> (dengue, sarampión…)</td><td>en el momento</td><td>—</td><td><span class="st info">2 enviadas esta semana</span></td><td></td></tr>
+      <tr><td><b>Informe mensual de la red</b> (para dirección)</td><td>septiembre</td><td>—</td><td><span class="st ok">listo</span></td><td><span class="btn p">📄 Ver</span></td></tr></tbody></table>
+    <div class="cols c3" style="margin-top:12px;gap:12px">
+      <div class="card mini2"><b>Antes</b>cada centro cuenta a mano, llena planillas, las lleva a la red; la red las suma. Días de trabajo y errores.</div>
+      <div class="card mini2"><b>Con el SIVEC</b>los números salen del trabajo diario. El jefe revisa, corrige si hace falta, <b>firma con huella</b> y envía.</div>
+      <div class="card mini2"><b>Control</b>si un número cambia mucho respecto al mes anterior, el sistema lo marca para revisar antes de enviar.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ T8 ============ -->
+<section class="scr" id="t8">
+  <div class="app"><div class="brand">SIVEC <span>RED</span></div><div class="who">📄 Informe mensual de la red · septiembre 2026 · vista de impresión</div></div>
+  <div class="body">
+    <div class="paper">
+      <div class="ph2"><div><b>Red de Salud Centro — Informe mensual</b><span>Septiembre 2026 · generado por SIVEC · 01/10/2026</span></div><div class="lg2">SIVEC</div></div>
+      <div class="kpi" style="grid-template-columns:repeat(4,1fr)"><div><small>Atenciones</small><b>41.300</b><span> +4%</span></div><div><small>Espera media</small><b>47 min</b><span> −8 min</span></div><div><small>Referencias</small><b>412</b><span> 82% contrarref.</span></div><div><small>PAP tomados</small><b>1.020</b><span> +22%</span></div></div>
+      <div class="cols c2" style="margin-top:10px">
+        <div><div class="lbl">Logros</div><div style="font-size:13px;line-height:1.6">✓ Resultado de PAP en 24 días (meta 30)<br>✓ 94% de dosis a tiempo en piso GO<br>✓ 72% de citas confirmadas por WhatsApp</div></div>
+        <div><div class="lbl">Problemas y acciones</div><div style="font-size:13px;line-height:1.6">⚠ El Bajío: 15% de faltas → recordatorios + visitas<br>⚠ Neurología: 24 días de espera → e-consulta<br>⚠ Turno noche sobrecargado → revisar dotación</div></div>
+      </div>
+      <div class="mini" style="margin-top:10px">3 hojas: resumen · centros (tabla comparativa) · programas. Firma del responsable de red 🖐. Se imprime o se envía en PDF.</div>
+    </div>
+  </div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  const NOTES = {
+    t1: '<b>A rede hoje:</b> números do dia (atendimentos, espera, camas, referências, ambulâncias, faltas de remédio), mapa com semáforo por centro e o que olhar hoje. O gestor vê números, não histórias clínicas.',
+    t2: '<b>Comparar centros:</b> tabela com os indicadores principais de cada centro contra a meta (verde, amarelo, vermelho), para ver onde ajudar e entender a causa.',
+    t3: '<b>Programas e metas:</b> avanço de PAP/VPH, pré-natal, parto institucional, vacinas, TB e criança sadia contra a meta anual; detalhe do programa PAP (positivos sem seguimento → busca ativa).',
+    t4: '<b>Recursos ao vivo:</b> camas livres em toda a rede, ambulâncias, pessoal do dia e estoque crítico com quem tem de sobra, para transferir com um toque.',
+    t5: '<b>Alertas para agir:</b> o “Para hacer hoy” do gestor, com prioridade, ação sugerida e responsável; cada alerta tem estado até ser resolvido.',
+    t6: '<b>Tendências:</b> evolução mês a mês (ex.: tomas de PAP e dias até o resultado), com filtros e download para apresentações.',
+    t7: '<b>Informes SNIS automáticos:</b> SNIS 301 e 302, prestações SUS, programa de câncer de colo, notificação imediata e informe mensal saem do trabalho diário; o chefe revisa, assina com digital e envia. Números estranhos são marcados antes de enviar.',
+    t8: '<b>Informe mensal:</b> 3 folhas para a direção (resumo, centros e programas), com logros, problemas e ações, pronto para imprimir ou enviar em PDF.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 't1');
+</script>
+
+</body>
+</html>

@@ -448,3 +448,13 @@ Respostas às 5 decisões pendentes de Redes/centros ficam propostas no desenho:
 6. Destino: alta, observação (≤ 24 h), quirófano, internar ou referir — cada um abre o formulário certo.
 7. Indicadores: chegada→triagem, atendidos a tempo por cor, foram embora, estância > 24 h, consultas não urgentes por centro de origem.
 - **Esclarecimento do autor — mesmo padrão na emergência** (`emergencias-07.png`): emergência também tem **recepção e triagem** (recepção → triagem → atendimento), como em todo o SIVEC. Vermelho entra direto no choque e a recepção completa os dados depois. Paciente inconsciente/sem documento: registro **NN** (ex.: "NN-0923 · mulher · ~40 anos") e união à história quando identificado (auditada). **Casos direto ao quirófano ficam inteiros na linha do tempo**: ambulância, recepção, triagem, choque, solicitação, entrada e saída do quirófano, recuperação/UTI e piso, com hora, lugar e responsável; tempo chegada→quirófano medido sozinho.
+
+### [24/09/2026] Módulo 5 · Emergências — APROVADO. Módulo 6 · Painel do gestor de rede — DESENHADO (`docs/esboco-gestor.html`, `gestor-01..08.png`)
+1. A rede hoje: números do dia, mapa com semáforo por centro, "o que olhar hoje"; o gestor vê números, não histórias (acesso a caso só com motivo e auditoria).
+2. Comparar centros: indicadores × meta (verde/amarelo/vermelho) e leitura da causa.
+3. Programas e metas: PAP/VPH, pré-natal, parto institucional, vacinas, TB, criança sadia; detalhe do PAP (positivos sem seguimento → busca ativa).
+4. Recursos ao vivo: camas livres da rede, ambulâncias, pessoal do dia, estoque crítico com transferência entre centros com um toque.
+5. Alertas para agir ("Para hacer hoy" do gestor) com responsável e estado.
+6. Tendências mês a mês (tomas de PAP, dias até resultado) com filtros e download.
+7. **Informes automáticos**: SNIS 301 e 302, prestações SUS, programa de câncer de colo, notificação imediata, informe mensal — saem do trabalho diário; o chefe revisa, assina com digital e envia; números fora do padrão são marcados antes.
+8. Informe mensal da rede (3 folhas: resumo, centros, programas) em PDF.
