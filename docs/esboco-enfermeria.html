@@ -158,6 +158,11 @@
   .dh em { position:absolute; left:0; right:0; border-top:2px dashed #991b1b; font-style:normal; font-size:11px; color:#991b1b; text-align:left; padding-left:4px; } .dh em { top:auto; } .dh em::before { content:""; }
   .dv { font-size:13px; padding:6px 0; border-bottom:1px dashed var(--line); } .ck2 { font-size:13.5px; padding:5px 0; }
   .sbar { font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .sbar b { display:block; color:var(--wine-d); font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
+  .catl { padding:7px 10px; border-radius:9px; font-size:13.5px; margin-bottom:3px; display:flex; justify-content:space-between; } .catl small { color:var(--soft); } .catl.on { background:var(--tint); font-weight:700; }
+  .soapE { display:grid; grid-template-columns:36px 1fr; gap:10px; padding:10px 0; border-bottom:1px dashed var(--line); font-size:14px; line-height:1.5; } .soapE > b { width:32px; height:32px; border-radius:8px; background:var(--wine); color:#fff; display:flex; align-items:center; justify-content:center; font-size:17px; }
+  .auto2 { font-size:10.5px; font-weight:800; background:#e0ecfa; color:#1e4f8a; border-radius:6px; padding:1px 6px; margin-right:4px; }
+  .opt2 { padding:0; overflow:hidden; } .oh { color:#fff; font-weight:800; font-size:15px; padding:10px 14px; } .ob { padding:10px 14px; font-size:13.5px; line-height:1.5; }
+  .stp { display:flex; gap:10px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:13.5px; } .stp i { width:26px; height:26px; border-radius:50%; flex:none; background:#dcf3e5; color:#15803d; font-style:normal; font-weight:800; display:flex; align-items:center; justify-content:center; } .stp b { display:block; } .stp span { color:var(--soft); font-size:12.5px; }
 </style>
 </head>
 <body>
@@ -170,6 +175,9 @@
   <button class="tab" data-t="e6">6. Escalas y cuidados</button>
   <button class="tab" data-t="e7">7. Nota y entrega de turno</button>
   <button class="tab" data-t="e8">8. Indicadores</button>
+  <button class="tab" data-t="e9">9. Historia de internación</button>
+  <button class="tab" data-t="e10">10. Evolución SOAP diaria</button>
+  <button class="tab" data-t="e11">11. Internos: cómo escriben</button>
 </div>
 <div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Funciona igual en el piso de un hospital y en las pocas camas de un centro de 1er nivel.</div>
 
@@ -342,6 +350,85 @@
   </div>
 </section>
 
+<!-- ============ E9 ============ -->
+<section class="scr" id="e9">
+  <div class="app"><div class="brand">SIVEC <span>INTERNACIÓN</span></div><div class="who">📂 Historia de internación · Juana M. · 28 a · cama 13 GO · día 2</div></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:250px 1fr">
+      <div class="card"><div class="lbl">Secciones — todo en un solo lugar</div>
+        <div class="catl">🪪 Datos y filiación</div>
+        <div class="catl">🚪 Motivo de ingreso</div>
+        <div class="catl">📖 Enfermedad actual · qué pasó</div>
+        <div class="catl">🧪 Laboratorios <small>6</small></div>
+        <div class="catl">🩻 Imagen · gabinete <small>2</small></div>
+        <div class="catl">🔪 Quirófano: entrada y salida</div>
+        <div class="catl">🛏 Ingreso a piso</div>
+        <div class="catl on">📝 Evolución SOAP <small>día 2</small></div>
+        <div class="catl">💊 Indicaciones médicas</div>
+        <div class="catl">🩺 Indicaciones de enfermería</div>
+        <div class="catl">❤️ Controles (SV, balance, escalas)</div>
+        <div class="catl">🔁 Interconsultas</div>
+        <div class="catl">🏠 Epicrisis y alta</div></div>
+      <div>
+        <div class="cols c2" style="gap:10px">
+          <div class="card"><div class="lbl">🚪 Motivo de ingreso · 23/09 22:10</div><div style="font-size:13.5px;line-height:1.5">Embarazo 36 sem. Cefalea y PA 170/110 en el C.S. San Luis → referida en ambulancia (REF-2026-0211).</div><div class="lbl">Diagnóstico de ingreso</div><div style="font-size:13.5px"><b>O14.1</b> Preeclampsia severa</div></div>
+          <div class="card"><div class="lbl">🧪 Laboratorios</div>
+            <div class="kv2"><span>Plaquetas</span><b>142.000 → 128.000 ↓</b></div><div class="kv2"><span>TGO / TGP</span><b>48 / 52 ↑</b></div><div class="kv2"><span>Creatinina</span><b>0,9</b></div><div class="kv2"><span>Proteinuria 24 h</span><b>en curso</b></div>
+            <div class="lbl">🩻 Imagen</div><div style="font-size:13px">Eco obstétrica: feto único, 36 sem, líquido normal · Doppler normal</div></div>
+          <div class="card"><div class="lbl">🔪 Quirófano</div><div style="font-size:13px;line-height:1.55">Programada: cesárea 24/09 14:00 · aún no ingresa<br><span class="mini">cuando se opere: hora de entrada, salida, protocolo quirúrgico y de anestesia aparecen aquí</span></div></div>
+          <div class="card"><div class="lbl">🛏 Ingreso a piso · 23/09 23:30</div><div style="font-size:13px">Piso GO cama 13 · desde emergencia · Dr. Paz · 🖐 Lic. Rojas</div></div>
+        </div>
+        <div class="cols c2" style="gap:10px;margin-top:10px">
+          <div class="card"><div class="lbl">💊 Indicaciones médicas vigentes (hoy)</div><div style="font-size:13px;line-height:1.6">1. Dieta blanda hiposódica · 2. Ringer lactato 80 mL/h · 3. Sulfato de Mg 1 g/h · 4. Labetalol si PA ≥ 160/110 · 5. Maduración pulmonar: completa · 6. Control de laboratorio 14:00</div><div class="mini">🖐 Dr. Paz · 07:30 · cambios en azul · se ven en el kárdex</div></div>
+          <div class="card"><div class="lbl">🩺 Indicaciones de enfermería y controles</div><div style="font-size:13px;line-height:1.6">PA c/30 min · diuresis horaria · reflejos c/2 h · FCF c/4 h · balance hídrico · reposo lateral izq. · alerta temprana: <b style="color:#991b1b">5 → 3</b></div><div class="mini">se registran en el módulo de enfermería y se ven aquí</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ E10 ============ -->
+<section class="scr" id="e10">
+  <div class="app"><div class="brand">SIVEC <span>INTERNACIÓN</span></div><div class="who">📝 Evolución diaria · Juana M. · día 2 · 24/09 07:30</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card">
+        <div class="soapE"><b>S</b><div>Refiere cefalea leve, sin fosfenos ni epigastralgia. Percibe movimientos fetales.</div></div>
+        <div class="soapE"><b>O</b><div><span class="auto2">auto</span> PA 148/96 · FC 88 · diuresis 35 mL/h · balance +250 · alerta 3 · plaquetas 128.000 · TGO 48<br>Reflejos ++ · edema ++ · FCF 142 · útero sin dinámica.</div></div>
+        <div class="soapE"><b>A</b><div>Preeclampsia severa en control, sin signos de HELLP completo. Embarazo 36 sem.</div></div>
+        <div class="soapE"><b>P</b><div>Mantener sulfato de Mg · labetalol según PA · <b>cesárea programada hoy 14:00</b> · control de laboratorio · interconsulta a Medicina interna.</div></div>
+        <div class="row" style="justify-content:flex-end;margin-top:8px"><span class="btn">Copiar indicaciones de ayer y editar</span><span class="btn p">🖐 Firmar evolución</span></div>
+        <div class="mini" style="margin-top:6px"><span class="auto2">auto</span> = signos vitales, balance, alerta y laboratorios del día se traen solos: el médico no copia números.</div></div>
+      <div>
+        <div class="card"><div class="lbl">Evoluciones anteriores</div><div class="tl"><div style="--c:#7d2a4c"><b>24/09 07:30</b> Día 2 · Dr. Paz (esta)</div><div style="--c:#7d2a4c"><b>23/09 23:40</b> Ingreso · Dr. Paz</div><div style="--c:#b91c1c"><b>23/09 22:15</b> Emergencia GO</div></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Recordatorios</div><div style="font-size:13px;line-height:1.6">⏳ Falta evolución de la tarde (se pide c/12 h en pacientes graves) · 🔁 interconsulta a Medicina interna pendiente</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ E11 ============ -->
+<section class="scr" id="e11">
+  <div class="app"><div class="brand">SIVEC <span>INTERNACIÓN</span></div><div class="who">👩‍🎓 Internos y residentes — ¿cómo evolucionan sin un tablet para cada uno?</div></div>
+  <div class="body">
+    <div class="cols c3" style="gap:12px">
+      <div class="card opt2"><div class="oh" style="background:#2f6fb0">🖥 Computadoras en la estación</div><div class="ob">2–3 PC por piso (estación de enfermería y sala de médicos). Donde se escribe la mayor parte. <b>Lo más barato.</b></div></div>
+      <div class="card opt2"><div class="oh" style="background:#15803d">📱 Su propio celular</div><div class="ob">Web/app SIVEC en el celular del interno: <b>entra con usuario + PIN</b>, sesión que se cierra sola, <b>no guarda datos en el teléfono</b>. Ideal para evolucionar en la ronda.</div></div>
+      <div class="card opt2"><div class="oh" style="background:#7d2a4c">📟 Tablets compartidos</div><div class="ob">1–2 tablets por piso en carrito o en la ronda (no uno por persona). Cada uno entra con su huella/PIN.</div></div>
+    </div>
+    <div class="cols c2" style="margin-top:12px">
+      <div class="card"><div class="lbl">Flujo del interno (con supervisión)</div>
+        <div class="stp ok"><i>1</i><div><b>El interno escribe la evolución</b><span>en borrador · con datos automáticos · en el celular o PC</span></div></div>
+        <div class="stp ok"><i>2</i><div><b>Queda “pendiente de firma”</b><span>marcado con su nombre</span></div></div>
+        <div class="stp ok"><i>3</i><div><b>El residente o médico de planta revisa</b><span>corrige si hace falta y firma con huella/PIN</span></div></div>
+        <div class="stp ok"><i>4</i><div><b>Pasa a la historia</b><span>se ve quién la escribió y quién la validó</span></div></div>
+        <div class="mini" style="margin-top:6px">Las <b>indicaciones médicas</b> del interno siempre necesitan firma del médico antes de llegar al kárdex.</div></div>
+      <div class="card"><div class="lbl">Para escribir más rápido</div><div style="font-size:13.5px;line-height:1.7">🎙 <b>Dictado por voz</b> (habla y el texto aparece)<br>📋 Plantillas por patología (preeclampsia, post-cesárea, neumonía…)<br>🔁 “Copiar la de ayer y editar”<br>📊 Signos, balance y laboratorio se traen solos<br>📴 Si cae el wifi, el borrador se guarda y sube después</div>
+        <div class="lbl">Recomendación</div><div style="font-size:13.5px"><b>No hace falta un tablet para cada uno:</b> PC en la estación + celular propio seguro + 1–2 tablets por piso para la ronda.</div></div>
+    </div>
+  </div>
+</section>
+
 <div class="note" id="note"></div>
 <script>
   const NOTES = {
@@ -352,6 +439,9 @@
     e5: '<b>Balanço hídrico:</b> entradas e saídas das 24 h, diurese por hora com linha mínima e aviso; os soros do kárdex somam sozinhos.',
     e6: '<b>Escalas e cuidados:</b> quedas, úlceras, dor e TVP; dispositivos (via, sonda, ferida) com aviso de troca; cuidados do turno e procedimentos que descontam insumos.',
     e7: '<b>Nota e passagem de plantão:</b> nota com frases rápidas e dados já registrados; a passagem SBAR se monta sozinha e é assinada por quem entrega e quem recebe.',
+    e9: '<b>História de internação:</b> tudo num só lugar: dados, motivo de ingresso, o que aconteceu, laboratórios, imagem, entrada e saída do quirófano, ingresso ao piso, evolução SOAP, indicações médicas, indicações de enfermagem e controles, interconsultas e alta.',
+    e10: '<b>Evolução SOAP diária:</b> o O (objetivo) já vem com sinais vitais, balanço, alerta e laboratórios do dia; o médico só escreve o que examinou e decide. “Copiar indicações de ontem e editar”. Lembrete quando falta evolução.',
+    e11: '<b>Internos:</b> não precisa tablet para cada um — PC na estação, o próprio celular com acesso seguro (sem guardar dados no telefone) e 1–2 tablets por piso. O interno escreve em rascunho e o residente/médico assina; indicações do interno só valem com assinatura do médico. Ditado por voz e modelos por patologia.',
     e8: '<b>Indicadores:</b> doses no horário, erros evitados pelo escaneamento, quedas, úlceras e pacientes por enfermeira por turno.',
   };
   const tabs = document.querySelectorAll('.tab');
