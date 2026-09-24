@@ -279,3 +279,31 @@ Números animados com tendência, embudo "Del tamizaje al seguimiento", "Para ha
 - Recepção evita duplicados buscando pela C.I. (e, no futuro, SEGIP); foto opcional.
 - Ao terminar a consulta, o doutor pode **derivar** para outra área do mesmo centro (vai para outra fila) ou para farmácia/laboratório.
 - Funciona em rede local mesmo se a internet cair (a TV e as filas não podem parar).
+
+### [24/09/2026] Modelo B de Historia clínica — APROVADO como base do SIVEC completo
+- O autor gostou do **Modelo B** (resumo tipo International Patient Summary + nota orientada a problemas).
+- **Exame físico por sistemas para todas as especialidades** (não só gineco): estado geral, pele e mucosas, cabeça, olhos, ouvidos, nariz, boca/orofaringe, pescoço, tórax/pulmões, coração, mamas, abdome, genitourinário/ginecológico, extremidades, coluna, neurológico, mental. Cada sistema com "normal" em um toque + campo de achado; o que é normal vira texto sozinho.
+- **Protocolo cirúrgico e pós-operatório** como tipos de nota próprios (equipe, anestesia, diagnóstico pré/pós, técnica, achados, contagem de compressas, amostras enviadas a patologia, complicações, sangramento; pós-operatório com evolução, dor, ferida, drenos, alta).
+
+### [24/09/2026] Assinatura eletrônica com impressão digital (biometria) — em todos os centros
+**Ideia do autor:** médicos, internos, enfermeiros, auxiliares, farmácia **e pacientes** assinam com a **digital**, já que todos têm a digital registrada no **SEGIP**. Resolve o caso de quem não sabe assinar (idosos). Usar em todos os documentos que precisam da assinatura da paciente (consentimentos, recebimento de medicamentos, alta, contrarreferência) e dos profissionais (notas, receitas, protocolos).
+**Sugestões do Claude:**
+- Leitor biométrico USB em cada consultório/farmácia/recepção; a verificação é **1:1** (digital × C.I. informada) contra o SEGIP, se houver convênio/serviço, ou contra a digital cadastrada na recepção do SIVEC.
+- Cada assinatura grava: quem, quando, onde (centro/terminal), qual documento e um **hash do conteúdo** (se o documento mudar depois, a assinatura deixa de valer) → auditoria completa.
+- Para profissionais: digital + PIN (dois fatores) nas receitas e documentos legais; verificar o marco legal boliviano de **firma digital** (ADSIB/AGETIC) para validade jurídica.
+- Plano B quando o leitor falhar: código por SMS ou assinatura manuscrita digitalizada, registrado como exceção.
+- Dados biométricos são sensíveis: guardar só o necessário, criptografado, com consentimento.
+
+### [24/09/2026] Módulos por especialidade (SIVEC Odonto e outros)
+**Ideia do autor:** cada especialidade com **todas as suas funções próprias**, dentro do SIVEC completo, compartilhando paciente, linha do tempo, receitas, laboratório e referências. Exemplos a detalhar:
+- **SIVEC Odonto:** odontograma interativo (dentes por número FDI, faces, cáries, restaurações, extrações, próteses), periodontograma, plano de tratamento por sessões, radiografias periapicais, índice CPO-D, flúor/selantes na escola.
+- **SIVEC Materno:** controle pré-natal (CLAP/OPS), partograma, puerpério, recém-nascido.
+- **SIVEC Nutrição:** antropometria, curvas OMS, planos alimentares.
+- **SIVEC Cirurgia:** protocolo cirúrgico, lista de verificação da OMS (cirurgia segura), pós-operatório.
+- **SIVEC PAP/VPH** (atual), **TB, Chagas, Raiva, Vacinas…** como programas.
+- Regra: **"guardar tudo que for ideia"** para o SIVEC completo e para os específicos.
+
+### [24/09/2026] Referência e contrarreferência entre níveis (1 → 2 → 3 → 4/Oncológico)
+Pedido do autor: pesquisar o mais ideal no mundo e desenhar para o SIVEC. Esboço em `docs/esboco-referencias.html`.
+Referências de modelo: **Norma Nacional de Referencia y Contrarreferencia** (Bolivia); **NHS e-Referral Service** (Reino Unido: pedido eletrônico, triagem pelo especialista, agenda); **SISREG / centrais de regulação** (Brasil: regulador classifica prioridade e agenda); **eConsult** (Canadá: consulta escrita ao especialista antes de encaminhar; em Ontário, cerca de 4 em cada 10 e-consultas evitaram a viagem da paciente); recomendações da **OMS/OPS** sobre redes integradas de serviços de saúde (RISS).
+Princípios para o SIVEC: dados mínimos obrigatórios + resumo clínico automático; prioridade com prazo (emergência/urgente/prioritária/rotina); triagem pelo nível receptor; **circuito fechado** com estados e prazos; **contrarreferência obrigatória** que volta à linha do tempo e ao centro de origem com "o que fazer no 1º nível"; e-consulta; indicadores por rede.

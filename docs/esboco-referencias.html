@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Referencias SIVEC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
+    --n1:#2f6fb0; --n2:#0e7490; --n3:#7c3aed; --n4:#b4235a; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .topbar { position:sticky; top:0; z-index:5; background:#2a1720; color:#fff; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; }
+  .topbar b { margin-right:6px; font-size:15px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; border:1px solid #6b4a58; background:transparent; color:#fff; border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tab.on { background:#fff; color:var(--wine-d); border-color:#fff; }
+  .warn { max-width:1100px; margin:14px auto 0; background:#fff7e0; border:1px solid #ecd9a0; border-radius:10px; padding:10px 14px; font-size:14px; color:#5b4712; }
+  .scr { display:none; max-width:1100px; margin:14px auto 30px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,.14); }
+  .scr.on { display:block; }
+  .app { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; }
+  .app .brand { font-weight:800; font-size:20px; letter-spacing:.04em; } .app .brand span { font-size:11px; background:#fff; color:var(--wine-d); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:3px; letter-spacing:.08em; }
+  .app .who { font-size:14px; opacity:.95; }
+  .body { padding:18px 22px 22px; }
+  h2 { margin:0 0 4px; font-size:20px; } .sub { color:var(--soft); font-size:14px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cols { display:grid; gap:14px; } .c2 { grid-template-columns:1fr 1fr; } .c3 { grid-template-columns:1fr 1fr 1fr; } .c21 { grid-template-columns:1.6fr 1fr; }
+  .lbl { font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); margin:10px 0 5px; }
+  .lbl:first-child { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:13px; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .chip.on { background:var(--tint); border-color:var(--wine); color:var(--wine-d); font-weight:700; }
+  .inp { border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13.5px; background:#fff; min-height:36px; }
+  .inp.tall { min-height:62px; line-height:1.45; }
+  .pri { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pri div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; }
+  .pri div b { display:block; font-size:14px; } .pri div.on { border:2px solid var(--wine); background:var(--tint); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .auto { background:#f3f7fb; border:1px dashed #b9cde3; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.55; }
+  .auto b { color:#1e4f8a; }
+  .att { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; } .att span { font-size:12.5px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13.5px; font-weight:700; border-radius:9px; padding:8px 14px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .btn.p { background:var(--wine); border-color:var(--wine); color:#fff; } .btn.g { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fp { width:26px; height:30px; vertical-align:middle; }
+  table.l { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; border-radius:12px; overflow:hidden; }
+  table.l th { text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); padding:9px 10px; border-bottom:1px solid var(--line); background:#fff; }
+  table.l td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .st { font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .st.bad { background:var(--badbg); color:var(--bad); } .st.warn { background:var(--warnbg); color:var(--warn); } .st.ok { background:var(--okbg); color:var(--ok); } .st.info { background:#e0ecfa; color:#1e4f8a; } .st.mut { background:#eee; color:#555; }
+  .lvl { font-size:11px; font-weight:800; color:#fff; border-radius:6px; padding:2px 7px; }
+  .mini { font-size:12px; color:var(--soft); }
+  .note { max-width:1100px; margin:-16px auto 30px; background:#fff; border-radius:10px; padding:12px 16px; font-size:14px; line-height:1.5; color:#3b3035; border-left:4px solid var(--wine); }
+  /* flujo */
+  .levels { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin:6px 0 4px; }
+  .lv { text-align:center; padding:0 8px; }
+  .lv .ic { width:74px; height:74px; border-radius:18px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; }
+  .lv b { display:block; font-size:15px; } .lv span { font-size:12.5px; color:var(--soft); }
+  .arrows { position:relative; height:74px; margin-top:-120px; margin-bottom:60px; pointer-events:none; }
+  .loop { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+  .loop div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12.3px; text-align:center; position:relative; }
+  .loop div b { display:block; font-size:13px; } .loop i { font-style:normal; display:block; font-size:18px; }
+  .loop div:not(:last-child)::after { content:"›"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--soft); font-size:18px; }
+  .world { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .world div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:12.3px; line-height:1.4; }
+  .world b { display:block; font-size:13px; color:var(--wine-d); }
+  /* seguimiento */
+  .steps { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin:8px 0 4px; }
+  .steps div { text-align:center; font-size:12px; position:relative; padding-top:30px; }
+  .steps div::before { content:""; position:absolute; top:9px; left:0; right:0; height:4px; background:#e3d6dc; }
+  .steps div:first-child::before { left:50%; } .steps div:last-child::before { right:50%; }
+  .steps div.done::before { background:var(--ok); } .steps div.cur::before { background:linear-gradient(90deg,var(--ok) 50%,#e3d6dc 50%); }
+  .steps i { position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:50%; background:#e3d6dc; color:#fff; font-style:normal; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:3px solid var(--paper); }
+  .steps .done i { background:var(--ok); } .steps .cur i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .steps b { display:block; font-size:12.5px; } .steps small { color:var(--soft); }
+  .tl { border-left:3px solid var(--line); margin-left:8px; padding-left:14px; }
+  .tl div { position:relative; font-size:13px; margin-bottom:10px; line-height:1.4; }
+  .tl div::before { content:""; position:absolute; left:-21px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--c,#999); border:2px solid #fff; }
+  .kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:600; } .kpi b { font-size:28px; letter-spacing:-.01em; } .kpi span { font-size:12px; color:var(--soft); }
+  .bars div.r { display:grid; grid-template-columns:170px 1fr 54px; align-items:center; gap:10px; font-size:13px; margin:7px 0; }
+  .bars .trk { height:14px; border-radius:0 4px 4px 0; background:transparent; position:relative; }
+  .bars .fill { height:14px; border-radius:0 4px 4px 0; background:var(--wine); }
+  .bars .ref { position:absolute; top:-3px; bottom:-3px; width:2px; background:#2d2429; }
+  .bars .v { font-weight:700; text-align:right; }
+  .alertc { border-left:4px solid var(--bad); }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — Referencia y contrarreferencia:</b>
+  <button class="tab on" data-t="r0">1. Cómo funciona</button>
+  <button class="tab" data-t="r1">2. Nueva referencia</button>
+  <button class="tab" data-t="r2">3. Bandeja del hospital</button>
+  <button class="tab" data-t="r3">4. Seguimiento</button>
+  <button class="tab" data-t="r4">5. Contrarreferencia</button>
+  <button class="tab" data-t="r5">6. Indicadores de la red</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Para el <b>SIVEC completo</b> (todos los centros y hospitales conectados). Basado en la Norma Nacional de Referencia y Contrarreferencia de Bolivia y en lo que mejor funciona en el mundo.</div>
+
+<!-- ============ R0 ============ -->
+<section class="scr on" id="r0">
+  <div class="app"><div class="brand">SIVEC <span>RED</span></div><div class="who">Red Centro · Santa Cruz</div></div>
+  <div class="body">
+    <h2>Un solo circuito, de ida y vuelta</h2>
+    <div class="sub">La referencia <b>sube</b> de nivel con todo el historial; la contrarreferencia <b>vuelve</b> al centro con lo que hay que hacer. Nada queda en papel ni se pierde.</div>
+    <div class="card">
+      <svg viewBox="0 0 1040 236" width="100%" role="img" aria-label="Niveles de atención y circuito de referencia">
+        <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#7d2a4c"/></marker><marker id="ah2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#15803d"/></marker></defs>
+        <g font-family="Source Sans 3, sans-serif" text-anchor="middle">
+          <rect x="30" y="60" width="180" height="96" rx="16" fill="#2f6fb0"/><text x="120" y="98" fill="#fff" font-size="15" font-weight="800">1er NIVEL</text><text x="120" y="118" fill="#fff" font-size="12.5">Centros de salud</text><text x="120" y="136" fill="#fff" font-size="12.5">(C.S. San Luis)</text>
+          <rect x="300" y="60" width="180" height="96" rx="16" fill="#0e7490"/><text x="390" y="98" fill="#fff" font-size="15" font-weight="800">2º NIVEL</text><text x="390" y="118" fill="#fff" font-size="12.5">Hospital municipal</text><text x="390" y="136" fill="#fff" font-size="12.5">colposcopia · LEEP</text>
+          <rect x="570" y="60" width="180" height="96" rx="16" fill="#7c3aed"/><text x="660" y="98" fill="#fff" font-size="15" font-weight="800">3er NIVEL</text><text x="660" y="118" fill="#fff" font-size="12.5">Hospital de especialidades</text><text x="660" y="136" fill="#fff" font-size="12.5">cirugía · UTI</text>
+          <rect x="840" y="60" width="180" height="96" rx="16" fill="#b4235a"/><text x="930" y="98" fill="#fff" font-size="15" font-weight="800">4º NIVEL</text><text x="930" y="118" fill="#fff" font-size="12.5">Oncológico</text><text x="930" y="136" fill="#fff" font-size="12.5">radio · quimioterapia</text>
+          <g fill="none" stroke="#7d2a4c" stroke-width="2.5"><path d="M210 80 L296 80" marker-end="url(#ah)"/><path d="M480 80 L566 80" marker-end="url(#ah)"/><path d="M750 80 L836 80" marker-end="url(#ah)"/><path d="M120 60 C 120 34, 930 34, 930 56" stroke-dasharray="6 5" marker-end="url(#ah)"/></g>
+          <g fill="none" stroke="#15803d" stroke-width="2.5"><path d="M296 136 L214 136" marker-end="url(#ah2)"/><path d="M566 136 L484 136" marker-end="url(#ah2)"/><path d="M836 136 L754 136" marker-end="url(#ah2)"/><path d="M930 156 C 930 184, 120 184, 120 160" stroke-dasharray="6 5" marker-end="url(#ah2)"/></g>
+          <text x="525" y="18" fill="#7d2a4c" font-size="13" font-weight="700">Referencia directa si la norma lo permite (ej.: cáncer confirmado → Oncológico)</text>
+          <text x="525" y="226" fill="#15803d" font-size="13" font-weight="700">Contrarreferencia: siempre vuelve al centro de origen, a la línea de tiempo de la paciente</text>
+          <text x="253" y="72" fill="#7d2a4c" font-size="11.5">referencia</text><text x="255" y="152" fill="#15803d" font-size="11.5">contrarreferencia</text>
+        </g>
+      </svg>
+    </div>
+    <div class="lbl" style="margin-top:14px">El circuito cerrado — cada referencia pasa por estos estados, con plazo</div>
+    <div class="loop">
+      <div><i>📤</i><b>Enviada</b>por el centro</div><div><i>📥</i><b>Recibida</b>por el hospital</div><div><i>🩺</i><b>Clasificada</b>prioridad confirmada</div><div><i>📅</i><b>Cita dada</b>aviso a la paciente</div><div><i>🏥</i><b>Atendida</b>llegó y se atendió</div><div><i>📝</i><b>Contrarreferencia</b>firmada</div><div><i>✅</i><b>Cerrada</b>el centro la aplicó</div>
+    </div>
+    <div class="lbl" style="margin-top:14px">Lo mejor del mundo que tomamos</div>
+    <div class="world">
+      <div><b>🇧🇴 Norma boliviana</b>Formularios de referencia y contrarreferencia, niveles y responsabilidades. El SIVEC la cumple, pero en digital.</div>
+      <div><b>🇬🇧 NHS e-Referral</b>Pedido electrónico, el especialista revisa y la paciente recibe la cita. Nada viaja en papel.</div>
+      <div><b>🇧🇷 Regulación (SISREG)</b>Un regulador clasifica la prioridad y reparte los cupos de la red con criterios claros.</div>
+      <div><b>🇨🇦 e-Consulta</b>Antes de mandar a la paciente, el médico pregunta por escrito al especialista; muchas veces se resuelve sin viajar.</div>
+      <div><b>🌎 OPS · Redes integradas</b>Circuito cerrado, contrarreferencia obligatoria, indicadores de la red y la paciente en el centro.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ R1 ============ -->
+<section class="scr" id="r1">
+  <div class="app"><div class="brand">SIVEC <span>PAP/VPH</span></div><div class="who">📤 Nueva referencia — <b>María Quispe Mamani</b> · 38 a · Dra. Aguilera</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div>
+        <div class="card">
+          <div class="lbl">¿Referencia o e-consulta?</div>
+          <div class="chips"><span class="chip on">📤 Referir a la paciente</span><span class="chip">💬 Solo e-consulta al especialista (sin que viaje)</span></div>
+          <div class="lbl">Destino</div>
+          <div class="cols c3" style="gap:8px">
+            <div class="inp"><span class="lvl" style="background:var(--n2)">2º</span> Nivel 2</div>
+            <div class="inp">Hospital municipal · Ginecología ▾</div>
+            <div class="inp">Servicio: <b>Colposcopia / LEEP</b></div>
+          </div>
+          <div class="mini" style="margin-top:4px">💡 El SIVEC sugiere el destino según el motivo y la norma; muestra cupos y tiempo de espera actual (12 días).</div>
+          <div class="lbl">Prioridad</div>
+          <div class="pri">
+            <div><span class="dot" style="background:#991b1b"></span><b>Emergencia</b>traslado inmediato</div>
+            <div><span class="dot" style="background:#c2410c"></span><b>Urgente</b>en 48 horas</div>
+            <div class="on"><span class="dot" style="background:#8a5a00"></span><b>Prioritaria</b>en 15 días · cáncer sospechoso</div>
+            <div><span class="dot" style="background:#6b7280"></span><b>Rutina</b>en 30–60 días</div>
+          </div>
+          <div class="lbl">Motivo de la referencia</div>
+          <div class="chips"><span class="chip on">Biopsia HSIL (NIC 2)</span><span class="chip">PAP ASC-H</span><span class="chip">VPH 16/18 +</span><span class="chip">Lesión sospechosa</span></div>
+          <div class="lbl">Pregunta concreta al especialista</div>
+          <div class="inp tall">Solicito evaluación y tratamiento escisional (LEEP) por NIC 2 en biopsia dirigida a las 12 h. Colposcopia con cambios mayores 11–1 h y 5–7 h.</div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="lbl">Resumen clínico — se arma solo</div>
+          <div class="auto"><b>Problemas:</b> NIC 2 (N87.1), cervicitis resuelta.<br><b>Alergias:</b> ⚠ penicilina.<br><b>Medicación:</b> medroxiprogesterona trimestral.<br><b>Últimos signos:</b> PA 110/70 · IMC 25,5.<br><b>Tamizaje:</b> PAP 09/26 HSIL · VPH 16 +.</div>
+          <div class="lbl">Adjuntos del historial</div>
+          <div class="att"><span>📄 PAP 24/09</span><span>🧬 VPH 16 +</span><span>🕐 Colposcopia (reloj)</span><span>🔬 Biopsia AP-26-4410</span><span>📷 Foto colposcopia</span></div>
+          <div class="lbl">La paciente</div>
+          <div class="mini" style="font-size:13px;line-height:1.5">📱 Aviso por SMS/WhatsApp cuando tenga cita · 🚑 Transporte: no necesita · 🗣 Idioma: castellano</div>
+          <div class="lbl">Firmas</div>
+          <div class="row" style="font-size:13px"><svg class="fp" viewBox="0 0 40 48"><g fill="none" stroke="#7d2a4c" stroke-width="1.8" stroke-linecap="round"><path d="M8 18a12 12 0 0 1 24 0v6"/><path d="M12 19a8 8 0 0 1 16 0v8c0 5-2 9-5 12"/><path d="M16 20a4 4 0 0 1 8 0v7c0 6-2 10-6 14"/><path d="M5 12a18 18 0 0 1 30 0"/></g></svg> Dra. Aguilera <span class="st ok">✓</span> &nbsp; <svg class="fp" viewBox="0 0 40 48"><g fill="none" stroke="#7d2a4c" stroke-width="1.8" stroke-linecap="round"><path d="M8 18a12 12 0 0 1 24 0v6"/><path d="M12 19a8 8 0 0 1 16 0v8c0 5-2 9-5 12"/><path d="M16 20a4 4 0 0 1 8 0v7c0 6-2 10-6 14"/><path d="M5 12a18 18 0 0 1 30 0"/></g></svg> Paciente (acepta) <span class="st ok">✓</span></div>
+        </div>
+        <div class="row" style="justify-content:flex-end;margin-top:12px"><span class="btn">🖨 Imprimir copia</span><span class="btn p">📤 Enviar referencia</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ R2 ============ -->
+<section class="scr" id="r2">
+  <div class="app"><div class="brand">SIVEC <span>HOSPITAL</span></div><div class="who">📥 Bandeja de referencias — Hospital municipal (2º nivel) · Ginecología</div></div>
+  <div class="body">
+    <div class="row" style="margin-bottom:10px"><span class="chip on">Por clasificar (6)</span><span class="chip">Con cita (21)</span><span class="chip">Esperando contrarreferencia (9)</span><span class="chip">Todas</span><span class="mini" style="margin-left:auto">Ordenadas por prioridad y días de espera</span></div>
+    <table class="l">
+      <thead><tr><th>Prioridad</th><th>Paciente</th><th>Motivo</th><th>Desde</th><th>Espera</th><th>Acción</th></tr></thead>
+      <tbody>
+        <tr><td><span class="st bad">Urgente · 48 h</span></td><td><b>Rosa Mamani</b><div class="mini">44 a · sangrado postcoital</div></td><td>Lesión sospechosa de invasión</td><td>C.S. El Bajío</td><td><span class="st bad">1 día ⏱</span></td><td class="row"><span class="btn g">Dar cita</span><span class="btn">Pedir datos</span></td></tr>
+        <tr style="background:#fffaf2"><td><span class="st warn">Prioritaria · 15 d</span></td><td><b>María Quispe Mamani</b><div class="mini">38 a · ⚠ penicilina</div></td><td>Biopsia NIC 2 → LEEP</td><td>C.S. San Luis</td><td><span class="st warn">3 días</span></td><td class="row"><span class="btn g">Dar cita</span><span class="btn">Responder e-consulta</span></td></tr>
+        <tr><td><span class="st warn">Prioritaria · 15 d</span></td><td><b>Juana Rojas</b><div class="mini">52 a</div></td><td>PAP ASC-H</td><td>C.S. Los Lotes</td><td><span class="st warn">9 días</span></td><td class="row"><span class="btn g">Dar cita</span><span class="btn">Redirigir</span></td></tr>
+        <tr><td><span class="st mut">Rutina · 60 d</span></td><td><b>Ana Vaca</b><div class="mini">29 a</div></td><td>Ectropión sintomático</td><td>C.S. San Luis</td><td>20 días</td><td class="row"><span class="btn">Responder e-consulta</span></td></tr>
+      </tbody>
+    </table>
+    <div class="cols c2" style="margin-top:14px">
+      <div class="card"><div class="lbl">Al abrir una referencia el especialista ve</div><div style="font-size:13.5px;line-height:1.6">✔ el resumen clínico y los adjuntos (PAP, VPH, reloj del cuello, biopsia)<br>✔ la <b>línea de tiempo completa</b> de la paciente<br>✔ puede <b>subir o bajar la prioridad</b> justificando<br>✔ puede <b>resolver por e-consulta</b> y devolver indicaciones sin que la paciente viaje</div></div>
+      <div class="card"><div class="lbl">Dar cita</div><div style="font-size:13.5px;line-height:1.6">📅 <b>Lunes 12/10 · 08:00</b> · Consultorio gineco 2 · Dr. Vaca<br>📱 Aviso automático a la paciente y al centro de origen<br>🔁 Recordatorio 1 día antes · si falta, el centro recibe alerta para <b>búsqueda activa</b></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ R3 ============ -->
+<section class="scr" id="r3">
+  <div class="app"><div class="brand">SIVEC <span>PAP/VPH</span></div><div class="who">🔁 Seguimiento de la referencia REF-2026-0187 — <b>María Quispe Mamani</b></div></div>
+  <div class="body">
+    <div class="card">
+      <div class="row"><span class="lvl" style="background:var(--n1)">1er</span> C.S. San Luis <span class="mini">→</span> <span class="lvl" style="background:var(--n2)">2º</span> Hospital municipal · Colposcopia/LEEP <span class="st warn" style="margin-left:auto">Prioritaria · plazo 15 días</span></div>
+      <div class="steps">
+        <div class="done"><i>✓</i><b>Enviada</b><small>24/09 10:10</small></div>
+        <div class="done"><i>✓</i><b>Recibida</b><small>24/09 11:02</small></div>
+        <div class="done"><i>✓</i><b>Clasificada</b><small>25/09 · prioritaria</small></div>
+        <div class="done"><i>✓</i><b>Cita dada</b><small>12/10 08:00</small></div>
+        <div class="cur"><i>5</i><b>Atendida</b><small>esperando · día 18</small></div>
+        <div><i>6</i><b>Contrarreferencia</b><small>—</small></div>
+        <div><i>7</i><b>Cerrada</b><small>—</small></div>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:14px">
+      <div class="card">
+        <div class="lbl">Historial de la referencia</div>
+        <div class="tl">
+          <div style="--c:#7d2a4c"><b>24/09</b> Dra. Aguilera envió la referencia (huella ✓). Paciente avisada por SMS.</div>
+          <div style="--c:#0e7490"><b>25/09</b> Dr. Vaca confirmó prioridad y pidió foto de la colposcopia → el centro la adjuntó.</div>
+          <div style="--c:#0e7490"><b>26/09</b> Cita dada: 12/10 08:00. Recordatorio enviado el 11/10.</div>
+          <div style="--c:#15803d"><b>12/10</b> La paciente llegó (registro en admisión del hospital).</div>
+          <div style="--c:#999"><b>Hoy</b> Pendiente la nota de atención y la contrarreferencia.</div>
+        </div>
+      </div>
+      <div class="card alertc">
+        <div class="lbl">Alertas automáticas</div>
+        <div style="font-size:13.5px;line-height:1.65">⏱ Si <b>no dan cita en 3 días</b> → aviso a la regulación de la red.<br>🚫 Si <b>la paciente no va</b> → el centro recibe tarea de búsqueda activa (aparece en “Para hacer hoy”).<br>📝 Si <b>no llega la contrarreferencia en 7 días</b> después de la atención → recordatorio al hospital.<br>✅ Cuando llega la contrarreferencia → aparece en la ficha y en la línea de tiempo, y el “próximo paso” se actualiza solo.</div>
+        <div class="lbl">En la tarjeta de la paciente</div>
+        <div class="row"><span class="st warn">➡ Referida a 2º nivel · día 18 · atendida</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ R4 ============ -->
+<section class="scr" id="r4">
+  <div class="app"><div class="brand">SIVEC <span>HOSPITAL</span></div><div class="who">📝 Contrarreferencia — <b>María Quispe Mamani</b> · vuelve a C.S. San Luis</div></div>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card">
+        <div class="lbl">Qué se hizo</div>
+        <div class="auto" style="background:#f6f2fb;border-color:#d7c8ef"><b style="color:#5b21b6">Atención:</b> 12/10 consulta · 12/11 LEEP (protocolo quirúrgico adjunto).<br><b style="color:#5b21b6">Diagnóstico final:</b> N87.1 NIC 2 · márgenes libres (AP-26-5531).<br><b style="color:#5b21b6">Tratamiento:</b> conización con asa. Sin complicaciones.</div>
+        <div class="lbl">Resultado de la referencia</div>
+        <div class="chips"><span class="chip on">✅ Resuelto en este nivel</span><span class="chip">Sigue en este hospital</span><span class="chip">Referida a nivel superior</span><span class="chip">No asistió</span></div>
+        <div class="lbl">Adjuntos</div>
+        <div class="att"><span>🔬 Histología del cono</span><span>🏥 Protocolo quirúrgico</span><span>📷 Colposcopia 12/10</span></div>
+      </div>
+      <div class="card">
+        <div class="lbl">Indicaciones para el 1er nivel — qué tiene que hacer el centro</div>
+        <div style="font-size:13.5px;line-height:1.7">
+          <div class="row"><span class="chip on">📅 PAP + VPH de control a los 6 meses</span><span class="mini">→ crea la tarea con fecha 05/2027</span></div>
+          <div class="row"><span class="chip on">📅 Luego anual por 3 años</span></div>
+          <div class="row"><span class="chip on">💊 Paracetamol si dolor</span><span class="chip">Tratar pareja</span></div>
+          <div class="row"><span class="chip on">⚠ Volver a referir si: VPH + persistente o PAP ≥ ASC-US</span></div>
+        </div>
+        <div class="lbl">Próximo control en el hospital</div>
+        <div class="inp">No necesita — alta del 2º nivel</div>
+        <div class="lbl">Firmas</div>
+        <div class="row" style="font-size:13px"><svg class="fp" viewBox="0 0 40 48"><g fill="none" stroke="#7d2a4c" stroke-width="1.8" stroke-linecap="round"><path d="M8 18a12 12 0 0 1 24 0v6"/><path d="M12 19a8 8 0 0 1 16 0v8c0 5-2 9-5 12"/><path d="M16 20a4 4 0 0 1 8 0v7c0 6-2 10-6 14"/><path d="M5 12a18 18 0 0 1 30 0"/></g></svg> Dr. Vaca · Ginecología <span class="st ok">✓ huella</span></div>
+        <div class="row" style="justify-content:flex-end;margin-top:12px"><span class="btn">🖨 Imprimir para la paciente</span><span class="btn p">↩ Enviar contrarreferencia</span></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px;display:flex;gap:14px;align-items:center">
+      <div style="font-size:30px">📬</div>
+      <div style="font-size:13.5px;line-height:1.55"><b>En el C.S. San Luis aparece:</b> “Contrarreferencia recibida — María Quispe: LEEP, NIC 2 márgenes libres. <b>Tarea creada:</b> PAP + VPH en 05/2027.” La Dra. Aguilera la marca como <b>aplicada</b> → la referencia se <b>cierra</b> y todo queda en la línea de tiempo.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ R5 ============ -->
+<section class="scr" id="r5">
+  <div class="app"><div class="brand">SIVEC <span>RED</span></div><div class="who">📊 Indicadores de referencia — Red Centro · últimos 3 meses</div></div>
+  <div class="body">
+    <div class="kpi">
+      <div><small>Referencias enviadas</small><b>412</b><span> · 38% gineco/PAP</span></div>
+      <div><small>Días hasta la cita (mediana)</small><b>11</b><span> · meta ≤ 15 en prioritarias</span></div>
+      <div><small>Contrarreferencias recibidas</small><b>71%</b><span> · meta ≥ 90%</span></div>
+      <div><small>Resueltas por e-consulta</small><b>18%</b><span> · sin viajar</span></div>
+    </div>
+    <div class="cols c2" style="margin-top:14px">
+      <div class="card bars">
+        <div class="lbl">% de contrarreferencias recibidas, por hospital <span style="text-transform:none;letter-spacing:0;font-weight:600">· línea = meta 90%</span></div>
+        <div class="r"><span>Hospital municipal (2º)</span><div class="trk"><div class="fill" style="width:88%"></div><div class="ref" style="left:90%"></div></div><span class="v">88%</span></div>
+        <div class="r"><span>Hospital de la mujer (3º)</span><div class="trk"><div class="fill" style="width:74%"></div><div class="ref" style="left:90%"></div></div><span class="v">74%</span></div>
+        <div class="r"><span>Hospital general (3º)</span><div class="trk"><div class="fill" style="width:61%"></div><div class="ref" style="left:90%"></div></div><span class="v">61%</span></div>
+        <div class="r"><span>Oncológico (4º)</span><div class="trk"><div class="fill" style="width:52%"></div><div class="ref" style="left:90%"></div></div><span class="v">52%</span></div>
+      </div>
+      <div class="card bars">
+        <div class="lbl">Días hasta la cita (mediana), por prioridad</div>
+        <div class="r"><span>Urgente (meta 2)</span><div class="trk"><div class="fill" style="width:6%"></div></div><span class="v">2 d</span></div>
+        <div class="r"><span>Prioritaria (meta 15)</span><div class="trk"><div class="fill" style="width:37%"></div></div><span class="v">11 d</span></div>
+        <div class="r"><span>Rutina (meta 60)</span><div class="trk"><div class="fill" style="width:90%"></div></div><span class="v">27 d</span></div>
+        <div class="mini" style="margin-top:8px">Escala 0–30 días.</div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="lbl">Para actuar</div>
+      <div style="font-size:13.5px;line-height:1.7">🔴 <b>23 pacientes</b> con cita a las que <b>nadie vio llegar</b> → búsqueda activa por centro · 🟠 <b>14 referencias</b> sin clasificar hace más de 3 días (Hospital general) · 🟠 <b>9%</b> de referencias <b>inadecuadas</b> (faltaban datos o no correspondía el nivel) → capacitación por centro</div>
+    </div>
+  </div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  const NOTES = {
+    r0: '<b>Cómo funciona:</b> 4 niveles conectados. La referencia sube con el historial y la contrarreferencia vuelve siempre al centro. Siete estados con plazos: si algo se traba, el sistema avisa.',
+    r1: '<b>Nueva referencia:</b> destino sugerido con cupos y espera actual, <b>prioridad con plazo</b>, pregunta concreta, <b>resumen clínico automático</b> con adjuntos del historial (PAP, VPH, reloj del cuello, biopsia) y <b>firma con huella</b>. Opción de <b>e-consulta</b> para no hacer viajar a la paciente.',
+    r2: '<b>Bandeja del hospital:</b> el especialista ve las referencias ordenadas por prioridad y días de espera; da cita, pide datos, redirige o responde por e-consulta. La paciente y el centro reciben aviso.',
+    r3: '<b>Seguimiento:</b> el centro ve en qué paso está cada referencia, con fechas, y recibe alertas si no dan cita, si la paciente no va o si no vuelve la contrarreferencia.',
+    r4: '<b>Contrarreferencia:</b> diagnóstico final, lo que se hizo, adjuntos y, sobre todo, <b>qué tiene que hacer el 1er nivel</b>: cada indicación crea una tarea con fecha en el centro. Al aplicarla, la referencia se cierra.',
+    r5: '<b>Indicadores de la red:</b> tiempos hasta la cita, % de contrarreferencias recibidas por hospital, e-consultas resueltas, pacientes perdidas y referencias inadecuadas.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 'r0');
+</script>
+</body>
+</html>

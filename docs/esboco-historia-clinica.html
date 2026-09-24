@@ -106,6 +106,15 @@
   .nb { margin-top:8px; } .nb h3 { margin:0 0 3px; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--wine-d); border-bottom:1px solid var(--hair); padding-bottom:2px; display:flex; justify-content:space-between; } .nb h3 span { font-weight:600; letter-spacing:0; text-transform:none; color:var(--soft); }
   .nb p { margin:0; font-size:13px; line-height:1.5; } .rs { display:flex; flex-wrap:wrap; gap:4px 14px; }
   .plan { display:grid; grid-template-columns:1fr 1fr; gap:8px; } .plan div { border:1px solid var(--hair); border-radius:8px; padding:7px 9px; font-size:12.3px; line-height:1.45; }
+  .ef { display:grid; grid-template-columns:1fr 1fr; gap:2px 14px; font-size:11.8px; line-height:1.35; }
+  .ef div { padding:2px 0; border-bottom:1px dotted var(--hair); } .ef b { color:var(--ink); margin-right:4px; }
+  .ef i { display:inline-flex; width:14px; height:14px; border-radius:50%; font-style:normal; font-size:9.5px; font-weight:800; align-items:center; justify-content:center; margin-right:5px; vertical-align:1px; }
+  .ef i.n { background:#dcf3e5; color:#166534; } .ef i.a { background:#fde2e2; color:#991b1b; }
+  .ef .hall { grid-column:1 / -1; background:#fff5f5; border-radius:4px; padding:3px 5px; }
+  .firmaD { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
+  .fd { display:flex; gap:10px; align-items:center; border:1.2px solid var(--line); border-radius:8px; padding:7px 10px; font-size:12px; line-height:1.4; }
+  .fd .fp { width:34px; height:42px; flex:none; } .fd .ok { color:#15803d; font-weight:700; }
+  .who { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; } .who div { border:1px solid var(--hair); border-radius:8px; padding:6px 9px; font-size:11.5px; display:flex; flex-direction:column; gap:1px; background:#f7fbf8; } .who b { color:var(--wine-d); font-size:11px; text-transform:uppercase; letter-spacing:.05em; } .who span { color:#166534; }
   .sigBox { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-top:16px; border-top:1.2px solid var(--line); padding-top:6px; font-size:12.5px; }
 </style>
 </head>
@@ -115,6 +124,7 @@
   <button class="tab" data-t="a2">A2 · Actual rediseñada — evolución</button>
   <button class="tab" data-t="b1">B1 · Completa (estándar internacional) — resumen</button>
   <button class="tab" data-t="b2">B2 · Completa — nota de atención</button>
+  <button class="tab" data-t="b3">B3 · Protocolo quirúrgico</button>
 </div>
 <div class="warn">⚠️ Dibujo para comparar, con datos inventados. <b>Modelo A</b> = la HC que usamos hoy (R.A. SALUD INE 101/2010), mismas secciones A–J, ordenada y legible. <b>Modelo B</b> = cómo se arma hoy una HC completa en el mundo (resumen del paciente tipo <i>International Patient Summary</i>, registro orientado a problemas, diagnósticos codificados CIE-10).</div>
 
@@ -246,9 +256,26 @@
   <div class="vit"><div><span class="k">PA</span><span class="v">110/70</span></div><div><span class="k">FC</span><span class="v">78</span></div><div><span class="k">FR</span><span class="v">18</span></div><div><span class="k">Temp.</span><span class="v">36,5°</span></div><div><span class="k">SatO₂</span><span class="v">97%</span></div><div><span class="k">Peso</span><span class="v">62 kg</span></div><div><span class="k">Talla</span><span class="v">1,56</span></div><div><span class="k">IMC</span><span class="v">25,5</span></div></div>
   <p class="muted" style="font-size:10.5px;margin:-2px 0 6px">Signos vitales tomados en triaje 09:22 (Lic. Rojas).</p>
   <div class="nb"><h3>Motivo de consulta</h3><p>"Flujo y picazón hace 2 semanas" · Tamizaje de cuello uterino.</p></div>
-  <div class="nb"><h3>Enfermedad actual</h3><p>Cuadro de 2 semanas de flujo vaginal blanquecino con prurito vulvar, sin mal olor ni fiebre. Niega sangrado postcoital. Último PAP 2023 (NILM).</p></div>
-  <div class="nb"><h3>Revisión por sistemas</h3><p class="rs"><span>General: s/p</span><span>Urinario: niega disuria</span><span>Mamas: s/p</span><span>Abdomen: s/p</span><span>Otros: negativo</span></p></div>
-  <div class="nb"><h3>Examen físico</h3><p><b>General:</b> lúcida, hidratada. <b>Abdomen:</b> blando, no doloroso. <b>Genitales:</b> vulva eritematosa. <b>Especuloscopía:</b> cuello eritematoso, leucorrea moderada blanquecina grumosa. Se toma PAP y VPH.</p></div>
+  <div class="nb"><h3>Enfermedad actual · revisión por sistemas</h3><p>Cuadro de 2 semanas de flujo vaginal blanquecino con prurito vulvar, sin mal olor ni fiebre. Niega sangrado postcoital. Último PAP 2023 (NILM). <span class="muted">RxS: niega disuria, fiebre, pérdida de peso; resto negativo.</span></p></div>
+  <div class="nb"><h3>Examen físico <span>por sistemas · un toque = normal, se escribe solo</span></h3>
+    <div class="ef">
+      <div><i class="n">✓</i><b>Estado general</b> Lúcida, orientada, hidratada.</div>
+      <div><i class="n">✓</i><b>Piel y mucosas</b> Normocoloreadas, húmedas.</div>
+      <div><i class="n">✓</i><b>Cabeza</b> Normocéfala.</div>
+      <div><i class="n">✓</i><b>Ojos</b> Conjuntivas rosadas, pupilas isocóricas.</div>
+      <div><i class="n">✓</i><b>Oídos · nariz</b> Sin alteraciones.</div>
+      <div><i class="n">✓</i><b>Boca · orofaringe</b> Húmeda, sin lesiones.</div>
+      <div><i class="n">✓</i><b>Cuello</b> Sin adenopatías, tiroides no palpable.</div>
+      <div><i class="n">✓</i><b>Tórax · pulmones</b> Murmullo vesicular conservado.</div>
+      <div><i class="n">✓</i><b>Corazón</b> Ruidos rítmicos, sin soplos.</div>
+      <div><i class="n">✓</i><b>Mamas</b> Sin nódulos ni secreción.</div>
+      <div><i class="n">✓</i><b>Abdomen</b> Blando, depresible, no doloroso.</div>
+      <div class="hall"><i class="a">!</i><b>Genitourinario / gineco</b> Vulva eritematosa. Especuloscopía: cuello eritematoso, leucorrea moderada blanquecina grumosa. PAP + VPH.</div>
+      <div><i class="n">✓</i><b>Extremidades</b> Sin edemas, pulsos presentes.</div>
+      <div><i class="n">✓</i><b>Columna</b> Sin dolor.</div>
+      <div><i class="n">✓</i><b>Neurológico</b> Sin déficit.</div>
+      <div><i class="n">✓</i><b>Mental</b> Ánimo y juicio conservados.</div>
+    </div></div>
   <div class="nb"><h3>Evaluación <span>diagnósticos codificados</span></h3>
     <table class="t sm"><tbody><tr><td style="width:70px"><b>B37.3</b></td><td>Candidiasis de vulva y vagina</td><td><span class="st act">Principal</span></td></tr><tr><td><b>N72</b></td><td>Enfermedad inflamatoria del cuello uterino</td><td><span class="st act">Secundario</span></td></tr><tr><td><b>Z12.4</b></td><td>Examen de pesquisa de tumor maligno del cuello uterino</td><td><span class="st pend">Tamizaje</span></td></tr></tbody></table></div>
   <div class="nb"><h3>Plan</h3>
@@ -258,8 +285,44 @@
       <div><b>🗣 Educación</b><br>Aseo vulvoperineal · uso de preservativo · signos de alarma</div>
       <div><b>📅 Seguimiento</b><br>Control al resultado del PAP (~3 semanas)<br>Derivación: ninguna</div>
     </div></div>
-  <div class="sigBox"><div><b>Dra. Aguilera</b> · Ginecología · 17576012 · Mat. ______<br><span class="muted">Firmado electrónicamente 24/09/2026 10:02</span></div><div class="muted" style="text-align:right;font-size:10.5px">Registro de auditoría: creada 09:41 · modificada 10:02 · vista por Lic. Rojas (triaje)</div></div>
+  <div class="firmaD">
+    <div class="fd"><svg class="fp" viewBox="0 0 40 48"><g fill="none" stroke="#7d2a4c" stroke-width="1.6" stroke-linecap="round"><path d="M8 18a12 12 0 0 1 24 0v6"/><path d="M12 19a8 8 0 0 1 16 0v8c0 5-2 9-5 12"/><path d="M16 20a4 4 0 0 1 8 0v7c0 6-2 10-6 14"/><path d="M20 21v7c0 5-2 9-5 12"/><path d="M8 24v3c0 4 1 7 3 10"/><path d="M32 27c0 6-2 11-6 15"/><path d="M5 12a18 18 0 0 1 30 0"/></g></svg><div><b>Dra. Aguilera</b> · Ginecología · 17576012<br><span class="ok">✓ Huella verificada</span> <span class="muted">· 24/09/2026 10:02 · Consultorio 3</span></div></div>
+    <div class="fd"><svg class="fp" viewBox="0 0 40 48"><g fill="none" stroke="#7d2a4c" stroke-width="1.6" stroke-linecap="round"><path d="M8 18a12 12 0 0 1 24 0v6"/><path d="M12 19a8 8 0 0 1 16 0v8c0 5-2 9-5 12"/><path d="M16 20a4 4 0 0 1 8 0v7c0 6-2 10-6 14"/><path d="M20 21v7c0 5-2 9-5 12"/><path d="M8 24v3c0 4 1 7 3 10"/><path d="M32 27c0 6-2 11-6 15"/><path d="M5 12a18 18 0 0 1 30 0"/></g></svg><div><b>María Quispe Mamani</b> · C.I. 7654321<br><span class="ok">✓ Huella verificada (SEGIP)</span> <span class="muted">· consentimiento y receta</span></div></div>
+  </div>
+  <p class="muted" style="font-size:10px;margin:4px 0 0">Auditoría: creada 09:41 · modificada 10:02 · vista por Lic. Rojas (triaje) · código de verificación 7F3A-19C2 (si el documento cambia, la firma deja de valer).</p>
   <div class="foot"><span>SIVEC · Modelo B — Nota orientada a problemas (SOAP ampliado)</span><span>Hoja 2</span></div>
+</section>
+
+<!-- ============ B3 ============ -->
+<section class="sheet" id="b3">
+  <div class="hd"><div class="logo">Escudo<br>Ministerio de Salud</div>
+    <h1>PROTOCOLO QUIRÚRGICO<small>Hospital de 2º nivel · Ginecología · Quirófano 2</small></h1>
+    <div class="hdR"><div class="folio">12/11/2026</div><div class="folio">Inicio <b>08:15</b> · Fin <b>08:50</b></div></div></div>
+  <div class="ctx"><span>Paciente: <b>MARÍA QUISPE MAMANI</b></span><span>38 a · C.I. <b>7654321 SC</b></span><span style="color:#b91c1c;font-weight:700">⚠ Alergia: penicilina</span><span>Referida desde: <b>C.S. San Luis</b> (REF-2026-0187)</span></div>
+  <div class="grid" style="grid-template-columns:1fr 1fr 1fr 1fr">
+    <div class="cell"><span class="k">Cirujano/a</span><span class="v">Dr. Vaca</span></div><div class="cell"><span class="k">Ayudante</span><span class="v">Dra. Suárez (R2)</span></div><div class="cell"><span class="k">Anestesiólogo/a</span><span class="v">Dr. Paz</span></div><div class="cell nr"><span class="k">Instrumentación / circulante</span><span class="v n">Lic. Flores · Aux. Mendoza</span></div>
+    <div class="cell"><span class="k">Anestesia</span><span class="v n">Local + sedación</span></div><div class="cell"><span class="k">ASA</span><span class="v">I</span></div><div class="cell"><span class="k">Tipo</span><span class="v n">Programada · ambulatoria</span></div><div class="cell nr"><span class="k">Profilaxis ATB</span><span class="v n">No indicada</span></div>
+    <div class="cell nb" style="grid-column:1/3"><span class="k">Diagnóstico preoperatorio</span><span class="v">N87.1 · NIC 2 (HSIL) por biopsia</span></div><div class="cell nb nr" style="grid-column:3/5"><span class="k">Diagnóstico postoperatorio</span><span class="v">N87.1 · NIC 2 — pendiente histología</span></div>
+  </div>
+  <div class="sec"><div class="secT">Lista de verificación de cirugía segura (OMS)</div>
+    <div class="who"><div><b>Antes de la anestesia</b><span>✓ Identidad y consentimiento</span><span>✓ Sitio marcado</span><span>✓ Alergias revisadas</span><span>✓ Riesgo de sangrado</span></div>
+      <div><b>Antes de la incisión</b><span>✓ Equipo presentado</span><span>✓ Procedimiento confirmado</span><span>✓ Imágenes/colposcopia disponibles</span></div>
+      <div><b>Antes de salir</b><span>✓ Conteo de gasas/agujas correcto</span><span>✓ Muestra rotulada</span><span>✓ Indicaciones de recuperación</span></div></div></div>
+  <div class="nb"><h3>Procedimiento</h3><p><b>Conización con asa diatérmica (LEEP)</b> guiada por colposcopia. ZT tipo 1.</p></div>
+  <div class="nb"><h3>Técnica</h3><p>Posición de litotomía. Colocación de espéculo aislado. Aplicación de ácido acético y lugol: zona yodo negativa de 11 a 1 h y de 5 a 7 h. Infiltración con lidocaína 2% con epinefrina. Resección en un solo pase con asa 20×10 mm. Hemostasia con electrofulguración de lecho y solución de Monsel.</p></div>
+  <div class="two" style="margin-top:6px">
+    <div class="nb" style="margin-top:0"><h3>Hallazgos</h3><p>Lesión acetoblanca densa que coincide con el mapa de la colposcopia (11–1 h y 5–7 h). Márgenes visualmente libres.</p></div>
+    <div class="nb" style="margin-top:0"><h3>Datos del acto</h3><p class="rs"><span>Sangrado: <b>&lt;20 mL</b></span><span>Complicaciones: <b>ninguna</b></span><span>Drenajes: <b>no</b></span><span>Conteo: <b>correcto</b></span></p></div>
+  </div>
+  <div class="nb"><h3>Muestras a patología</h3><p>1 pieza de cono rotulada a las 12 h con hilo · frasco formol 10% · orden AP-26-5531 · <span class="st pend">Enviada</span></p></div>
+  <div class="nb"><h3>Post-operatorio inmediato e indicaciones</h3>
+    <div class="plan"><div><b>🛏 Recuperación</b><br>Signos vitales c/15 min x 1 h · alta si estable (Aldrete ≥ 9)</div><div><b>💊 Receta</b><br>Paracetamol 500 mg c/8 h x 3 días<br><span class="muted">(evitar AINE por 24 h)</span></div><div><b>⚠ Signos de alarma</b><br>Sangrado mayor que una menstruación, fiebre, dolor intenso → emergencias</div><div><b>📅 Seguimiento</b><br>Resultado de histología en 15 días · abstinencia 4 semanas · <b>contrarreferencia</b> al C.S. San Luis</div></div></div>
+  <div class="firmaD" style="grid-template-columns:1fr 1fr 1fr">
+    <div class="fd"><svg class="fp" viewBox="0 0 40 48"><g fill="none" stroke="#7d2a4c" stroke-width="1.6" stroke-linecap="round"><path d="M8 18a12 12 0 0 1 24 0v6"/><path d="M12 19a8 8 0 0 1 16 0v8c0 5-2 9-5 12"/><path d="M16 20a4 4 0 0 1 8 0v7c0 6-2 10-6 14"/><path d="M20 21v7c0 5-2 9-5 12"/><path d="M8 24v3c0 4 1 7 3 10"/><path d="M32 27c0 6-2 11-6 15"/><path d="M5 12a18 18 0 0 1 30 0"/></g></svg><div><b>Dr. Vaca</b> · Cirujano<br><span class="ok">✓ Huella</span> <span class="muted">08:58</span></div></div>
+    <div class="fd"><svg class="fp" viewBox="0 0 40 48"><g fill="none" stroke="#7d2a4c" stroke-width="1.6" stroke-linecap="round"><path d="M8 18a12 12 0 0 1 24 0v6"/><path d="M12 19a8 8 0 0 1 16 0v8c0 5-2 9-5 12"/><path d="M16 20a4 4 0 0 1 8 0v7c0 6-2 10-6 14"/><path d="M20 21v7c0 5-2 9-5 12"/><path d="M8 24v3c0 4 1 7 3 10"/><path d="M32 27c0 6-2 11-6 15"/><path d="M5 12a18 18 0 0 1 30 0"/></g></svg><div><b>Dr. Paz</b> · Anestesiólogo<br><span class="ok">✓ Huella</span> <span class="muted">09:01</span></div></div>
+    <div class="fd"><svg class="fp" viewBox="0 0 40 48"><g fill="none" stroke="#7d2a4c" stroke-width="1.6" stroke-linecap="round"><path d="M8 18a12 12 0 0 1 24 0v6"/><path d="M12 19a8 8 0 0 1 16 0v8c0 5-2 9-5 12"/><path d="M16 20a4 4 0 0 1 8 0v7c0 6-2 10-6 14"/><path d="M20 21v7c0 5-2 9-5 12"/><path d="M8 24v3c0 4 1 7 3 10"/><path d="M32 27c0 6-2 11-6 15"/><path d="M5 12a18 18 0 0 1 30 0"/></g></svg><div><b>María Quispe M.</b> · Paciente<br><span class="ok">✓ Huella (SEGIP)</span> <span class="muted">consentimiento 07:50</span></div></div>
+  </div>
+  <div class="foot"><span>SIVEC · Modelo B — Protocolo quirúrgico (incluye lista OMS de cirugía segura)</span><span>Hoja 3</span></div>
 </section>
 
 <div class="note" id="note"></div>
@@ -268,7 +331,8 @@
     a1: '<b>Modelo A, hoja 1:</b> son las mismas secciones A–J de la HC oficial, pero cada dato en su casilla y con letra grande. Lo que el SIVEC ya sabe (Registrar, métodos anticonceptivos, PAP anteriores) sale impreso solo.',
     a2: '<b>Modelo A, evolución:</b> igual a la hoja 2 oficial (3 notas por hoja), legible y firmada con especialidad y código.',
     b1: '<b>Modelo B, resumen:</b> lo que el mundo recomienda que el médico vea primero: <b>alertas</b> (alergias), <b>lista de problemas</b> con código CIE-10, medicación actual, antecedentes, vacunas, tamizajes pendientes, tendencia de signos vitales, resultados y la línea de tiempo de todos los centros.',
-    b2: '<b>Modelo B, nota de atención:</b> SOAP ampliado: motivo, enfermedad actual, revisión por sistemas, examen físico, diagnósticos <b>codificados</b>, plan separado (receta, órdenes, educación, seguimiento), firma electrónica y <b>auditoría</b>. Los signos vitales vienen del triaje.',
+    b3: '<b>Protocolo quirúrgico:</b> equipo completo, anestesia, diagnósticos pre y post, <b>lista de verificación de cirugía segura de la OMS</b>, técnica, hallazgos, conteo, muestras a patología, indicaciones del post-operatorio y <b>firmas con huella</b> de cirujano, anestesiólogo y paciente. Se une a la referencia y vuelve como contrarreferencia.',
+    b2: '<b>Modelo B, nota de atención:</b> SOAP ampliado: motivo, enfermedad actual, <b>examen físico por sistemas para cualquier especialidad</b> (un toque = normal), diagnósticos <b>codificados</b>, plan separado (receta, órdenes, educación, seguimiento), <b>firma con huella</b> del médico y de la paciente, y <b>auditoría</b>. Los signos vitales vienen del triaje.',
   };
   const tabs = document.querySelectorAll('.tab');
   function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.sheet').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
