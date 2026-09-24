@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marca SIVEC</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#241b20; --soft:#6f6168; --line:#e9dfe3; --wine:#7d2a4c; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e6e0e3; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .board { width:1240px; margin:0 auto 30px; background:#fbf8f6; padding:34px 36px 36px; }
+  .bt { display:flex; align-items:baseline; gap:14px; margin-bottom:18px; border-bottom:2px solid var(--line); padding-bottom:10px; }
+  .bt h2 { margin:0; font-size:28px; font-weight:900; letter-spacing:-.01em; } .bt span { color:var(--soft); font-size:16px; }
+  .bt i { margin-left:auto; font-style:normal; font-size:13px; font-weight:700; color:var(--soft); letter-spacing:.08em; text-transform:uppercase; }
+  /* lockup */
+  .lk { display:flex; align-items:center; gap:12px; }
+  .badge { flex:none; border-radius:24%; display:flex; align-items:center; justify-content:center; color:#fff; box-shadow: inset 0 -3px 0 rgba(0,0,0,.14); }
+  .badge svg { width:58%; height:58%; }
+  .wm { line-height:1; } .wm b { display:block; font-weight:900; letter-spacing:.06em; color:var(--ink); } .wm span { display:block; font-weight:800; letter-spacing:.12em; text-transform:uppercase; margin-top:3px; }
+  /* hero */
+  .hero { display:grid; grid-template-columns:1.35fr 1fr; gap:18px; }
+  .panel { background:#fff; border:1px solid var(--line); border-radius:20px; padding:26px; position:relative; }
+  .panel.dark { background:linear-gradient(135deg,#1d0b15,#4a1630 60%,#7d2a4c); border:none; color:#fff; }
+  .cap { position:absolute; top:12px; left:16px; font-size:11.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--soft); }
+  .dark .cap { color:#f1a7c3; }
+  .tag { font-size:15px; color:var(--soft); letter-spacing:.02em; margin-top:12px; } .tag b { color:var(--wine); }
+  .sizes { display:flex; align-items:flex-end; gap:18px; }
+  .pal { display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-top:18px; }
+  .pal div { border-radius:12px; padding:10px 10px 8px; color:#fff; font-size:12px; font-weight:700; min-height:74px; display:flex; flex-direction:column; justify-content:flex-end; }
+  .pal small { font-weight:600; opacity:.85; }
+  /* grid */
+  .fam { margin-top:18px; } .fam:first-of-type { margin-top:0; }
+  .famh { display:flex; align-items:center; gap:10px; font-size:13px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--soft); margin-bottom:10px; }
+  .famh::after { content:""; flex:1; height:1px; background:var(--line); }
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:14px 14px 12px; }
+  .card p { margin:9px 0 0; font-size:13px; line-height:1.35; color:var(--soft); min-height:35px; }
+  /* aplicaciones */
+  .apps { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .mock { background:#fff; border:1px solid var(--line); border-radius:18px; overflow:hidden; position:relative; }
+  .mock .cap { z-index:2; }
+  .bar { display:flex; align-items:center; gap:12px; padding:14px 18px; color:#fff; }
+  .bar .wm b { color:#fff; } .bar .wm span { color:rgba(255,255,255,.85); }
+  .tv { background:#120810; margin:34px 18px 18px; border-radius:14px; border:8px solid #2b2b2b; padding:16px; color:#fff; }
+  .tvcall { border-radius:12px; padding:14px; text-align:center; background:linear-gradient(135deg,#4338ca,#6d28d9); }
+  .tvcall b { display:block; font-size:54px; letter-spacing:.04em; line-height:1; } .tvcall span { font-size:20px; font-weight:700; }
+  .sign { margin:40px auto 22px; width:84%; border-radius:16px; padding:22px 24px; display:flex; align-items:center; gap:18px; color:#fff; box-shadow:0 10px 24px rgba(0,0,0,.18); }
+  .sign .wm b { color:#fff; font-size:38px; } .sign .wm span { color:#dcfce7; font-size:20px; }
+  .rx { margin:34px 22px 20px; border:1px solid var(--line); border-radius:6px; padding:16px 18px; background:#fff; box-shadow:0 4px 14px rgba(0,0,0,.08); font-size:13px; }
+  .rx hr { border:none; border-top:2px solid #15803d; margin:10px 0; }
+  .phone { width:210px; height:380px; border-radius:30px; border:9px solid #1f1f1f; margin:32px auto 18px; background:linear-gradient(160deg,#7d2a4c,#3b0f22); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; color:#fff; }
+  .note { max-width:1240px; margin:0 auto 30px; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-sivec" viewBox="0 0 24 24"><path d="M16.8 7.4C16 5.9 14.3 5 12.1 5 9.3 5 7.5 6.4 7.5 8.4c0 4.4 9.1 2.9 9.1 7.4 0 2-1.9 3.3-4.6 3.3-2.4 0-4.1-.9-4.9-2.5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><circle cx="16.8" cy="7.4" r="1.9" fill="currentColor"/><circle cx="7.2" cy="16.6" r="1.9" fill="currentColor"/><path d="M3 12h2.6l1-1.6 1.2 3.2 1-1.6H11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity=".75"/></symbol>
+    <g id="st" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></g>
+    <symbol id="i-recepcion" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="9" cy="11" r="2"/><path d="M5.8 16.2c.8-1.5 1.9-2.2 3.2-2.2s2.4.7 3.2 2.2M14 10h4M14 13.5h3.2"/></g></symbol>
+    <symbol id="i-triaje" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/><path d="M6.5 12.3h3l1.3-2.1 2 4 1.3-1.9h3.4"/></g></symbol>
+    <symbol id="i-turnos" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8.5 21h7M12 17v4"/></g><text x="12" y="13.8" text-anchor="middle" font-family="Source Sans 3, Arial" font-size="7.5" font-weight="900" fill="currentColor">A1</text></symbol>
+    <symbol id="i-consultorio" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v5a4.5 4.5 0 0 0 9 0V3"/><path d="M9.5 12.5V15a4.5 4.5 0 0 0 9 0v-2.6"/><circle cx="18.5" cy="10.3" r="2"/></g></symbol>
+    <symbol id="i-historia" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 11v7"/><circle cx="9" cy="11" r=".6"/><path d="M11.5 12h4M11.5 16h3"/></g></symbol>
+    <symbol id="i-gineco" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="9" r="5.2"/><path d="M12 14.2V21M9 18h6"/></g></symbol>
+    <symbol id="i-materno" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6.5" r="2.6"/><circle cx="16.3" cy="11" r="1.9"/><path d="M3.8 20c0-4.2 2.3-7.2 5.2-7.2 1.4 0 2.6.6 3.5 1.7M12.6 20c0-2.6 1.6-4.6 3.7-4.6S20 17.4 20 20"/></g></symbol>
+    <symbol id="i-pediatria" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="13.2" r="6.3"/><circle cx="6.6" cy="7.2" r="2.1"/><circle cx="17.4" cy="7.2" r="2.1"/><circle cx="12" cy="15.5" r="2"/></g><circle cx="9.7" cy="11.8" r=".9" fill="currentColor"/><circle cx="14.3" cy="11.8" r=".9" fill="currentColor"/></symbol>
+    <symbol id="i-odonto" viewBox="0 0 24 24"><path d="M7.2 3C5 3 3.6 4.8 3.6 7.2c0 2.3 1 3.6 1.5 5.3.6 2 .8 4.5 1.5 6.5.4 1.2 1.6 1.2 2 0 .5-1.6.7-3.5 1.5-4.6.4-.6 1.6-.6 2 0 .8 1.1 1 3 1.5 4.6.4 1.2 1.6 1.2 2 0 .7-2 .9-4.5 1.5-6.5.5-1.7 1.5-3 1.5-5.3C20.4 4.8 19 3 16.8 3c-2 0-3 1.2-4.8 1.2S9.2 3 7.2 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-nutricion" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.3c-1.6-1-5.3-1.4-6.7 1.6S5 16.3 7.5 19.1c1.8 2 3.4 1.4 4.5 1.4s2.7.6 4.5-1.4c2.5-2.8 3.6-7.2 2.2-10.2S13.6 6.3 12 7.3z"/><path d="M12 7.3c0-2.1.9-3.6 2.9-4.3"/></g></symbol>
+    <symbol id="i-mental" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 21v-3h2.2a2 2 0 0 0 2-2v-2.2l1.6-.6-1.6-3.4C18.2 6.2 15.4 3 11.3 3 6.8 3 4 6.4 4 10.2c0 2.9 1.4 4.9 3 6.1V21"/><path d="M11.2 13.6s-2.6-1.5-2.6-3.1a1.35 1.35 0 0 1 2.6-.6 1.35 1.35 0 0 1 2.6.6c0 1.6-2.6 3.1-2.6 3.1z"/></g></symbol>
+    <symbol id="i-pap" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2.5" y="8" width="19" height="8.5" rx="1.6"/><circle cx="8.8" cy="12.25" r="2.1"/><path d="M14 10.8h4.3M14 13.8h3"/></g></symbol>
+    <symbol id="i-vacunas" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m18 2 4 4M17 7l3-3M19 9 8.7 19.3a2.4 2.4 0 0 1-3.4 0l-.6-.6a2.4 2.4 0 0 1 0-3.4L15 5M9 11l4 4M5 19l-3 3M14 4l6 6"/></g></symbol>
+    <symbol id="i-tb" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v8.3M12 11.8c-.8.9-1.8 1.4-2.8 1.5M12 11.8c.8.9 1.8 1.4 2.8 1.5"/><path d="M8.8 7C5.9 7 4 11 4 16c0 2.3 1.1 4 3 4s3-1.5 3-4v-3.6M15.2 7C18.1 7 20 11 20 16c0 2.3-1.1 4-3 4s-3-1.5-3-4v-3.6"/></g></symbol>
+    <symbol id="i-chagas" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><ellipse cx="12" cy="13.5" rx="4" ry="6"/><circle cx="12" cy="5.4" r="1.8"/><path d="M12 7.5v12M8 10.5 4.5 8.5M8 13.5H3.8M8.3 16.5l-3.6 2M16 10.5l3.5-2M16 13.5h4.2M15.7 16.5l3.6 2"/></g></symbol>
+    <symbol id="i-zoonosis" viewBox="0 0 24 24"><g fill="currentColor"><ellipse cx="12" cy="16" rx="4.2" ry="3.6"/><circle cx="6.3" cy="10.8" r="1.9"/><circle cx="9.6" cy="6.6" r="1.9"/><circle cx="14.4" cy="6.6" r="1.9"/><circle cx="17.7" cy="10.8" r="1.9"/></g></symbol>
+    <symbol id="i-farmacia" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5-7-7a4.95 4.95 0 0 1 7-7l7 7a4.95 4.95 0 0 1-7 7z"/><path d="m8.5 8.5 7 7"/></g></symbol>
+    <symbol id="i-laboratorio" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/><path d="M7.4 15h9.2"/></g></symbol>
+    <symbol id="i-imagen" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M12 6v12M8 9h8M7.6 12h8.8M8.5 15h7"/></g></symbol>
+    <symbol id="i-telesalud" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="13" height="12" rx="2"/><path d="m15 10.2 6-3.2v10l-6-3.2M8.5 9.5v5M6 12h5"/></g></symbol>
+    <symbol id="i-hospital" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V7.5L12 3l8 4.5V21M2.5 21h19"/><path d="M12 7.5v5.5M9.25 10.25h5.5M10 21v-3.8h4V21"/></g></symbol>
+    <symbol id="i-quirofano" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 3.2c-4.3 1-8.4 5-11.3 8.8l2.9 2.9c3.8-2.9 7.8-7 8.4-11.7z"/><path d="m9.2 12-5.6 5.6a1.6 1.6 0 0 0 2.3 2.3l5.6-5.6"/></g></symbol>
+    <symbol id="i-oncologico" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2c-2 0-3.5 1.5-3.5 3.5 0 1.8 1 3.6 2.2 5.2L6 20l2.6 1 3.4-5.6 3.4 5.6L18 20l-4.7-8.1c1.2-1.6 2.2-3.4 2.2-5.2 0-2-1.5-3.5-3.5-3.5z"/></g></symbol>
+    <symbol id="i-emergencias" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 17.5V12a5.5 5.5 0 0 1 11 0v5.5M4.5 17.5h15V21h-15zM12 2.5V4.5M4.4 5.4l1.4 1.4M19.6 5.4l-1.4 1.4M12 9.5v4"/></g></symbol>
+    <symbol id="i-transito" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 17V7h11v10M13 10h4l3.5 3.5V17H2"/><circle cx="6.5" cy="17.5" r="2" fill="currentColor" stroke="none"/><circle cx="16.5" cy="17.5" r="2" fill="currentColor" stroke="none"/><path d="M7.5 8.8v5M5 11.3h5"/></g></symbol>
+    <symbol id="i-referencias" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 20V4M4.5 7l3-3 3 3M16.5 4v16M13.5 17l3 3 3-3"/></g></symbol>
+    <symbol id="i-red" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><circle cx="5" cy="18" r="2.2"/><circle cx="19" cy="18" r="2.2"/><path d="M10.9 6.9 6.1 16M13.1 6.9l4.8 9.1M7.2 18h9.6"/></g></symbol>
+    <symbol id="i-medgral" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M12 8v8M8 12h8"/></g></symbol>
+  </defs>
+</svg>
+
+<!-- ================= 1. MARCA PRINCIPAL ================= -->
+<section class="board" id="m1">
+  <div class="bt"><h2>SIVEC — marca principal</h2><span>Sistema Integral de Vigilancia y Enlace Clínico</span><i>Esbozo de identidad</i></div>
+  <div class="hero">
+    <div class="panel" style="display:flex;flex-direction:column;justify-content:center;min-height:330px">
+      <span class="cap">Logo horizontal</span>
+      <div class="lk" style="gap:22px"><div class="badge" style="width:130px;height:130px;background:linear-gradient(145deg,#9c3a5f,#5a1c36)"><svg><use href="#i-sivec"/></svg></div>
+        <div class="wm"><b style="font-size:84px;letter-spacing:.08em">SIVEC</b><span style="font-size:17px;color:#7d2a4c;letter-spacing:.14em;margin-top:6px">Vigilancia y enlace clínico</span></div></div>
+      <div class="tag">La <b>S</b> une dos puntos (paciente y servicio): el <b>enlace</b>. El pulso que la cruza es la <b>vigilancia</b>.</div>
+    </div>
+    <div style="display:grid;grid-template-rows:1fr 1fr;gap:18px">
+      <div class="panel dark" style="display:flex;align-items:center;justify-content:center"><span class="cap">Sobre fondo oscuro</span>
+        <div class="lk" style="gap:16px"><div class="badge" style="width:78px;height:78px;background:#fff;color:#7d2a4c"><svg><use href="#i-sivec"/></svg></div><div class="wm"><b style="font-size:52px;color:#fff">SIVEC</b><span style="font-size:12px;color:#f1a7c3">Vigilancia y enlace clínico</span></div></div></div>
+      <div class="panel" style="display:flex;align-items:center;justify-content:space-between"><span class="cap">Ícono de app · tamaños</span>
+        <div class="sizes" style="margin-top:14px">
+          <div class="badge" style="width:96px;height:96px;background:linear-gradient(145deg,#9c3a5f,#5a1c36)"><svg><use href="#i-sivec"/></svg></div>
+          <div class="badge" style="width:64px;height:64px;background:linear-gradient(145deg,#9c3a5f,#5a1c36)"><svg><use href="#i-sivec"/></svg></div>
+          <div class="badge" style="width:40px;height:40px;background:linear-gradient(145deg,#9c3a5f,#5a1c36)"><svg><use href="#i-sivec"/></svg></div>
+          <div class="badge" style="width:28px;height:28px;background:#241b20"><svg><use href="#i-sivec"/></svg></div>
+        </div>
+        <div class="lk" style="margin-top:14px"><div class="badge" style="width:44px;height:44px;background:#241b20"><svg><use href="#i-sivec"/></svg></div><div class="wm"><b style="font-size:28px">SIVEC</b><span style="font-size:10px;color:var(--soft)">Una tinta</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:18px"><span class="cap">Cómo se forma el nombre de cada módulo</span>
+    <div style="display:flex;align-items:center;gap:26px;margin-top:14px;flex-wrap:wrap">
+      <div class="lk"><div class="badge" style="width:64px;height:64px;background:#15803d"><svg><use href="#i-farmacia"/></svg></div><div class="wm"><b style="font-size:34px">SIVEC</b><span style="font-size:15px;color:#15803d">Farmacia</span></div></div>
+      <div style="font-size:15px;line-height:1.5;color:var(--soft);max-width:680px">Siempre <b style="color:var(--ink)">SIVEC</b> + <b style="color:var(--ink)">nombre del lugar</b>, con un <b style="color:var(--ink)">ícono propio</b> y un <b style="color:var(--ink)">color de familia</b>. Así se vende un solo producto con muchos módulos: el hospital, la farmacia o el laboratorio reconocen su parte, pero todo es SIVEC.</div>
+    </div>
+    <div class="pal">
+      <div style="background:#7d2a4c">Núcleo SIVEC<small>bordó</small></div>
+      <div style="background:#2f6fb0">Atención al paciente<small>azules</small></div>
+      <div style="background:#be185d">Especialidades<small>rosas y violetas</small></div>
+      <div style="background:#0d9488">Programas de salud<small>verdes azulados</small></div>
+      <div style="background:#15803d">Diagnóstico y tratamiento<small>verdes y azules</small></div>
+      <div style="background:#b91c1c">Hospital y red<small>rojos y oscuros</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 2. FAMILIA DE MÓDULOS ================= -->
+<section class="board" id="m2">
+  <div class="bt"><h2>Familia SIVEC — un logo para cada lugar</h2><span>28 módulos, el mismo estilo</span><i>Esbozo de identidad</i></div>
+  <div id="fams"></div>
+</section>
+
+<!-- ================= 3. APLICACIONES ================= -->
+<section class="board" id="m3">
+  <div class="bt"><h2>Así se ve en cada lugar</h2><span>pantallas, TV, cartel, receta y celular</span><i>Esbozo de identidad</i></div>
+  <div class="apps">
+    <div class="mock"><span class="cap">Barra de la aplicación</span>
+      <div style="padding:34px 16px 16px;display:flex;flex-direction:column;gap:10px">
+        <div class="bar" style="background:#2f6fb0;border-radius:12px"><div class="badge" style="width:40px;height:40px;background:rgba(255,255,255,.2)"><svg><use href="#i-recepcion"/></svg></div><div class="wm"><b style="font-size:22px">SIVEC</b><span style="font-size:11px">Recepción</span></div><span style="margin-left:auto;font-size:13px;opacity:.9">Ventanilla 1 · Lic. Cruz</span></div>
+        <div class="bar" style="background:#15803d;border-radius:12px"><div class="badge" style="width:40px;height:40px;background:rgba(255,255,255,.2)"><svg><use href="#i-farmacia"/></svg></div><div class="wm"><b style="font-size:22px">SIVEC</b><span style="font-size:11px">Farmacia</span></div><span style="margin-left:auto;font-size:13px;opacity:.9">11 recetas por dispensar</span></div>
+        <div class="bar" style="background:#b91c1c;border-radius:12px"><div class="badge" style="width:40px;height:40px;background:rgba(255,255,255,.2)"><svg><use href="#i-hospital"/></svg></div><div class="wm"><b style="font-size:22px">SIVEC</b><span style="font-size:11px">Hospital</span></div><span style="margin-left:auto;font-size:13px;opacity:.9">Bandeja de referencias · 6</span></div>
+        <div class="bar" style="background:#9c3a5f;border-radius:12px"><div class="badge" style="width:40px;height:40px;background:rgba(255,255,255,.2)"><svg><use href="#i-pap"/></svg></div><div class="wm"><b style="font-size:22px">SIVEC</b><span style="font-size:11px">PAP / VPH</span></div><span style="margin-left:auto;font-size:13px;opacity:.9">C.S. San Luis · el que ya funciona</span></div>
+      </div></div>
+    <div class="mock" style="background:#f3eef0"><span class="cap">TV de la sala de espera</span>
+      <div class="tv"><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div class="badge" style="width:34px;height:34px;background:#4338ca"><svg><use href="#i-turnos"/></svg></div><div class="wm"><b style="font-size:20px;color:#fff">SIVEC</b><span style="font-size:10px;color:#c7c2ff">Turnos</span></div><span style="margin-left:auto;color:#cfb7c2;font-size:14px;font-weight:700">C.S. SAN LUIS · 08:02</span></div>
+        <div class="tvcall"><small style="letter-spacing:.2em;font-weight:800;font-size:12px">🔔 LLAMANDO</small><b>A-023</b><span>María Q. → Consultorio 3</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:16px;margin-top:10px;color:#e9dff0"><span><b style="color:#c7c2ff">A-021</b> Pedro L.</span><span>Consultorio 1</span></div></div></div>
+    <div class="mock" style="background:linear-gradient(#dfe7e2,#c9d6ce)"><span class="cap">Cartel en la puerta</span>
+      <div class="sign" style="background:#15803d"><div class="badge" style="width:92px;height:92px;background:#fff;color:#15803d"><svg><use href="#i-farmacia"/></svg></div><div class="wm"><b>SIVEC</b><span>Farmacia</span></div></div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-bottom:22px">
+        <div class="lk" style="background:#fff;border-radius:12px;padding:8px 12px"><div class="badge" style="width:34px;height:34px;background:#1d4ed8"><svg><use href="#i-laboratorio"/></svg></div><div class="wm"><b style="font-size:16px">SIVEC</b><span style="font-size:10px;color:#1d4ed8">Laboratorio</span></div></div>
+        <div class="lk" style="background:#fff;border-radius:12px;padding:8px 12px"><div class="badge" style="width:34px;height:34px;background:#0e7490"><svg><use href="#i-triaje"/></svg></div><div class="wm"><b style="font-size:16px">SIVEC</b><span style="font-size:10px;color:#0e7490">Triaje</span></div></div>
+        <div class="lk" style="background:#fff;border-radius:12px;padding:8px 12px"><div class="badge" style="width:34px;height:34px;background:#0891b2"><svg><use href="#i-odonto"/></svg></div><div class="wm"><b style="font-size:16px">SIVEC</b><span style="font-size:10px;color:#0891b2">Odonto</span></div></div>
+      </div></div>
+    <div class="mock" style="display:grid;grid-template-columns:1.2fr 1fr;background:#f6f1f3"><span class="cap">Receta impresa · celular</span>
+      <div class="rx"><div class="lk"><div class="badge" style="width:36px;height:36px;background:#15803d"><svg><use href="#i-farmacia"/></svg></div><div class="wm"><b style="font-size:18px">SIVEC</b><span style="font-size:9.5px;color:#15803d">Farmacia</span></div><span style="margin-left:auto;font-size:11px;color:var(--soft)">RX-2026-08812</span></div><hr>
+        <b>María Quispe Mamani</b> · C.I. 7654321<br><br>🥚 Clotrimazol 500 mg óvulo — 1 c/noche x 10<br>💊 Fluconazol 150 mg — dosis única<br><br><span style="color:#15803d;font-weight:700">✓ Firmado con huella · Dra. Aguilera</span></div>
+      <div class="phone"><div class="badge" style="width:84px;height:84px;background:#fff;color:#7d2a4c"><svg><use href="#i-sivec"/></svg></div><div class="wm" style="text-align:center"><b style="font-size:32px;color:#fff">SIVEC</b><span style="font-size:10px;color:#f1a7c3">Mi salud</span></div><div style="font-size:12px;text-align:center;opacity:.85;padding:0 16px">Tu resultado de PAP estará listo el 15/10</div></div></div>
+  </div>
+</section>
+
+<script>
+  const FAMS = [
+    ['Atención al paciente', [
+      ['recepcion', 'Recepción', '#2f6fb0', 'Llegada, C.I., datos del SEGIP, huella y derivación.'],
+      ['triaje', 'Triaje', '#0e7490', 'Signos vitales y prioridad; entran solos a la historia.'],
+      ['turnos', 'Turnos', '#4338ca', 'Fichas y TV de la sala de espera con aviso sonoro.'],
+      ['consultorio', 'Consultorio', '#7d2a4c', 'Atención médica: fila, ficha y consulta con figuras.'],
+      ['historia', 'Historia clínica', '#9d174d', 'Línea de tiempo de la paciente en todos los centros.'],
+      ['medgral', 'Medicina general', '#a21caf', 'Consulta general; código 17576016 en el D-1.'],
+      ['telesalud', 'Telesalud', '#0369a1', 'Videoconsulta, e-consulta y consentimiento digital.'],
+      ['emergencias', 'Emergencias', '#dc2626', 'Atención inmediata y prioridad de traslado.'],
+    ]],
+    ['Especialidades', [
+      ['gineco', 'Ginecología', '#be185d', 'Consulta gineco, colposcopia y código 17576012.'],
+      ['materno', 'Materno', '#db2777', 'Control prenatal, parto, puerperio y recién nacido.'],
+      ['pediatria', 'Pediatría', '#c2410c', 'Control de niño sano, crecimiento y vacunas.'],
+      ['odonto', 'Odonto', '#0891b2', 'Odontograma, tratamientos por sesión y radiografías.'],
+      ['nutricion', 'Nutrición', '#4d7c0f', 'Medidas, curvas de la OMS y planes de alimentación.'],
+      ['mental', 'Salud mental', '#7c3aed', 'Seguimiento, escalas y derivación.'],
+      ['quirofano', 'Cirugía', '#0f766e', 'Protocolo quirúrgico, lista OMS y post-operatorio.'],
+      ['oncologico', 'Oncológico', '#86198f', 'Tratamiento del cáncer y contrarreferencia.'],
+    ]],
+    ['Programas de salud', [
+      ['pap', 'PAP / VPH', '#9c3a5f', 'Tamizaje de cuello uterino — el que ya funciona.'],
+      ['vacunas', 'Vacunas', '#0d9488', 'Esquemas, dosis pendientes y campañas.'],
+      ['tb', 'Tuberculosis', '#b45309', 'Casos, tratamiento supervisado y contactos.'],
+      ['chagas', 'Chagas', '#92400e', 'Vigilancia, tamizaje y control del vector.'],
+      ['zoonosis', 'Zoonosis', '#a16207', 'Rabia: mordeduras, vacunación y seguimiento.'],
+    ]],
+    ['Diagnóstico y tratamiento', [
+      ['farmacia', 'Farmacia', '#15803d', 'Recetas, stock, dispensación con huella.'],
+      ['laboratorio', 'Laboratorio', '#1d4ed8', 'Muestras, lotes y resultados en línea.'],
+      ['imagen', 'Imagen', '#334155', 'Rayos X, ecografía e informes.'],
+    ]],
+    ['Hospital y red', [
+      ['hospital', 'Hospital', '#b91c1c', 'Admisión, internación y bandeja de referencias.'],
+      ['referencias', 'Referencias', '#6d28d9', 'Referencia y contrarreferencia entre niveles.'],
+      ['transito', 'Tránsito', '#ea580c', 'Traslados, ambulancias e internación de tránsito.'],
+      ['red', 'Red', '#1e293b', 'Panel del gestor: indicadores de toda la red.'],
+    ]],
+  ];
+  document.getElementById('fams').innerHTML = FAMS.map(([t, mods]) => `<div class="fam"><div class="famh">${t}</div><div class="grid">${mods.map(([id, n, c, d]) =>
+    `<div class="card"><div class="lk"><div class="badge" style="width:52px;height:52px;background:${c}"><svg><use href="#i-${id}"/></svg></div><div class="wm"><b style="font-size:24px">SIVEC</b><span style="font-size:12.5px;color:${c}">${n}</span></div></div><p>${d}</p></div>`).join('')}</div></div>`).join('');
+</script>
+</body>
+</html>

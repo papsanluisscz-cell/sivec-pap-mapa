@@ -314,3 +314,15 @@ Princípios para o SIVEC: dados mínimos obrigatórios + resumo clínico automá
 - No SIVEC PAP/VPH já existe no Panel: tarefas do dia calculadas pelo "próximo passo" de cada paciente (buscar resultado atrasado, derivar, entregar, controle vencido…).
 - No SIVEC completo **cada função tem o seu**: médico (por programa: PAP, pré-natal, TB…), **recepção** (citas do dia, contrarreferências a agendar, pacientes para chamar em busca ativa, referências com cita hoje), enfermagem/triagem (fila, vacinas pendentes), farmácia (receitas a dispensar, estoque baixo), laboratório (amostras a enviar/receber, resultados a liberar) e gestor da rede (alertas da rede).
 - Esboço do fluxo recepção → triagem → consultório → assinatura com digital: `docs/esboco-recepcion-consultorio.html`.
+
+### [24/09/2026] Identidade visual — marca SIVEC e família de logos (para vender o produto)
+- Esboço em `docs/marca-sivec.html` (+ `marca-1-principal.png`, `marca-2-familia-modulos.png`, `marca-3-aplicaciones.png`).
+- **Marca principal:** a "S" que une dois pontos (paciente ↔ serviço = *enlace*) cruzada por um pulso (*vigilância*), cor bordô.
+- **Regra:** sempre **SIVEC + nome do lugar**, com ícone próprio e cor da família. 28 módulos em 5 famílias:
+  - Atenção ao paciente: Recepción, Triaje, Turnos (TV), Consultorio, Historia clínica, Medicina general, Telesalud, Emergencias.
+  - Especialidades: Ginecología, Materno, Pediatría, Odonto, Nutrición, Salud mental, Cirugía, Oncológico.
+  - Programas: PAP/VPH, Vacunas, Tuberculosis, Chagas, Zoonosis (rabia).
+  - Diagnóstico e tratamento: Farmacia, Laboratorio, Imagen.
+  - Hospital e rede: Hospital, Referencias, Tránsito (traslados/ambulâncias/internação de trânsito), Red (gestor).
+- Aplicações: barra do app, TV de turnos, cartaz de porta, receita impressa, app da paciente **"SIVEC Mi salud"** (ideia nova: a paciente vê resultados, citas e receitas no celular).
+- Antes de vender: registrar a marca (SENAPI na Bolívia) e fazer a versão final com um designer.
