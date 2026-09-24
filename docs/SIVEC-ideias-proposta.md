@@ -522,3 +522,17 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - **Stock y lotes:** cuántos días alcanza, lote más próximo a vencer y pérdidas. El pedido al SEDES se arma solo; un lote retirado se bloquea en la red, con la lista de quién lo recibió.
 - **Coberturas y ESAVI:** cobertura acumulada contra lo esperado, deserción Penta 1→3, ESAVI con lote, e informe mensual PAI automático (SNIS y gestor).
 - Imágenes: docs/vacunas-01..08.png · esboco-vacunas.html
+
+### Carnet de vacunas del niño/a (impreso) — dibujado, para aprobar
+- 1 hoja A4 horizontal, impresa en los 2 lados y doblada al medio (A5). Sale de la impresora del centro; en blanco y negro también sirve.
+- **8 especificaciones:**
+  1. identificación con QR (niño/a, mamá/tutor, centro);
+  2. esquema completo por edad, con fecha, lote y quién vacunó;
+  3. próxima vacuna grande en la portada;
+  4. casillas en blanco para escribir a mano (brigada u otro centro), que después se pasan al SIVEC por el QR;
+  5. campañas y otras vacunas;
+  6. vitamina A, chispitas y antiparasitario;
+  7. reacciones normales y señales de alarma (160);
+  8. lenguaje simple, letra ≥ 9 pt, el mismo carnet para niña y niño.
+- **Uso:** Pediatría lo imprime al nacer (BCG y HepB ya anotadas) y se reimprime después de cada vacuna. El QR siempre muestra la verdad del SIVEC.
+- Imágenes: docs/carnet-vacunas-01..03.png · esboco-carnet-vacunas.html
