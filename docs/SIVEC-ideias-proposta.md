@@ -406,3 +406,9 @@ Respostas às 5 decisões pendentes de Redes/centros ficam propostas no desenho:
 5. Médico ausente → reprogramação em bloco + WhatsApp "1 aceito / 2 outro dia".
 6. Faltas (de programa → busca ativa), vaga liberada oferecida à lista de espera, encaixes só com motivo.
 7. Indicadores (ocupação, faltas, dias de espera, confirmações).
+**Ajuste pedido pelo autor — modalidade "ficha na hora":** no 1º nível (e também no 2º/3º) a paciente chega e pede consulta no momento. Acrescentado ao módulo 2:
+- **Modalidade por estabelecimento e por serviço:** 🎫 ficha do dia (ordem de chegada + prioridade) · 📅 com cita (especialidades, referências, procedimentos) · 🔀 mista (parte fichas, parte citas) · 🚨 emergência por gravidade (triagem de cores).
+- **Fichas do dia na recepção:** quantas fichas restam por médico, espera aproximada, ficha impressa ou SMS; se acabaram → outro médico, cita, lista de espera ou emergência.
+- **Fila mista do médico:** citas na sua hora; entre elas fichas por ordem de chegada; prioridade (grávida, idoso, criança < 5, deficiência, alarme) sobe.
+- **Ficha pelo celular** (Mi salud/WhatsApp) com hora aproximada; parte das fichas sempre reservada para a janela (quem não tem celular).
+- Indicadores de fichas: entregues, % por celular, foram embora sem atenção, espera média, dias em que acabam cedo.

@@ -158,6 +158,11 @@
   .wk .d { display:flex; gap:8px; align-items:center; padding:7px 0; border-bottom:1px dashed var(--line); } .wk .d b { width:40px; }
   .bk { font-size:12.5px; font-weight:700; border-radius:8px; padding:5px 9px; } .bk.c { background:#dbeafe; color:#1e4f8a; } .bk.p { background:#f7e9ef; color:#7d2a4c; } .bk.q { background:#ede4fb; color:#5b21b6; } .bk.b { background:#f3eef0; color:var(--soft); }
   .li2 { font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); }
+  .mod { padding:0; overflow:hidden; } .mod .mh { color:#fff; font-weight:800; font-size:16px; padding:10px 14px; } .mod .mb { padding:10px 14px; font-size:13.5px; line-height:1.5; }
+  .fcs { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .fc { border:1px solid var(--line); border-radius:12px; padding:9px 11px; background:#fff; display:flex; flex-direction:column; gap:3px; font-size:13px; } .fc b { font-size:15px; } .fc small { color:var(--soft); } .fc em { font-style:normal; font-size:12px; color:var(--soft); } .fc.sel { border:2px solid var(--wine); background:var(--tint); } .fc.off { opacity:.7; }
+  .bar2 { height:8px; border-radius:4px; background:#eee4e8; overflow:hidden; } .bar2 i { display:block; height:100%; background:#2f6fb0; }
+  .fq { display:grid; grid-template-columns:28px 120px 1fr auto; gap:8px; align-items:center; padding:8px 4px; border-bottom:1px dashed var(--line); font-size:13.5px; } .fq .n { width:24px; height:24px; border-radius:50%; background:#f3eef0; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; } .fq em { font-style:normal; color:var(--soft); font-size:12.5px; } .fq.pr { background:#fff5f5; border-radius:8px; }
 </style>
 </head>
 <body>
@@ -168,7 +173,11 @@
   <button class="tab" data-t="g4">4. Citas que llegan solas</button>
   <button class="tab" data-t="g5">5. Médico ausente</button>
   <button class="tab" data-t="g6">6. Faltas y lista de espera</button>
-  <button class="tab" data-t="g7">7. Indicadores</button>
+  <button class="tab" data-t="g8">8. Modalidad por nivel</button>
+  <button class="tab" data-t="g9">9. Fichas del día (sin cita)</button>
+  <button class="tab" data-t="g10">10. Fila mixta del médico</button>
+  <button class="tab" data-t="g11">11. Ficha desde el celular</button>
+  <button class="tab" data-t="g7">12. Indicadores</button>
 </div>
 <div class="warn">⚠️ Dibujo para aprobar, con datos inventados. La agenda une recepción, consultorio, referencias, programas y los mensajes a la paciente.</div>
 
@@ -306,11 +315,103 @@
   </div>
 </section>
 
+
+<!-- ============ G8 ============ -->
+<section class="scr" id="g8">
+  <div class="app"><div class="brand">SIVEC <span>AGENDA</span></div><div class="who">⚙️ Modalidad de atención — se elige por establecimiento y por servicio</div></div>
+  <div class="body">
+    <div class="cols c3" style="gap:12px">
+      <div class="card mod"><div class="mh" style="background:#2f6fb0">🎫 Ficha en el momento</div><div class="mb">La paciente llega, recepción le da una <b>ficha del día</b> con el médico que pide (o el que tiene lugar). Se atiende <b>por orden de llegada</b> y por prioridad.<div class="mini" style="margin-top:6px">Típico del <b>1er nivel</b>.</div></div></div>
+      <div class="card mod"><div class="mh" style="background:#7d2a4c">📅 Con cita</div><div class="mb">Día y hora fijos. Se usa para <b>especialidades</b>, controles programados, referencias recibidas y procedimientos (colposcopia, ecografía).<div class="mini" style="margin-top:6px">Típico del <b>2º y 3er nivel</b>.</div></div></div>
+      <div class="card mod"><div class="mh" style="background:#15803d">🔀 Mixta</div><div class="mb">Cada médico tiene <b>parte de fichas del día</b> y <b>parte de citas</b>. El sistema intercala las dos en una sola fila.<div class="mini" style="margin-top:6px">Lo más común en la práctica.</div></div></div>
+    </div>
+    <div class="card" style="margin-top:12px"><div class="lbl">Ejemplo de configuración</div>
+      <table class="l"><thead><tr><th>Establecimiento</th><th>Servicio</th><th>Modalidad</th><th>Fichas del día</th><th>Citas</th><th>Entrega de fichas</th></tr></thead><tbody>
+        <tr><td><b>C.S. San Luis</b> <span class="mini">1er</span></td><td>Medicina general</td><td><span class="st info">🎫 Fichas</span></td><td>20 por médico</td><td>4 reservadas (controles, contrarreferencias)</td><td>desde 06:30</td></tr>
+        <tr><td><b>C.S. San Luis</b></td><td>Ginecología · PAP</td><td><span class="st ok">🔀 Mixta</span></td><td>10</td><td>8 (PAP programado, resultados)</td><td>desde 06:30</td></tr>
+        <tr><td><b>Hospital municipal</b> <span class="mini">2º</span></td><td>Consulta externa general</td><td><span class="st ok">🔀 Mixta</span></td><td>15</td><td>10 (referencias de la red)</td><td>desde 06:00</td></tr>
+        <tr><td><b>Hospital municipal</b></td><td>Colposcopia</td><td><span class="st warn">📅 Solo cita</span></td><td>—</td><td>12</td><td>—</td></tr>
+        <tr><td><b>Hospital de 3er nivel</b></td><td>Cardiología / Nefrología</td><td><span class="st warn">📅 Solo cita</span></td><td>—</td><td>por referencia</td><td>—</td></tr>
+        <tr><td><b>Todos</b></td><td>Emergencias</td><td><span class="st bad">🚨 Sin cita · por gravedad</span></td><td colspan="3">se atiende por triaje de colores, no por orden de llegada</td></tr>
+      </tbody></table></div>
+  </div>
+</section>
+
+<!-- ============ G9 ============ -->
+<section class="scr" id="g9">
+  <div class="app"><div class="brand">SIVEC <span>RECEPCIÓN</span></div><div class="who">🎫 Fichas del día · C.S. San Luis · jueves 24/09 · 07:10</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Fichas disponibles ahora</div>
+        <div class="fcs">
+          <div class="fc"><b>Dra. Ortuño</b><small>Medicina general · C1</small><div class="bar2"><i style="width:70%"></i></div><span>14 de 20 entregadas · <b>6 quedan</b></span><em>espera aprox. 1 h 30</em></div>
+          <div class="fc"><b>Dr. Tola</b><small>Medicina general · C4</small><div class="bar2"><i style="width:45%"></i></div><span>9 de 20 · <b>11 quedan</b></span><em>espera aprox. 50 min</em></div>
+          <div class="fc sel"><b>Dra. Aguilera</b><small>Ginecología · C3</small><div class="bar2"><i style="width:80%"></i></div><span>8 de 10 · <b>2 quedan</b></span><em>+ 8 con cita</em></div>
+          <div class="fc off"><b>Lic. Vargas</b><small>Nutrición · C2</small><div class="bar2"><i style="width:100%;background:#991b1b"></i></div><span>agotadas</span><em>→ ofrecer cita</em></div>
+        </div>
+        <div class="lbl">Prioridad (pasa antes en la fila)</div>
+        <div class="chips"><span class="chip">🤰 Embarazada</span><span class="chip">👵 Adulto mayor</span><span class="chip">👶 Niño &lt; 5</span><span class="chip">♿ Discapacidad</span><span class="chip">🔴 Signo de alarma (triaje)</span></div>
+      </div>
+      <div>
+        <div class="card"><div class="lbl">Paciente que llega sin cita</div>
+          <div class="found" style="margin-top:0"><div class="photo2" style="width:46px;height:52px">📷</div><div><b>CARMEN VACA</b><div class="mini">52 a · C.I. 3344556 · huella ✓</div></div></div>
+          <div class="inp" style="margin-top:8px">Pide: <b>Dra. Aguilera</b> · motivo: control / PAP</div>
+          <div class="tk" style="margin-top:10px"><small>C.S. SAN LUIS · FICHA DEL DÍA</small><b>G-009</b><span>Ginecología · Dra. Aguilera</span><span>turno aprox. <strong>09:30</strong> · pase primero a triaje</span></div>
+          <div class="row" style="justify-content:center;margin-top:8px"><span class="btn">🖨 Imprimir</span><span class="btn">📱 SMS</span></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Si se acabaron las fichas</div><div style="font-size:13px;line-height:1.55">➡️ otro médico con lugar hoy · 📅 cita para otro día · 📝 lista de espera de hoy (si alguien no viene) · 🚨 si es urgente → triaje/emergencia</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ G10 ============ -->
+<section class="scr" id="g10">
+  <div class="app"><div class="brand">SIVEC <span>CONSULTORIO 3</span></div><div class="who">👩‍⚕️ Dra. Aguilera · fila mixta de hoy (citas + fichas)</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Orden en que el sistema la llama</div>
+        <div class="fq"><span class="n">1</span><span class="st warn">📅 cita 08:00</span><b>María Quispe</b><em>en atención</em></div>
+        <div class="fq"><span class="n">2</span><span class="st info">🎫 G-001</span><b>Ana Vaca</b><em>llegó 06:40 · triaje ✓</em></div>
+        <div class="fq pr"><span class="n">3</span><span class="st bad">🤰 prioridad</span><b>Carla Torres</b><em>embarazada 28 sem · ficha G-006</em></div>
+        <div class="fq"><span class="n">4</span><span class="st warn">📅 cita 08:40</span><b>Juana Rojas</b><em>contrarreferencia</em></div>
+        <div class="fq"><span class="n">5</span><span class="st info">🎫 G-002</span><b>Elena S.</b><em>triaje ✓</em></div>
+        <div class="fq"><span class="n">6</span><span class="st info">🎫 G-003</span><b>Irma F.</b><em>en triaje</em></div>
+        <div class="fq"><span class="n">7</span><span class="st warn">📅 cita 09:20</span><b>Rosa Mamani</b><em>aún no llegó</em></div>
+      </div>
+      <div>
+        <div class="card"><div class="lbl">Regla de la fila</div><div style="font-size:13.5px;line-height:1.6">📅 Las <b>citas</b> entran a su hora (si la paciente ya llegó).<br>🎫 Entre citas, las <b>fichas</b> por orden de llegada.<br>🔴 <b>Prioridad</b> (embarazada, adulto mayor, niño, alarma) sube en la fila.<br>⏭ Si una cita no llegó, pasa la siguiente ficha y la cita entra cuando llegue.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Resumen</div><div class="kv2"><span>Atendidas</span><b>1</b></div><div class="kv2"><span>En espera</span><b>5</b></div><div class="kv2"><span>Espera media</span><b>35 min</b></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ G11 ============ -->
+<section class="scr" id="g11">
+  <div class="app"><div class="brand">SIVEC <span>MI SALUD</span></div><div class="who">📱 Sacar ficha desde el celular — para no hacer fila desde la madrugada</div></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:260px 260px 1fr;gap:16px">
+      <div class="phn" style="background:#fff;min-height:430px"><div class="phh" style="background:#7d2a4c">Mi salud · Sacar ficha</div>
+        <div style="font-size:13px;line-height:1.5;padding:4px"><b>C.S. San Luis · hoy</b></div>
+        <div class="fc" style="margin:0"><b>Dr. Tola</b><small>Medicina general</small><span>11 fichas quedan</span></div>
+        <div class="fc sel" style="margin:0"><b>Dra. Aguilera</b><small>Ginecología</small><span>2 fichas quedan</span></div>
+        <div class="btn p" style="justify-content:center">Sacar ficha con Dra. Aguilera</div>
+        <div class="mini" style="padding:4px">Parte de las fichas se entrega por celular y parte en ventanilla, para quien no tiene celular.</div></div>
+      <div class="phn" style="background:#fff;min-height:430px"><div class="phh" style="background:#7d2a4c">Mi ficha</div>
+        <div style="text-align:center;padding:10px 0"><div class="mini">FICHA VIRTUAL</div><div style="font-size:46px;font-weight:900;color:#7d2a4c">G-010</div><div style="font-size:13px">Dra. Aguilera · Ginecología</div><div style="font-size:15px;margin-top:6px">venga a las <b>10:00</b></div></div>
+        <div class="msg in" style="max-width:100%">🔔 Le avisaremos 30 min antes. Al llegar, confirme en recepción con su C.I. o huella.</div>
+        <div class="mini" style="padding:4px">Si no llega 15 min después de su turno, la ficha pasa al siguiente.</div></div>
+      <div class="card"><div class="lbl">Por qué ayuda a vender</div><div style="font-size:14px;line-height:1.65">⏰ Menos gente haciendo fila desde las 5 de la mañana.<br>📊 El centro sabe cuántas personas vendrán y a qué hora.<br>🧓 Quien no tiene celular sigue sacando ficha en ventanilla (cupo reservado).<br>📱 También por WhatsApp: “escriba FICHA y su C.I.”.</div></div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ G7 ============ -->
 <section class="scr" id="g7">
   <div class="app"><div class="brand">SIVEC <span>AGENDA</span></div><div class="who">📊 Indicadores de agenda · C.S. San Luis · septiembre</div></div>
   <div class="body">
     <div class="kpi"><div><small>Ocupación de cupos</small><b>86%</b></div><div><small>Faltas (no vino)</small><b>9%</b><span> meta &lt; 10%</span></div><div><small>Días hasta la cita</small><b>3</b><span> mediana</span></div><div><small>Confirmadas por WhatsApp</small><b>72%</b></div></div>
+    <div class="kpi" style="margin-top:10px"><div><small>Fichas del día entregadas</small><b>1.240</b><span> 38% por celular</span></div><div><small>Se fueron sin atención</small><b>4%</b></div><div><small>Espera media con ficha</small><b>52 min</b></div><div><small>Fichas agotadas antes de las 8</small><b>6 días</b><span> Nutrición</span></div></div>
     <div class="cols c2" style="margin-top:12px">
       <div class="card bars"><div class="lbl">Faltas por médico</div>
         <div class="r"><span>Dra. Aguilera</span><div class="trk"><div class="fill" style="width:30%"></div></div><span class="v">6%</span></div>
@@ -331,12 +432,16 @@
 <div class="note" id="note"></div>
 <script>
   const NOTES = {
-    g1: '<b>Agenda do dia:</b> todos os médicos em colunas, com o estado de cada cita (confirmada, chegou, em atendimento, atendida, faltou, encaixe, livre). A mesma agenda alimenta a recepção, a fila do médico, a TV e o Mi salud.',
+    g1: '<b>Agenda do dia (com cita):</b> todos os médicos em colunas, com o estado de cada cita (confirmada, chegou, em atendimento, atendida, faltou, encaixe, livre). A mesma agenda alimenta a recepção, a fila do médico, a TV e o Mi salud.',
     g2: '<b>Dar uma cita:</b> busca a paciente (o sistema avisa o que lhe falta, ex.: tamizaje PAP), escolhe o tipo, sugere os primeiros horários livres e manda a confirmação por WhatsApp com as indicações.',
     g3: '<b>Agenda do médico:</b> semana tipo por atividade, bloqueios (férias, cursos), duração por tipo de consulta e vagas reservadas para referências, encaixes e para o Mi salud.',
     g4: '<b>Citas que chegam sozinhas:</b> contrarreferências, programas (PAP, pré-natal, vacinas), “retorno comigo” e resultados positivos geram a cita sugerida; a recepção só confirma.',
     g5: '<b>Médico ausente:</b> o sistema mostra as pacientes afetadas, propõe outro médico no mesmo dia ou o próximo dia e avisa todas por WhatsApp.',
     g6: '<b>Faltas e lista de espera:</b> faltas de programas viram busca ativa; vaga liberada é oferecida à lista de espera pelo WhatsApp; encaixes só com motivo.',
+    g8: '<b>Modalidade por nível:</b> cada centro e cada serviço escolhe: ficha na hora (1º nível), com cita (especialidades, 2º e 3º nível), ou mista. A emergência não usa cita nem ordem de chegada: é por gravidade.',
+    g9: '<b>Fichas do dia:</b> a recepção vê quantas fichas restam por médico e a espera aproximada; a paciente que chega sem cita recebe a ficha na hora (papel ou SMS). Se acabaram: outro médico, cita, lista de espera ou emergência.',
+    g10: '<b>Fila mista do médico:</b> as citas entram na sua hora, entre elas as fichas por ordem de chegada, e quem tem prioridade (grávida, idoso, criança, alarme) sobe na fila.',
+    g11: '<b>Ficha pelo celular:</b> parte das fichas pode ser tirada pelo Mi salud ou WhatsApp com hora aproximada — menos fila de madrugada. Sempre fica uma parte para a janela.',
     g7: '<b>Indicadores:</b> ocupação, faltas, dias de espera e confirmações — por médico e por especialidade.',
   };
   const tabs = document.querySelectorAll('.tab');
