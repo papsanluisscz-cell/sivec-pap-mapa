@@ -303,7 +303,14 @@ Números animados com tendência, embudo "Del tamizaje al seguimiento", "Para ha
 - **SIVEC PAP/VPH** (atual), **TB, Chagas, Raiva, Vacinas…** como programas.
 - Regra: **"guardar tudo que for ideia"** para o SIVEC completo e para os específicos.
 
-### [24/09/2026] Referência e contrarreferência entre níveis (1 → 2 → 3 → 4/Oncológico)
+### [24/09/2026] Referência e contrarreferência entre níveis (1 → 2 → 3 → 4/Oncológico) — APROVADO pelo autor
 Pedido do autor: pesquisar o mais ideal no mundo e desenhar para o SIVEC. Esboço em `docs/esboco-referencias.html`.
 Referências de modelo: **Norma Nacional de Referencia y Contrarreferencia** (Bolivia); **NHS e-Referral Service** (Reino Unido: pedido eletrônico, triagem pelo especialista, agenda); **SISREG / centrais de regulação** (Brasil: regulador classifica prioridade e agenda); **eConsult** (Canadá: consulta escrita ao especialista antes de encaminhar; em Ontário, cerca de 4 em cada 10 e-consultas evitaram a viagem da paciente); recomendações da **OMS/OPS** sobre redes integradas de serviços de saúde (RISS).
 Princípios para o SIVEC: dados mínimos obrigatórios + resumo clínico automático; prioridade com prazo (emergência/urgente/prioritária/rotina); triagem pelo nível receptor; **circuito fechado** com estados e prazos; **contrarreferência obrigatória** que volta à linha do tempo e ao centro de origem com "o que fazer no 1º nível"; e-consulta; indicadores por rede.
+
+**Telas aprovadas (esboço `docs/esboco-referencias.html`):** 1) como funciona (4 níveis + circuito de 7 estados: enviada → recebida → classificada → cita → atendida → contrarreferência → fechada); 2) nova referência (destino sugerido com vagas/espera, prioridade com prazo, pergunta ao especialista, resumo clínico e anexos automáticos, assinatura com digital, opção e-consulta); 3) caixa de entrada do hospital (ordenada por prioridade/espera; dar cita, pedir dados, redirecionar, responder por e-consulta); 4) acompanhamento com alertas (sem cita em 3 dias, paciente não foi, contrarreferência atrasada); 5) contrarreferência com "o que o 1º nível deve fazer" → vira tarefa com data no centro; 6) indicadores da rede.
+
+### [24/09/2026] "Para hacer hoy" por função (SIVEC completo)
+- No SIVEC PAP/VPH já existe no Panel: tarefas do dia calculadas pelo "próximo passo" de cada paciente (buscar resultado atrasado, derivar, entregar, controle vencido…).
+- No SIVEC completo **cada função tem o seu**: médico (por programa: PAP, pré-natal, TB…), **recepção** (citas do dia, contrarreferências a agendar, pacientes para chamar em busca ativa, referências com cita hoje), enfermagem/triagem (fila, vacinas pendentes), farmácia (receitas a dispensar, estoque baixo), laboratório (amostras a enviar/receber, resultados a liberar) e gestor da rede (alertas da rede).
+- Esboço do fluxo recepção → triagem → consultório → assinatura com digital: `docs/esboco-recepcion-consultorio.html`.

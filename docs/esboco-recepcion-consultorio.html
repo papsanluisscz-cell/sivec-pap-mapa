@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recepción y consultorio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
+    --n1:#2f6fb0; --n2:#0e7490; --n3:#7c3aed; --n4:#b4235a; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .topbar { position:sticky; top:0; z-index:5; background:#2a1720; color:#fff; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; }
+  .topbar b { margin-right:6px; font-size:15px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; border:1px solid #6b4a58; background:transparent; color:#fff; border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tab.on { background:#fff; color:var(--wine-d); border-color:#fff; }
+  .warn { max-width:1100px; margin:14px auto 0; background:#fff7e0; border:1px solid #ecd9a0; border-radius:10px; padding:10px 14px; font-size:14px; color:#5b4712; }
+  .scr { display:none; max-width:1100px; margin:14px auto 30px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,.14); }
+  .scr.on { display:block; }
+  .app { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; }
+  .app .brand { font-weight:800; font-size:20px; letter-spacing:.04em; } .app .brand span { font-size:11px; background:#fff; color:var(--wine-d); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:3px; letter-spacing:.08em; }
+  .app .who { font-size:14px; opacity:.95; }
+  .body { padding:18px 22px 22px; }
+  h2 { margin:0 0 4px; font-size:20px; } .sub { color:var(--soft); font-size:14px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cols { display:grid; gap:14px; } .c2 { grid-template-columns:1fr 1fr; } .c3 { grid-template-columns:1fr 1fr 1fr; } .c21 { grid-template-columns:1.6fr 1fr; }
+  .lbl { font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); margin:10px 0 5px; }
+  .lbl:first-child { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:13px; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .chip.on { background:var(--tint); border-color:var(--wine); color:var(--wine-d); font-weight:700; }
+  .inp { border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13.5px; background:#fff; min-height:36px; }
+  .inp.tall { min-height:62px; line-height:1.45; }
+  .pri { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pri div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; }
+  .pri div b { display:block; font-size:14px; } .pri div.on { border:2px solid var(--wine); background:var(--tint); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .auto { background:#f3f7fb; border:1px dashed #b9cde3; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.55; }
+  .auto b { color:#1e4f8a; }
+  .att { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; } .att span { font-size:12.5px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13.5px; font-weight:700; border-radius:9px; padding:8px 14px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .btn.p { background:var(--wine); border-color:var(--wine); color:#fff; } .btn.g { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fp { width:26px; height:30px; vertical-align:middle; }
+  table.l { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; border-radius:12px; overflow:hidden; }
+  table.l th { text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); padding:9px 10px; border-bottom:1px solid var(--line); background:#fff; }
+  table.l td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .st { font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .st.bad { background:var(--badbg); color:var(--bad); } .st.warn { background:var(--warnbg); color:var(--warn); } .st.ok { background:var(--okbg); color:var(--ok); } .st.info { background:#e0ecfa; color:#1e4f8a; } .st.mut { background:#eee; color:#555; }
+  .lvl { font-size:11px; font-weight:800; color:#fff; border-radius:6px; padding:2px 7px; }
+  .mini { font-size:12px; color:var(--soft); }
+  .note { max-width:1100px; margin:-16px auto 30px; background:#fff; border-radius:10px; padding:12px 16px; font-size:14px; line-height:1.5; color:#3b3035; border-left:4px solid var(--wine); }
+  /* flujo */
+  .levels { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin:6px 0 4px; }
+  .lv { text-align:center; padding:0 8px; }
+  .lv .ic { width:74px; height:74px; border-radius:18px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; }
+  .lv b { display:block; font-size:15px; } .lv span { font-size:12.5px; color:var(--soft); }
+  .arrows { position:relative; height:74px; margin-top:-120px; margin-bottom:60px; pointer-events:none; }
+  .loop { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+  .loop div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12.3px; text-align:center; position:relative; }
+  .loop div b { display:block; font-size:13px; } .loop i { font-style:normal; display:block; font-size:18px; }
+  .loop div:not(:last-child)::after { content:"›"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--soft); font-size:18px; }
+  .world { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .world div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:12.3px; line-height:1.4; }
+  .world b { display:block; font-size:13px; color:var(--wine-d); }
+  /* seguimiento */
+  .steps { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin:8px 0 4px; }
+  .steps div { text-align:center; font-size:12px; position:relative; padding-top:30px; }
+  .steps div::before { content:""; position:absolute; top:9px; left:0; right:0; height:4px; background:#e3d6dc; }
+  .steps div:first-child::before { left:50%; } .steps div:last-child::before { right:50%; }
+  .steps div.done::before { background:var(--ok); } .steps div.cur::before { background:linear-gradient(90deg,var(--ok) 50%,#e3d6dc 50%); }
+  .steps i { position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:50%; background:#e3d6dc; color:#fff; font-style:normal; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:3px solid var(--paper); }
+  .steps .done i { background:var(--ok); } .steps .cur i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .steps b { display:block; font-size:12.5px; } .steps small { color:var(--soft); }
+  .tl { border-left:3px solid var(--line); margin-left:8px; padding-left:14px; }
+  .tl div { position:relative; font-size:13px; margin-bottom:10px; line-height:1.4; }
+  .tl div::before { content:""; position:absolute; left:-21px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--c,#999); border:2px solid #fff; }
+  .kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:600; } .kpi b { font-size:28px; letter-spacing:-.01em; } .kpi span { font-size:12px; color:var(--soft); }
+  .bars div.r { display:grid; grid-template-columns:170px 1fr 54px; align-items:center; gap:10px; font-size:13px; margin:7px 0; }
+  .bars .trk { height:14px; border-radius:0 4px 4px 0; background:transparent; position:relative; }
+  .bars .fill { height:14px; border-radius:0 4px 4px 0; background:var(--wine); }
+  .bars .ref { position:absolute; top:-3px; bottom:-3px; width:2px; background:#2d2429; }
+  .bars .v { font-weight:700; text-align:right; }
+  .alertc { border-left:4px solid var(--bad); }
+
+  .role .rh { display:flex; gap:10px; align-items:center; margin-bottom:8px; } .role .rh b { display:block; font-size:15px; } .role .rh small { color:var(--soft); font-size:12px; }
+  .ri { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .todo { display:flex; align-items:center; gap:10px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .todo:last-child { border-bottom:none; }
+  .todo .st { min-width:30px; text-align:center; font-size:13px; }
+  .mini2 { font-size:13px; line-height:1.5; } .mini2 b { display:block; margin-bottom:2px; }
+  .flowbar { display:flex; gap:6px; margin-bottom:12px; } .flowbar span { flex:1; text-align:center; font-size:13px; font-weight:700; padding:7px; border-radius:9px; background:#fff; border:1px solid var(--line); color:var(--soft); }
+  .flowbar span.on { background:var(--okbg); color:var(--ok); border-color:#b8e3c7; } .flowbar span.cur { background:var(--wine); color:#fff; border-color:var(--wine); }
+  .found { display:flex; gap:12px; align-items:center; margin-top:10px; padding:10px; border-radius:10px; background:#f3f9f5; border:1px solid #cfe9d8; }
+  .photo2 { width:64px; height:72px; border-radius:10px; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:24px; flex:none; }
+  .k2 { display:block; font-size:10.5px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.04em; }
+  .scanner { width:150px; height:160px; margin:6px auto 0; border-radius:18px; background:radial-gradient(circle at 50% 45%, #fff 0, #f7e9ef 70%); border:3px solid #d9b9c6; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -6px 12px rgba(125,42,76,.12); }
+  .ticket { margin-top:12px; text-align:center; }
+  .tk { border:2px dashed var(--wine); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:2px; font-size:13.5px; } .tk b { font-size:40px; color:var(--wine-d); letter-spacing:.04em; line-height:1.1; } .tk small { color:var(--soft); font-size:11.5px; }
+  .q2 { padding:8px 10px; border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:13.5px; background:#fff; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; } .q2 .mini { width:100%; }
+  .q2.cur { border:2px solid var(--wine); background:var(--tint); } .q2 .st { margin-left:auto; }
+  .vit2 { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .vit2 div { background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 8px; font-size:16px; font-weight:800; } .vit2 small { display:block; font-size:10.5px; color:var(--soft); font-weight:700; text-transform:uppercase; }
+  .tv { background:#120810; border-radius:16px; padding:14px; color:#fff; border:8px solid #2a2a2a; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
+  .tvh { display:flex; justify-content:space-between; font-size:13px; color:#cfb7c2; font-weight:700; letter-spacing:.08em; }
+  .tvnow { background:linear-gradient(135deg,#7d2a4c,#b4235a); border-radius:12px; padding:16px; text-align:center; } .tvnow small { display:block; font-size:13px; letter-spacing:.2em; font-weight:800; color:#ffe4ee; }
+  .tvnow b { display:block; font-size:64px; line-height:1.05; letter-spacing:.04em; } .tvnow span { display:block; font-size:24px; font-weight:700; } .tvnow em { display:block; font-style:normal; font-size:20px; margin-top:4px; color:#ffe4ee; }
+  .tvlist div { display:flex; gap:12px; align-items:baseline; font-size:18px; padding:6px 4px; border-bottom:1px solid #3a2530; } .tvlist b { color:#f1a7c3; min-width:70px; } .tvlist span { margin-left:auto; color:#cfb7c2; font-size:15px; }
+  .tvf { font-size:13px; color:#cfb7c2; }
+  .doc { display:grid; grid-template-columns:34px 1fr auto auto; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--line); font-size:13.5px; } .di { font-size:22px; text-align:center; } .dest { font-size:12.5px; color:var(--soft); font-weight:600; }
+  .st.warn { margin:0; max-width:none; padding:2px 9px; border:none; font-size:11.5px; }
+  .todo .st.warn { font-size:13px; }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — Recepción y consultorio:</b>
+  <button class="tab on" data-t="p0">1. “Para hacer hoy” por función</button>
+  <button class="tab" data-t="p1">2. Croquis del centro</button>
+  <button class="tab" data-t="p2">3. Recepción — llega la paciente</button>
+  <button class="tab" data-t="p3">4. Triaje y TV</button>
+  <button class="tab" data-t="p4">5. Consultorio — atención</button>
+  <button class="tab" data-t="p5">6. Consultorio — firmar documentos</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Es para el <b>SIVEC completo</b> (recepción, triaje, consultorios, farmacia y laboratorio conectados).</div>
+
+<!-- ============ P0 ============ -->
+<section class="scr on" id="p0">
+  <div class="app"><div class="brand">SIVEC <span>HOY</span></div><div class="who">Cada persona entra y ve <b>lo suyo</b> para hoy</div></div>
+  <div class="body">
+    <h2>“Para hacer hoy” = las tareas del día de cada función</h2>
+    <div class="sub">No son metas escritas a mano: el sistema las <b>calcula solo</b> con los datos (resultados atrasados, citas, referencias, stock…). Al resolver una, desaparece.</div>
+    <div class="cols c2">
+      <div class="card role"><div class="rh"><span class="ri" style="background:#7d2a4c">👩‍⚕️</span><div><b>Médico — programa PAP/VPH</b><small>Dra. Aguilera · lo que ya existe hoy en el Panel</small></div></div>
+        <div class="todo"><span class="st bad">12</span>Buscar resultado atrasado (más de 90 días)</div>
+        <div class="todo"><span class="st bad">3</span>Derivar a colposcopia (PAP/VPH positivo)</div>
+        <div class="todo"><span class="st warn">8</span>Entregar resultado a la paciente</div>
+        <div class="todo"><span class="st warn">5</span>Control vencido (volver a tomar)</div>
+        <div class="todo"><span class="st info">2</span>Contrarreferencias por aplicar</div></div>
+      <div class="card role"><div class="rh"><span class="ri" style="background:#2f6fb0">🧾</span><div><b>Recepción</b><small>Lic. Cruz · nuevo en el SIVEC completo</small></div></div>
+        <div class="todo"><span class="st info">34</span>Citas de hoy (quién llegó y quién falta)</div>
+        <div class="todo"><span class="st bad">7</span>Pacientes para llamar — búsqueda activa (lista del médico)</div>
+        <div class="todo"><span class="st warn">4</span>Pacientes con cita en el hospital hoy (recordar)</div>
+        <div class="todo"><span class="st warn">3</span>Contrarreferencias: agendar control en el centro</div>
+        <div class="todo"><span class="st mut">2</span>Datos incompletos (sin celular / sin huella)</div></div>
+      <div class="card role"><div class="rh"><span class="ri" style="background:#0e7490">🩺</span><div><b>Enfermería / triaje</b><small>Lic. Rojas</small></div></div>
+        <div class="todo"><span class="st info">6</span>En fila para signos vitales</div>
+        <div class="todo"><span class="st warn">9</span>Vacunas pendientes de quienes vienen hoy</div>
+        <div class="todo"><span class="st bad">1</span>Signo de alarma: PA 160/100 → pasa primero</div></div>
+      <div class="card role"><div class="rh"><span class="ri" style="background:#15803d">💊</span><div><b>Farmacia</b><small>Aux. Mendoza</small></div></div>
+        <div class="todo"><span class="st info">11</span>Recetas para dispensar (llegan del consultorio)</div>
+        <div class="todo"><span class="st warn">2</span>Stock bajo: clotrimazol óvulo, fluconazol</div>
+        <div class="todo"><span class="st mut">1</span>Lote por vencer en 30 días</div></div>
+    </div>
+    <div class="card" style="margin-top:14px;font-size:13.5px;line-height:1.6">También: <b>laboratorio</b> (muestras a enviar/recibir, resultados a liberar) y <b>gestor de la red</b> (alertas de todos los centros). Cada tarea abre directo la ficha o la pantalla donde se resuelve.</div>
+  </div>
+</section>
+
+<!-- ============ P1 ============ -->
+<section class="scr" id="p1">
+  <div class="app"><div class="brand">SIVEC <span>CENTRO</span></div><div class="who">Croquis — recorrido de la paciente en el C.S. San Luis</div></div>
+  <div class="body">
+    <div class="card" style="padding:10px">
+      <svg viewBox="0 0 1040 470" width="100%" role="img" aria-label="Plano del centro con el recorrido de la paciente">
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#dc2626"/></marker></defs>
+        <g font-family="Source Sans 3, sans-serif">
+          <rect x="10" y="10" width="1020" height="450" rx="14" fill="#fbf8f6" stroke="#cdbfc5" stroke-width="2"/>
+          <!-- entrada -->
+          <rect x="40" y="400" width="120" height="44" rx="8" fill="#fff" stroke="#cdbfc5"/><text x="100" y="427" text-anchor="middle" font-size="14" font-weight="700" fill="#2d2429">🚪 Entrada</text>
+          <!-- recepcion -->
+          <rect x="40" y="250" width="220" height="120" rx="10" fill="#e0ecfa" stroke="#2f6fb0" stroke-width="2"/><text x="150" y="278" text-anchor="middle" font-size="16" font-weight="800" fill="#1e4f8a">① RECEPCIÓN</text>
+          <text x="150" y="302" text-anchor="middle" font-size="12.5" fill="#1e4f8a">C.I. → datos (SEGIP)</text><text x="150" y="320" text-anchor="middle" font-size="12.5" fill="#1e4f8a">🖐 huella · derivación</text><text x="150" y="338" text-anchor="middle" font-size="12.5" fill="#1e4f8a">🎫 ficha A-023</text>
+          <!-- sala espera -->
+          <rect x="300" y="190" width="330" height="250" rx="10" fill="#fff" stroke="#cdbfc5" stroke-width="2"/><text x="465" y="218" text-anchor="middle" font-size="16" font-weight="800" fill="#2d2429">② SALA DE ESPERA</text>
+          <rect x="385" y="232" width="160" height="70" rx="6" fill="#1c0a13"/><text x="465" y="258" text-anchor="middle" font-size="12" fill="#f1a7c3" font-weight="700">📺 TV</text><text x="465" y="280" text-anchor="middle" font-size="12.5" fill="#fff">A-023 → Consultorio 3</text><text x="465" y="296" text-anchor="middle" font-size="10.5" fill="#cfb7c2">🔔 con aviso sonoro</text>
+          <g fill="#e3d6dc"><rect x="330" y="330" width="40" height="18" rx="4"/><rect x="380" y="330" width="40" height="18" rx="4"/><rect x="430" y="330" width="40" height="18" rx="4"/><rect x="480" y="330" width="40" height="18" rx="4"/><rect x="530" y="330" width="40" height="18" rx="4"/><rect x="330" y="370" width="40" height="18" rx="4"/><rect x="380" y="370" width="40" height="18" rx="4"/><rect x="430" y="370" width="40" height="18" rx="4"/><rect x="480" y="370" width="40" height="18" rx="4"/><rect x="530" y="370" width="40" height="18" rx="4"/></g>
+          <!-- triaje -->
+          <rect x="40" y="40" width="220" height="170" rx="10" fill="#dff3f6" stroke="#0e7490" stroke-width="2"/><text x="150" y="70" text-anchor="middle" font-size="16" font-weight="800" fill="#0e5566">③ TRIAJE</text><text x="150" y="96" text-anchor="middle" font-size="12.5" fill="#0e5566">PA · FC · T° · peso · talla</text><text x="150" y="114" text-anchor="middle" font-size="12.5" fill="#0e5566">→ entran solos a la HC</text><text x="150" y="132" text-anchor="middle" font-size="12.5" fill="#0e5566">prioridad si hay alarma</text>
+          <!-- consultorios -->
+          <g><rect x="300" y="40" width="160" height="130" rx="10" fill="#fff" stroke="#cdbfc5" stroke-width="2"/><text x="380" y="70" text-anchor="middle" font-size="14" font-weight="800" fill="#2d2429">Consultorio 1</text><text x="380" y="92" text-anchor="middle" font-size="12" fill="#7a6a71">Medicina general</text></g>
+          <g><rect x="475" y="40" width="160" height="130" rx="10" fill="#fff" stroke="#cdbfc5" stroke-width="2"/><text x="555" y="70" text-anchor="middle" font-size="14" font-weight="800" fill="#2d2429">Consultorio 2</text><text x="555" y="92" text-anchor="middle" font-size="12" fill="#7a6a71">Nutrición</text></g>
+          <g><rect x="650" y="40" width="190" height="170" rx="10" fill="#f7e9ef" stroke="#7d2a4c" stroke-width="2.5"/><text x="745" y="70" text-anchor="middle" font-size="16" font-weight="800" fill="#5a1c36">④ Consultorio 3</text><text x="745" y="92" text-anchor="middle" font-size="12.5" fill="#5a1c36">Ginecología · PAP</text><text x="745" y="118" text-anchor="middle" font-size="12.5" fill="#5a1c36">consulta con figuras</text><text x="745" y="136" text-anchor="middle" font-size="12.5" fill="#5a1c36">🖐 firma D1 · D8 · HC</text><text x="745" y="154" text-anchor="middle" font-size="12.5" fill="#5a1c36">(médico y paciente)</text></g>
+          <!-- farmacia y lab -->
+          <rect x="870" y="40" width="140" height="170" rx="10" fill="#dcf3e5" stroke="#15803d" stroke-width="2"/><text x="940" y="70" text-anchor="middle" font-size="15" font-weight="800" fill="#14532d">⑤ FARMACIA</text><text x="940" y="94" text-anchor="middle" font-size="12" fill="#14532d">la receta ya llegó</text><text x="940" y="112" text-anchor="middle" font-size="12" fill="#14532d">🖐 huella al recibir</text>
+          <rect x="660" y="250" width="350" height="190" rx="10" fill="#fff" stroke="#cdbfc5" stroke-width="2"/><text x="835" y="280" text-anchor="middle" font-size="15" font-weight="800" fill="#2d2429">⑥ Laboratorio · toma de muestras</text><text x="835" y="302" text-anchor="middle" font-size="12.5" fill="#7a6a71">el D8 ya está en el sistema · lote de envío</text>
+          <text x="835" y="360" text-anchor="middle" font-size="12.5" fill="#7a6a71">Salida: SMS con próxima cita / fecha de resultado</text>
+          <!-- recorrido -->
+          <g fill="none" stroke="#dc2626" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#ar)">
+            <path d="M100 400 L100 374"/><path d="M262 318 L300 318"/><path d="M330 240 C 300 240, 280 200, 262 170"/><path d="M262 120 C 300 220, 600 230, 650 170"/><path d="M842 120 L868 120"/><path d="M940 212 L940 248"/>
+          </g>
+          <g font-size="12" font-weight="700" fill="#dc2626"><text x="110" y="394">llega</text><text x="264" y="308">espera</text><text x="236" y="230">la llaman</text><text x="470" y="185">TV la llama →</text><text x="846" y="112">receta</text><text x="948" y="234">muestras</text></g>
+        </g>
+      </svg>
+    </div>
+    <div class="cols c3" style="margin-top:12px">
+      <div class="card mini2"><b>⏱ Cada paso queda registrado</b>hora de llegada, triaje, llamada, atención y salida → tiempo de espera real por área.</div>
+      <div class="card mini2"><b>📄 Sin papel entre salas</b>la paciente no lleva hojas de un lado a otro: todo viaja en el SIVEC. Se imprime solo lo que ella necesita llevarse.</div>
+      <div class="card mini2"><b>🌐 Funciona en red local</b>si se cae internet, recepción, TV y consultorios siguen andando y sincronizan después.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ P2 ============ -->
+<section class="scr" id="p2">
+  <div class="app"><div class="brand">SIVEC <span>RECEPCIÓN</span></div><div class="who">🧾 Lic. Cruz · Ventanilla 1 · 07:48</div></div>
+  <div class="body">
+    <div class="flowbar"><span class="on">1 · Buscar</span><span class="on">2 · Datos</span><span class="on cur">3 · Huella</span><span>4 · Derivar</span><span>5 · Ficha</span></div>
+    <div class="cols c21">
+      <div class="card">
+        <div class="lbl">1 · Buscar por C.I. (o nombre)</div>
+        <div class="row"><div class="inp" style="flex:1;font-size:16px;font-weight:700">7654321 SC</div><span class="btn p">🔎 Buscar</span></div>
+        <div class="found"><div class="photo2">📷</div><div><b style="font-size:16px">MARÍA QUISPE MAMANI</b><div class="mini">F · 38 años · 14/03/1988 · ya registrada en el SIVEC (HC 0418)</div><div class="row" style="margin-top:4px"><span class="st ok">✓ Datos del SEGIP</span><span class="st warn">⚠ Alergia: penicilina</span><span class="st info">📅 Cita hoy: Ginecología 08:00</span></div></div></div>
+        <div class="lbl">2 · Confirmar datos — solo cambia lo que cambió</div>
+        <div class="cols c3" style="gap:8px">
+          <div class="inp"><small class="k2">Celular</small>7 123 4567 ✓</div><div class="inp"><small class="k2">Dirección</small>B. San Luis, C. Muchiri #45 ✓</div><div class="inp"><small class="k2">Seguro</small>SUS ✓</div>
+          <div class="inp"><small class="k2">Acompañante</small>Hija — Ana Q.</div><div class="inp"><small class="k2">Idioma</small>Castellano / quechua</div><div class="inp"><small class="k2">Motivo</small>Control PAP + consulta</div>
+        </div>
+        <div class="lbl">4 · Derivar</div>
+        <div class="chips"><span class="chip">Medicina general · 4 en espera</span><span class="chip on">Ginecología · Dra. Aguilera · 2 en espera</span><span class="chip">Nutrición · 1</span><span class="chip">Vacunas</span><span class="chip">Solo farmacia/laboratorio</span></div>
+        <div class="mini" style="margin-top:6px">💡 Tiene cita a las 08:00 → se sugiere Ginecología. Pasa primero por <b>triaje</b>.</div>
+      </div>
+      <div>
+        <div class="card" style="text-align:center">
+          <div class="lbl" style="text-align:left">3 · Huella de la paciente</div>
+          <div class="scanner"><svg viewBox="0 0 40 48" width="96" height="116"><g fill="none" stroke="#7d2a4c" stroke-width="1.5" stroke-linecap="round"><path d="M8 18a12 12 0 0 1 24 0v6"/><path d="M12 19a8 8 0 0 1 16 0v8c0 5-2 9-5 12"/><path d="M16 20a4 4 0 0 1 8 0v7c0 6-2 10-6 14"/><path d="M20 21v7c0 5-2 9-5 12"/><path d="M8 24v3c0 4 1 7 3 10"/><path d="M32 27c0 6-2 11-6 15"/><path d="M5 12a18 18 0 0 1 30 0"/></g></svg></div>
+          <div class="st ok" style="font-size:14px;display:inline-block;margin-top:8px">✓ Identidad confirmada — coincide con el SEGIP</div>
+          <div class="mini" style="margin-top:6px">Índice derecho · 07:49 · Ventanilla 1<br>Sirve como firma para: <b>consentimiento de datos</b> y <b>atención SUS</b></div>
+        </div>
+        <div class="card ticket">
+          <div class="lbl" style="text-align:left">5 · Ficha</div>
+          <div class="tk"><small>C.S. SAN LUIS</small><b>A-023</b><span>Ginecología · Consultorio 3</span><span>Pase primero a <strong>triaje</strong></span><small>Espera aprox. 20 min · 24/09/2026 07:50</small></div>
+          <div class="row" style="justify-content:center;margin-top:8px"><span class="btn">🖨 Imprimir ficha</span><span class="btn">📱 Enviar por SMS</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ P3 ============ -->
+<section class="scr" id="p3">
+  <div class="app"><div class="brand">SIVEC <span>TRIAJE</span></div><div class="who">🩺 Lic. Rojas · Triaje</div></div>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card">
+        <div class="lbl">Fila de triaje</div>
+        <div class="q2 cur"><b>A-023</b> María Quispe M. · Ginecología <span class="st info">ahora</span></div>
+        <div class="q2"><b>A-024</b> Juan Pérez · Medicina general</div>
+        <div class="q2"><b>N-002</b> Rosa Vaca · Nutrición</div>
+        <div class="lbl">Signos vitales — A-023</div>
+        <div class="vit2"><div><small>PA</small>110/70</div><div><small>FC</small>78</div><div><small>FR</small>18</div><div><small>T°</small>36,5</div><div><small>SatO₂</small>97%</div><div><small>Peso</small>62 kg</div><div><small>Talla</small>1,56</div><div><small>IMC</small>25,5</div></div>
+        <div class="lbl">Prioridad</div>
+        <div class="chips"><span class="chip on">🟢 Normal</span><span class="chip">🟠 Prioridad (gestante, adulto mayor)</span><span class="chip">🔴 Alarma → pasa primero</span></div>
+        <div class="row" style="justify-content:flex-end;margin-top:12px"><span class="btn p">✓ Enviar a sala de espera</span></div>
+        <div class="mini" style="margin-top:6px">Los signos vitales entran solos a la nota del médico (Modelo B) y a la tendencia del resumen.</div>
+      </div>
+      <div class="tv">
+        <div class="tvh"><span>C.S. SAN LUIS</span><span>08:02</span></div>
+        <div class="tvnow"><small>🔔 LLAMANDO</small><b>A-023</b><span>María Q.</span><em>→ Consultorio 3 · Ginecología</em></div>
+        <div class="tvlist">
+          <div><b>A-021</b> Pedro L.<span>Consultorio 1</span></div>
+          <div><b>N-001</b> Carla M.<span>Consultorio 2</span></div>
+          <div><b>A-022</b> Luis T.<span>Triaje</span></div>
+        </div>
+        <div class="tvf">Próximos: A-024 · A-025 · N-002 · V-003 &nbsp;|&nbsp; 💉 Hoy vacunación de influenza</div>
+      </div>
+    </div>
+    <div class="mini" style="margin-top:10px;font-size:13px">📺 La TV muestra <b>nombre corto</b> (o solo el número) por privacidad, con <b>sonido + voz</b>: “Ficha A-023, consultorio 3”. Desde el consultorio el médico toca <b>Llamar</b> y aparece en la TV.</div>
+  </div>
+</section>
+
+<!-- ============ P4 ============ -->
+<section class="scr" id="p4">
+  <div class="app"><div class="brand">SIVEC <span>CONSULTORIO 3</span></div><div class="who">👩‍⚕️ Dra. Aguilera · Ginecología · 17576012</div></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:250px 1fr">
+      <div class="card">
+        <div class="lbl">Mi fila</div>
+        <div class="q2 cur"><b>A-023</b> María Quispe M.<div class="mini">triaje ✓ · espera 12 min</div></div>
+        <div class="q2"><b>A-026</b> Ana Vaca<div class="mini">en triaje</div></div>
+        <div class="q2"><b>A-027</b> Juana Rojas<div class="mini">en recepción</div></div>
+        <div class="row" style="margin-top:10px"><span class="btn p" style="flex:1;justify-content:center">🔔 Llamar A-023</span></div>
+        <div class="row" style="margin-top:6px"><span class="btn" style="flex:1;justify-content:center">↻ Llamar de nuevo</span></div>
+        <div class="row" style="margin-top:6px"><span class="btn" style="flex:1;justify-content:center">🚫 No se presentó</span></div>
+      </div>
+      <div class="card">
+        <div class="row"><div class="photo2" style="width:54px;height:54px">📷</div><div><b style="font-size:17px">María Quispe Mamani</b><div class="mini">38 a · C.I. 7654321 · HC 0418 · ficha A-023</div></div><div class="row" style="margin-left:auto"><span class="st bad">⚠ Penicilina</span><span class="st warn">PAP 2023 · toca tamizaje</span></div></div>
+        <div class="vit2" style="margin-top:10px"><div><small>PA</small>110/70</div><div><small>FC</small>78</div><div><small>T°</small>36,5</div><div><small>Peso</small>62</div><div><small>IMC</small>25,5</div><div><small>SatO₂</small>97%</div><div><small>de triaje</small>07:58</div><div><small>&nbsp;</small>&nbsp;</div></div>
+        <div class="cols c2" style="margin-top:10px;gap:10px">
+          <div><div class="lbl">Línea de tiempo (todos los centros)</div>
+            <div class="tl"><div style="--c:#7d2a4c"><b>Hoy</b> Recepción 07:49 · triaje 07:58</div><div style="--c:#2f6fb0"><b>03/2026</b> Laboratorio: Hb 12,8</div><div style="--c:#6b5f64"><b>2023</b> PAP NILM</div><div style="--c:#6b5f64"><b>2016</b> Cesárea (Maternidad)</div></div></div>
+          <div><div class="lbl">Qué voy a hacer</div>
+            <div class="chips"><span class="chip on">📝 Consulta con figuras</span><span class="chip on">🧪 Toma PAP + VPH</span><span class="chip">🕐 Colposcopia</span><span class="chip">📤 Referir</span></div>
+            <div class="mini" style="margin-top:8px">La consulta que ya existe en el SIVEC PAP (S-O-A-P con toques, tratamientos con íconos, especialidad) se abre acá, con los signos vitales ya cargados.</div></div>
+        </div>
+        <div class="row" style="justify-content:flex-end;margin-top:12px"><span class="btn">Ver historia completa</span><span class="btn p">✍ Terminar y firmar documentos →</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ P5 ============ -->
+<section class="scr" id="p5">
+  <div class="app"><div class="brand">SIVEC <span>CONSULTORIO 3</span></div><div class="who">✍ Terminar atención — <b>María Quispe Mamani</b> · A-023</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card">
+        <div class="lbl">Documentos de esta atención — se generan solos</div>
+        <div class="doc"><span class="di">📄</span><div><b>D-1 · Recetario</b><div class="mini">Insumos PAP + clotrimazol óvulo x10 + fluconazol 150 mg · T - 17576012</div></div><span class="dest">→ 💊 Farmacia</span><span class="st ok">listo</span></div>
+        <div class="doc"><span class="di">🧪</span><div><b>D-8 · Solicitud de exámenes</b><div class="mini">Tinción PAP · VPH ADN · lote L-2026-39</div></div><span class="dest">→ 🔬 Laboratorio</span><span class="st ok">listo</span></div>
+        <div class="doc"><span class="di">🧾</span><div><b>Registro de toma de PAP</b><div class="mini">con croquis del mapa</div></div><span class="dest">→ 🗂 Programa</span><span class="st ok">listo</span></div>
+        <div class="doc"><span class="di">📝</span><div><b>Historia clínica — nota de atención</b><div class="mini">S-O-A-P, examen físico, diagnósticos CIE-10, plan</div></div><span class="dest">→ 🕐 Línea de tiempo</span><span class="st ok">listo</span></div>
+        <div class="doc"><span class="di">✅</span><div><b>Consentimiento informado</b><div class="mini">toma de muestra · telesalud</div></div><span class="dest">necesita la paciente</span><span class="st warn">falta huella</span></div>
+        <div class="mini" style="margin-top:8px">Se imprime <b>solo lo que la paciente se lleva</b> (receta e indicaciones). Lo demás queda firmado en el sistema; se puede imprimir cuando haga falta.</div>
+      </div>
+      <div>
+        <div class="card sign">
+          <div class="lbl">Paso 1 · Firma de la médica</div>
+          <div class="row" style="flex-wrap:nowrap"><svg class="fp" viewBox="0 0 40 48" style="width:40px;height:48px"><g fill="none" stroke="#7d2a4c" stroke-width="1.8" stroke-linecap="round"><path d="M8 18a12 12 0 0 1 24 0v6"/><path d="M12 19a8 8 0 0 1 16 0v8c0 5-2 9-5 12"/><path d="M16 20a4 4 0 0 1 8 0v7c0 6-2 10-6 14"/><path d="M5 12a18 18 0 0 1 30 0"/></g></svg><div><b>Dra. Aguilera</b> · huella + PIN<div class="st ok" style="display:inline-block;margin-top:3px">✓ firmados 4 documentos · 08:21</div></div></div>
+          <div class="mini" style="margin-top:6px">Una sola huella firma <b>todos</b> los documentos de la atención.</div>
+        </div>
+        <div class="card sign" style="margin-top:12px;border:2px solid var(--wine)">
+          <div class="lbl">Paso 2 · Firma de la paciente</div>
+          <div class="row"><div class="scanner" style="width:90px;height:100px;margin:0"><svg viewBox="0 0 40 48" width="58" height="70"><g fill="none" stroke="#7d2a4c" stroke-width="1.5" stroke-linecap="round"><path d="M8 18a12 12 0 0 1 24 0v6"/><path d="M12 19a8 8 0 0 1 16 0v8c0 5-2 9-5 12"/><path d="M16 20a4 4 0 0 1 8 0v7c0 6-2 10-6 14"/><path d="M20 21v7c0 5-2 9-5 12"/><path d="M5 12a18 18 0 0 1 30 0"/></g></svg></div>
+            <div style="font-size:13.5px;line-height:1.5">“Coloque el dedo en el lector”<br><span class="mini">Consentimiento de la toma · recibí indicaciones</span><br><span class="st warn">esperando huella…</span></div></div>
+          <div class="mini" style="margin-top:6px">Lector en el escritorio del consultorio. Para quien no sabe firmar, la huella <b>es</b> su firma.</div>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <div class="lbl">Paso 3 · Al confirmar</div>
+          <div style="font-size:13px;line-height:1.6">💊 La receta aparece en <b>farmacia</b> · 🔬 el D-8 en <b>laboratorio</b> · 🕐 todo en la <b>línea de tiempo</b> · 📱 SMS: “Su resultado estará en ~3 semanas” · 🔔 se llama a la siguiente ficha</div>
+          <div class="row" style="justify-content:flex-end;margin-top:10px"><span class="btn">🖨 Imprimir receta</span><span class="btn p">✓ Finalizar atención</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  const NOTES = {
+    p0: '<b>“Para hacer hoy”:</b> no son metas que alguien escribe; son las <b>tareas del día que el sistema calcula</b>. En el SIVEC PAP ya existe para el médico (Panel). En el SIVEC completo <b>cada función</b> tiene el suyo: médico por programa, recepción, triaje, farmacia, laboratorio y gestor de la red.',
+    p1: '<b>Croquis:</b> el recorrido de la paciente (línea roja punteada): entrada → recepción → sala de espera con TV → triaje → consultorio → farmacia/laboratorio → salida. Cada paso queda registrado con la hora.',
+    p2: '<b>Recepción:</b> busca por C.I., los datos vienen del SEGIP/SIVEC (solo se corrige lo que cambió), la <b>huella confirma la identidad</b>, se deriva al área y sale la ficha (impresa o por SMS).',
+    p3: '<b>Triaje y TV:</b> signos vitales que entran solos a la historia, prioridad si hay alarma, y la TV de la sala de espera con la ficha llamada, sonido y voz.',
+    p4: '<b>Atención:</b> el médico ve su fila, llama a la paciente (aparece en la TV) y abre la ficha con alertas, signos vitales del triaje y la línea de tiempo de todos los centros.',
+    p5: '<b>Firmar documentos:</b> D-1, D-8, registro de PAP, historia y consentimiento se generan solos. La médica firma todo con <b>una huella + PIN</b>; la paciente pone su <b>huella</b> donde hace falta. Cada documento va solo a su destino (farmacia, laboratorio, línea de tiempo) y se imprime solo lo que ella se lleva.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 'p0');
+</script>
+
+</body>
+</html>
