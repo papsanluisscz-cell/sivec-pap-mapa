@@ -451,6 +451,28 @@
   .fxBtn { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 9px; padding: 9px 14px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
   .fxBtn.primary { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
   @media (prefers-reduced-motion: reduce) { #fichaPanel, .fxEv { transition: none !important; animation: none !important; } }
+  /* ===== Registrar en 3 pasos ===== */
+  .regHead { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 8px 0 16px; }
+  .regSteps { display: flex; align-items: center; flex: 1; min-width: 300px; }
+  .regSp { display: flex; align-items: center; gap: 8px; border: none; background: none; font-size: 13px; font-weight: 600; color: var(--ink-soft); cursor: pointer; padding: 0; font-family: inherit; white-space: nowrap; }
+  .regSp i { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--line); display: inline-flex; align-items: center; justify-content: center; font-style: normal; background: var(--surface); transition: all .25s; }
+  .regSp.on { color: var(--teal-700); } .regSp.on i { background: var(--teal-700); border-color: var(--teal-700); color: #fff; box-shadow: 0 0 0 4px color-mix(in srgb, var(--teal-700) 18%, transparent); }
+  .regSp.done { color: #16a34a; } .regSp.done i { background: #16a34a; border-color: #16a34a; color: #fff; font-size: 0; } .regSp.done i::after { content: "✓"; font-size: 14px; }
+  .regLine { flex: 1; height: 3px; background: var(--line); margin: 0 10px; border-radius: 2px; overflow: hidden; min-width: 20px; }
+  .regLine b { display: block; height: 100%; width: 0; background: #16a34a; transition: width .5s ease; } .regLine.done b { width: 100%; }
+  .regDraft { font-size: 12px; color: #16a34a; display: inline-flex; align-items: center; gap: 6px; } .regDraft:not(:empty)::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #16a34a; }
+  #patientForm[data-cur="1"] [data-step]:not([data-step="1"]), #patientForm[data-cur="2"] [data-step]:not([data-step="2"]), #patientForm[data-cur="3"] [data-step]:not([data-step="3"]) { display: none !important; }
+  #patientForm[data-cur="1"] #submitBtn { display: none; }
+  .regNav { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .regNav #submitBtn { margin: 0; }
+  .regNav button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 9px; padding: 10px 18px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .regNav .regNext { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
+  .regBorr, .regExist { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; border-radius: 10px; padding: 10px 12px; font-size: 13px; margin-bottom: 12px; }
+  .regBorr { background: #fff7e6; border: 1px solid #f3d9a4; color: #6b4a00; } .regExist { background: #e3eefb; border: 1px solid #c4dbf5; color: #1e4f86; }
+  body.dark .regBorr { background: #3a2a0c; color: #fcd34d; border-color: #5a4212; } body.dark .regExist { background: #132741; color: #93c5fd; border-color: #1f3d63; }
+  .regBorr button, .regExist button { border: 1px solid currentColor; background: transparent; color: inherit; border-radius: 7px; padding: 4px 10px; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .regOk { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .regOk button { border: none; background: var(--teal-700); color: #fff; border-radius: 8px; padding: 7px 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
   /* ===== Métodos: calendario ===== */
   .metTiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 6px 0 14px; }
   .metTile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; cursor: pointer; }
@@ -1761,19 +1783,22 @@ async function onSubmit(e) {
   const msg = document.getElementById('formMsg');
   msg.className = ''; msg.style.display = 'none';
 
-  const { error } = await sb.from('pacientes').insert([data]);
+  const { data: insertado, error } = await sb.from('pacientes').insert([data]).select();
   btn.disabled = false;
   if (error) {
     msg.textContent = 'Error al guardar: ' + error.message;
     msg.className = 'err';
     showToast('Error al guardar la paciente: ' + error.message, 'err');
   } else {
-    msg.textContent = 'Paciente guardada correctamente.';
+    const nueva = insertado && insertado[0];
+    msg.innerHTML = `<span class="regOk">✅ ${esc(data.nombre)} guardada correctamente.${nueva ? ' <button type="button" id="regPrint">🖨 Imprimir documentos</button>' : ''}</span>`;
     msg.className = 'ok';
+    if (nueva) document.getElementById('regPrint').onclick = () => printPatientDocs(nueva);
     showToast('Paciente guardada correctamente ✔', 'ok');
     allPatientsData = []; // se vuelve a leer en el próximo registro, así también avisa de la toma recién guardada
     form.reset();
     resetGeoPick(form);
+    if (window.regBorrarBorrador) window.regBorrarBorrador();
   }
 }
 
@@ -3061,6 +3086,125 @@ async function deletePatient(p) {
   showToast('Paciente movida a la Papelera ✔', 'ok');
   loadList();
 }
+
+// ================= Registrar en 3 pasos + borrador automático =================
+(function () {
+  const form = document.getElementById('patientForm');
+  const PASO1 = ['nombre', 'carnet', 'fecha_nacimiento', 'celular', 'estado_civil', 'ocupacion', 'direccion'];
+  const PASO2 = ['numero_folio_d1', 'numero_folio_d8', 'numero_folio_pap', 'doctora', 'fecha_toma', 'tipo_examen', 'observaciones'];
+  // Asignar cada bloque del formulario a un paso (sin cambiar los campos)
+  form.querySelectorAll(':scope > .formGrid > .field').forEach(f => {
+    const el = f.querySelector('[name]'); const n = el && el.name;
+    f.dataset.step = PASO1.includes(n) ? '1' : '2';
+  });
+  [...form.children].forEach(ch => {
+    if (ch.classList.contains('formGrid') || ch.id === 'formMsg') return;
+    if (ch.matches('details.consentBox')) ch.dataset.step = '3';
+    else if (ch.id === 'submitBtn') return; // visible en los pasos 2 y 3 (los consentimientos son opcionales)
+    else ch.dataset.step = '2';
+  });
+  // Encabezado con pasos + barra de navegación
+  const head = document.createElement('div'); head.className = 'regHead';
+  head.innerHTML = `<div class="regSteps">
+      <button type="button" class="regSp" data-go="1"><i>1</i>Paciente</button><span class="regLine"><b></b></span>
+      <button type="button" class="regSp" data-go="2"><i>2</i>Toma</button><span class="regLine"><b></b></span>
+      <button type="button" class="regSp" data-go="3"><i>3</i>Consentimientos</button></div>
+    <span class="regDraft" id="regDraft"></span>`;
+  form.parentNode.insertBefore(head, form);
+  const banner = document.createElement('div'); banner.id = 'regBanner'; form.parentNode.insertBefore(banner, form);
+  const exist = document.createElement('div'); exist.id = 'regExist'; form.insertBefore(exist, form.firstChild);
+  const nav = document.createElement('div'); nav.className = 'regNav';
+  nav.innerHTML = `<button type="button" class="regBack">← Anterior</button><span></span><button type="button" class="regNext">Siguiente →</button>`;
+  form.insertBefore(nav, document.getElementById('submitBtn'));
+  nav.querySelector('span').replaceWith(document.getElementById('submitBtn')); // Anterior · Guardar · Siguiente
+  let paso = 1;
+  function irA(n, validar) {
+    if (validar && n > paso) {
+      const campos = n >= 2 ? [form.nombre] : [];
+      if (n >= 3 && paso <= 2) campos.push(form.fecha_toma);
+      for (const c of campos) if (!c.checkValidity()) { irA(c === form.nombre ? 1 : 2); c.reportValidity(); return; }
+    }
+    paso = n; form.dataset.cur = n;
+    head.querySelectorAll('.regSp').forEach(b => { const k = +b.dataset.go; b.classList.toggle('on', k === n); b.classList.toggle('done', k < n); });
+    head.querySelectorAll('.regLine').forEach((l, i) => l.classList.toggle('done', i + 1 < n));
+    nav.querySelector('.regBack').style.visibility = n > 1 ? 'visible' : 'hidden';
+    nav.querySelector('.regNext').style.display = n < 3 ? '' : 'none';
+    nav.querySelector('.regNext').textContent = n === 1 ? 'Siguiente: Toma →' : 'Siguiente: Consentimientos →';
+    const v = document.getElementById('formView'); if (v && v.scrollTop > 120) v.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  head.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) irA(+b.dataset.go, true); });
+  nav.querySelector('.regBack').addEventListener('click', () => irA(Math.max(1, paso - 1)));
+  nav.querySelector('.regNext').addEventListener('click', () => irA(Math.min(3, paso + 1), true));
+  // Si al guardar falta un obligatorio, llevar al paso correcto
+  form.addEventListener('invalid', e => { const s = e.target.closest('[data-step]'); if (s && +s.dataset.step !== paso) irA(+s.dataset.step); }, true);
+  irA(1);
+  window.regIrA = irA;
+
+  // ---- Borrador automático ----
+  const KEY = 'sivec_borrador_registro_v1';
+  let tGuardado = null, timer = null;
+  function snapshot() {
+    const vals = {};
+    form.querySelectorAll('[name]').forEach(el => {
+      if (el.type === 'checkbox') { if (el.checked) (vals[el.name] = vals[el.name] || []).push(el.value); }
+      else if (el.value) vals[el.name] = el.value;
+    });
+    form.querySelectorAll('[data-ap]').forEach(el => { if (el.value) vals['ap:' + el.dataset.ap] = el.value; });
+    return vals;
+  }
+  function hayDatos(v) { return Object.keys(v).some(k => !['doctora', 'tipo_examen'].includes(k)); }
+  function guardar() {
+    const v = snapshot();
+    try { if (hayDatos(v)) { localStorage.setItem(KEY, JSON.stringify({ t: Date.now(), v, paso })); tGuardado = Date.now(); } else localStorage.removeItem(KEY); } catch (e) {}
+    pintar();
+  }
+  function pintar() {
+    const el = document.getElementById('regDraft');
+    if (!tGuardado) { el.textContent = ''; return; }
+    const s = Math.round((Date.now() - tGuardado) / 1000);
+    el.textContent = 'Borrador guardado ' + (s < 5 ? 'recién' : s < 60 ? `hace ${s} s` : `hace ${Math.round(s / 60)} min`);
+  }
+  setInterval(pintar, 10000);
+  form.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(guardar, 700); });
+  form.addEventListener('change', () => { clearTimeout(timer); timer = setTimeout(guardar, 700); });
+  function restaurar(d) {
+    Object.entries(d.v).forEach(([k, val]) => {
+      if (k.startsWith('ap:')) { const el = form.querySelector(`[data-ap="${k.slice(3)}"]`); if (el) el.value = val; return; }
+      const els = form.querySelectorAll(`[name="${k}"]`);
+      els.forEach(el => { if (el.type === 'checkbox') el.checked = [].concat(val).includes(el.value); else el.value = val; });
+    });
+    if (form.fecha_nacimiento) form.fecha_nacimiento.dispatchEvent(new Event('change'));
+    irA(d.paso || 1);
+    tGuardado = d.t; pintar();
+  }
+  window.regBorrarBorrador = () => { try { localStorage.removeItem(KEY); } catch (e) {} tGuardado = null; pintar(); banner.innerHTML = ''; };
+  try {
+    const d = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (d && d.v && hayDatos(d.v)) {
+      banner.innerHTML = `<div class="regBorr">📝 Hay un registro sin guardar${d.v.nombre ? ' de <b>' + esc(d.v.nombre) + '</b>' : ''} (${new Date(d.t).toLocaleString('es', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}).
+        <button type="button" id="regRec">Recuperar</button><button type="button" id="regDesc">Descartar</button></div>`;
+      banner.querySelector('#regRec').onclick = () => { restaurar(d); banner.innerHTML = ''; };
+      banner.querySelector('#regDesc').onclick = () => window.regBorrarBorrador();
+    }
+  } catch (e) {}
+  form.addEventListener('reset', () => setTimeout(() => { irA(1); exist.innerHTML = ''; }, 0));
+
+  // ---- ¿La paciente ya está registrada? (por CI, o nombre + nacimiento) ----
+  async function buscarExistente() {
+    const p = { carnet: form.carnet.value, nombre: form.nombre.value, fecha_nacimiento: form.fecha_nacimiento.value };
+    const keys = new Set(pacienteKeys(p)); if (!keys.size) { exist.innerHTML = ''; return; }
+    if (!allPatientsData.length) { const { data } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null)); if (data) { allPatientsData = data; tomasIndex = buildTomasIndex(data); } }
+    const prev = allPatientsData.filter(x => pacienteKeys(x).some(k => keys.has(k))).sort((a, b) => String(b.fecha_toma || '').localeCompare(String(a.fecha_toma || '')));
+    if (!prev.length) { exist.innerHTML = ''; return; }
+    const u = prev[0];
+    exist.innerHTML = `<div class="regExist">🔁 <b>${esc(u.nombre)}</b> ya está registrada (${prev.length} toma${prev.length > 1 ? 's' : ''}, la última ${fmtFecha(u.fecha_toma) || 'sin fecha'} · ${esc(tomaResumen(u).split(' — ')[1] || '')}). Esta será una <b>nueva toma</b>.
+      <button type="button" id="regFill">Completar sus datos</button><button type="button" id="regVer">Ver ficha</button></div>`;
+    exist.querySelector('#regFill').onclick = () => { PASO1.forEach(k => { if (form[k] && u[k] != null && !form[k].value) form[k].value = u[k]; }); form.fecha_nacimiento.dispatchEvent(new Event('change')); guardar(); showToast('Datos personales completados ✔', 'ok'); };
+    exist.querySelector('#regVer').onclick = () => openFicha(u);
+  }
+  form.carnet.addEventListener('change', buscarExistente);
+  form.fecha_nacimiento.addEventListener('change', () => { if (form.nombre.value) buscarExistente(); });
+})();
 
 // ================= Ficha de la paciente (línea de tiempo) =================
 // Base del futuro "Historial" del SIVEC: todas las tomas, resultados, entregas, seguimientos y colposcopias
