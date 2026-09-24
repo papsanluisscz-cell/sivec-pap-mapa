@@ -364,7 +364,7 @@ Formulários/telas a ter, todos ligados à linha do tempo e ao "onde está a pac
 - **SIVEC Pediatria:** **calculadora de doses por peso**, **busca de medicamento por indicação**, controles (crescimento com curvas OMS, desenvolvimento, vacinas).
 - Esboço em `docs/esboco-hospital.html`.
 
-### [24/09/2026] App da paciente "SIVEC Mi salud" (esboço `docs/esboco-mi-salud.html`)
+### [24/09/2026] App da paciente "SIVEC Mi salud" — APROVADO (esboço `docs/esboco-mi-salud.html`)
 Fase 2 (a fase 1 é SMS/WhatsApp). Grátis para a paciente, Android e iPhone, e também versão web leve.
 - **Entrar:** C.I. + código por SMS (primeira vez com validação no centro/SEGIP) e depois digital/rosto do próprio celular.
 - **Início:** próxima cita, o que fazer hoje (remédios, controles), avisos.
@@ -376,5 +376,12 @@ Fase 2 (a fase 1 é SMS/WhatsApp). Grátis para a paciente, Android e iPhone, e 
 - **Família:** filhos (controles, vacinas) e **gravidez** (semanas, controles pré-natais, sinais de alarme).
 - **Carnê de vacinas digital** com QR.
 - **Privacidade:** a paciente vê **quem acessou** a sua história (auditoria visível), autoriza familiar/cuidador.
-- **Emergência:** botão que liga para o número de emergência e compartilha a localização; não substitui a ligação.
+- ~~Emergência no app~~ **retirado pelo autor** (guardado como ideia): a emergência já aciona a ambulância discando **160**. No lugar: **"Compartilhar meu resumo"** com código temporal de 24 h.
 - Acessibilidade: letra grande, **áudio em espanhol e quechua/guarani/aimara**, funciona com internet fraca.
+
+### [24/09/2026] Mapa do projeto — o que falta organizar (`docs/mapa-projeto.png`)
+- **Já funciona:** SIVEC PAP/VPH, consulta com figuras, colposcopia com relógio, ficha com linha do tempo, documentos oficiais + formato SIVEC (prova), informes.
+- **Desenhado e aprovado:** um só SIVEC, marca, recepção, triagem/TV, consultório e assinatura, HC modelo B, referências, hoja de tránsito, hospital/quirófano/camas/alta, chefe de piso, farmácia, mensagens, tránsito + app ambulância, Mi salud, pediatria, monitorização fetal.
+- **Falta desenhar (ordem sugerida):** 1 SIVEC Admin (redes/centros/usuários/perfis/catálogos) · 2 Agenda e citas · 3 Laboratório (e portal do laboratório de PAP) · 4 Enfermagem de piso (kárdex, administração de medicamentos, balanço) · 5 Emergências (triagem por cores) · 6 Painel do gestor + informes SNIS · 7 Materno (CLAP, partograma) · 8 Vacinas · 9 Imagem · 10 Odonto · 11 Almoxarifado/logística · 12 Pessoal e plantões · 13 Epidemiologia · 14 Telessaúde · 15 App do profissional · 16 TB, Chagas, Zoonoses, Nutrição, Saúde mental.
+- **Base (não aparece, mas sem ela não se vende):** segurança e proteção de dados, infraestrutura (nuvem/servidor, sem internet), integrações (SEGIP, SNIS, SUS, HL7 FHIR), legal (Ministério/SEDES, ADSIB, SENAPI), hardware por centro, implantação (piloto, migração, capacitação), suporte, qualidade.
+- **Fases:** 0 agora (PAP/VPH + login seguro + redes/centros) → 1 núcleo do centro → 2 rede e hospital → 3 apps e especialidades.

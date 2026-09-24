@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa del proyecto SIVEC</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#241b20; --soft:#6f6168; --line:#e9dfe3; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e6e0e3; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .board { width:1400px; margin:0 auto 30px; background:#fbf8f6; padding:30px 34px 34px; }
+  .bt { display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+  .logo { width:54px; height:54px; border-radius:24%; background:linear-gradient(145deg,#9c3a5f,#5a1c36); display:flex; align-items:center; justify-content:center; }
+  .bt h2 { margin:0; font-size:30px; font-weight:900; } .bt span { color:var(--soft); font-size:17px; }
+  .legend { margin-left:auto; display:flex; gap:10px; font-size:13px; font-weight:700; }
+  .legend span { border-radius:999px; padding:4px 11px; }
+  .cols { display:grid; grid-template-columns:1fr 1.25fr 1.45fr; gap:16px; }
+  .col { border-radius:18px; padding:14px; }
+  .col h3 { margin:0 0 10px; font-size:17px; display:flex; align-items:center; gap:8px; } .col h3 small { font-weight:600; color:var(--soft); font-size:13px; }
+  .it { background:#fff; border:1px solid var(--line); border-radius:12px; padding:8px 11px; margin-bottom:7px; font-size:13.5px; line-height:1.35; }
+  .it b { display:block; font-size:14.5px; } .it span { color:var(--soft); font-size:12.5px; }
+  .g2 { display:grid; grid-template-columns:1fr 1fr; gap:7px; } .g2 .it { margin:0; }
+  .done { background:#e6f5ec; } .done .it { border-left:4px solid #15803d; }
+  .sk { background:#f7e9ef; } .sk .it { border-left:4px solid #7d2a4c; }
+  .todo { background:#fdf3e1; } .todo .it { border-left:4px solid #c2410c; }
+  .base { margin-top:16px; background:#eef1f6; border-radius:18px; padding:14px; }
+  .base .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; } .base .it { margin:0; border-left:4px solid #334155; }
+  .road { margin-top:16px; display:grid; grid-template-columns:repeat(4,1fr); gap:0; }
+  .ph { position:relative; padding:12px 16px 12px 22px; color:#fff; font-size:13px; line-height:1.4; clip-path:polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%, 18px 50%); }
+  .ph:first-child { clip-path:polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%); padding-left:16px; }
+  .ph b { display:block; font-size:15px; }
+</style>
+</head>
+<body>
+<section class="board" id="mp">
+  <div class="bt"><div class="logo"><svg viewBox="0 0 24 24" width="32" height="32"><path d="M16.8 7.4C16 5.9 14.3 5 12.1 5 9.3 5 7.5 6.4 7.5 8.4c0 4.4 9.1 2.9 9.1 7.4 0 2-1.9 3.3-4.6 3.3-2.4 0-4.1-.9-4.9-2.5" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round"/><circle cx="16.8" cy="7.4" r="1.9" fill="#fff"/><circle cx="7.2" cy="16.6" r="1.9" fill="#fff"/></svg></div>
+    <h2>Mapa del proyecto SIVEC</h2><span>qué funciona, qué está dibujado y qué falta</span>
+    <div class="legend"><span style="background:#e6f5ec;color:#15803d">✅ funcionando</span><span style="background:#f7e9ef;color:#7d2a4c">🎨 dibujado y aprobado</span><span style="background:#fdf3e1;color:#c2410c">⏳ falta dibujar</span></div></div>
+
+  <div class="cols">
+    <div class="col done"><h3>✅ Funcionando <small>piloto C.S. San Luis desde 01/2026</small></h3>
+      <div class="it"><b>SIVEC PAP/VPH</b><span>registro, mapa, seguimiento, balance, panel, métodos</span></div>
+      <div class="it"><b>Consulta con figuras</b><span>SOAP por toques, tratamientos, especialidad + código D1</span></div>
+      <div class="it"><b>Colposcopia con reloj del cuello</b></div>
+      <div class="it"><b>Ficha con línea de tiempo</b></div>
+      <div class="it"><b>Documentos oficiales + formato SIVEC (prueba)</b><span>D1, D8, PAP, consentimiento, HC</span></div>
+      <div class="it"><b>Informes y búsqueda activa</b></div>
+    </div>
+    <div class="col sk"><h3>🎨 Dibujado y aprobado <small>esbozos en docs/</small></h3>
+      <div class="g2">
+        <div class="it"><b>Un solo SIVEC</b><span>vistas por función</span></div>
+        <div class="it"><b>Marca y 28 logos</b></div>
+        <div class="it"><b>Recepción + huella</b><span>foto, ficha, derivación</span></div>
+        <div class="it"><b>Triaje y TV de turnos</b></div>
+        <div class="it"><b>Consultorio y firma</b><span>huella médico + paciente</span></div>
+        <div class="it"><b>Historia clínica B</b><span>resumen + nota + protocolo</span></div>
+        <div class="it"><b>Referencias</b><span>botón Derivar, bandeja, indicadores</span></div>
+        <div class="it"><b>Hoja de tránsito</b><span>interconsultas</span></div>
+        <div class="it"><b>Hospital y quirófano</b><span>anestesia, recuperación, camas, alta</span></div>
+        <div class="it"><b>Jefe de piso</b></div>
+        <div class="it"><b>Farmacia</b><span>receta, stock, huella</span></div>
+        <div class="it"><b>Mensajes SMS/WhatsApp</b></div>
+        <div class="it"><b>Tránsito + app ambulancia</b></div>
+        <div class="it"><b>App Mi salud</b></div>
+        <div class="it"><b>Pediatría</b><span>dosis, búsqueda, controles</span></div>
+        <div class="it"><b>Monitoreo fetal</b></div>
+      </div>
+    </div>
+    <div class="col todo"><h3>⏳ Falta dibujar <small>módulos</small></h3>
+      <div class="g2">
+        <div class="it"><b>1 · SIVEC Admin</b><span>redes, centros, usuarios, roles, catálogos (ya aprobado)</span></div>
+        <div class="it"><b>2 · Agenda y citas</b><span>cupos por médico, sobreturnos, reprogramar</span></div>
+        <div class="it"><b>3 · Laboratorio</b><span>muestras, lotes, validación, portal del laboratorio de PAP</span></div>
+        <div class="it"><b>4 · Enfermería de piso</b><span>kárdex, administración de medicamentos, balance, notas</span></div>
+        <div class="it"><b>5 · Emergencias</b><span>triaje por colores, boxes, observación</span></div>
+        <div class="it"><b>6 · Tablero del gestor</b><span>indicadores de la red, informes SNIS automáticos</span></div>
+        <div class="it"><b>7 · Materno</b><span>control prenatal (CLAP), partograma, RN</span></div>
+        <div class="it"><b>8 · Vacunas</b><span>esquemas, campañas, cadena de frío</span></div>
+        <div class="it"><b>9 · Imagen</b><span>RX/eco, informes, visor</span></div>
+        <div class="it"><b>10 · Odonto</b><span>odontograma</span></div>
+        <div class="it"><b>11 · Almacén y logística</b><span>pedidos entre centros, insumos, equipos</span></div>
+        <div class="it"><b>12 · Personal y guardias</b><span>turnos, reemplazos, permisos</span></div>
+        <div class="it"><b>13 · Epidemiología</b><span>notificación obligatoria</span></div>
+        <div class="it"><b>14 · Telesalud</b><span>videoconsulta, e-consulta</span></div>
+        <div class="it"><b>15 · App del profesional</b><span>médico en el celular: pacientes, firmar</span></div>
+        <div class="it"><b>16 · TB, Chagas, Zoonosis, Nutrición, Salud mental</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="base"><h3 style="margin:0 0 10px;font-size:17px">🧱 La base que sostiene todo (no se ve, pero sin esto no se vende)</h3>
+    <div class="g4">
+      <div class="it"><b>Seguridad y datos</b><span>login + roles, auditoría, copias de seguridad, cifrado, ley de protección de datos</span></div>
+      <div class="it"><b>Infraestructura</b><span>nube o servidor del ministerio, funcionamiento sin internet, velocidad</span></div>
+      <div class="it"><b>Integraciones</b><span>SEGIP, SNIS, SUS, laboratorios, equipos; estándar HL7 FHIR</span></div>
+      <div class="it"><b>Legal</b><span>autorización Ministerio/SEDES, firma digital (ADSIB), marca y derecho de autor (SENAPI)</span></div>
+      <div class="it"><b>Hardware por centro</b><span>lector de huella, cámara, TV, celular, impresora</span></div>
+      <div class="it"><b>Implantación</b><span>piloto por fases, migración de datos, capacitación, manuales</span></div>
+      <div class="it"><b>Soporte</b><span>mesa de ayuda, actualizaciones, contrato de mantenimiento</span></div>
+      <div class="it"><b>Calidad</b><span>seguridad del paciente, eventos adversos, encuestas</span></div>
+    </div></div>
+
+  <div class="road">
+    <div class="ph" style="background:#15803d"><b>Fase 0 · ahora</b>PAP/VPH + login seguro + redes y centros</div>
+    <div class="ph" style="background:#2f6fb0"><b>Fase 1 · núcleo del centro</b>paciente única, recepción, agenda, consultorio, farmacia, laboratorio, mensajes</div>
+    <div class="ph" style="background:#7d2a4c"><b>Fase 2 · red y hospital</b>referencias, hospital, quirófano, camas, tránsito, gestor</div>
+    <div class="ph" style="background:#6d28d9"><b>Fase 3 · apps y especialidades</b>Mi salud, app del profesional, materno, pediatría, odonto, programas</div>
+  </div>
+</section>
+</body>
+</html>
