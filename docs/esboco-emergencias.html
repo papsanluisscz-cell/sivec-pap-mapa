@@ -169,7 +169,8 @@
   <button class="tab" data-t="m4">4. Atención en el box</button>
   <button class="tab" data-t="m5">5. Códigos y protocolos</button>
   <button class="tab" data-t="m6">6. Observación y destino</button>
-  <button class="tab" data-t="m7">7. Indicadores</button>
+  <button class="tab" data-t="m8">7. Mismo patrón + directo a quirófano</button>
+  <button class="tab" data-t="m7">8. Indicadores</button>
 </div>
 <div class="warn">⚠️ Dibujo para aprobar, con datos inventados. En emergencia no hay cita ni orden de llegada: se atiende por gravedad.</div>
 
@@ -298,6 +299,41 @@
   </div>
 </section>
 
+
+<!-- ============ M8 ============ -->
+<section class="scr" id="m8">
+  <div class="app"><div class="brand">SIVEC <span>EMERGENCIAS</span></div><div class="who">🔁 El mismo patrón de siempre: recepción → triaje → atención — y todo a la línea de tiempo</div></div>
+  <div class="body">
+    <div class="cols c3" style="gap:12px">
+      <div class="card"><div class="lbl">1 · Recepción de emergencia</div>
+        <div style="font-size:13.5px;line-height:1.6">🪪 C.I. o <b>huella</b> → datos del SEGIP/SIVEC en segundos.<br>🆘 <b>Si llega inconsciente o sin documento:</b> se registra como <b>“NN-0923 · mujer · ~40 años”</b> y se atiende igual. Cuando se identifica (huella, familiar), el sistema <b>une</b> todo a su historia.<br>👨‍👩‍👧 Acompañante y teléfono de contacto.</div></div>
+      <div class="card"><div class="lbl">2 · Triaje</div>
+        <div style="font-size:13.5px;line-height:1.6">Color y tiempo máximo (tipo Manchester) · signos vitales · alertas.<br>🔴 <b>Rojo:</b> pasa directo al shock — la recepción completa los datos <b>después</b>, nunca frena la atención.</div></div>
+      <div class="card"><div class="lbl">3 · Atención y destino</div>
+        <div style="font-size:13.5px;line-height:1.6">Box → nota, órdenes, códigos → <b>alta · observación · quirófano · internación · referencia</b>.</div></div>
+    </div>
+    <div class="cols c21" style="margin-top:12px">
+      <div class="card"><div class="lbl">Caso directo a quirófano — Rosa Mamani (hemorragia obstétrica)</div>
+        <div class="tl">
+          <div style="--c:#ea580c"><b>23:18</b> Pedido de ambulancia desde C.S. El Bajío (REF-2026-0219)</div>
+          <div style="--c:#ea580c"><b>23:46</b> Llega AMB-07 · entrega con huella</div>
+          <div style="--c:#2f6fb0"><b>23:46</b> Recepción de emergencia (identificada por huella)</div>
+          <div style="--c:#dc2626"><b>23:47</b> Triaje 🔴 inmediato · PA 88/54 · código rojo obstétrico activado</div>
+          <div style="--c:#dc2626"><b>23:48</b> Shock 1 · 2 vías · sangre O− · laboratorio urgente</div>
+          <div style="--c:#be185d"><b>00:02</b> Solicitud de quirófano · emergencia (inmediata) · consentimiento 🖐</div>
+          <div style="--c:#0f766e"><b>00:10</b> <b>Entrada a quirófano 1</b> · anestesia general</div>
+          <div style="--c:#0f766e"><b>01:05</b> <b>Salida de quirófano</b> · protocolo quirúrgico y de anestesia firmados</div>
+          <div style="--c:#0e7490"><b>01:10</b> Recuperación / UTI · control c/15 min</div>
+          <div style="--c:#7d2a4c"><b>03:40</b> Ingreso a piso GO · cama 13</div>
+        </div></div>
+      <div>
+        <div class="card"><div class="lbl">Lo que el sistema asegura</div><div style="font-size:13.5px;line-height:1.6">✓ Ningún paso se salta: aunque vaya directo, quedan recepción, triaje, quirófano y piso<br>✓ Cada paso con <b>hora, lugar y responsable</b><br>✓ Tiempos clave medidos solos: <b>llegada → quirófano: 24 min</b><br>✓ El centro de origen ve todo en la referencia</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Paciente sin identificar (NN)</div><div style="font-size:13.5px;line-height:1.55">Brazalete con código NN · todo se registra igual · al identificarla, se unen los registros y queda auditado quién los unió.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ M7 ============ -->
 <section class="scr" id="m7">
   <div class="app"><div class="brand">SIVEC <span>EMERGENCIAS</span></div><div class="who">📊 Indicadores de emergencia · Hospital municipal · septiembre</div></div>
@@ -328,6 +364,7 @@
     m4: '<b>Atendimento no box:</b> nota rápida SOAP com dados da triagem, ordens de um toque (laboratório, imagem, soro, remédios) e resultados ao vivo; interconsulta avisada.',
     m5: '<b>Códigos e protocolos:</b> código vermelho obstétrico, infarto, AVC e outros, com cronômetro e lista de passos; cada passo com hora e responsável.',
     m6: '<b>Observação e destino:</b> alta, observação (até 24 h), quirófano, internar ou referir — cada destino abre o formulário certo com tudo carregado.',
+    m8: '<b>Mesmo padrão + direto ao quirófano:</b> a emergência também tem recepção (com C.I./digital ou registro NN se chega inconsciente) e triagem; o vermelho entra direto no choque e os dados se completam depois. O caso que vai direto ao quirófano fica inteiro na linha do tempo: ambulância, recepção, triagem, choque, solicitação, entrada e saída do quirófano, recuperação e piso.',
     m7: '<b>Indicadores:</b> tempo até triagem, atendidos no tempo por cor, pacientes que foram embora, estância longa e consultas não urgentes por centro de origem.',
   };
   const tabs = document.querySelectorAll('.tab');
