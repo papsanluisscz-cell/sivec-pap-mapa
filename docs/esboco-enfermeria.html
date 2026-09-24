@@ -163,6 +163,10 @@
   .auto2 { font-size:10.5px; font-weight:800; background:#e0ecfa; color:#1e4f8a; border-radius:6px; padding:1px 6px; margin-right:4px; }
   .opt2 { padding:0; overflow:hidden; } .oh { color:#fff; font-weight:800; font-size:15px; padding:10px 14px; } .ob { padding:10px 14px; font-size:13.5px; line-height:1.5; }
   .stp { display:flex; gap:10px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:13.5px; } .stp i { width:26px; height:26px; border-radius:50%; flex:none; background:#dcf3e5; color:#15803d; font-style:normal; font-weight:800; display:flex; align-items:center; justify-content:center; } .stp b { display:block; } .stp span { color:var(--soft); font-size:12.5px; }
+  mark.err { background:#fde2e2; color:#991b1b; border-bottom:2px solid #dc2626; padding:0 2px; } mark.miss { background:#fdf0d5; color:#8a5a00; border-bottom:2px dashed #c2410c; padding:0 2px; }
+  .cm { margin-top:6px; background:#fffbea; border:1px solid #f0dfa0; border-left:4px solid #eab308; border-radius:8px; padding:6px 9px; font-size:12.8px; }
+  .flowbar { display:flex; gap:6px; margin-bottom:12px; } .flowbar span { flex:1; text-align:center; font-size:13px; font-weight:700; padding:7px; border-radius:9px; background:#fff; border:1px solid var(--line); color:var(--soft); } .flowbar span.on { background:#dcf3e5; color:#15803d; border-color:#b8e3c7; } .flowbar span.cur { background:var(--wine); color:#fff; border-color:var(--wine); }
+  .sgn { margin:5px 0; }
 </style>
 </head>
 <body>
@@ -178,6 +182,7 @@
   <button class="tab" data-t="e9">9. Historia de internación</button>
   <button class="tab" data-t="e10">10. Evolución SOAP diaria</button>
   <button class="tab" data-t="e11">11. Internos: cómo escriben</button>
+  <button class="tab" data-t="e12">12. Revisión del residente</button>
 </div>
 <div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Funciona igual en el piso de un hospital y en las pocas camas de un centro de 1er nivel.</div>
 
@@ -429,6 +434,30 @@
   </div>
 </section>
 
+<!-- ============ E12 ============ -->
+<section class="scr" id="e12">
+  <div class="app"><div class="brand">SIVEC <span>INTERNACIÓN</span></div><div class="who">✍️ Revisión de evolución · escrita por Int. Rojas · revisa R2 Vaca · cama 13</div></div>
+  <div class="body">
+    <div class="flowbar"><span class="on">1 · Interno escribe</span><span class="on cur">2 · Residente marca y comenta</span><span>3 · Interno corrige</span><span>4 · Firman los dos</span></div>
+    <div class="cols c21">
+      <div class="card">
+        <div class="soapE"><b>S</b><div>Refiere cefalea leve, sin fosfenos. Percibe movimientos fetales.</div></div>
+        <div class="soapE"><b>O</b><div><span class="auto2">auto</span> PA 148/96 · FC 88 · diuresis 35 mL/h · plaquetas 128.000<br>Reflejos ++ · edema ++ · <mark class="err">FCF 162</mark> · útero sin dinámica.<div class="cm">💬 <b>R2 Vaca:</b> La FCF del monitoreo de las 06:00 fue 142, no 162. Revisá y corregí.</div></div></div>
+        <div class="soapE"><b>A</b><div>Preeclampsia severa en control. <mark class="err">Sin datos de HELLP.</mark><div class="cm">💬 <b>R2 Vaca:</b> Plaquetas bajando y TGO 48: poné “sin HELLP completo, vigilar”.</div></div></div>
+        <div class="soapE"><b>P</b><div>Mantener sulfato de Mg · <mark class="miss">falta: hora de la cesárea y control de laboratorio</mark><div class="cm">💬 <b>R2 Vaca:</b> Agregá cesárea 14:00 y laboratorio de control.</div></div></div>
+        <div class="row" style="justify-content:flex-end;margin-top:8px"><span class="btn">✏️ Marcar texto y comentar</span><span class="btn p">↩ Devolver al interno (3 notas)</span></div></div>
+      <div>
+        <div class="card"><div class="lbl">Qué ve el interno</div><div style="font-size:13.5px;line-height:1.6">🔔 “Tu evolución de cama 13 tiene <b>3 correcciones</b> de R2 Vaca.”<br>Corrige cada punto, marca ✓ “corregido” y la devuelve.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">4 · Firma de los dos</div>
+          <div class="sgn"><span class="st ok">🖐 Int. Rojas · escribió · 08:12</span></div>
+          <div class="sgn"><span class="st ok">🖐 R2 Vaca · validó · 08:20</span></div>
+          <div class="mini" style="margin-top:6px"><b>Recién con las dos firmas la evolución vale</b> y entra a la historia. Antes aparece como “borrador en revisión”.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Queda registrado</div><div style="font-size:13px;line-height:1.55">las correcciones y comentarios quedan como historial de la nota → sirven para la <b>enseñanza</b> del interno y para auditoría. El jefe de servicio ve cuántas correcciones tiene cada interno.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <div class="note" id="note"></div>
 <script>
   const NOTES = {
@@ -442,6 +471,7 @@
     e9: '<b>História de internação:</b> tudo num só lugar: dados, motivo de ingresso, o que aconteceu, laboratórios, imagem, entrada e saída do quirófano, ingresso ao piso, evolução SOAP, indicações médicas, indicações de enfermagem e controles, interconsultas e alta.',
     e10: '<b>Evolução SOAP diária:</b> o O (objetivo) já vem com sinais vitais, balanço, alerta e laboratórios do dia; o médico só escreve o que examinou e decide. “Copiar indicações de ontem e editar”. Lembrete quando falta evolução.',
     e11: '<b>Internos:</b> não precisa tablet para cada um — PC na estação, o próprio celular com acesso seguro (sem guardar dados no telefone) e 1–2 tablets por piso. O interno escreve em rascunho e o residente/médico assina; indicações do interno só valem com assinatura do médico. Ditado por voz e modelos por patologia.',
+    e12: '<b>Revisão do residente:</b> o residente marca no texto o que está errado ou falta e escreve uma nota para o interno; o interno recebe o aviso, corrige e devolve; com tudo certo os dois assinam e só então a evolução vale. As correções ficam como histórico (ensino e auditoria).',
     e8: '<b>Indicadores:</b> doses no horário, erros evitados pelo escaneamento, quedas, úlceras e pacientes por enfermeira por turno.',
   };
   const tabs = document.querySelectorAll('.tab');

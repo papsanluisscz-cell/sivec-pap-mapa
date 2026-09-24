@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIVEC Emergencias</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
+    --n1:#2f6fb0; --n2:#0e7490; --n3:#7c3aed; --n4:#b4235a; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .topbar { position:sticky; top:0; z-index:5; background:#2a1720; color:#fff; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; }
+  .topbar b { margin-right:6px; font-size:15px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; border:1px solid #6b4a58; background:transparent; color:#fff; border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tab.on { background:#fff; color:var(--wine-d); border-color:#fff; }
+  .warn { max-width:1100px; margin:14px auto 0; background:#fff7e0; border:1px solid #ecd9a0; border-radius:10px; padding:10px 14px; font-size:14px; color:#5b4712; }
+  .scr { display:none; max-width:1100px; margin:14px auto 30px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,.14); }
+  .scr.on { display:block; }
+  .app { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; }
+  .app .brand { font-weight:800; font-size:20px; letter-spacing:.04em; } .app .brand span { font-size:11px; background:#fff; color:var(--wine-d); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:3px; letter-spacing:.08em; }
+  .app .who { font-size:14px; opacity:.95; }
+  .body { padding:18px 22px 22px; }
+  h2 { margin:0 0 4px; font-size:20px; } .sub { color:var(--soft); font-size:14px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cols { display:grid; gap:14px; } .c2 { grid-template-columns:1fr 1fr; } .c3 { grid-template-columns:1fr 1fr 1fr; } .c21 { grid-template-columns:1.6fr 1fr; }
+  .lbl { font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); margin:10px 0 5px; }
+  .lbl:first-child { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:13px; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .chip.on { background:var(--tint); border-color:var(--wine); color:var(--wine-d); font-weight:700; }
+  .inp { border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13.5px; background:#fff; min-height:36px; }
+  .inp.tall { min-height:62px; line-height:1.45; }
+  .pri { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pri div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; }
+  .pri div b { display:block; font-size:14px; } .pri div.on { border:2px solid var(--wine); background:var(--tint); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .auto { background:#f3f7fb; border:1px dashed #b9cde3; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.55; }
+  .auto b { color:#1e4f8a; }
+  .att { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; } .att span { font-size:12.5px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13.5px; font-weight:700; border-radius:9px; padding:8px 14px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .btn.p { background:var(--wine); border-color:var(--wine); color:#fff; } .btn.g { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fp { width:26px; height:30px; vertical-align:middle; }
+  table.l { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; border-radius:12px; overflow:hidden; }
+  table.l th { text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); padding:9px 10px; border-bottom:1px solid var(--line); background:#fff; }
+  table.l td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .st { font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .st.bad { background:var(--badbg); color:var(--bad); } .st.warn { background:var(--warnbg); color:var(--warn); } .st.ok { background:var(--okbg); color:var(--ok); } .st.info { background:#e0ecfa; color:#1e4f8a; } .st.mut { background:#eee; color:#555; }
+  .lvl { font-size:11px; font-weight:800; color:#fff; border-radius:6px; padding:2px 7px; }
+  .mini { font-size:12px; color:var(--soft); }
+  .note { max-width:1100px; margin:-16px auto 30px; background:#fff; border-radius:10px; padding:12px 16px; font-size:14px; line-height:1.5; color:#3b3035; border-left:4px solid var(--wine); }
+  /* flujo */
+  .levels { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin:6px 0 4px; }
+  .lv { text-align:center; padding:0 8px; }
+  .lv .ic { width:74px; height:74px; border-radius:18px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; }
+  .lv b { display:block; font-size:15px; } .lv span { font-size:12.5px; color:var(--soft); }
+  .arrows { position:relative; height:74px; margin-top:-120px; margin-bottom:60px; pointer-events:none; }
+  .loop { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+  .loop div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12.3px; text-align:center; position:relative; }
+  .loop div b { display:block; font-size:13px; } .loop i { font-style:normal; display:block; font-size:18px; }
+  .loop div:not(:last-child)::after { content:"›"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--soft); font-size:18px; }
+  .world { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .world div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:12.3px; line-height:1.4; }
+  .world b { display:block; font-size:13px; color:var(--wine-d); }
+  /* seguimiento */
+  .steps { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin:8px 0 4px; }
+  .steps div { text-align:center; font-size:12px; position:relative; padding-top:30px; }
+  .steps div::before { content:""; position:absolute; top:9px; left:0; right:0; height:4px; background:#e3d6dc; }
+  .steps div:first-child::before { left:50%; } .steps div:last-child::before { right:50%; }
+  .steps div.done::before { background:var(--ok); } .steps div.cur::before { background:linear-gradient(90deg,var(--ok) 50%,#e3d6dc 50%); }
+  .steps i { position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:50%; background:#e3d6dc; color:#fff; font-style:normal; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:3px solid var(--paper); }
+  .steps .done i { background:var(--ok); } .steps .cur i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .steps b { display:block; font-size:12.5px; } .steps small { color:var(--soft); }
+  .tl { border-left:3px solid var(--line); margin-left:8px; padding-left:14px; }
+  .tl div { position:relative; font-size:13px; margin-bottom:10px; line-height:1.4; }
+  .tl div::before { content:""; position:absolute; left:-21px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--c,#999); border:2px solid #fff; }
+  .kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:600; } .kpi b { font-size:28px; letter-spacing:-.01em; } .kpi span { font-size:12px; color:var(--soft); }
+  .bars div.r { display:grid; grid-template-columns:170px 1fr 54px; align-items:center; gap:10px; font-size:13px; margin:7px 0; }
+  .bars .trk { height:14px; border-radius:0 4px 4px 0; background:transparent; position:relative; }
+  .bars .fill { height:14px; border-radius:0 4px 4px 0; background:var(--wine); }
+  .bars .ref { position:absolute; top:-3px; bottom:-3px; width:2px; background:#2d2429; }
+  .bars .v { font-weight:700; text-align:right; }
+  .alertc { border-left:4px solid var(--bad); }
+
+  .role .rh { display:flex; gap:10px; align-items:center; margin-bottom:8px; } .role .rh b { display:block; font-size:15px; } .role .rh small { color:var(--soft); font-size:12px; }
+  .ri { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .todo { display:flex; align-items:center; gap:10px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .todo:last-child { border-bottom:none; }
+  .todo .st { min-width:30px; text-align:center; font-size:13px; }
+  .mini2 { font-size:13px; line-height:1.5; } .mini2 b { display:block; margin-bottom:2px; }
+  .flowbar { display:flex; gap:6px; margin-bottom:12px; } .flowbar span { flex:1; text-align:center; font-size:13px; font-weight:700; padding:7px; border-radius:9px; background:#fff; border:1px solid var(--line); color:var(--soft); }
+  .flowbar span.on { background:var(--okbg); color:var(--ok); border-color:#b8e3c7; } .flowbar span.cur { background:var(--wine); color:#fff; border-color:var(--wine); }
+  .found { display:flex; gap:12px; align-items:center; margin-top:10px; padding:10px; border-radius:10px; background:#f3f9f5; border:1px solid #cfe9d8; }
+  .photo2 { width:64px; height:72px; border-radius:10px; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:24px; flex:none; }
+  .k2 { display:block; font-size:10.5px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.04em; }
+  .scanner { width:150px; height:160px; margin:6px auto 0; border-radius:18px; background:radial-gradient(circle at 50% 45%, #fff 0, #f7e9ef 70%); border:3px solid #d9b9c6; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -6px 12px rgba(125,42,76,.12); }
+  .ticket { margin-top:12px; text-align:center; }
+  .tk { border:2px dashed var(--wine); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:2px; font-size:13.5px; } .tk b { font-size:40px; color:var(--wine-d); letter-spacing:.04em; line-height:1.1; } .tk small { color:var(--soft); font-size:11.5px; }
+  .q2 { padding:8px 10px; border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:13.5px; background:#fff; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; } .q2 .mini { width:100%; }
+  .q2.cur { border:2px solid var(--wine); background:var(--tint); } .q2 .st { margin-left:auto; }
+  .vit2 { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .vit2 div { background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 8px; font-size:16px; font-weight:800; } .vit2 small { display:block; font-size:10.5px; color:var(--soft); font-weight:700; text-transform:uppercase; }
+  .tv { background:#120810; border-radius:16px; padding:14px; color:#fff; border:8px solid #2a2a2a; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
+  .tvh { display:flex; justify-content:space-between; font-size:13px; color:#cfb7c2; font-weight:700; letter-spacing:.08em; }
+  .tvnow { background:linear-gradient(135deg,#7d2a4c,#b4235a); border-radius:12px; padding:16px; text-align:center; } .tvnow small { display:block; font-size:13px; letter-spacing:.2em; font-weight:800; color:#ffe4ee; }
+  .tvnow b { display:block; font-size:64px; line-height:1.05; letter-spacing:.04em; } .tvnow span { display:block; font-size:24px; font-weight:700; } .tvnow em { display:block; font-style:normal; font-size:20px; margin-top:4px; color:#ffe4ee; }
+  .tvlist div { display:flex; gap:12px; align-items:baseline; font-size:18px; padding:6px 4px; border-bottom:1px solid #3a2530; } .tvlist b { color:#f1a7c3; min-width:70px; } .tvlist span { margin-left:auto; color:#cfb7c2; font-size:15px; }
+  .tvf { font-size:13px; color:#cfb7c2; }
+  .doc { display:grid; grid-template-columns:34px 1fr auto auto; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--line); font-size:13.5px; } .di { font-size:22px; text-align:center; } .dest { font-size:12.5px; color:var(--soft); font-weight:600; }
+  .st.warn { margin:0; max-width:none; padding:2px 9px; border:none; font-size:11.5px; }
+  .todo .st.warn { font-size:13px; }
+
+  .svc { display:flex; flex-wrap:wrap; gap:8px; } .svc span { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 12px; font-size:13.5px; font-weight:600; }
+  .prob { display:flex; align-items:center; gap:8px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .prob .mini { margin-left:auto; }
+  .dotc { width:10px; height:10px; border-radius:50%; flex:none; }
+  .tpl { border:1px solid; border-left-width:5px; border-radius:10px; padding:9px 11px; font-size:13px; line-height:1.45; background:#fff; } .tpl b { display:block; font-size:14px; margin-bottom:2px; }
+  .opt { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; } .opt span { border:1px solid var(--line); border-radius:12px; padding:10px; font-size:22px; background:#fff; text-align:center; } .opt b { display:block; font-size:14px; margin-top:4px; } .opt small { display:block; font-size:12px; color:var(--soft); }
+  .opt .sel { border:2px solid var(--wine); background:var(--tint); }
+  .side { border-left:4px solid var(--line); padding:5px 10px; margin-bottom:8px; font-size:13.5px; line-height:1.45; } .side b { display:block; }
+  .stk { display:grid; grid-template-columns:150px 1fr auto; gap:8px; align-items:center; font-size:13px; margin:6px 0; } .stk div { height:10px; background:#eee4e8; border-radius:5px; overflow:hidden; } .stk i { display:block; height:100%; background:#15803d; border-radius:5px; } .stk b { font-size:12.5px; }
+  .phn { background:#e5ddd5; border:9px solid #1f1f1f; border-radius:26px; padding:10px; display:flex; flex-direction:column; gap:8px; min-height:430px; }
+  .phh { background:#075e54; color:#fff; font-size:13px; font-weight:700; margin:-10px -10px 4px; padding:10px 12px; border-radius:16px 16px 0 0; }
+  .msg { font-size:13px; line-height:1.4; border-radius:10px; padding:7px 9px; max-width:88%; box-shadow:0 1px 1px rgba(0,0,0,.12); } .msg.in { background:#fff; align-self:flex-start; } .msg.out { background:#dcf8c6; align-self:flex-end; font-weight:800; }
+  .ck { font-size:13.5px; line-height:1.45; } .ck b { display:block; font-size:15px; margin-bottom:3px; }
+
+  .kv2 { display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:4px 0; border-bottom:1px dashed var(--line); } .kv2 span { color:var(--soft); }
+  .req { display:flex; flex-wrap:wrap; gap:6px; } .req span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .req .ok { background:var(--okbg); color:var(--ok); } .req .no { background:var(--warnbg); color:var(--warn); }
+  .qx { position:relative; height:30px; background:#f3eef0; border-radius:8px; margin:6px 0; padding-left:34px; } .qx b { position:absolute; left:8px; top:6px; font-size:13px; }
+  .qx span { position:absolute; top:3px; bottom:3px; margin-left:34px; border-radius:6px; color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; padding:0 6px; white-space:nowrap; overflow:hidden; }
+  .who2 { display:grid; gap:6px; } .who2 div { border:1px solid var(--line); border-radius:8px; padding:6px 9px; background:#f7fbf8; font-size:12.5px; } .who2 b { display:block; color:var(--wine-d); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; } .who2 span { color:#166534; }
+  .beds { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .bed { border-radius:10px; padding:8px; font-size:13px; font-weight:700; border:1px solid var(--line); min-height:76px; } .bed b { display:block; font-size:18px; } .bed small { display:block; font-weight:500; font-size:11.5px; color:var(--soft); }
+  .bed.p { background:#fbe4ee; } .bed.a { background:#fde2e2; } .bed.g { background:#ede4fb; } .bed.free { background:#ecf8f1; color:#15803d; } .bed.clean { background:#fdf0d5; color:#8a5a00; } .bed.sel { outline:3px solid var(--wine); }
+  .leg2 { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-left:6px; border:1px solid var(--line); }
+  .dose { border:1px solid var(--line); border-radius:10px; padding:7px 9px; margin-bottom:6px; font-size:13px; display:flex; flex-direction:column; } .dose span { color:var(--soft); font-size:12px; } .dose em { font-style:normal; margin-top:2px; }
+  .srch { border-left:4px solid #c2410c; background:#fff7f0; border-radius:6px; padding:6px 9px; margin-bottom:6px; font-size:13px; } .srch b { display:block; font-size:12px; color:#c2410c; text-transform:uppercase; letter-spacing:.04em; }
+  .amb { border:9px solid #1f1f1f; border-radius:26px; background:#fff; overflow:hidden; min-height:420px; display:flex; flex-direction:column; }
+  .ah { background:#ea580c; color:#fff; font-weight:800; font-size:14px; padding:10px 12px; } .ab { padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .big2 { font-size:40px; font-weight:900; text-align:center; color:#ea580c; margin-top:6px; }
+
+  .tree div { padding:6px 8px; border-radius:8px; font-size:13.5px; } .tree small { color:var(--soft); margin-left:4px; }
+  .tree .t0 { font-weight:800; } .tree .t1 { padding-left:18px; font-weight:700; } .tree .t2 { padding-left:32px; font-weight:700; } .tree .t3 { padding-left:50px; } .tree .mut { color:var(--soft); }
+  .tree .on { background:#f3eef0; } .tree .sel { background:var(--tint); outline:2px solid var(--wine); }
+  .fing { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:8px; } .fing span { font-size:12px; font-weight:700; border-radius:999px; padding:3px 9px; background:#f3eef0; } .fing .done { background:var(--okbg); color:var(--ok); } .fing .cur { background:var(--wine); color:#fff; }
+  table.mx td, table.mx th { text-align:center; font-size:12.5px; padding:8px 6px; } table.mx td:first-child, table.mx th:first-child { text-align:left; }
+  table.mx2 td, table.mx2 th { text-align:center; font-size:12.5px; } table.mx2 td:first-child, table.mx2 th:first-child { text-align:left; }
+  table.mx2 td.on { color:#15803d; font-size:18px; } table.mx2 td.pi { color:#c2410c; font-size:18px; } table.mx2 td { color:#c9bcc2; font-size:18px; } table.mx2 td:first-child { font-size:13.5px; color:var(--ink); }
+  .catl { padding:8px 10px; border-radius:9px; font-size:13.5px; margin-bottom:4px; display:flex; justify-content:space-between; } .catl small { color:var(--soft); } .catl.on { background:var(--tint); font-weight:700; }
+  table.mx2 { table-layout:fixed; } table.mx2 th { font-size:10px; padding:6px 3px; letter-spacing:.02em; white-space:normal; text-align:center; } table.mx2 th:first-child { width:170px; } table.mx2 td { padding:8px 3px; }
+  .boxes { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .bx2 { border-radius:12px; padding:9px 11px; font-size:13px; font-weight:700; min-height:92px; display:flex; flex-direction:column; gap:2px; border:1px solid var(--line); } .bx2 b { font-size:15px; } .bx2 small { font-weight:500; color:#5b4a52; font-size:12px; } .bx2 em { font-style:normal; font-size:11.5px; margin-top:auto; color:#5b4a52; }
+  .bx2.r { background:#fee2e2; border-left:6px solid #dc2626; } .bx2.o { background:#ffedd5; border-left:6px solid #ea580c; } .bx2.y { background:#fef9c3; border-left:6px solid #eab308; } .bx2.f { background:#ecf8f1; color:#15803d; } .bx2.c { background:#f3eef0; color:var(--soft); }
+  .wq { display:grid; grid-template-columns:16px 110px 1fr; gap:8px; align-items:center; font-size:13.5px; padding:7px 0; border-bottom:1px dashed var(--line); } .wq em { grid-column:3; font-style:normal; font-size:12px; color:var(--soft); } .dot2 { width:12px; height:12px; border-radius:50%; }
+  .qq { display:flex; justify-content:space-between; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); }
+  .big3 { color:#fff; font-size:26px; font-weight:900; border-radius:12px; padding:14px; }
+  .lv2 { display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:4px 0; } .lv2 span { color:#fff; font-weight:700; border-radius:7px; padding:3px 9px; font-size:12.5px; }
+  .soapE { display:grid; grid-template-columns:36px 1fr; gap:10px; padding:9px 0; border-bottom:1px dashed var(--line); font-size:14px; line-height:1.5; } .soapE > b { width:32px; height:32px; border-radius:8px; background:var(--wine); color:#fff; display:flex; align-items:center; justify-content:center; font-size:17px; }
+  .auto2 { font-size:10.5px; font-weight:800; background:#e0ecfa; color:#1e4f8a; border-radius:6px; padding:1px 6px; margin-right:4px; }
+  .ch3 { font-weight:800; font-size:15px; display:flex; justify-content:space-between; margin-bottom:8px; } .ch3 span { font-size:12.5px; color:var(--soft); } .ck2 { font-size:13px; padding:5px 0; border-bottom:1px dashed var(--line); }
+  .opt { grid-template-columns:repeat(5,1fr) !important; }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — 5 · Emergencias:</b>
+  <button class="tab on" data-t="m1">1. Tablero de emergencia</button>
+  <button class="tab" data-t="m2">2. Triaje por colores</button>
+  <button class="tab" data-t="m3">3. Llega una ambulancia</button>
+  <button class="tab" data-t="m4">4. Atención en el box</button>
+  <button class="tab" data-t="m5">5. Códigos y protocolos</button>
+  <button class="tab" data-t="m6">6. Observación y destino</button>
+  <button class="tab" data-t="m7">7. Indicadores</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos inventados. En emergencia no hay cita ni orden de llegada: se atiende por gravedad.</div>
+
+<!-- ============ M1 ============ -->
+<section class="scr on" id="m1">
+  <div class="app"><div class="brand">SIVEC <span>EMERGENCIAS</span></div><div class="who">🚨 Hospital municipal · emergencia general y GO · 23:40</div></div>
+  <div class="body">
+    <div class="kpi" style="grid-template-columns:repeat(6,1fr)">
+      <div style="border-top:5px solid #dc2626"><small>🔴 Inmediato</small><b>1</b></div>
+      <div style="border-top:5px solid #ea580c"><small>🟠 Muy urgente</small><b>3</b></div>
+      <div style="border-top:5px solid #eab308"><small>🟡 Urgente</small><b>6</b></div>
+      <div style="border-top:5px solid #16a34a"><small>🟢 Menos urgente</small><b>9</b></div>
+      <div style="border-top:5px solid #2563eb"><small>🔵 No urgente</small><b>4</b></div>
+      <div><small>Ambulancias en camino</small><b>2</b></div>
+    </div>
+    <div class="card" style="margin-top:12px"><div class="lbl">Boxes y camillas — en vivo</div>
+      <div class="boxes">
+        <div class="bx2 r"><b>Shock 1</b>Rosa Mamani · 44 a<small>hemorragia obstétrica · 12 min</small><em>Dr. Paz · 🔴</em></div>
+        <div class="bx2 o"><b>Box 2</b>Juan Pérez · 62 a<small>dolor torácico · código infarto · 25 min</small><em>Dr. Suárez · 🟠</em></div>
+        <div class="bx2 o"><b>Box 3</b>Tomás G. · 3 a<small>dificultad respiratoria · 40 min</small><em>Dr. Rivas · 🟠</em></div>
+        <div class="bx2 y"><b>Box 4</b>Elena S.<small>dolor abdominal · 1 h 10</small><em>R2 Vaca · 🟡</em></div>
+        <div class="bx2 f"><b>Box 5</b>libre<small>limpio</small></div>
+        <div class="bx2 c"><b>Box 6</b>limpieza<small>alta 23:30</small></div>
+        <div class="bx2 o"><b>GO 1</b>Juana M. · 36 sem<small>PA 170/110 · 18 min</small><em>Dra. Suárez · 🟠</em></div>
+        <div class="bx2 y"><b>GO 2</b>Lucía F. · 39 sem<small>trabajo de parto · monitoreo</small><em>Int. Rojas · 🟡</em></div>
+      </div></div>
+    <div class="cols c2" style="margin-top:12px">
+      <div class="card"><div class="lbl">Sala de espera · por gravedad (no por llegada)</div>
+        <div class="wq"><span class="dot2" style="background:#eab308"></span><b>Mario C.</b> fiebre y vómitos<em>espera 38 min · límite 60 ⏳</em></div>
+        <div class="wq"><span class="dot2" style="background:#eab308"></span><b>Irma F.</b> caída, dolor de muñeca<em>22 min</em></div>
+        <div class="wq"><span class="dot2" style="background:#16a34a"></span><b>Pablo R.</b> tos 3 días<em>1 h 05 · límite 2 h</em></div>
+        <div class="wq"><span class="dot2" style="background:#2563eb"></span><b>Sara L.</b> receta crónica<em>→ sugerir consultorio mañana</em></div></div>
+      <div class="card alertc"><div class="lbl">Alertas</div><div style="font-size:13.5px;line-height:1.6">⏳ Mario C. cerca de su tiempo máximo (🟡 60 min) → re-triaje<br>🚑 AMB-07 llega en 6 min con paciente 🔴 (hemorragia)<br>🛏 Camas libres en piso: GO 2 · Cirugía 1 · Medicina 0</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ M2 ============ -->
+<section class="scr" id="m2">
+  <div class="app"><div class="brand">SIVEC <span>TRIAJE</span></div><div class="who">🩺 Triaje de emergencia · Lic. Flores · Mario C. · 23:02</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Motivo principal</div>
+        <div class="chips"><span class="chip">Dolor torácico</span><span class="chip">Dificultad respiratoria</span><span class="chip">Trauma</span><span class="chip on">Fiebre</span><span class="chip">Dolor abdominal</span><span class="chip">Sangrado</span><span class="chip">Embarazada</span><span class="chip">Niño enfermo</span><span class="chip">Convulsión</span><span class="chip">Intoxicación</span></div>
+        <div class="lbl">Signos vitales</div>
+        <div class="vit2" style="grid-template-columns:repeat(7,1fr)"><div><small>PA</small>100/60</div><div><small>FC</small>112</div><div><small>FR</small>22</div><div><small>T°</small>39,2</div><div><small>SatO₂</small>95%</div><div><small>Glasgow</small>15</div><div><small>Dolor</small>5</div></div>
+        <div class="lbl">Preguntas de gravedad (según el motivo)</div>
+        <div class="qq"><span>¿Confusión o somnolencia?</span><b>No</b></div><div class="qq"><span>¿Rigidez de nuca o manchas en la piel?</span><b>No</b></div><div class="qq"><span>¿Vómitos persistentes, no tolera líquidos?</span><b style="color:#c2410c">Sí</b></div><div class="qq"><span>¿Embarazo / inmunosupresión?</span><b>No</b></div></div>
+      <div>
+        <div class="card" style="text-align:center"><div class="lbl" style="text-align:left">Color sugerido</div><div class="big3" style="background:#eab308">🟡 URGENTE</div><div style="font-size:14px;margin-top:6px">atender antes de <b>60 min</b></div><div class="mini" style="margin-top:6px">El sistema sugiere; la enfermera confirma o cambia con motivo.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">5 niveles (tipo Manchester)</div>
+          <div class="lv2"><span style="background:#dc2626">🔴 Inmediato</span>0 min</div><div class="lv2"><span style="background:#ea580c">🟠 Muy urgente</span>10 min</div><div class="lv2"><span style="background:#eab308">🟡 Urgente</span>60 min</div><div class="lv2"><span style="background:#16a34a">🟢 Menos urgente</span>120 min</div><div class="lv2"><span style="background:#2563eb">🔵 No urgente</span>240 min · o consultorio</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ M3 ============ -->
+<section class="scr" id="m3">
+  <div class="app"><div class="brand">SIVEC <span>EMERGENCIAS</span></div><div class="who">🚑 Pre-aviso de ambulancia · AMB-07 → Hospital municipal</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card alertc"><div class="lbl">🔴 Llega en 6 minutos</div>
+        <div class="row"><div class="photo2" style="width:54px;height:60px">📷</div><div><b style="font-size:18px">Rosa Mamani · 44 a</b><div class="mini">C.I. 5566001 · desde C.S. El Bajío · REF-2026-0219 · ⚠ sin alergias</div></div></div>
+        <div style="font-size:14px;line-height:1.6;margin-top:10px"><b>Motivo:</b> sangrado vaginal abundante, 2 h.<br><b>En la ambulancia:</b> PA 88/54 · FC 124 · SatO₂ 96% · 2 vías, 1.000 mL de suero.<br><b>Antecedentes:</b> PAP ASC-H (09/2026) · Hb 11,2 (03/2026).</div>
+        <div class="lbl">Qué se prepara solo al aceptar</div>
+        <div class="req"><span class="ok">✓ Box Shock 1 reservado</span><span class="ok">✓ Aviso a GO de turno</span><span class="ok">✓ Banco de sangre: 2 unidades O−</span><span class="ok">✓ Laboratorio avisado</span></div></div>
+      <div>
+        <div class="card"><div class="lbl">Tripulación y tiempos</div><div class="kv2"><span>Pedido</span><b>23:18</b></div><div class="kv2"><span>Con paciente</span><b>23:27</b></div><div class="kv2"><span>Llegada estimada</span><b>23:46</b></div><div class="kv2"><span>Tripulación</span><b>R. Vaca · L. Soto</b></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Entrega en la puerta</div><div style="font-size:13.5px">La tripulación entrega con <b>huella</b>; queda la hora exacta de llegada y el traspaso a Shock 1.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ M4 ============ -->
+<section class="scr" id="m4">
+  <div class="app"><div class="brand">SIVEC <span>EMERGENCIAS</span></div><div class="who">🩺 Box 4 · Elena S. · 🟡 dolor abdominal · R2 Vaca · 23:35</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Nota de emergencia (rápida)</div>
+        <div class="soapE"><b>S</b><div>Dolor en fosa ilíaca derecha, 12 h, náuseas. FUM hace 3 semanas.</div></div>
+        <div class="soapE"><b>O</b><div><span class="auto2">triaje</span> PA 118/74 · FC 96 · T° 37,9 · Blumberg + · McBurney +</div></div>
+        <div class="soapE"><b>A</b><div>Probable apendicitis aguda (K35.8). Descartar embarazo ectópico.</div></div>
+        <div class="soapE"><b>P</b><div>Ayuno · suero · analgesia · laboratorio · eco · interconsulta Cirugía.</div></div></div>
+      <div>
+        <div class="card"><div class="lbl">Órdenes rápidas (un toque)</div>
+          <div class="chips"><span class="chip on">🧪 Hemograma</span><span class="chip on">🧪 Beta-HCG</span><span class="chip on">🧪 Orina</span><span class="chip on">🩻 Eco abdominal</span><span class="chip on">💧 Ringer 1000</span><span class="chip on">💉 Ketorolaco IV</span><span class="chip">📈 ECG</span><span class="chip">🩻 RX</span></div>
+          <div class="mini" style="margin-top:6px">Van a laboratorio, imagen y enfermería al instante (prioridad emergencia).</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Resultados en vivo</div><div class="kv2"><span>Leucocitos</span><b>15.800 ↑</b></div><div class="kv2"><span>Beta-HCG</span><b>negativa</b></div><div class="kv2"><span>Eco</span><b>en espera · 12 min</b></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Interconsulta</div><div style="font-size:13.5px">🔔 Cirugía de guardia avisada · Dr. Vaca responde en 8 min</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ M5 ============ -->
+<section class="scr" id="m5">
+  <div class="app"><div class="brand">SIVEC <span>EMERGENCIAS</span></div><div class="who">🚨 Códigos y protocolos — con cronómetro y lista de pasos</div></div>
+  <div class="body">
+    <div class="cols c3" style="gap:12px">
+      <div class="card cod" style="border-top:6px solid #dc2626"><div class="ch3">🩸 Código rojo obstétrico<span>Rosa M. · 14:22 ⏱</span></div>
+        <div class="ck2"><span class="st ok">✓</span> 00:00 activación · equipo avisado</div><div class="ck2"><span class="st ok">✓</span> 00:03 2 vías · cristaloides</div><div class="ck2"><span class="st ok">✓</span> 00:05 sangre O− pedida</div><div class="ck2"><span class="st ok">✓</span> 00:08 oxitocina / masaje</div><div class="ck2"><span class="st warn">⏳</span> 00:20 evaluar quirófano</div></div>
+      <div class="card cod" style="border-top:6px solid #ea580c"><div class="ch3">❤️ Código infarto<span>Juan P. · 25:10 ⏱</span></div>
+        <div class="ck2"><span class="st ok">✓</span> ECG en 10 min</div><div class="ck2"><span class="st ok">✓</span> Aspirina · nitrato</div><div class="ck2"><span class="st ok">✓</span> Troponina pedida</div><div class="ck2"><span class="st warn">⏳</span> Referencia a 3er nivel (hemodinamia)</div><div class="mini">meta: puerta–ECG ≤ 10 min</div></div>
+      <div class="card cod" style="border-top:6px solid #7c3aed"><div class="ch3">🧠 Código ACV<span>—</span></div>
+        <div class="ck2"><span class="st mut">○</span> Hora de inicio de síntomas</div><div class="ck2"><span class="st mut">○</span> Glicemia capilar</div><div class="ck2"><span class="st mut">○</span> Escala NIHSS</div><div class="ck2"><span class="st mut">○</span> Tomografía / referir</div><div class="mini">ventana de tiempo visible</div></div>
+    </div>
+    <div class="card" style="margin-top:12px"><div class="lbl">Otros protocolos configurables</div><div class="chips"><span class="chip">Sepsis</span><span class="chip">Preeclampsia severa</span><span class="chip">Trauma grave</span><span class="chip">Paro cardíaco (RCP)</span><span class="chip">Violencia</span><span class="chip">Intoxicación</span><span class="chip">Deshidratación en niños</span></div><div class="mini" style="margin-top:6px">Cada paso queda con hora y quién lo hizo → sirve para auditoría y para mejorar tiempos.</div></div>
+  </div>
+</section>
+
+<!-- ============ M6 ============ -->
+<section class="scr" id="m6">
+  <div class="app"><div class="brand">SIVEC <span>EMERGENCIAS</span></div><div class="who">🛏 Observación y destino · Elena S.</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">¿Qué pasa con la paciente?</div>
+        <div class="opt"><span>🏠<b>Alta</b><small>receta + indicaciones + control en su centro</small></span><span>👁<b>Observación</b><small>hasta 24 h con controles</small></span><span class="sel">🔪<b>Quirófano</b><small>solicitud de quirófano</small></span><span>🛏<b>Internar</b><small>piso sugerido + cama</small></span><span>🚑<b>Referir</b><small>a otro nivel (ambulancia)</small></span></div>
+        <div class="auto" style="margin-top:10px"><b>Quirófano:</b> apendicectomía · urgencia relativa · el sistema abre la <b>solicitud de quirófano</b> con todo cargado; después va a piso de <b>Cirugía</b> (cama C-4 libre).</div></div>
+      <div>
+        <div class="card"><div class="lbl">Observación (si corresponde)</div><div style="font-size:13.5px;line-height:1.55">Signos c/1 h · reevaluación médica c/6 h · <b>máximo 24 h</b>: después hay que decidir (alta, internar o referir).</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Al alta desde emergencia</div><div style="font-size:13.5px;line-height:1.55">La nota va a su línea de tiempo · aviso a su centro de salud · cita de control sugerida · receta a farmacia.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ M7 ============ -->
+<section class="scr" id="m7">
+  <div class="app"><div class="brand">SIVEC <span>EMERGENCIAS</span></div><div class="who">📊 Indicadores de emergencia · Hospital municipal · septiembre</div></div>
+  <div class="body">
+    <div class="kpi"><div><small>Atenciones</small><b>3.420</b></div><div><small>Llegada → triaje</small><b>7 min</b><span> meta ≤ 10</span></div><div><small>Se fueron sin atención</small><b>3,1%</b></div><div><small>Estancia &gt; 24 h en emergencia</small><b>12</b><span> pacientes</span></div></div>
+    <div class="cols c2" style="margin-top:12px">
+      <div class="card bars"><div class="lbl">Atendidos a tiempo, por color</div>
+        <div class="r"><span>🔴 Inmediato</span><div class="trk"><div class="fill" style="width:100%"></div></div><span class="v">100%</span></div>
+        <div class="r"><span>🟠 Muy urgente</span><div class="trk"><div class="fill" style="width:88%"></div></div><span class="v">88%</span></div>
+        <div class="r"><span>🟡 Urgente</span><div class="trk"><div class="fill" style="width:74%"></div></div><span class="v">74%</span></div>
+        <div class="r"><span>🟢 Menos urgente</span><div class="trk"><div class="fill" style="width:81%"></div></div><span class="v">81%</span></div>
+        <div class="mini">Escala 0–100%.</div></div>
+      <div class="card bars"><div class="lbl">Consultas no urgentes (🔵) por centro de origen</div>
+        <div class="r"><span>C.S. San Luis</span><div class="trk"><div class="fill" style="width:30%"></div></div><span class="v">60</span></div>
+        <div class="r"><span>C.S. El Bajío</span><div class="trk"><div class="fill" style="width:90%"></div></div><span class="v">180</span></div>
+        <div class="r"><span>C.S. Los Lotes</span><div class="trk"><div class="fill" style="width:45%"></div></div><span class="v">90</span></div>
+        <div class="mini">Escala 0–200 · ayuda a la red a reforzar el 1er nivel donde falta.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  const NOTES = {
+    m1: '<b>Painel da emergência:</b> quantos pacientes há em cada cor, os boxes ao vivo (quem está, desde quando, quem atende), a sala de espera ordenada por gravidade e alertas (tempo máximo, ambulância chegando, camas livres).',
+    m2: '<b>Triagem por cores:</b> motivo, sinais vitais e perguntas de gravidade; o sistema sugere a cor (5 níveis tipo Manchester) com o tempo máximo; a enfermeira confirma.',
+    m3: '<b>Chega uma ambulância:</b> pré-aviso com ficha, sinais vitais da ambulância e antecedentes; ao aceitar, reserva box, avisa especialista, banco de sangue e laboratório. Entrega com digital.',
+    m4: '<b>Atendimento no box:</b> nota rápida SOAP com dados da triagem, ordens de um toque (laboratório, imagem, soro, remédios) e resultados ao vivo; interconsulta avisada.',
+    m5: '<b>Códigos e protocolos:</b> código vermelho obstétrico, infarto, AVC e outros, com cronômetro e lista de passos; cada passo com hora e responsável.',
+    m6: '<b>Observação e destino:</b> alta, observação (até 24 h), quirófano, internar ou referir — cada destino abre o formulário certo com tudo carregado.',
+    m7: '<b>Indicadores:</b> tempo até triagem, atendidos no tempo por cor, pacientes que foram embora, estância longa e consultas não urgentes por centro de origem.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 'm1');
+</script>
+
+</body>
+</html>
