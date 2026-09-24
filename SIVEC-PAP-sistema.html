@@ -402,6 +402,14 @@
   }
   .printBoxActions .primaryBtn { background: #fff; color: var(--teal-900); }
   .printBoxActions .cancelBtn { background: rgba(255,255,255,0.15); color: #fff; }
+  .printFmt { display: flex; align-items: center; gap: 0; background: rgba(255,255,255,.12); border-radius: 8px; padding: 3px; margin-right: 4px; }
+  .printFmt span { color: #fff; font-size: 12px; padding: 0 8px 0 6px; opacity: .85; }
+  .printBoxActions .printFmt button { background: transparent; color: #fff; padding: 6px 11px; border-radius: 6px; }
+  .printBoxActions .printFmt button.on { background: #fff; color: var(--teal-900); }
+  .pdfBlockLabel { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .pdfBlockLabel .fmtTag { font-weight: 600; background: #fde68a; color: #7c4a03; border-radius: 999px; padding: 1px 8px; margin-left: 6px; font-size: 11px; }
+  .pdfBlockLabel .fmtPrint { background: #fff; color: var(--teal-900); border: none; border-radius: 6px; padding: 4px 10px; font-weight: 700; font-size: 12px; cursor: pointer; }
+  .printBoxActions { flex-wrap: wrap; justify-content: flex-end; align-items: center; }
   .printBody { flex: 1; overflow-y: auto; padding: 20px; background: #d8d8d8; }
   .printLoading { text-align: center; color: #666; padding: 40px; font-size: 14px; }
   .pdfBlockWrap { max-width: 850px; margin: 0 auto 20px; }
@@ -1175,7 +1183,9 @@
     <div class="printBoxHeader">
       <span id="printTitle">Documentos</span>
       <div class="printBoxActions">
-        <span style="color:#cfe3e3;font-size:12px;align-self:center;margin-right:6px">Cada documento tiene su propio botón de imprimir ⎙ arriba a la derecha</span>
+        
+        <div id="printFmt" class="printFmt" title="Formato de los documentos"><span>Formato</span><button type="button" data-f="oficial" onclick="cambiarFormato('oficial')">Oficial</button><button type="button" data-f="sivec" onclick="cambiarFormato('sivec')">SIVEC (prueba)</button></div>
+        <button type="button" id="printFmtNota" class="primaryBtn" style="display:none" onclick="imprimirTodosPropios()" title="Los 5 formularios SIVEC en una sola impresión">🖨 Imprimir todos</button>
         <label class="printEspLbl">Especialidad (D1) <select id="printEsp" onchange="cambiarEspImpresion(this.value)"></select></label>
         <button onclick="saveDocsToDrive()" class="primaryBtn" id="saveDriveBtn">Guardar en Drive</button>
         <button onclick="closePrintOverlay()" class="cancelBtn">Cerrar</button>
@@ -3804,8 +3814,7 @@ function cuelloSVG(m, size) {
 }
 
 // Arma los 4 campos S-O-A-P de la Historia clínica con la consulta + la colposcopia
-function hcSoapDatos(consulta, colp) {
-  const up = s => (s || '').toUpperCase();
+function hcSoapPartes(consulta, colp) {
   const arr = v => Array.isArray(v) ? v : (v ? [v] : []); // lista o texto suelto
   const c = consulta || {};
   const S = c.subjetivo || (colp && colp.soap_subjetivo) || '';
@@ -3834,7 +3843,11 @@ function hcSoapDatos(consulta, colp) {
   if (c.plan_texto) P.push(c.plan_texto.replace(/\.?$/, '.'));
   const derivs = [...new Set([c.derivacion, colp && colp.derivacion].filter(Boolean))];
   if (derivs.length) P.push('Derivación: ' + derivs.join(', ') + '.');
-  return { colp_fecha: fmtFecha((consulta && consulta.fecha) || (colp && colp.fecha)) || '', colp_subjetivo: up(S), colp_objetivo: up(O.join(' ')), colp_analisis: up(A.join(' ')), colp_plan: up(P.join(' ')) };
+  return { fecha: (consulta && consulta.fecha) || (colp && colp.fecha) || '', S, O: O.join(' '), A: A.join(' '), P: P.join(' ') };
+}
+function hcSoapDatos(consulta, colp) {
+  const x = hcSoapPartes(consulta, colp), up = s => (s || '').toUpperCase();
+  return { colp_fecha: fmtFecha(x.fecha) || '', colp_subjetivo: up(x.S), colp_objetivo: up(x.O), colp_analisis: up(x.A), colp_plan: up(x.P) };
 }
 // Renglones del D1 con los medicamentos de la consulta (los 4 del PAP ya vienen impresos)
 function d1Datos(consulta) {
@@ -4740,6 +4753,217 @@ async function fillPdfForm(b64, data) {
 let currentPrintPatient = null;
 let currentPdfUrls = [];
 
+// ================= Formularios propios del SIVEC (versión de prueba) =================
+// Mismos datos que los oficiales, armados por el sistema con letra más clara. Todavía NO son oficiales:
+// se eligen en la pantalla de impresión ("Formato: SIVEC") para comparar. En Drive se guardan los oficiales.
+const FORM_CSS = `
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#1f1a1c; --soft:#6b5f64; --line:#2b2326; --hair:#cfc3c8; --tint:#f7eef2; }
+  * { box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  html,body { margin:0; background:#d8d8d8; }
+  body { font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .sheet { width:794px; min-height:1123px; margin:0 auto; background:#fff; padding:40px 44px 36px; position:relative; font-size:12.5px; }
+  @page { size:A4; margin:0; }
+  @media print { html,body { background:#fff; } body { zoom:1 !important; } .sheet { margin:0; width:210mm; min-height:297mm; } }
+  .hd { display:grid; grid-template-columns:90px 1fr 150px; gap:12px; align-items:center; border-bottom:2.5px solid var(--wine); padding-bottom:10px; }
+  .logo { height:62px; border:1.5px dashed var(--hair); border-radius:8px; display:flex; align-items:center; justify-content:center; text-align:center; font-size:10px; color:var(--soft); line-height:1.2; padding:4px; }
+  .hd h1 { margin:0; font-size:19px; font-weight:800; text-align:center; line-height:1.15; }
+  .hd h1 small { display:block; font-size:12.5px; font-weight:600; color:var(--soft); margin-top:3px; }
+  .hdR { text-align:right; }
+  .code { display:inline-block; background:var(--wine); color:#fff; font-weight:800; border-radius:6px; padding:3px 10px; font-size:15px; }
+  .folio { margin-top:6px; font-size:12px; color:var(--soft); } .folio b { color:var(--ink); font-size:15px; letter-spacing:.03em; }
+  .ctx { display:flex; flex-wrap:wrap; gap:4px 18px; font-size:11.5px; color:var(--soft); margin:7px 0 12px; } .ctx b { color:var(--ink); }
+  .sec { margin-top:12px; }
+  .secT { font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--wine-d); border-bottom:1px solid var(--hair); padding-bottom:3px; margin-bottom:6px; display:flex; justify-content:space-between; }
+  .secT span { font-weight:600; letter-spacing:0; text-transform:none; color:var(--soft); }
+  .grid { display:grid; border:1.2px solid var(--line); border-radius:4px; overflow:hidden; }
+  .cell { padding:5px 8px 6px; border-right:1px solid var(--hair); border-bottom:1px solid var(--hair); min-height:38px; }
+  .cell .k { display:block; font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--soft); }
+  .cell .v { display:block; font-size:14px; font-weight:700; margin-top:1px; } .cell .v.n { font-weight:400; }
+  .nr { border-right:none !important; } .nb { border-bottom:none !important; }
+  .chk { display:inline-flex; align-items:center; vertical-align:top; gap:5px; margin-right:12px; white-space:nowrap; font-size:12.5px; }
+  .bx { flex:none; overflow:hidden; width:13px; height:13px; border:1.3px solid var(--line); border-radius:2px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; line-height:1; }
+  .bx.x::after { content:"✕"; }
+  table.t { width:100%; border-collapse:collapse; border:1.2px solid var(--line); }
+  table.t th { background:var(--tint); font-size:10px; text-transform:uppercase; letter-spacing:.05em; text-align:left; padding:5px 7px; border:1px solid var(--hair); color:var(--wine-d); }
+  table.t td { border:1px solid var(--hair); padding:6px 7px; font-size:12.5px; height:26px; vertical-align:middle; }
+  table.t td.num { text-align:center; font-weight:700; font-size:14px; } table.t td.med { font-weight:700; }
+  .ico { font-size:14px; margin-right:5px; }
+  .firmas { display:grid; grid-template-columns:1fr 1fr 1fr; gap:26px; margin-top:34px; text-align:center; font-size:11.5px; color:var(--soft); }
+  .firmas div { border-top:1.2px solid var(--line); padding-top:5px; } .firmas b { display:block; color:var(--ink); font-size:12.5px; }
+  .foot { position:absolute; left:44px; right:44px; bottom:18px; display:flex; justify-content:space-between; font-size:10px; color:var(--soft); border-top:1px solid var(--hair); padding-top:5px; }
+  .pill { display:inline-block; font-size:11px; font-weight:700; background:var(--tint); color:var(--wine-d); border-radius:999px; padding:1px 9px; }
+  .muted { color:var(--soft); }
+  .soapT { width:100%; border-collapse:collapse; border:1.4px solid var(--line); }
+  .soapT td { border:1px solid var(--hair); vertical-align:top; padding:8px 10px; }
+  .soapT .l { width:38px; text-align:center; font-size:22px; font-weight:800; color:#fff; background:var(--wine); border-color:var(--wine); vertical-align:middle; }
+  .soapT .l small { display:block; font-size:8.5px; font-weight:700; letter-spacing:.04em; }
+  .soapT .tx { font-size:13.5px; line-height:1.5; min-height:60px; } .soapT .tx b { color:var(--wine-d); }
+  .vit { display:grid; grid-template-columns:repeat(8,1fr); border:1.2px solid var(--line); border-radius:4px; overflow:hidden; margin-bottom:8px; }
+  .vit div { padding:4px 6px; border-right:1px solid var(--hair); min-height:40px; } .vit div:last-child { border-right:none; }
+  .vit .k { display:block; font-size:9px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.05em; } .vit .v { font-size:14px; font-weight:700; }
+  .fig { float:right; width:190px; margin:-2px 0 6px 14px; border:1px solid var(--hair); border-radius:8px; padding:6px 6px 4px; text-align:center; background:#fff; }
+  .fig .cap { font-size:10px; color:var(--soft); margin-top:2px; line-height:1.3; text-align:left; }
+  .leg { display:flex; flex-wrap:wrap; gap:3px 9px; font-size:10px; margin-top:3px; text-align:left; } .leg i { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:3px; vertical-align:-1px; }
+  .tags { display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; } .tag { font-size:11px; border:1px solid var(--hair); border-radius:999px; padding:0 8px; }
+  .q { display:grid; grid-template-columns:26px 1fr 200px; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid var(--hair); font-size:13.2px; line-height:1.4; }
+  .q .n { width:22px; height:22px; border-radius:50%; background:var(--wine); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:12px; }
+  .q .ans { display:flex; gap:12px; justify-content:flex-end; }
+  .intro { font-size:13px; line-height:1.5; background:var(--tint); border-radius:8px; padding:9px 12px; }
+  .huella { border:1.2px solid var(--line); border-radius:6px; height:88px; display:flex; align-items:flex-end; justify-content:center; font-size:11px; color:var(--soft); padding-bottom:5px; }
+  .map { height:210px; border:1.2px solid var(--line); border-radius:6px; overflow:hidden; position:relative; background:#f3efe9; }
+  .map img { position:absolute; width:256px; height:256px; }
+  .pin { position:absolute; left:50%; top:50%; transform:translate(-50%,-100%); }
+  .copias { width:100%; border-collapse:collapse; font-size:11px; } .copias td { padding:3px 6px; border-bottom:1px solid var(--hair); }
+  .cols3 { columns:3; column-gap:16px; font-size:11.5px; } .cols3 .chk { display:flex; margin:0 0 4px; white-space:normal; }
+  .big { flex:1; border:2px solid var(--wine); border-radius:8px; padding:10px 12px; background:var(--tint); }
+  .big.off { border:1.2px solid var(--hair); background:#fff; }
+  .prueba { position:absolute; top:12px; right:44px; font-size:9.5px; font-weight:700; color:#b45309; letter-spacing:.04em; }`;
+
+const FORM_TITULOS = { d1: 'D-1 · Recetario / Recibo', d8: 'D-8 · Solicitud de Exámenes', pap: 'Registro de Toma de PAP', ci: 'Consentimiento Informado — Telesalud', hc: 'Historia Clínica — Evolución (SOAP)' };
+function formFmt() { try { return localStorage.getItem('sivec_form_fmt') === 'sivec' ? 'sivec' : 'oficial'; } catch (e) { return 'oficial'; } }
+
+function fpCell(k, v, cls, st) { return `<div class="cell ${cls || ''}"${st ? ` style="${st}"` : ''}><span class="k">${k}</span>${v != null ? `<span class="v${/n\b/.test(cls || '') ? ' n' : ''}">${v}</span>` : ''}</div>`; }
+function fpChk(label, on) { return `<span class="chk"><span class="bx${on ? ' x' : ''}"></span>${label}</span>`; }
+function fpFecha(d) { return d ? fmtFecha(d).replace(/\//g, ' / ') : '…… / …… / ……'; }
+function fpHead(titulo, sub, derecha, logo) {
+  return `<div class="prueba">FORMATO SIVEC · PRUEBA (NO OFICIAL)</div>
+  <div class="hd"><div class="logo">${logo || 'Escudo<br>Ministerio de Salud'}</div><h1>${titulo}<small>${sub}</small></h1><div class="hdR">${derecha}</div></div>`;
+}
+function fpFoot(extra) { return `<div class="foot"><span>SIVEC PAP/VPH · C.S. San Luis${extra ? ' · ' + extra : ''}</span><span>Generado ${fmtFecha(hoyISO())} · Hoja 1 de 1</span></div>`; }
+
+function croquisHTML(lat, lng) {
+  const z = 17, n = Math.pow(2, z) * 256, W = 470, H = 210;
+  const px = (lng + 180) / 360 * n, lr = lat * Math.PI / 180;
+  const py = (1 - Math.log(Math.tan(lr) + 1 / Math.cos(lr)) / Math.PI) / 2 * n;
+  const x0 = px - W / 2, y0 = py - H / 2;
+  let imgs = '';
+  for (let tx = Math.floor(x0 / 256); tx <= Math.floor((x0 + W) / 256); tx++)
+    for (let ty = Math.floor(y0 / 256); ty <= Math.floor((y0 + H) / 256); ty++)
+      imgs += `<img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/${z}/${ty}/${tx}" style="left:${Math.round(tx * 256 - x0)}px;top:${Math.round(ty * 256 - y0)}px" alt="" onerror="this.remove()">`;
+  return `<div class="map">${imgs}<svg class="pin" width="30" height="40" viewBox="0 0 24 32"><path d="M12 1C6 1 1.5 5.5 1.5 11.3 1.5 19 12 31 12 31s10.5-12 10.5-19.7C22.5 5.5 18 1 12 1z" fill="#dc2626" stroke="#fff" stroke-width="1.5"/><circle cx="12" cy="11.5" r="4" fill="#fff"/></svg></div>`;
+}
+
+function formPropioHTML(tipo, ctx) {
+  const { p, consulta, colp, esp } = ctx;
+  const d = consulta && consulta.detalle;
+  const nom = esc((p.nombre || '').toUpperCase()), ci = esc(p.carnet || ''), dom = esc(p.direccion || '');
+  const doctora = esc((consulta && consulta.doctora) || p.doctora || '');
+  const espTxt = esp ? `${esc(esp.nombre)} · ${esp.codigo}` : '';
+  const edad = edadTexto(p.fecha_nacimiento, p.fecha_toma) || '';
+  const fecha = fpFecha(p.fecha_toma);
+  if (tipo === 'd1') {
+    const meds = ((d && d.meds) || []).filter(m => m.d1).slice(0, 10);
+    const dx = (d && d.diagnosticos && d.diagnosticos.length) ? d.diagnosticos.join(' · ') : ((consulta && consulta.analisis) || 'Prevención de cáncer de cuello uterino');
+    const ins = ['Porta objeto', 'Cepillo', 'Espátula', 'Guantes (par)'].map(x => `<tr><td>${x}</td><td class="muted">Insumo toma de PAP</td><td class="num">01</td><td></td><td></td><td></td></tr>`).join('');
+    const filas = meds.map(m => `<tr><td class="med"><span class="ico">${m.icon || ''}</span>${esc(m.nombre)}</td><td>${esc(m.indic || '')}</td><td class="num">${esc(m.cant ? String(m.cant).padStart(2, '0') : '')}</td><td></td><td></td><td></td></tr>`).join('');
+    const vacias = '<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>'.repeat(Math.max(2, 6 - meds.length));
+    return `<section class="sheet">${fpHead('RECETARIO / RECIBO', 'Atención ambulatoria · Sistema Único de Salud', `<span class="code">D-1</span><div class="folio">Nº receta <b>${esc(p.numero_folio_d1 || '………')}</b></div>`)}
+      <div class="ctx"><span>SEDES: <b>Santa Cruz</b></span><span>Red: <b>Centro</b></span><span>Municipio: <b>Santa Cruz</b></span><span>Establecimiento: <b>C.S. San Luis</b></span><span>SUS <span class="bx x"></span></span></div>
+      <div class="grid" style="grid-template-columns:2.2fr 1fr 1fr 1fr">${fpCell('Nombre del paciente', nom)}${fpCell('Cédula de identidad', ci)}${fpCell('Fecha de nacimiento', fpFecha(p.fecha_nacimiento))}${fpCell('Fecha', fecha, 'nr')}
+        ${fpCell('Domicilio', dom, 'n nb', 'grid-column:1/3')}${fpCell('Sexo', fpChk('M', false) + fpChk('F', true), 'nb')}${fpCell('Tipo de atención', fpChk('Consultorio', true), 'n nb nr')}</div>
+      <div class="sec"><div class="secT">Diagnóstico <span>solo lo marcado en la consulta</span></div>
+        <div class="grid" style="grid-template-columns:1fr 1fr">${fpCell('Diagnósticos de la consulta', esc(dx), 'nb')}${fpCell('Otro diagnóstico / código de especialidad', esp ? `T - ${esp.codigo} <span class="pill">${esc(esp.nombre)}</span>` : '', 'nb nr')}</div></div>
+      <div class="sec"><div class="secT">Otros servicios y productos</div>${fpChk('Toma de PAP / IVAA', !esSoloVph(p))}${fpChk('Consulta médica (sin medicamentos)', false)}${fpChk('Curación pequeña', false)}${fpChk('Control prenatal', false)}</div>
+      <div class="sec"><div class="secT">Medicamentos e insumos</div>
+        <table class="t"><thead><tr><th style="width:36%">Medicamento / insumo (nombre genérico, forma, concentración)</th><th>Indicaciones para el paciente</th><th style="width:62px">Recetada</th><th style="width:66px">Dispensada</th><th style="width:58px">Unitario</th><th style="width:52px">Total</th></tr></thead>
+        <tbody>${ins}${filas}${vacias}</tbody></table>
+        <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:6px;font-size:11.5px;font-weight:700">Costo total: ________ &nbsp; Costo total al usuario: ________</div></div>
+      <div class="firmas"><div><b>${doctora || '&nbsp;'}</b>Recetado por${espTxt ? ' · ' + espTxt : ''}</div><div><b>&nbsp;</b>Dispensado por</div><div><b>&nbsp;</b>Firma paciente / acompañante · C.I.</div></div>
+      <p class="muted" style="font-size:10px;margin-top:14px">El prescriptor y dispensador certifican la veracidad de la información declarada en este documento médico legal. El usuario certifica haber recibido los medicamentos señalados.</p>${fpFoot()}</section>`;
+  }
+  if (tipo === 'd8') {
+    const pap = !esSoloVph(p), vph = !!(p.hizo_prueba_vph || p.tipo_examen === 'VPH');
+    const otros = ['Baciloscopía seriada', 'Bilirrubinas totales y fracciones', 'Coproparasitológico simple', 'Coproparasitológico seriado', 'Creatinina en orina', 'Creatinina sérica', 'Cultivo y antibiograma', 'Examen general de orina', 'Factor reumatoide', 'Fosfatasa alcalina y ácida', 'Frotis tinción Gram', 'Grupo sanguíneo y factor Rh', 'Glicemia', 'Gota gruesa + frotis', 'Hemoglobina y hematocrito', 'Hemograma completo', 'Inmunoglobulinas IgG, IgM, IgA', 'Moco fecal', 'Nitrógeno ureico y urea', 'Proteína C reactiva (PCR)', 'Proteinuria de 24 horas', 'Coombs directa/indirecta', 'Prueba rápida sífilis', 'Tiempo de coagulación y sangría', 'Tiempo de protrombina/TPP', 'Transaminasas TGO-TGP', 'Test de embarazo (HCG)', 'Reactantes de fase aguda', 'Reacción de Widal', 'RPR para sífilis – VDRL'];
+    const big = (on, t, sub) => `<div class="big${on ? '' : ' off'}"><span class="chk" style="font-size:15px;font-weight:800"><span class="bx${on ? ' x' : ''}"></span>${t}</span><div class="muted" style="font-size:11.5px;margin-top:3px">${sub}</div></div>`;
+    return `<section class="sheet">${fpHead('SOLICITUD DE EXÁMENES', 'Laboratorio · Imagenología / Gabinete · Servicios de sangre', `<span class="code">D-8</span><div class="folio">Nº registro <b>${esc(p.numero_folio_d8 || '………')}</b></div>`)}
+      <div class="ctx"><span>Red: <b>Centro</b></span><span>Municipio: <b>Santa Cruz de la Sierra</b></span><span>Establecimiento: <b>C.S. San Luis</b></span></div>
+      <div class="grid" style="grid-template-columns:2.2fr 1.2fr .6fr .6fr">${fpCell('Nombres', nom)}${fpCell('Cédula de identidad', ci)}${fpCell('Edad', esc(edad))}${fpCell('Sexo', 'F', 'nr')}
+        ${fpCell('Fecha de solicitud', fecha, 'nb')}${fpCell('Diagnóstico clínico principal', 'Prevención de cáncer de cérvix', 'nb nr', 'grid-column:2/5')}</div>
+      <div class="sec"><div class="secT">Solicitado</div><div style="display:flex;gap:10px">
+        ${big(pap, 'Tinción PAP (citología cervical)', 'Muestra: exocérvix + endocérvix' + (p.lote_envio ? ' · Lote de envío ' + esc(p.lote_envio) : ''))}
+        ${big(vph, 'Prueba de VPH (ADN alto riesgo)', vph ? 'Toma convencional' : 'No solicitada')}</div></div>
+      <div class="sec"><div class="secT">Laboratorio — otros</div><div class="cols3">${otros.map(o => fpChk(o, false)).join('')}</div></div>
+      <div class="sec"><div class="secT">Imagenología / gabinete</div><div class="grid" style="grid-template-columns:1fr 1fr">${fpCell('Ecografía')}${fpCell('Rayos X', null, 'nr')}${fpCell('TAC', null, 'nb')}${fpCell('Endoscopía', null, 'nb nr')}</div></div>
+      <div class="sec"><div class="secT">Servicio de transfusión / banco de sangre</div><div class="grid" style="grid-template-columns:2fr 1fr 1fr">${fpCell('Unidad / servicio', null, 'nb')}${fpCell('Urgencia', fpChk('Urgente', false) + fpChk('Programada', false), 'n nb')}${fpCell('Grupo sanguíneo y Rh', null, 'nb nr')}</div></div>
+      <div class="firmas" style="grid-template-columns:1fr 1fr"><div><b>${doctora || '&nbsp;'}</b>Firma y sello del solicitante${espTxt ? ' · ' + espTxt : ''}</div><div><b>&nbsp;</b>Sello del establecimiento</div></div>${fpFoot()}</section>`;
+  }
+  if (tipo === 'pap') {
+    const np = splitNombre(p.nombre);
+    const prox = proximoControlDe(p);
+    const g = (d && d.gineco) || {};
+    const croquis = p.lat != null && p.lng != null
+      ? `${croquisHTML(Number(p.lat), Number(p.lng))}<div style="font-size:11.5px;line-height:1.45"><b>Coordenadas:</b> ${Number(p.lat).toFixed(5)}, ${Number(p.lng).toFixed(5)}<div class="muted" style="margin-top:8px;font-size:10.5px">Ubicación marcada en el mapa del SIVEC. Referencia para la visita:</div><div style="border-bottom:1px dotted var(--soft);height:22px"></div><div style="border-bottom:1px dotted var(--soft);height:22px"></div></div>`
+      : `<div class="map" style="background:#fff"></div><div class="muted" style="font-size:11px">Sin ubicación marcada en el mapa: dibujar a mano.</div>`;
+    const oce = consulta && consulta.objetivo_oce;
+    return `<section class="sheet">${fpHead('REGISTRO DE TOMA DE PAP', 'Servicio Departamental de Salud (SEDES) — Santa Cruz', `<div class="logo" style="height:44px;margin-bottom:4px">Logo municipio</div><div class="folio">Nº <b>${esc(p.numero_folio_pap || '………')}</b></div>`, 'Escudo<br>Gobernación<br>Santa Cruz')}
+      <div class="ctx"><span>Red: <b>Centro</b></span><span>Establecimiento: <b>San Luis</b></span><span>Nivel: <b>1ro</b></span><span>Municipio: <b>Santa Cruz de la Sierra</b></span></div>
+      <div class="grid" style="grid-template-columns:1.4fr 1fr 1fr .5fr">${fpCell('Nombres', esc(np.nombre_pila.toUpperCase()))}${fpCell('Apellido paterno', esc(np.apellido_paterno.toUpperCase()))}${fpCell('Apellido materno', esc(np.apellido_materno.toUpperCase()))}${fpCell('Edad', esc(String(edad).replace(/\D.*$/, '')), 'nr')}
+        ${fpCell('C.I. · Fecha de nacimiento', ci + ' · ' + (fmtFecha(p.fecha_nacimiento) || '—'))}${fpCell('Teléfono celular', esc(p.celular || ''))}${fpCell('Estado civil', esc((p.estado_civil || '').toUpperCase()))}${fpCell('Fecha', esc(fmtFecha(p.fecha_toma) || ''), 'nr')}
+        ${fpCell('Dirección (barrio · calle · Nº · UV · Mz · lote)', dom, 'n nb nr', 'grid-column:1/5')}</div>
+      <div class="sec"><div class="secT">Datos de la toma</div><div class="grid" style="grid-template-columns:1fr 1fr 1fr">
+        ${fpCell('Embarazo actual', fpChk('Sí', false) + fpChk('No', false), 'n')}${fpCell('Muestra de', fpChk('Exocérvix', !esSoloVph(p)) + fpChk('Endocérvix', !esSoloVph(p)) + fpChk('Vaginal', false), 'n')}${fpCell('Toma de muestra test VPH', fpChk('Sí', !!p.hizo_prueba_vph) + fpChk('No', !p.hizo_prueba_vph) + fpChk('Convencional', !!p.hizo_prueba_vph) + fpChk('Autotoma', false), 'n nr')}
+        ${fpCell('PAP previo', g.ultimo_pap ? fpChk('Sí — ' + esc(g.ultimo_pap), true) : fpChk('Sí', false) + fpChk('No', false), 'n')}${fpCell('Cuello', fpChk('Sano', oce === 'Íntegro') + fpChk('Lesión sospechosa', !!oce && oce !== 'Íntegro'), 'n')}${fpCell('Antecedente de PAP positivo', fpChk('Sí', false) + fpChk('No', false), 'n nr')}
+        ${fpCell('Tratamiento realizado', ['Cauterización', 'Crioterapia', 'LEEP', 'Cono frío', 'Histerectomía', 'Radioterapia', 'Otros'].map(x => fpChk(x, false)).join(''), 'n nb nr', 'grid-column:1/4')}</div></div>
+      <div class="sec"><div class="secT">Resultado <span>lo llena el laboratorio</span></div><div class="grid" style="grid-template-columns:1.3fr 1fr">
+        ${fpCell('Diagnóstico de patología (Bethesda)')}${fpCell('Diagnóstico test VPH', null, 'nr')}${fpCell('Fecha de recepción · Citotecnólogo')}${fpCell('Fecha de entrega · Patólogo', null, 'nr')}
+        ${fpCell('Fecha del próximo PAP', prox ? esc(fmtFecha(prox)) : '<span class="muted" style="font-weight:400;font-size:12px">La calcula el SIVEC cuando llega el resultado</span>', 'nb nr', 'grid-column:1/3;background:var(--tint)')}</div></div>
+      <div class="sec"><div class="secT">Croquis de ubicación del domicilio <span>del mapa del SIVEC</span></div><div style="display:grid;grid-template-columns:1fr 190px;gap:12px">${croquis}</div></div>
+      <div class="sec" style="display:grid;grid-template-columns:1fr 1.2fr;gap:16px;align-items:end">
+        <div class="firmas" style="grid-template-columns:1fr;margin-top:26px"><div><b>${doctora || '&nbsp;'}</b>Nombre, cargo, firma y sello del responsable</div></div>
+        <table class="copias"><tr><td><b>Original</b> (blanca)</td><td>Establecimiento — expediente de Patología / Oncológico</td></tr><tr><td><b>1ra copia</b> (amarilla)</td><td>Establecimiento I-II nivel — búsqueda de positivas</td></tr><tr><td><b>2da copia</b> (rosada)</td><td>Establecimiento de salud — GAD</td></tr><tr><td><b>3ra copia</b> (verde)</td><td>Establecimiento que realiza la referencia</td></tr></table></div>
+      ${fpFoot('Todos los datos deben llenarse obligatoriamente')}</section>`;
+  }
+  if (tipo === 'ci') {
+    const disp = p.consent_dispositivos_lista || [];
+    const q = (n, txt, ops, val, ancho) => `<div class="q"${ancho ? ` style="grid-template-columns:26px 1fr ${ancho}"` : ''}><span class="n">${n}</span><span>${txt}</span><span class="ans">${ops.map(o => fpChk(o, val === o)).join('')}</span></div>`;
+    return `<section class="sheet">${fpHead('CONSENTIMIENTO INFORMADO', 'Ficha específica de información · Servicio de Telesalud', '<div class="logo" style="height:52px">Logo Programa<br>Telesalud</div>')}
+      <div class="grid" style="grid-template-columns:1.6fr 1fr 1fr;margin-top:12px">${fpCell('Paciente', nom)}${fpCell('C.I.', ci)}${fpCell('Fecha de nacimiento', fpFecha(p.fecha_nacimiento), 'nr')}
+        ${fpCell('Dirección', dom, 'n nb')}${fpCell('Nº de celular', esc(p.celular || ''), 'n nb')}${fpCell('Ocupación', esc(p.ocupacion || ''), 'n nb nr')}</div>
+      <p class="intro" style="margin-top:12px">Estimada paciente: el/la médico responsable del área de Telesalud le solicita leer con detenimiento este documento. <b>El consentimiento informado</b> es su derecho a aceptar de forma libre, informada, voluntaria y sin presiones que se realice algún procedimiento clínico, imagenológico (videoconferencia y/o fotografías) y/o la discusión diagnóstica de su caso. Marque su aceptación o rechazo.</p>
+      ${q(1, '¿Acepta de forma libre, voluntaria e informada la atención por el área de <b>Telemedicina</b> y los procesos que implica?', ['Acepto', 'Rechazo'], p.consent_telemedicina)}
+      ${q(2, '¿Da su consentimiento para el interrogatorio y examen físico, el seguimiento y el registro de sus datos y exámenes en una <b>Historia Clínica Digital</b>?', ['Acepto', 'Rechazo'], p.consent_interrogatorio)}
+      ${q(3, '¿Desea ser <b>informada</b> de todo lo que acontezca con su enfermedad?', ['Si', 'No'], p.consent_informado).replace('></span>Si<', '></span>Sí<')}
+      ${q(4, '¿Autoriza el <b>uso de dispositivos médicos</b> de Telesalud, previa explicación detallada?', ['Si', 'No', 'Solo a algunos'], p.consent_dispositivos, '250px').replace('></span>Si<', '></span>Sí<')}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;padding:6px 0 8px 34px;font-size:12.5px;border-bottom:1px solid var(--hair)">${['Monitor de signos vitales', 'Electrocardiógrafo', 'Ultrasonido', 'Espirómetro', 'Cámara de examen general', 'Otoscopio', 'Oftalmoscopio', 'Videocolposcopio'].map(x => fpChk(x, disp.includes(x))).join('')}</div>
+      ${q(5, '¿La lectura de esta ficha fue acompañada de una <b>explicación clara y detallada</b>?', ['Si', 'No'], p.consent_explicacion).replace('></span>Si<', '></span>Sí<')}
+      <div class="grid" style="grid-template-columns:1.6fr 1fr 1.2fr;margin-top:14px">${fpCell('Nombre completo (paciente) o tutor legal', nom, 'nb')}${fpCell('C.I.', ci, 'nb')}${fpCell('Lugar y fecha', 'Santa Cruz de la Sierra, ' + esc(fmtFecha(p.fecha_toma) || ''), 'n nb nr')}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 150px;gap:22px;margin-top:40px;align-items:end">
+        <div class="firmas" style="grid-template-columns:1fr;margin:0"><div><b>&nbsp;</b>Firma paciente, tutor legal o familiar</div></div>
+        <div class="firmas" style="grid-template-columns:1fr;margin:0"><div><b>&nbsp;</b>Firma y sello · Médico Telesalud</div></div><div class="huella">Huella digital</div></div>${fpFoot()}</section>`;
+  }
+  // Historia clínica — evolución
+  const x = (consulta || colp) ? hcSoapPartes(consulta, colp) : { fecha: p.fecha_toma, S: '', O: '', A: '', P: '' };
+  const m = colp && colp.cuello_mapa, hayMapa = m && !cuelloVacio(m);
+  const fig = hayMapa ? `<div class="fig">${cuelloSVG(m, 170)}<div class="leg">${CUELLO_TIPOS.filter(t => (m.marcas[t.id] || []).length).map(t => `<span><i style="background:${t.color}${t.id === 'biopsia' ? ';border-radius:50%' : ''}"></i>${t.nombre}</span>`).join('')}</div><div class="cap">Colposcopia ${esc(fmtFecha(colp.fecha) || '')}${colp.prueba_schiller ? ' · Schiller ' + esc(colp.prueba_schiller.toLowerCase()) : ''}${m.zt ? ' · ZT ' + esc(m.zt.toLowerCase()) : ''}</div></div>` : '';
+  const tags = consulta ? [consulta.objetivo_leucorrea && '💧 ' + consulta.objetivo_leucorrea, consulta.objetivo_color && '● ' + consulta.objetivo_color, consulta.objetivo_oce && 'Cuello ' + consulta.objetivo_oce.toLowerCase()].filter(Boolean) : [];
+  const meds = d && d.meds;
+  const plan = meds && meds.length
+    ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 16px">${meds.map(mm => `<span>${mm.icon || '•'} <b>${esc(mm.nombre)}</b>${mm.indic ? ' — ' + esc(mm.indic) : ''}</span>`).join('')}</div>${[consulta.plan_texto, consulta.derivacion && 'Derivación: ' + consulta.derivacion, colp && colp.derivacion && colp.derivacion !== consulta.derivacion && 'Derivación (colposcopia): ' + colp.derivacion].filter(Boolean).length ? `<p style="margin:6px 0 0">${esc([consulta.plan_texto, consulta.derivacion && 'Derivación: ' + consulta.derivacion + '.', colp && colp.derivacion && colp.derivacion !== consulta.derivacion && 'Derivación (colposcopia): ' + colp.derivacion + '.'].filter(Boolean).join(' '))}</p>` : ''}`
+    : esc(x.P);
+  return `<section class="sheet">${fpHead('HISTORIA CLÍNICA — EVOLUCIÓN', 'Nota S-O-A-P · Código R.A. SALUD INE 101/2010', '<div class="folio">Nº H.C. <b>……</b></div>')}
+    <div class="ctx"><span>Paciente: <b>${nom}</b></span><span>C.I.: <b>${ci}</b></span><span>Edad: <b>${esc(edad)}</b></span><span>Establecimiento: <b>C.S. San Luis</b></span></div>
+    <div class="vit"><div><span class="k">Fecha</span><span class="v">${esc(fmtFecha(x.fecha) || '')}</span></div><div><span class="k">Edad</span><span class="v">${esc(String(edad).replace(/\D.*$/, ''))}</span></div><div><span class="k">Talla</span></div><div><span class="k">Peso</span></div><div><span class="k">Temp.</span></div><div><span class="k">FC</span></div><div><span class="k">PA</span></div><div><span class="k">FR</span></div></div>
+    <table class="soapT">
+      <tr><td class="l">S<small>SUBJ.</small></td><td class="tx">${esc(x.S) || '&nbsp;'}</td></tr>
+      <tr><td class="l">O<small>OBJ.</small></td><td class="tx">${fig}${esc(x.O) || '&nbsp;'}${tags.length ? `<div class="tags">${tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}<div style="clear:both"></div></td></tr>
+      <tr><td class="l">A<small>ANÁL.</small></td><td class="tx">${esc(x.A) || '&nbsp;'}</td></tr>
+      <tr><td class="l">P<small>PLAN</small></td><td class="tx">${plan || '&nbsp;'}</td></tr>
+    </table>
+    <div class="firmas" style="grid-template-columns:1fr 1fr;margin-top:40px"><div><b>${doctora || '&nbsp;'}</b>Nombre y firma${espTxt ? ' · ' + espTxt : ''}</div><div><b>&nbsp;</b>Sello del establecimiento</div></div>
+    <p class="muted" style="font-size:11px;margin-top:16px">Formato propio de prueba: la hoja 1 (datos administrativos) se sigue imprimiendo en el formato oficial.</p>${fpFoot()}</section>`;
+}
+function formPropioDoc(tipo, ctx) {
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${FORM_TITULOS[tipo]}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet"><style>${FORM_CSS}</style></head>
+    <body>${formPropioHTML(tipo, ctx)}<script>
+      function fit(){ document.body.style.zoom = Math.min(1, (innerWidth - 4) / 794); }
+      fit(); addEventListener('resize', fit); addEventListener('beforeprint', function(){ document.body.style.zoom = 1; }); addEventListener('afterprint', fit);
+    <\/script></body></html>`;
+}
+
+let printCtx = null;
+const PRINT_TARGETS = [['d1', 'prevD1', 'PDFTPL_D1', 'numero_folio_d1'], ['d8', 'prevD8', 'PDFTPL_D8', 'numero_folio_d8'], ['pap', 'prevPAP', 'PDFTPL_PAP', 'numero_folio_pap'], ['ci', 'prevCI', 'PDFTPL_CI', null], ['hc', 'prevHC', 'PDFTPL_HC', null]];
+const PDFTPL_POR_NOMBRE = () => ({ PDFTPL_D1, PDFTPL_D8, PDFTPL_PAP, PDFTPL_CI, PDFTPL_HC });
 async function printPatientDocs(p) {
   currentPrintPatient = p;
   const data = buildTemplateData(p);
@@ -4748,31 +4972,57 @@ async function printPatientDocs(p) {
 
   const info = await completarHc(data, p); // consulta (SOAP + receta) + colposcopia
   printEspElegida = info.esp.id; currentPrintData = data;
+  printCtx = { p, consulta: info.consulta, colp: info.colp, esp: info.esp };
   const selEsp = document.getElementById('printEsp');
   selEsp.innerHTML = ESPECIALIDADES.map(e => `<option value="${e.id}">${esc(e.nombre)} · ${e.codigo}</option>`).join('');
   selEsp.value = info.esp.id;
   document.getElementById('printTitle').textContent = 'Documentos — ' + (p.nombre || '');
   document.getElementById('printOverlay').classList.add('open');
+  await renderPrintDocs();
+}
+// Muestra los 5 documentos en el formato elegido: "oficial" (PDF de siempre) o "sivec" (propio, de prueba)
+async function renderPrintDocs(solo) {
+  const p = currentPrintPatient, data = currentPrintData, fmt = formFmt();
+  document.querySelectorAll('#printFmt button').forEach(b => b.classList.toggle('on', b.dataset.f === fmt));
+  const nota = document.getElementById('printFmtNota');
+  if (nota) nota.style.display = fmt === 'sivec' ? '' : 'none';
   document.getElementById('printLoading').style.display = 'block';
-
-  currentPdfUrls.forEach(u => URL.revokeObjectURL(u));
-  currentPdfUrls = [];
-
-  const targets = [
-    { id: 'prevD1', tpl: PDFTPL_D1, numero: p.numero_folio_d1 },
-    { id: 'prevD8', tpl: PDFTPL_D8, numero: p.numero_folio_d8 },
-    { id: 'prevPAP', tpl: PDFTPL_PAP, numero: p.numero_folio_pap },
-    { id: 'prevCI', tpl: PDFTPL_CI },
-    { id: 'prevHC', tpl: PDFTPL_HC },
-  ];
-  for (const t of targets) {
-    const docData = { ...data, numero: t.numero || '' };
-    const blob = await fillPdfForm(t.tpl, docData);
-    const url = URL.createObjectURL(blob);
-    currentPdfUrls.push(url);
-    document.getElementById(t.id).src = url;
+  if (!solo) { currentPdfUrls.forEach(u => URL.revokeObjectURL(u)); currentPdfUrls = []; }
+  const tpls = PDFTPL_POR_NOMBRE();
+  for (const [tipo, id, tpl, folio] of PRINT_TARGETS) {
+    if (solo && solo !== tipo) continue;
+    const fr = document.getElementById(id);
+    const lbl = fr.parentElement.querySelector('.pdfBlockLabel');
+    lbl.innerHTML = `<span>${esc(FORM_TITULOS[tipo])}${fmt === 'sivec' ? ' <small class="fmtTag">formato SIVEC · prueba</small>' : ''}</span>${fmt === 'sivec' ? `<button type="button" class="fmtPrint" data-fr="${id}">🖨 Imprimir</button>` : ''}`;
+    if (fmt === 'sivec') {
+      fr.removeAttribute('src');
+      fr.srcdoc = formPropioDoc(tipo, Object.assign({}, printCtx, { esp: espBuscar(printEspElegida) || printCtx.esp }));
+    } else {
+      fr.removeAttribute('srcdoc');
+      const blob = await fillPdfForm(tpls[tpl], { ...data, numero: (folio && p[folio]) || '' });
+      const url = URL.createObjectURL(blob);
+      currentPdfUrls.push(url);
+      fr.src = url;
+    }
   }
   document.getElementById('printLoading').style.display = 'none';
+}
+function cambiarFormato(f) {
+  try { localStorage.setItem('sivec_form_fmt', f); } catch (e) { /* sin almacenamiento */ }
+  if (currentPrintPatient) renderPrintDocs();
+}
+document.getElementById('printBody').addEventListener('click', e => {
+  const b = e.target.closest('.fmtPrint'); if (!b) return;
+  const fr = document.getElementById(b.dataset.fr);
+  try { fr.contentWindow.focus(); fr.contentWindow.print(); } catch (err) { alert('No se pudo imprimir este documento: ' + err.message); }
+});
+async function imprimirTodosPropios() {
+  const w = window.open('', '_blank');
+  if (!w) { alert('El navegador bloqueó la ventana nueva. Permití las ventanas emergentes para este sitio.'); return; }
+  const ctx = Object.assign({}, printCtx, { esp: espBuscar(printEspElegida) || printCtx.esp });
+  const hojas = PRINT_TARGETS.map(([tipo]) => formPropioHTML(tipo, ctx).replace('<section class="sheet"', '<section class="sheet" style="page-break-after:always"')).join('');
+  w.document.write(formPropioDoc('d1', ctx).replace(/<body>[\s\S]*<\/body>/, `<body>${hojas}<script>addEventListener('load',function(){setTimeout(function(){print()},400)})<\/script></body>`));
+  w.document.close();
 }
 
 let printEspElegida = null, currentPrintData = null;
@@ -4780,9 +5030,7 @@ async function cambiarEspImpresion(id) {
   const esp = espBuscar(id); if (!esp || !currentPrintData || !currentPrintPatient) return;
   printEspElegida = esp.id; currentPrintData.__codigo_d1 = esp.codigo;
   espRecordar(currentPrintPatient.doctora, esp);
-  const blob = await fillPdfForm(PDFTPL_D1, { ...currentPrintData, numero: currentPrintPatient.numero_folio_d1 || '' });
-  const url = URL.createObjectURL(blob); currentPdfUrls.push(url);
-  document.getElementById('prevD1').src = url;
+  await renderPrintDocs(formFmt() === 'sivec' ? null : 'd1');
   showToast('D1 con código ' + esp.codigo + ' (' + esp.nombre + ')', 'ok');
 }
 function closePrintOverlay() {

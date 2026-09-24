@@ -241,3 +241,25 @@ Números animados com tendência, embudo "Del tamizaje al seguimiento", "Para ha
 **Ideia do autor:** criar **formulários próprios** do SIVEC, baseados nos oficiais que já usamos (D1, D8, PAP, Consentimento, Historia clínica), gerados pelo sistema na hora de imprimir, com letra mais legível e espaço para as figuras (ex.: relógio do colo na HC).
 - Esboço em `docs/esboco-formularios.html` (aguardando aprovação).
 - **Ponto a verificar na proposta:** quais formulários podem ser próprios e quais precisam manter o **modelo oficial do SUS/Ministério** (D1 e D8 costumam ser exigidos no formato oficial); para esses, o próprio pode reproduzir o mesmo layout com melhor letra.
+
+### [24/09/2026] Formulários próprios — DENTRO DO SISTEMA como opção de prova
+- Ainda **sem autorização** para usar formulários próprios. Ficam no sistema para **comparar**: na tela de impressão, **Formato: Oficial | SIVEC (prueba)**. A escolha fica lembrada no computador.
+- Cada folha SIVEC leva a marca "FORMATO SIVEC · PRUEBA (NO OFICIAL)". No Drive continuam sendo salvos os **oficiais**.
+
+### [24/09/2026] SIVEC Farmácia — receita enviada à farmácia, com estoque (SIVEC completo)
+**Ideia do autor:** na consulta, opção **"Enviar a farmacia"**. A farmácia (versão SIVEC Farmácia dentro do SIVEC) recebe a receita, e **pelo estoque** já se sabe se o medicamento existe ou não. A paciente vai **só com a carteira de identidade** e tudo já está no sistema; a dispensação fica **vinculada à linha do tempo**.
+- Requisitos: segurança, **auditoria** (quem prescreveu, quem dispensou, quando, quanto), perfis de acesso.
+- Sugestões do Claude:
+  - Na hora de prescrever, cada cartão de tratamento mostra 🟢 disponível / 🟠 pouco / 🔴 sem estoque, e sugere alternativa equivalente que esteja disponível.
+  - A dispensação preenche sozinha a coluna **"Dispensada"** do D1 e desconta do estoque (entradas, lotes e vencimentos).
+  - Receita com **código único** e estado (*emitida → dispensada parcial/total → vencida*); não pode ser dispensada duas vezes.
+  - Painel da rede: consumo por medicamento e alerta de ruptura de estoque antes de acabar.
+  - Ponto legal: validade da **receita digital** (firma digital/eletrônica do prescritor) e regras do SUS para dispensação.
+
+### [24/09/2026] SIVEC em toda a rede — maternidade, Oncológico, laboratórios
+**Visão do autor:** o SIVEC estará **em todo lugar**: centros, maternidade, hospital Oncológico e **laboratórios que processam PAP**. O laboratório **sobe o resultado direto** no sistema (acaba a perda de papel); o centro só **imprime quando a paciente vem à consulta**.
+- Sugestões do Claude:
+  - **Portal do laboratório:** lista das amostras recebidas por lote de envio (o SIVEC PAP/VPH já registra lote e data de envio); carrega Bethesda/VPH/genótipo com **validação do patologista** (firma) antes de liberar.
+  - Ao liberar: aviso automático ao centro, "próximo passo" calculado na hora (positivo → busca ativa/derivação) e o indicador **tempo toma → resultado** passa a ser real.
+  - **Oncológico/maternidade:** recebem a derivação no sistema e devolvem a **contrarreferência**, que aparece na linha do tempo.
+  - Base técnica: identificação única da paciente (C.I. + SEGIP), padrões de interoperabilidade (**HL7 FHIR**), registro de acesso (quem viu o quê), consentimento da paciente, e funcionamento com internet ruim (fila offline).
