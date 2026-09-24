@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIVEC Mi salud</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2a2026; --soft:#7a6a71; --line:#efe4e8; --tint:#f7e9ef; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .board { width:1400px; margin:0 auto 30px; background:linear-gradient(160deg,#fbf7f5,#f3e9ee); padding:30px 34px 34px; }
+  .bt { display:flex; align-items:center; gap:14px; margin-bottom:22px; }
+  .logo { width:54px; height:54px; border-radius:24%; background:linear-gradient(145deg,#9c3a5f,#5a1c36); display:flex; align-items:center; justify-content:center; color:#fff; }
+  .bt h2 { margin:0; font-size:30px; font-weight:900; } .bt span { color:var(--soft); font-size:17px; } .bt i { margin-left:auto; font-style:normal; font-size:13px; font-weight:800; letter-spacing:.1em; color:var(--soft); }
+  .row4 { display:grid; grid-template-columns:repeat(4,1fr); gap:26px; }
+  .ph { width:300px; margin:0 auto; }
+  .dev { width:300px; height:630px; border-radius:40px; border:10px solid #17121a; background:#fff; overflow:hidden; position:relative; box-shadow:0 18px 40px rgba(60,20,40,.22); display:flex; flex-direction:column; }
+  .notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:110px; height:22px; background:#17121a; border-radius:0 0 14px 14px; z-index:3; }
+  .sb { height:30px; display:flex; justify-content:space-between; align-items:center; padding:0 18px; font-size:11.5px; font-weight:700; color:#fff; background:var(--wine-d); flex:none; }
+  .hd { background:linear-gradient(145deg,#8a3056,#5a1c36); color:#fff; padding:10px 16px 16px; flex:none; }
+  .hd small { opacity:.85; font-size:12px; } .hd h3 { margin:2px 0 0; font-size:20px; font-weight:800; }
+  .ct { flex:1; overflow:hidden; padding:12px; display:flex; flex-direction:column; gap:10px; background:#faf6f8; }
+  .nav { flex:none; display:grid; grid-template-columns:repeat(5,1fr); border-top:1px solid var(--line); background:#fff; padding:6px 0 10px; }
+  .nav span { text-align:center; font-size:10px; color:var(--soft); font-weight:700; } .nav span b { display:block; font-size:18px; line-height:1.2; } .nav .on { color:var(--wine); }
+  .c { background:#fff; border:1px solid var(--line); border-radius:16px; padding:11px 12px; font-size:13px; line-height:1.4; }
+  .c h4 { margin:0 0 4px; font-size:14.5px; } .c .m { color:var(--soft); font-size:12px; }
+  .big { background:linear-gradient(145deg,#9c3a5f,#6d2142); color:#fff; border:none; } .big .m { color:#f6d6e3; }
+  .btn { display:block; text-align:center; font-weight:800; font-size:13.5px; border-radius:12px; padding:10px; margin-top:8px; background:var(--wine); color:#fff; }
+  .btn.o { background:#fff; color:var(--wine); border:1.5px solid var(--wine); } .btn.g { background:var(--ok); }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .q { display:flex; flex-direction:column; align-items:center; gap:3px; background:#fff; border:1px solid var(--line); border-radius:14px; padding:10px 4px; font-size:11.5px; font-weight:700; text-align:center; } .q b { font-size:22px; }
+  .pill { display:inline-block; font-size:11px; font-weight:800; border-radius:999px; padding:2px 8px; } .ok { background:var(--okbg); color:var(--ok); } .wa { background:var(--warnbg); color:var(--warn); } .ba { background:var(--badbg); color:var(--bad); } .in { background:#e0ecfa; color:#1e4f8a; }
+  .li { display:flex; gap:10px; align-items:center; padding:8px 0; border-bottom:1px dashed var(--line); } .li:last-child { border-bottom:none; } .li .ic { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px; flex:none; background:var(--tint); }
+  .li .tx { flex:1; font-size:12.5px; } .li .tx b { display:block; font-size:13.5px; }
+  .cap { margin-top:12px; text-align:center; font-size:14.5px; line-height:1.4; color:#43363d; padding:0 6px; } .cap b { display:block; font-size:16px; color:var(--wine-d); margin-bottom:2px; }
+  .rng { position:relative; height:12px; border-radius:6px; background:linear-gradient(90deg,#fde2e2 0 25%,#dcf3e5 25% 80%,#fde2e2 80%); margin:8px 0 4px; }
+  .rng i { position:absolute; top:-4px; width:4px; height:20px; border-radius:2px; background:var(--ink); }
+  .step { display:flex; gap:8px; align-items:flex-start; font-size:12.5px; padding:5px 0; } .step i { width:20px; height:20px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-style:normal; font-size:11px; font-weight:800; color:#fff; background:#d6c6cd; }
+  .step.d i { background:var(--ok); } .step.c i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .qr { display:flex; justify-content:center; padding:6px; }
+  .sos { background:#b91c1c; color:#fff; border-radius:16px; padding:12px; text-align:center; font-weight:900; font-size:16px; }
+  .baby { display:flex; align-items:center; gap:12px; }
+  .ring { width:86px; height:86px; border-radius:50%; background:conic-gradient(var(--wine) 0 82%, #eadde3 82% 100%); display:flex; align-items:center; justify-content:center; flex:none; }
+  .ring div { width:66px; height:66px; border-radius:50%; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:10px; color:var(--soft); } .ring b { font-size:22px; color:var(--ink); line-height:1; }
+  .note { max-width:1400px; margin:0 auto 30px; }
+</style>
+</head>
+<body>
+
+<!-- ================= BOARD 1 ================= -->
+<section class="board" id="s1">
+  <div class="bt"><div class="logo"><svg viewBox="0 0 24 24" width="32" height="32"><path d="M16.8 7.4C16 5.9 14.3 5 12.1 5 9.3 5 7.5 6.4 7.5 8.4c0 4.4 9.1 2.9 9.1 7.4 0 2-1.9 3.3-4.6 3.3-2.4 0-4.1-.9-4.9-2.5" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round"/><circle cx="16.8" cy="7.4" r="1.9" fill="#fff"/><circle cx="7.2" cy="16.6" r="1.9" fill="#fff"/></svg></div><h2>SIVEC Mi salud</h2><span>la app de la paciente · 1. entrar, inicio y citas</span><i>ESBOZO</i></div>
+  <div class="row4">
+    <div class="ph"><div class="dev"><div class="notch"></div>
+      <div style="flex:1;background:linear-gradient(160deg,#8a3056,#3b0f22);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:22px">
+        <div style="width:84px;height:84px;border-radius:24%;background:#fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="52" height="52"><path d="M16.8 7.4C16 5.9 14.3 5 12.1 5 9.3 5 7.5 6.4 7.5 8.4c0 4.4 9.1 2.9 9.1 7.4 0 2-1.9 3.3-4.6 3.3-2.4 0-4.1-.9-4.9-2.5" fill="none" stroke="#7d2a4c" stroke-width="2.3" stroke-linecap="round"/><circle cx="16.8" cy="7.4" r="1.9" fill="#7d2a4c"/><circle cx="7.2" cy="16.6" r="1.9" fill="#7d2a4c"/></svg></div>
+        <div style="font-size:30px;font-weight:900;letter-spacing:.06em">SIVEC</div><div style="font-size:13px;letter-spacing:.14em;color:#f6c6d8;font-weight:800;margin-top:-10px">MI SALUD</div>
+        <div style="width:100%;background:#fff;color:var(--ink);border-radius:14px;padding:10px 12px;font-size:13px"><span class="m" style="color:var(--soft);font-size:11px;font-weight:700">CÉDULA DE IDENTIDAD</span><br><b style="font-size:17px">7654321 SC</b></div>
+        <div style="width:100%;background:#fff;color:var(--ink);border-radius:14px;padding:10px 12px;font-size:13px"><span style="color:var(--soft);font-size:11px;font-weight:700">CÓDIGO ENVIADO POR SMS</span><br><b style="font-size:20px;letter-spacing:.3em">4 8 1 9</b></div>
+        <div class="btn" style="width:100%;background:#fff;color:var(--wine)">Entrar</div>
+        <div style="font-size:12px;opacity:.9">Próximas veces: 👆 huella o rostro del celular</div>
+      </div></div>
+      <div class="cap"><b>1 · Entrar</b>C.I. + código por SMS. La primera vez se valida en el centro; después entra con la huella del celular.</div></div>
+
+    <div class="ph"><div class="dev"><div class="notch"></div><div class="sb"><span>08:15</span><span>●●● 4G</span></div>
+      <div class="hd"><small>Hola,</small><h3>María 👋</h3></div>
+      <div class="ct">
+        <div class="c big"><div class="m">PRÓXIMA CITA</div><h4 style="font-size:16px">Colposcopia · lun 12/10 · 08:00</h4><div class="m">Hospital municipal · Ginecología</div><div class="btn" style="background:#fff;color:var(--wine)">Ver detalles</div></div>
+        <div class="c"><h4>Para hoy</h4>
+          <div class="li"><div class="ic">🥚</div><div class="tx"><b>Clotrimazol óvulo</b>esta noche · día 4 de 10</div><span class="pill ok">✓</span></div>
+          <div class="li"><div class="ic">💉</div><div class="tx"><b>Inyectable trimestral</b>toca el 12/11</div></div></div>
+        <div class="two"><div class="q"><b>🧪</b>Resultados<span class="pill in">1 nuevo</span></div><div class="q"><b>💊</b>Mis remedios</div><div class="q"><b>👨‍👩‍👧</b>Mi familia</div><div class="q"><b>💉</b>Vacunas</div></div>
+      </div>
+      <div class="nav"><span class="on"><b>🏠</b>Inicio</span><span><b>📅</b>Citas</span><span><b>🧪</b>Resultados</span><span><b>💊</b>Remedios</span><span><b>☰</b>Más</span></div></div>
+      <div class="cap"><b>2 · Inicio</b>Lo más importante primero: la próxima cita y lo que hay que hacer hoy.</div></div>
+
+    <div class="ph"><div class="dev"><div class="notch"></div><div class="sb"><span>08:16</span><span>●●● 4G</span></div>
+      <div class="hd"><small>Mis citas</small><h3>Próximas</h3></div>
+      <div class="ct">
+        <div class="c" style="border:2px solid var(--wine)"><span class="pill wa">Confirmar</span><h4 style="margin-top:5px">Colposcopia</h4><div>📅 Lunes 12/10 · 08:00<br>🏥 Hospital municipal · consultorio gineco 2<br>👩‍⚕️ Dr. Vaca</div><div class="m" style="margin-top:4px">Llevar: C.I. · no usar óvulos 2 días antes</div>
+          <div class="two"><div class="btn g">✓ Confirmo</div><div class="btn o">Otro día</div></div><div class="btn o">🗺 Cómo llegar</div></div>
+        <div class="c"><span class="pill ok">Confirmada</span><h4 style="margin-top:5px">Control niño sano — Tomás (hijo)</h4><div class="m">C.S. San Luis · 20/10 · 09:30</div></div>
+        <div class="c"><h4>Pasadas</h4><div class="m">24/09 · Consulta gineco · C.S. San Luis ✓</div></div>
+      </div>
+      <div class="nav"><span><b>🏠</b>Inicio</span><span class="on"><b>📅</b>Citas</span><span><b>🧪</b>Resultados</span><span><b>💊</b>Remedios</span><span><b>☰</b>Más</span></div></div>
+      <div class="cap"><b>3 · Citas</b>Confirmar o pedir otro día con un toque (igual que el WhatsApp). Indicaciones y mapa.</div></div>
+
+    <div class="ph"><div class="dev"><div class="notch"></div><div class="sb"><span>07:52</span><span>●●● 4G</span></div>
+      <div class="hd"><small>Estoy en el centro</small><h3>Mi turno</h3></div>
+      <div class="ct">
+        <div class="c" style="text-align:center"><div class="m">SU FICHA</div><div style="font-size:54px;font-weight:900;color:var(--wine);line-height:1.05">A-023</div><div>Ginecología · Consultorio 3</div></div>
+        <div class="c"><h4>Delante de usted</h4><div style="display:flex;gap:6px;margin:6px 0">
+          <span style="flex:1;height:10px;border-radius:5px;background:var(--wine)"></span><span style="flex:1;height:10px;border-radius:5px;background:var(--wine)"></span><span style="flex:1;height:10px;border-radius:5px;background:var(--wine)"></span><span style="flex:1;height:10px;border-radius:5px;background:#eadde3"></span></div>
+          <b style="font-size:18px">3 personas · ~15 min</b></div>
+        <div class="c"><div class="step d"><i>✓</i>Recepción 07:49</div><div class="step c"><i>2</i>Triaje — le llaman pronto</div><div class="step"><i>3</i>Consultorio 3</div></div>
+        <div class="c" style="background:#e0ecfa;border-color:#c5d8f0">🔔 El celular vibra cuando la llamen, aunque esté afuera.</div>
+      </div>
+      <div class="nav"><span><b>🏠</b>Inicio</span><span class="on"><b>📅</b>Citas</span><span><b>🧪</b>Resultados</span><span><b>💊</b>Remedios</span><span><b>☰</b>Más</span></div></div>
+      <div class="cap"><b>4 · Fila en vivo</b>La misma ficha que la TV: cuántas personas faltan y aviso al celular.</div></div>
+  </div>
+</section>
+
+<!-- ================= BOARD 2 ================= -->
+<section class="board" id="s2">
+  <div class="bt"><div class="logo"><svg viewBox="0 0 24 24" width="32" height="32"><path d="M16.8 7.4C16 5.9 14.3 5 12.1 5 9.3 5 7.5 6.4 7.5 8.4c0 4.4 9.1 2.9 9.1 7.4 0 2-1.9 3.3-4.6 3.3-2.4 0-4.1-.9-4.9-2.5" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round"/><circle cx="16.8" cy="7.4" r="1.9" fill="#fff"/><circle cx="7.2" cy="16.6" r="1.9" fill="#fff"/></svg></div><h2>SIVEC Mi salud</h2><span>2. resultados, remedios y farmacia</span><i>ESBOZO</i></div>
+  <div class="row4">
+    <div class="ph"><div class="dev"><div class="notch"></div><div class="sb"><span>10:02</span><span>●●● 4G</span></div>
+      <div class="hd"><small>Mis resultados</small><h3>Resultados</h3></div>
+      <div class="ct">
+        <div class="c" style="border:2px solid var(--ok)"><span class="pill ok">Nuevo · normal</span><h4 style="margin-top:5px">Papanicolaou · 24/09</h4><div>✅ <b>Su resultado es normal.</b> No se encontraron células anormales.</div><div class="m" style="margin-top:4px">Próximo control: <b>septiembre 2029</b></div><div class="two"><div class="btn o">📄 Ver PDF</div><div class="btn o">🔊 Escuchar</div></div></div>
+        <div class="c"><span class="pill ok">Normal</span><h4 style="margin-top:5px">VPH · 24/09</h4><div class="m">Negativo</div></div>
+        <div class="c"><span class="pill wa">Revise con su médico</span><h4 style="margin-top:5px">Hemograma · 03/2026</h4><div class="m">1 valor fuera de rango</div></div>
+      </div>
+      <div class="nav"><span><b>🏠</b>Inicio</span><span><b>📅</b>Citas</span><span class="on"><b>🧪</b>Resultados</span><span><b>💊</b>Remedios</span><span><b>☰</b>Más</span></div></div>
+      <div class="cap"><b>5 · Resultados en palabras simples</b>Con el PDF oficial y audio (español, quechua, guaraní, aimara).</div></div>
+
+    <div class="ph"><div class="dev"><div class="notch"></div><div class="sb"><span>10:03</span><span>●●● 4G</span></div>
+      <div class="hd"><small>Resultado</small><h3>Hemoglobina</h3></div>
+      <div class="ct">
+        <div class="c"><div style="font-size:32px;font-weight:900">11,2 <span style="font-size:15px;color:var(--soft)">g/dL</span></div><div class="rng"><i style="left:23%"></i></div><div class="m" style="display:flex;justify-content:space-between"><span>bajo</span><span>normal 12–16</span><span>alto</span></div>
+          <div style="margin-top:8px">Un poco baja. Su médico le indicó <b>sulfato ferroso</b>.</div></div>
+        <div class="c"><h4>Cómo fue cambiando</h4><svg viewBox="0 0 240 70" width="100%"><path d="M8 20H232" stroke="#dcf3e5" stroke-width="14"/><polyline points="12,26 90,34 170,48 228,42" fill="none" stroke="#7d2a4c" stroke-width="2"/><circle cx="228" cy="42" r="4" fill="#7d2a4c"/><g font-family="Source Sans 3" font-size="10" fill="#7a6a71"><text x="8" y="66">2024</text><text x="208" y="66">2026</text></g></svg></div>
+        <div class="c" style="background:var(--warnbg);border-color:#f0d9a8">⚠️ Un resultado que necesita conversación (por ejemplo un PAP alterado) <b>no aparece solo</b>: aparece con “venga al centro, ya tiene cita”.</div>
+      </div>
+      <div class="nav"><span><b>🏠</b>Inicio</span><span><b>📅</b>Citas</span><span class="on"><b>🧪</b>Resultados</span><span><b>💊</b>Remedios</span><span><b>☰</b>Más</span></div></div>
+      <div class="cap"><b>6 · Detalle con rango</b>Se ve si está bien o no y cómo cambió. Nunca un resultado grave “suelto”.</div></div>
+
+    <div class="ph"><div class="dev"><div class="notch"></div><div class="sb"><span>21:00</span><span>●●● 4G</span></div>
+      <div class="hd"><small>Mis remedios</small><h3>Hoy</h3></div>
+      <div class="ct">
+        <div class="c" style="border:2px solid var(--wine)"><div class="li" style="border:none"><div class="ic">🥚</div><div class="tx"><b>Clotrimazol 500 mg óvulo</b>1 por vía vaginal · 21:00</div></div><div class="two"><div class="btn g">✓ Ya lo usé</div><div class="btn o">⏰ 30 min</div></div><div class="m" style="margin-top:6px">Día 4 de 10 · ●●●●○○○○○○</div></div>
+        <div class="c"><div class="li"><div class="ic">💊</div><div class="tx"><b>Sulfato ferroso</b>1 al día · con el almuerzo</div><span class="pill ok">✓ 13:10</span></div><div class="li"><div class="ic">💉</div><div class="tx"><b>Inyectable trimestral</b>próximo: 12/11 en el centro</div></div></div>
+        <div class="c"><h4>Recetas</h4><div class="m">24/09 · Dra. Aguilera · <span class="pill ok">retirada</span></div></div>
+      </div>
+      <div class="nav"><span><b>🏠</b>Inicio</span><span><b>📅</b>Citas</span><span><b>🧪</b>Resultados</span><span class="on"><b>💊</b>Remedios</span><span><b>☰</b>Más</span></div></div>
+      <div class="cap"><b>7 · Mis remedios</b>Recordatorio a la hora, “ya lo tomé” y cuántos días faltan. El médico ve si cumple.</div></div>
+
+    <div class="ph"><div class="dev"><div class="notch"></div><div class="sb"><span>10:40</span><span>●●● 4G</span></div>
+      <div class="hd"><small>Receta RX-2026-08812</small><h3>Retirar en farmacia</h3></div>
+      <div class="ct">
+        <div class="c" style="text-align:center"><span class="pill ok">✓ Disponible · C.S. San Luis</span><div class="qr" id="qr1"></div><div class="m">Muestre este código en la farmacia</div></div>
+        <div class="c"><div class="li"><div class="ic">🥚</div><div class="tx"><b>Clotrimazol óvulo</b>10 unidades</div><span class="pill ok">hay</span></div><div class="li"><div class="ic">💊</div><div class="tx"><b>Fluconazol 150 mg</b>1 cápsula</div><span class="pill ok">hay</span></div></div>
+        <div class="c" style="background:#ecf8f1;border-color:#cfe9d8">🖐 En la farmacia confirma con su huella: “recibí”.</div>
+      </div>
+      <div class="nav"><span><b>🏠</b>Inicio</span><span><b>📅</b>Citas</span><span><b>🧪</b>Resultados</span><span class="on"><b>💊</b>Remedios</span><span><b>☰</b>Más</span></div></div>
+      <div class="cap"><b>8 · Farmacia</b>Sabe antes de ir si hay el remedio; retira con código QR + huella.</div></div>
+  </div>
+</section>
+
+<!-- ================= BOARD 3 ================= -->
+<section class="board" id="s3">
+  <div class="bt"><div class="logo"><svg viewBox="0 0 24 24" width="32" height="32"><path d="M16.8 7.4C16 5.9 14.3 5 12.1 5 9.3 5 7.5 6.4 7.5 8.4c0 4.4 9.1 2.9 9.1 7.4 0 2-1.9 3.3-4.6 3.3-2.4 0-4.1-.9-4.9-2.5" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round"/><circle cx="16.8" cy="7.4" r="1.9" fill="#fff"/><circle cx="7.2" cy="16.6" r="1.9" fill="#fff"/></svg></div><h2>SIVEC Mi salud</h2><span>3. referencias, embarazo, familia, privacidad y emergencia</span><i>ESBOZO</i></div>
+  <div class="row4">
+    <div class="ph"><div class="dev"><div class="notch"></div><div class="sb"><span>11:20</span><span>●●● 4G</span></div>
+      <div class="hd"><small>Mi referencia</small><h3>Hospital municipal</h3></div>
+      <div class="ct">
+        <div class="c"><div class="m">DESDE C.S. SAN LUIS · COLPOSCOPIA</div>
+          <div class="step d"><i>✓</i><div><b>Enviada</b> · 24/09</div></div><div class="step d"><i>✓</i><div><b>El hospital la recibió</b> · 24/09</div></div><div class="step d"><i>✓</i><div><b>Cita dada</b> · lun 12/10 08:00</div></div><div class="step c"><i>4</i><div><b>Atención</b> · falta 4 días</div></div><div class="step"><i>5</i><div>Vuelve el informe a su centro</div></div></div>
+        <div class="c">🚑 Si necesita traslado, su centro lo pide. Aquí verá cuándo llega la ambulancia.</div>
+        <div class="c"><h4>¿Algo cambió?</h4><div class="btn o">💬 Escribir a mi centro</div></div>
+      </div>
+      <div class="nav"><span><b>🏠</b>Inicio</span><span class="on"><b>📅</b>Citas</span><span><b>🧪</b>Resultados</span><span><b>💊</b>Remedios</span><span><b>☰</b>Más</span></div></div>
+      <div class="cap"><b>9 · Mi referencia</b>La paciente sabe en qué paso está: nadie se pierde entre el centro y el hospital.</div></div>
+
+    <div class="ph"><div class="dev"><div class="notch"></div><div class="sb"><span>09:00</span><span>●●● 4G</span></div>
+      <div class="hd"><small>Mi embarazo · Lucía</small><h3>Semana 32</h3></div>
+      <div class="ct">
+        <div class="c"><div class="baby"><div class="ring"><div><b>32</b>semanas</div></div><div style="font-size:12.5px">👶 El bebé pesa cerca de <b>1,7 kg</b>.<br>📅 Fecha probable: <b>19/11</b></div></div></div>
+        <div class="c"><h4>Controles prenatales</h4><div class="m">✓ 1º · ✓ 2º · ✓ 3º · ✓ 4º · <b style="color:var(--wine)">5º: 02/10 C.S. San Luis</b></div><div class="m" style="margin-top:4px">✓ Ecografía · ✓ Laboratorio · ⏳ Vacuna dTpa</div></div>
+        <div class="c" style="background:var(--badbg);border-color:#f5c2c2"><h4 style="color:var(--bad)">Vaya de inmediato si:</h4><div style="font-size:12.5px">sangrado · pérdida de líquido · dolor de cabeza fuerte o visión borrosa · el bebé se mueve menos</div></div>
+      </div>
+      <div class="nav"><span class="on"><b>🏠</b>Inicio</span><span><b>📅</b>Citas</span><span><b>🧪</b>Resultados</span><span><b>💊</b>Remedios</span><span><b>☰</b>Más</span></div></div>
+      <div class="cap"><b>10 · Mi embarazo</b>Semanas, controles pendientes y señales de alarma claras.</div></div>
+
+    <div class="ph"><div class="dev"><div class="notch"></div><div class="sb"><span>18:30</span><span>●●● 4G</span></div>
+      <div class="hd"><small>Mi familia</small><h3>Tomás · 3 años</h3></div>
+      <div class="ct">
+        <div class="two"><div class="q"><b>👩</b>María<span class="m">yo</span></div><div class="q" style="border:2px solid var(--wine)"><b>🧒</b>Tomás<span class="m">3 años</span></div></div>
+        <div class="c"><h4>💉 Carnet de vacunas</h4><div class="m">✓ BCG · ✓ Pentavalente 3/3 · ✓ SRP 1 · ✓ Influenza 2026<br><b style="color:var(--wine)">⏳ SRP 2ª dosis: pendiente</b></div><div class="qr" id="qr2"></div><div class="m" style="text-align:center">Carnet digital para la escuela</div></div>
+        <div class="c"><h4>📈 Crecimiento</h4><div class="m">14 kg · 95 cm · <span class="pill ok">normal</span></div></div>
+      </div>
+      <div class="nav"><span><b>🏠</b>Inicio</span><span><b>📅</b>Citas</span><span><b>🧪</b>Resultados</span><span><b>💊</b>Remedios</span><span class="on"><b>☰</b>Más</span></div></div>
+      <div class="cap"><b>11 · Mi familia y vacunas</b>La mamá ve a sus hijos: vacunas con QR, controles y crecimiento.</div></div>
+
+    <div class="ph"><div class="dev"><div class="notch"></div><div class="sb"><span>18:31</span><span>●●● 4G</span></div>
+      <div class="hd"><small>Mi privacidad</small><h3>Quién vio mi historia</h3></div>
+      <div class="ct">
+        <div class="c"><div class="li"><div class="ic">👩‍⚕️</div><div class="tx"><b>Dra. Aguilera</b>C.S. San Luis · consulta · 24/09</div></div><div class="li"><div class="ic">🩺</div><div class="tx"><b>Lic. Rojas</b>triaje · 24/09</div></div><div class="li"><div class="ic">🏥</div><div class="tx"><b>Dr. Vaca</b>Hospital municipal · referencia · 25/09</div></div><div class="btn o">⚠️ No reconozco un acceso</div></div>
+        <div class="c"><h4>Personas autorizadas</h4><div class="m">👧 Ana (hija) puede ver mis citas</div></div>
+        <div class="sos">🆘 EMERGENCIA<div style="font-size:12px;font-weight:600">llama a emergencias y comparte mi ubicación</div></div>
+      </div>
+      <div class="nav"><span><b>🏠</b>Inicio</span><span><b>📅</b>Citas</span><span><b>🧪</b>Resultados</span><span><b>💊</b>Remedios</span><span class="on"><b>☰</b>Más</span></div></div>
+      <div class="cap"><b>12 · Privacidad y emergencia</b>La paciente ve quién abrió su historia y a quién autoriza. Botón de emergencia.</div></div>
+  </div>
+</section>
+
+<script>
+  function qr(el, seed, n, s) {
+    let x = seed, h = ''; const rnd = () => (x = (x * 9301 + 49297) % 233280) / 233280;
+    const fin = (r, c) => (r < 7 && c < 7) || (r < 7 && c >= n - 7) || (r >= n - 7 && c < 7);
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+      let on;
+      if (fin(r, c)) { const rr = r % (n - 7) , cc = c % (n - 7); const a = r < 7 ? r : r - (n - 7), b = c < 7 ? c : c - (n - 7); on = a === 0 || a === 6 || b === 0 || b === 6 || (a >= 2 && a <= 4 && b >= 2 && b <= 4); }
+      else on = rnd() > .5;
+      if (on) h += `<rect x="${c * s}" y="${r * s}" width="${s}" height="${s}"/>`;
+    }
+    el.innerHTML = `<svg width="${n * s}" height="${n * s}" viewBox="0 0 ${n * s} ${n * s}" fill="#2a2026">${h}</svg>`;
+  }
+  qr(document.getElementById('qr1'), 7, 25, 6);
+  qr(document.getElementById('qr2'), 3, 21, 4);
+</script>
+</body>
+</html>

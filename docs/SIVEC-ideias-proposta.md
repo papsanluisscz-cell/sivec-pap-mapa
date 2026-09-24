@@ -344,13 +344,13 @@ Princípios para o SIVEC: dados mínimos obrigatórios + resumo clínico automá
 ### [24/09/2026] PLANO — Organização da plataforma aprovada pelo autor
 As ideias de "um só SIVEC" (vistas por função, paciente única, botão Derivar, hoja de tránsito, farmácia, mensagens, ambulâncias e a lista do que contabilizar) foram **aprovadas e entram no plano do projeto**.
 
-### [24/09/2026] SIVEC Tránsito — app da ambulância ("tipo Uber", mas com regulação)
+### [24/09/2026] SIVEC Tránsito — app da ambulância ("tipo Uber", mas com regulação) — APROVADO
 - **1 smartphone institucional por ambulância** (não o celular pessoal do motorista), com o app **SIVEC Tránsito**: login da tripulação do turno, GPS contínuo do próprio celular (+ rastreador veicular opcional como reserva).
 - **Despacho:** o centro pede o traslado (botão Derivar → "precisa ambulância"); a **central de regulação** escolhe a ambulância (o sistema sugere a mais próxima disponível do tipo certo); o celular da ambulância **toca**, a tripulação **aceita** (se não aceitar em 60 s, passa para a próxima e a central é avisada).
 - No celular: **ficha da paciente** (foto, dados, diagnóstico, sinais vitais, alergias), **origem e destino**, navegação, e se o **hospital receptor já aceitou** (serviço/cama). Estados: aceita → a caminho → no local → com paciente → chegou → entregue (com digital de quem recebe) → disponível.
 - **A central telefônica continua:** chamadas do público e de emergência, e plano B quando falhar internet/app. O operador registra a chamada no SIVEC e despacha pelo mesmo sistema → tudo fica medido (tempos, km, quem atendeu) e na linha do tempo.
 
-### [24/09/2026] Fluxo cirúrgico e hospitalar completo (pedido do autor)
+### [24/09/2026] Fluxo cirúrgico e hospitalar completo (pedido do autor) — APROVADO (esboço com 11 telas)
 Formulários/telas a ter, todos ligados à linha do tempo e ao "onde está a paciente agora":
 - **Solicitação de quirófano** (diagnóstico, procedimento, prioridade, tempo estimado, anestesia sugerida, sangue reservado, exames pré-op, consentimento).
 - **Avaliação pré-anestésica** + **receita da anestesiologia**.
@@ -363,3 +363,18 @@ Formulários/telas a ter, todos ligados à linha do tempo e ao "onde está a pac
 - **Monitorização fetal (NST/cardiotocografia)** como exame pedido na emergência gineco-obstétrica, com resultado e classificação no sistema — dentro de um **catálogo de exames**.
 - **SIVEC Pediatria:** **calculadora de doses por peso**, **busca de medicamento por indicação**, controles (crescimento com curvas OMS, desenvolvimento, vacinas).
 - Esboço em `docs/esboco-hospital.html`.
+
+### [24/09/2026] App da paciente "SIVEC Mi salud" (esboço `docs/esboco-mi-salud.html`)
+Fase 2 (a fase 1 é SMS/WhatsApp). Grátis para a paciente, Android e iPhone, e também versão web leve.
+- **Entrar:** C.I. + código por SMS (primeira vez com validação no centro/SEGIP) e depois digital/rosto do próprio celular.
+- **Início:** próxima cita, o que fazer hoje (remédios, controles), avisos.
+- **Citas:** confirmar / pedir outro dia, **ficha e fila ao vivo** ("faltam 3 pessoas"), como chegar.
+- **Resultados em linguagem simples** (PAP, laboratório) + PDF oficial; resultados que exigem conversa (ex.: PAP positivo) **só aparecem com a mensagem "venha ao centro, já temos sua cita"** — nunca um positivo solto.
+- **Receitas e remédios:** horários com lembrete, "disponível na farmácia", **QR** para retirar.
+- **Minha linha do tempo** simplificada.
+- **Minhas referências:** onde está o pedido, cita no hospital, traslado.
+- **Família:** filhos (controles, vacinas) e **gravidez** (semanas, controles pré-natais, sinais de alarme).
+- **Carnê de vacinas digital** com QR.
+- **Privacidade:** a paciente vê **quem acessou** a sua história (auditoria visível), autoriza familiar/cuidador.
+- **Emergência:** botão que liga para o número de emergência e compartilha a localização; não substitui a ligação.
+- Acessibilidade: letra grande, **áudio em espanhol e quechua/guarani/aimara**, funciona com internet fraca.
