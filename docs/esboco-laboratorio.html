@@ -152,6 +152,14 @@
   .bth { display:flex; flex-wrap:wrap; gap:5px; } .bth span { font-size:13px; font-weight:700; border-radius:8px; padding:6px 10px; border:1px solid var(--line); background:#fff; } .bth .on { background:#dcf3e5; border-color:#15803d; color:#15803d; }
   .secg { columns:4; column-gap:10px; } .sec2 { break-inside:avoid; background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-bottom:10px; }
   .sh { color:#fff; font-weight:800; font-size:13.5px; padding:6px 10px; } .sb2 { padding:6px 10px 8px; display:flex; flex-direction:column; gap:2px; } .sb2 span { font-size:12.5px; border-bottom:1px dashed var(--line); padding:2px 0; } .sb2 span:last-child { border-bottom:none; }
+  .arg { display:grid; grid-template-columns:1fr 1fr; gap:8px; align-content:start; }
+  .ar { background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden; } .ah2 { padding:8px 10px; font-weight:800; font-size:13.5px; display:flex; justify-content:space-between; align-items:center; } .ah2 small { font-weight:700; font-size:11px; color:var(--soft); }
+  .ar:not(.open) .ab2 { display:none; } .ar:not(.open) .ah2 { color:#5b4a52; }
+  .ab2 { padding:2px 10px 8px; display:flex; flex-direction:column; gap:3px; } .ab2 label { display:flex; gap:7px; align-items:center; font-size:12.5px; } .ab2 label.x { font-weight:700; color:var(--wine-d); }
+  .cb { width:15px; height:15px; border:1.5px solid #bca9b1; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:900; color:#fff; flex:none; } label.x .cb { background:var(--wine); border-color:var(--wine); }
+  .ped { display:flex; flex-direction:column; gap:3px; } .ped span { font-size:13px; padding:4px 0; border-bottom:1px dashed var(--line); } .ped em { font-style:normal; font-size:11px; color:#c2410c; font-weight:700; margin-left:6px; }
+  .d8 { margin-top:12px; border:1.5px solid #2a2026; border-radius:6px; background:#fff; } .d8h { display:flex; justify-content:space-between; padding:6px 10px; border-bottom:1.5px solid #2a2026; font-size:13px; } .d8h span { font-size:11px; color:#15803d; font-weight:700; }
+  .d8b { padding:8px 10px; } .d8r { display:flex; gap:8px; font-size:12px; padding:2px 0; } .d8r span { color:var(--soft); width:80px; } .d8g { display:grid; grid-template-columns:1fr 1fr; gap:2px 10px; font-size:11.5px; margin:6px 0; color:#9c8b92; } .d8g .x { color:var(--ink); font-weight:700; }
 </style>
 </head>
 <body>
@@ -165,6 +173,7 @@
   <button class="tab" data-t="l7">7. Resultado al médico</button>
   <button class="tab" data-t="l8">8. Indicadores</button>
   <button class="tab" data-t="l9">9. Todos los exámenes</button>
+  <button class="tab" data-t="l10">10. El médico pide (D-8)</button>
 </div>
 <div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Sirve para el laboratorio del centro, el del hospital y el laboratorio de patología que lee los PAP.</div>
 
@@ -360,6 +369,35 @@
   </div>
 </section>
 
+<!-- ============ L10 ============ -->
+<section class="scr" id="l10">
+  <div class="app"><div class="brand">SIVEC <span>CONSULTORIO</span></div><div class="who">🧪 Pedir exámenes · Dra. Aguilera · Carla Torres · 🤰 28 semanas</div></div>
+  <div class="body">
+    <div class="row" style="margin-bottom:10px"><div class="inp" style="flex:1">🔎 Buscar examen…</div><span class="mini">Perfiles:</span><span class="chip on">🤰 Prenatal ✓</span><span class="chip">🫘 Renal</span><span class="chip">🟤 Hepático</span><span class="chip">🩺 Preoperatorio</span><span class="chip">🍬 Diabetes</span><span class="chip">🌡️ Febril</span><span class="chip">⭐ Mis favoritos</span></div>
+    <div class="cols" style="grid-template-columns:1.55fr 1fr">
+      <div class="arg"><div class="ar open"><div class="ah2" style="border-left:5px solid #b91c1c">🩸 Hematología<small>2 marcados</small></div><div class="ab2"><label class="x"><span class="cb">✓</span>Hemograma completo</label><label class=""><span class="cb"></span>Hemoglobina y hematocrito</label><label class=""><span class="cb"></span>Plaquetas</label><label class=""><span class="cb"></span>VES</label><label class="x"><span class="cb">✓</span>Grupo sanguíneo y Rh</label><label class=""><span class="cb"></span>Coombs indirecto</label></div></div><div class="ar open"><div class="ah2" style="border-left:5px solid #c2410c">⚗️ Química sanguínea<small>2 marcados</small></div><div class="ab2"><label class="x"><span class="cb">✓</span>Glicemia</label><label class=""><span class="cb"></span>Curva de tolerancia</label><label class=""><span class="cb"></span>HbA1c</label><label class=""><span class="cb"></span>Urea</label><label class="x"><span class="cb">✓</span>Creatinina</label><label class=""><span class="cb"></span>Ácido úrico</label><label class=""><span class="cb"></span>Perfil lipídico</label></div></div><div class="ar open"><div class="ah2" style="border-left:5px solid #a16207">🟤 Hepático<small>1 marcados</small></div><div class="ab2"><label class="x"><span class="cb">✓</span>Transaminasas TGO · TGP</label><label class=""><span class="cb"></span>Bilirrubinas</label><label class=""><span class="cb"></span>Fosfatasa alcalina</label><label class=""><span class="cb"></span>Fosfatasa ácida</label><label class=""><span class="cb"></span>GGT</label></div></div><div class="ar open"><div class="ah2" style="border-left:5px solid #6d28d9">🛡️ Inmunología / serología<small>2 marcados</small></div><div class="ab2"><label class=""><span class="cb"></span>PCR</label><label class=""><span class="cb"></span>Factor reumatoide</label><label class=""><span class="cb"></span>Widal</label><label class="x"><span class="cb">✓</span>VIH rápida</label><label class="x"><span class="cb">✓</span>Sífilis rápida</label><label class=""><span class="cb"></span>Hepatitis B</label><label class=""><span class="cb"></span>Chagas</label><label class=""><span class="cb"></span>Toxoplasma</label><label class=""><span class="cb"></span>Test de embarazo</label></div></div><div class="ar"><div class="ah2" style="border-left:5px solid #ca8a04">🧪 Orina<small>1 marcados</small></div><div class="ab2"><label class="x"><span class="cb">✓</span>Examen general de orina</label><label class=""><span class="cb"></span>Urocultivo</label><label class=""><span class="cb"></span>Proteinuria 24 h</label></div></div><div class="ar"><div class="ah2" style="border-left:5px solid #78350f">💩 Heces<small>0 marcados</small></div><div class="ab2"><label class=""><span class="cb"></span>Coproparasitológico simple</label><label class=""><span class="cb"></span>Coproparasitológico seriado</label><label class=""><span class="cb"></span>Moco fecal</label><label class=""><span class="cb"></span>Sangre oculta</label></div></div><div class="ar"><div class="ah2" style="border-left:5px solid #15803d">🦟 Parasitología<small>0 marcados</small></div><div class="ab2"><label class=""><span class="cb"></span>Gota gruesa + frotis</label><label class=""><span class="cb"></span>Chagas micro</label></div></div><div class="ar"><div class="ah2" style="border-left:5px solid #1d4ed8">🧫 Microbiología<small>0 marcados</small></div><div class="ab2"><label class=""><span class="cb"></span>Baciloscopía seriada</label><label class=""><span class="cb"></span>GeneXpert</label><label class=""><span class="cb"></span>Cultivo y antibiograma</label><label class=""><span class="cb"></span>Gram</label></div></div><div class="ar"><div class="ah2" style="border-left:5px solid #7d2a4c">🔬 Citología / patología<small>0 marcados</small></div><div class="ab2"><label class=""><span class="cb"></span>PAP</label><label class=""><span class="cb"></span>VPH</label><label class=""><span class="cb"></span>Biopsia</label></div></div><div class="ar"><div class="ah2" style="border-left:5px solid #9f1239">🩸 Coagulación<small>0 marcados</small></div><div class="ab2"><label class=""><span class="cb"></span>Tiempo de protrombina</label><label class=""><span class="cb"></span>TPT</label><label class=""><span class="cb"></span>Fibrinógeno</label></div></div><div class="ar"><div class="ah2" style="border-left:5px solid #be185d">🧬 Hormonas<small>0 marcados</small></div><div class="ab2"><label class=""><span class="cb"></span>TSH · T4 libre</label><label class=""><span class="cb"></span>Beta-HCG</label></div></div><div class="ar"><div class="ah2" style="border-left:5px solid #334155">🩻 Imagen / gabinete<small>0 marcados</small></div><div class="ab2"><label class=""><span class="cb"></span>Ecografía obstétrica</label><label class=""><span class="cb"></span>Ecografía abdominal</label><label class=""><span class="cb"></span>Rayos X tórax</label><label class=""><span class="cb"></span>ECG</label></div></div></div>
+      <div>
+        <div class="card"><div class="lbl">Pedido — 8 exámenes</div>
+          <div class="ped"><span>🩸 Hemograma completo</span><span>🩸 Grupo sanguíneo y Rh</span><span>⚗️ Glicemia <em>ayuno 8 h</em></span><span>⚗️ Creatinina</span><span>🟤 Transaminasas TGO · TGP</span><span>🛡️ VIH rápida <em>consentimiento</em></span><span>🛡️ Sífilis rápida</span><span>🧪 Examen general de orina <em>primera orina</em></span></div>
+          <div class="lbl">Diagnóstico y prioridad</div>
+          <div class="inp">Z34.9 · Control prenatal · 28 sem</div>
+          <div class="chips" style="margin-top:6px"><span class="chip on">Rutina</span><span class="chip">Urgente</span></div>
+          <div class="lbl">Dónde se hacen</div>
+          <div style="font-size:13px;line-height:1.55">🏥 C.S. San Luis: 7 exámenes · hoy<br>🏨 Hospital municipal: transaminasas → van en lote</div>
+          <div class="mini" style="margin-top:6px">⚠ Ya tiene hemograma de hace 10 días — ¿repetir? · ✓ indicaciones de preparación por SMS a la paciente</div>
+          <div class="row" style="justify-content:flex-end;margin-top:10px"><span class="btn">👁 Ver D-8</span><span class="btn p">🖐 Firmar y enviar</span></div></div>
+        <div class="d8">
+          <div class="d8h"><b>D-8 · SOLICITUD DE EXÁMENES</b><span>se llena solo</span></div>
+          <div class="d8b">
+            <div class="d8r"><span>Paciente</span><b>CARLA TORRES · 26 a · F</b></div>
+            <div class="d8r"><span>Diagnóstico</span><b>Control prenatal 28 sem</b></div>
+            <div class="d8g"><span class="x">☒ Hemograma completo</span><span class="x">☒ Grupo y factor Rh</span><span class="x">☒ Glicemia</span><span class="x">☒ Creatinina sérica</span><span class="x">☒ Transaminasas TGO-TGP</span><span class="x">☒ Prueba rápida sífilis</span><span class="x">☒ Examen general de orina</span><span>☐ Bilirrubinas</span><span>☐ Coproparasitológico</span><span>☐ Gota gruesa</span><span>☐ Baciloscopía</span><span>☐ Test de embarazo</span></div>
+            <div class="mini">…VIH va en su formulario propio con consentimiento. Firma: 🖐 Dra. Aguilera · 17576012</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <div class="note" id="note"></div>
 <script>
   function bc(el, seed) { let x = seed, h = '', pos = 0; const r = () => (x = (x * 9301 + 49297) % 233280) / 233280;
@@ -375,6 +413,7 @@
     l6: '<b>Portal PAP (citologia):</b> o laboratório de patologia lê e carrega o resultado Bethesda, VPH e genótipo por toques, com dupla leitura e assinatura. Ao liberar, o resultado aparece direto no SIVEC PAP do centro e calcula o próximo passo.',
     l7: '<b>Resultado ao médico:</b> lista por prioridade com o próximo passo sugerido (derivar, receitar, controle). Normais podem ser avisados sozinhos; alterados só com “venha, já tem cita”.',
     l9: '<b>Todos os exames:</b> o catálogo inclui todas as áreas (hematologia, química, hepático, eletrólitos, sorologia, coagulação, urina, fezes, parasitologia, microbiologia, citologia, hormônios), com perfis rápidos (pré-natal, renal, pré-operatório…). Cada exame sabe tubo, preparo, faixas, setor e onde se faz. Exames novos se somam pelo Admin.',
+    l10: '<b>O médico pede (D-8):</b> na consulta aparecem as mesmas abas do catálogo; o médico marca os exames (ou um perfil, como pré-natal), vê preparo e onde se faz cada um, e o D-8 se preenche sozinho com as caixas marcadas. Assina com a digital e o pedido vai direto para a coleta de amostras.',
     l8: '<b>Indicadores:</b> PAP lidos, dias coleta→resultado por centro, amostras rejeitadas e o motivo (para capacitar), percentagem de positivos.',
   };
   const tabs = document.querySelectorAll('.tab');
