@@ -163,6 +163,9 @@
   .fc { border:1px solid var(--line); border-radius:12px; padding:9px 11px; background:#fff; display:flex; flex-direction:column; gap:3px; font-size:13px; } .fc b { font-size:15px; } .fc small { color:var(--soft); } .fc em { font-style:normal; font-size:12px; color:var(--soft); } .fc.sel { border:2px solid var(--wine); background:var(--tint); } .fc.off { opacity:.7; }
   .bar2 { height:8px; border-radius:4px; background:#eee4e8; overflow:hidden; } .bar2 i { display:block; height:100%; background:#2f6fb0; }
   .fq { display:grid; grid-template-columns:28px 120px 1fr auto; gap:8px; align-items:center; padding:8px 4px; border-bottom:1px dashed var(--line); font-size:13.5px; } .fq .n { width:24px; height:24px; border-radius:50%; background:#f3eef0; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; } .fq em { font-style:normal; color:var(--soft); font-size:12.5px; } .fq.pr { background:#fff5f5; border-radius:8px; }
+  .stp { display:flex; gap:10px; padding:8px 0; border-bottom:1px dashed var(--line); font-size:13.5px; } .stp i { width:26px; height:26px; border-radius:50%; flex:none; background:#fde2e2; color:#991b1b; font-style:normal; font-weight:800; display:flex; align-items:center; justify-content:center; } .stp.ok i { background:#dcf3e5; color:#15803d; } .stp b { display:block; font-size:14.5px; } .stp span { color:var(--soft); font-size:12.5px; }
+  .stack { display:flex; gap:3px; border-radius:10px; overflow:hidden; } .stack span { color:#fff; font-size:12px; font-weight:700; padding:10px 8px; line-height:1.3; }
+  .totem { border:10px solid #2b2b2b; border-radius:22px; background:#fff; overflow:hidden; min-height:430px; } .tt { background:#7d2a4c; color:#fff; font-weight:800; padding:10px 14px; } .tb { padding:14px; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; }
 </style>
 </head>
 <body>
@@ -177,7 +180,11 @@
   <button class="tab" data-t="g9">9. Fichas del día (sin cita)</button>
   <button class="tab" data-t="g10">10. Fila mixta del médico</button>
   <button class="tab" data-t="g11">11. Ficha desde el celular</button>
-  <button class="tab" data-t="g7">12. Indicadores</button>
+  <button class="tab" data-t="g12">12. Sin fila: hoy vs SIVEC</button>
+  <button class="tab" data-t="g13">13. La cita sale del centro</button>
+  <button class="tab" data-t="g14">14. Cupos del especialista</button>
+  <button class="tab" data-t="g15">15. El día de la cita</button>
+  <button class="tab" data-t="g7">16. Indicadores</button>
 </div>
 <div class="warn">⚠️ Dibujo para aprobar, con datos inventados. La agenda une recepción, consultorio, referencias, programas y los mensajes a la paciente.</div>
 
@@ -406,6 +413,95 @@
   </div>
 </section>
 
+
+<!-- ============ G12 ============ -->
+<section class="scr" id="g12">
+  <div class="app"><div class="brand">SIVEC <span>SIN FILA</span></div><div class="who">🏥 Cita con especialista en 2º y 3er nivel — sin madrugar</div></div>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card" style="border-top:5px solid #991b1b"><div class="lbl" style="color:#991b1b">Hoy</div>
+        <div class="stp"><i>1</i><div><b>El médico entrega la referencia en papel</b><span>la paciente la lleva en la mano</span></div></div>
+        <div class="stp"><i>2</i><div><b>Viaja al hospital y hace fila desde las 4–5 de la mañana</b><span>muchas veces con niños, adultos mayores, embarazadas</span></div></div>
+        <div class="stp"><i>3</i><div><b>Si no alcanza ficha, vuelve otro día</b><span>o usa una app aparte (foto de la referencia en papel)</span></div></div>
+        <div class="stp"><i>4</i><div><b>El especialista no sabe nada de ella</b><span>repite historia, exámenes; el papel se pierde</span></div></div>
+        <div class="stp"><i>5</i><div><b>El centro de origen no sabe si fue atendida</b></div></div></div>
+      <div class="card" style="border-top:5px solid #15803d"><div class="lbl" style="color:#15803d">Con el SIVEC</div>
+        <div class="stp ok"><i>1</i><div><b>El médico refiere desde la consulta y la cita sale en ese momento</b><span>día y hora con el especialista, sin papel</span></div></div>
+        <div class="stp ok"><i>2</i><div><b>La paciente recibe SMS/WhatsApp con día, hora y lugar</b><span>confirma con “1”; recordatorio el día anterior</span></div></div>
+        <div class="stp ok"><i>3</i><div><b>Llega 30 min antes y solo da su C.I. o huella</b><span>en recepción, tótem o triaje — no hace fila de fichas</span></div></div>
+        <div class="stp ok"><i>4</i><div><b>El especialista ya tiene todo</b><span>resumen, resultados, pregunta del médico, línea de tiempo</span></div></div>
+        <div class="stp ok"><i>5</i><div><b>La contrarreferencia vuelve sola al centro</b></div></div></div>
+    </div>
+    <div class="card" style="margin-top:12px;font-size:14px;line-height:1.55">💡 Sirve también para quien llega con una <b>referencia en papel</b> de fuera de la red: la recepción del hospital (o la paciente desde Mi salud) la fotografía una sola vez, queda <b>digitalizada</b> y se le da la cita — nunca más vuelve a hacer fila por esa referencia.</div>
+  </div>
+</section>
+
+<!-- ============ G13 ============ -->
+<section class="scr" id="g13">
+  <div class="app"><div class="brand">SIVEC <span>CONSULTORIO</span></div><div class="who">📤 Dra. Ortuño (C.S. San Luis) refiere a Cardiología del Hospital de 3er nivel</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card">
+        <div class="lbl">Referencia no urgente → elegir la cita ahora, con la paciente al frente</div>
+        <div class="row" style="margin-bottom:8px"><span class="lvl" style="background:#7c3aed">3er</span><b>Hospital de 3er nivel · Cardiología</b><span class="st info" style="margin-left:auto">Prioritaria · dentro de 30 días</span></div>
+        <div class="slots">
+          <div class="on"><b>lun 05/10 · 08:30</b>Dr. Suárez · consultorio 12</div>
+          <div><b>lun 05/10 · 09:00</b>Dr. Suárez</div>
+          <div><b>mié 07/10 · 10:30</b>Dra. Ramos</div>
+          <div><b>vie 09/10 · 08:00</b>Dra. Ramos</div>
+        </div>
+        <div class="mini" style="margin-top:6px">Son los <b>cupos que el hospital reservó para la red</b>. Se eligen junto con la paciente (día que puede viajar).</div>
+        <div class="lbl">Si el especialista debe revisar antes</div>
+        <div class="chips"><span class="chip on">Cita directa (el especialista la ve el día)</span><span class="chip">Pre-cita: el especialista confirma en 48 h</span></div>
+        <div class="row" style="justify-content:flex-end;margin-top:10px"><span class="btn p">📤 Referir y reservar cita</span></div>
+      </div>
+      <div>
+        <div class="phn" style="min-height:0;border-width:7px"><div class="phh">WhatsApp · SIVEC</div><div class="msg in">Hola Juan 👋 Tiene cita en <b>Cardiología</b>, <b>Hospital de 3er nivel</b>, el <b>lunes 05/10 a las 08:30</b> (Dr. Suárez, consultorio 12).<br><b>No necesita hacer fila ni sacar ficha.</b> Llegue a las 08:00 con su C.I.<br><b>1</b> Confirmo · <b>2</b> Otro día</div><div class="msg out">1</div></div>
+        <div class="card" style="margin-top:12px"><div class="mini2"><b>¿Y si no se puede elegir en el momento?</b>La referencia entra a la bandeja del hospital; en cuanto dan la cita, llega el mensaje. La paciente <strong>no viaja</strong> hasta tener cita.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ G14 ============ -->
+<section class="scr" id="g14">
+  <div class="app"><div class="brand">SIVEC <span>HOSPITAL</span></div><div class="who">⚙️ Cupos de Cardiología — Hospital de 3er nivel · semana 05–09/10</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Cómo se reparten los cupos de cada día</div>
+        <div class="stack"><span style="flex:50;background:#7c3aed">50% referencias de la red (se agendan desde los centros)</span><span style="flex:20;background:#0e7490">20% controles propios</span><span style="flex:15;background:#c2410c">15% interconsultas</span><span style="flex:15;background:#6b7280">15% fichas del día</span></div>
+        <table class="l" style="margin-top:12px"><thead><tr><th>Día</th><th>Referencias red</th><th>Controles</th><th>Interconsultas</th><th>Fichas del día</th></tr></thead><tbody>
+          <tr><td>Lun 05/10</td><td>10 · <b>7 ocupados</b></td><td>4 · 4</td><td>3 · 1</td><td>3</td></tr>
+          <tr><td>Mar 06/10</td><td>10 · 10 <span class="st bad">lleno</span></td><td>4 · 3</td><td>3 · 2</td><td>3</td></tr>
+          <tr><td>Mié 07/10</td><td>10 · 4</td><td>4 · 2</td><td>3 · 0</td><td>3</td></tr></tbody></table>
+        <div class="mini" style="margin-top:6px">Cupos de referencia no usados se liberan 48 h antes para controles o fichas.</div></div>
+      <div>
+        <div class="card"><div class="lbl">Reparto entre redes</div>
+          <div class="kv2"><span>Red Centro</span><b>3 por día</b></div><div class="kv2"><span>Red Norte</span><b>2</b></div><div class="kv2"><span>Red Sur</span><b>3</b></div><div class="kv2"><span>Red Este / Oeste / provincias</span><b>2</b></div>
+          <div class="mini" style="margin-top:6px">Así ninguna red se queda sin acceso. Urgentes y emergencias no usan cupo: entran siempre.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Espera actual</div><div class="kv2"><span>Cardiología</span><b>11 días</b></div><div class="kv2"><span>Nefrología</span><b>19 días</b></div><div class="kv2"><span>Neurología</span><b>24 días ⚠</b></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ G15 ============ -->
+<section class="scr" id="g15">
+  <div class="app"><div class="brand">SIVEC <span>HOSPITAL</span></div><div class="who">📍 El día de la cita — lunes 05/10 · 08:00</div></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:300px 1fr 1fr;gap:14px">
+      <div class="totem"><div class="tt">SIVEC · Bienvenido</div><div class="tb"><div style="font-size:15px;font-weight:800">Tengo cita</div><div class="mini">Ponga su dedo o escriba su C.I.</div>
+        <div class="scanner" style="width:120px;height:130px"><svg viewBox="0 0 40 48" width="70" height="84"><g fill="none" stroke="#7d2a4c" stroke-width="1.5" stroke-linecap="round"><path d="M8 18a12 12 0 0 1 24 0v6"/><path d="M12 19a8 8 0 0 1 16 0v8c0 5-2 9-5 12"/><path d="M16 20a4 4 0 0 1 8 0v7c0 6-2 10-6 14"/><path d="M5 12a18 18 0 0 1 30 0"/></g></svg></div>
+        <div class="st ok" style="font-size:14px">✓ Juan Pérez · cita 08:30</div><div style="font-size:14px;line-height:1.5;margin-top:4px">Cardiología · consultorio 12<br>🖨 ficha <b>C-012</b> · piso 2</div></div></div>
+      <div class="card"><div class="lbl">Qué pasa sin que nadie haga nada</div>
+        <div class="tl"><div style="--c:#15803d"><b>08:02</b> Llegada registrada (tótem, recepción o triaje)</div><div style="--c:#0e7490"><b>08:10</b> Triaje: signos vitales → a su ficha</div><div style="--c:#7d2a4c"><b>08:30</b> El Dr. Suárez la llama (TV del piso 2)</div><div style="--c:#6d28d9"><b>09:05</b> Nota, órdenes y contrarreferencia al C.S. San Luis</div></div>
+        <div class="mini" style="margin-top:6px">Si no llega 30 min después de su hora, el cupo pasa a otra y se avisa al centro de origen.</div></div>
+      <div class="card"><div class="lbl">Para quien no tiene celular o no sabe usar tótem</div><div style="font-size:13.5px;line-height:1.6">🧾 La recepción/triaje busca por C.I. o huella y hace lo mismo.<br>📄 El centro de origen imprime un <b>comprobante</b> con día, hora y lugar.<br>☎️ El centro llama si no confirmó por mensaje.</div>
+        <div class="lbl">Para quien trae referencia en papel</div><div style="font-size:13.5px;line-height:1.6">📷 Se escanea en recepción o se sube foto por Mi salud (C.I. + fecha de nacimiento) → entra a la bandeja y recibe cita por mensaje.</div></div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ G7 ============ -->
 <section class="scr" id="g7">
   <div class="app"><div class="brand">SIVEC <span>AGENDA</span></div><div class="who">📊 Indicadores de agenda · C.S. San Luis · septiembre</div></div>
@@ -442,6 +538,10 @@
     g9: '<b>Fichas do dia:</b> a recepção vê quantas fichas restam por médico e a espera aproximada; a paciente que chega sem cita recebe a ficha na hora (papel ou SMS). Se acabaram: outro médico, cita, lista de espera ou emergência.',
     g10: '<b>Fila mista do médico:</b> as citas entram na sua hora, entre elas as fichas por ordem de chegada, e quem tem prioridade (grávida, idoso, criança, alarme) sobe na fila.',
     g11: '<b>Ficha pelo celular:</b> parte das fichas pode ser tirada pelo Mi salud ou WhatsApp com hora aproximada — menos fila de madrugada. Sempre fica uma parte para a janela.',
+    g12: '<b>Sem fila (hoje × SIVEC):</b> hoje a paciente leva a referência em papel e faz fila de madrugada no hospital; com o SIVEC a cita sai marcada do centro de saúde, chega por mensagem e ela só se apresenta com a C.I. ou digital. Referências em papel de fora da rede se digitalizam uma vez.',
+    g13: '<b>A cita sai do centro:</b> o médico do 1º nível refere e escolhe, com a paciente, um dos cupos que o hospital reservou para a rede. A mensagem já diz “não precisa fazer fila”. Se o especialista precisa revisar antes, vira pré-cita e o hospital confirma.',
+    g14: '<b>Cupos do especialista:</b> o hospital reparte o dia (referências da rede, controles, interconsultas, fichas do dia) e divide os cupos de referência entre as redes. Os não usados se liberam 48 h antes. Urgências não usam cupo.',
+    g15: '<b>O dia da cita:</b> chega, põe o dedo no totem (ou dá a C.I. na recepção/triagem), recebe a ficha do consultório e é chamada pela TV do piso. Quem não tem celular recebe comprovante e ligação do centro.',
     g7: '<b>Indicadores:</b> ocupação, faltas, dias de espera e confirmações — por médico e por especialidade.',
   };
   const tabs = document.querySelectorAll('.tab');
