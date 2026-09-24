@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esbozo pestañas</title>
+<style>
+  :root {
+    color-scheme: light;
+    --paper:#fbf6f3; --surface:#fff; --line:#ecdde3; --grid:#f1e8ec; --ink:#40323a; --ink2:#6b5760; --ink3:#9a8690;
+    --wine:#7d2a4c; --wine2:#9c3a5f; --pos:#7c3aed; --neg:#ea8c2e; --pend:#2f6fb0; --vph:#dc2626; --vneg:#16a34a;
+    --good:#16a34a; --warn:#d97706; --crit:#dc2626; --shadow:0 1px 2px rgba(64,50,58,.06),0 6px 20px rgba(109,33,66,.06);
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,"Segoe UI",Arial,sans-serif; background:#e9e2e5; color:var(--ink); }
+  .demoBar { background:#2b1520; color:#fff; padding:10px 14px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; position:sticky; top:0; z-index:20; }
+  .demoBar b { font-size:12.5px; opacity:.8; margin-right:4px; }
+  .demoBar button { border:1px solid rgba(255,255,255,.3); background:transparent; color:#fff; border-radius:8px; padding:6px 11px; cursor:pointer; font-size:12.5px; }
+  .demoBar button.on { background:#fff; color:var(--wine); font-weight:700; }
+  .note { max-width:1200px; margin:12px auto 0; background:#fff7e6; border:1px solid #f3d9a4; color:#6b4a00; border-radius:10px; padding:9px 14px; font-size:12.5px; }
+  .frame { max-width:1200px; margin:12px auto 40px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 10px 40px rgba(0,0,0,.15); display:none; }
+  .frame.on { display:block; animation:fade .35s ease; }
+  @keyframes fade { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:none; } }
+  .hdr { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; }
+  .hdr .n { font-weight:900; letter-spacing:1.5px; font-size:18px; } .hdr .n span { font-size:10.5px; background:#fff; color:var(--wine); border-radius:6px; padding:2px 7px; margin-left:6px; letter-spacing:1px; }
+  .hdr .tab { font-size:12.5px; background:#fff; color:var(--wine); border-radius:8px; padding:5px 10px; font-weight:700; }
+  main { padding:18px 20px 24px; }
+  h2 { margin:0 0 3px; font-size:19px; } .hint { color:var(--ink2); font-size:13px; margin:0 0 14px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); padding:14px 16px; }
+  .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:14px; }
+  .tile { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:10px 12px; } .tile .v { font-size:24px; font-weight:800; } .tile .l { font-size:12px; color:var(--ink2); font-weight:600; }
+  .pill { font-size:11px; font-weight:700; border-radius:999px; padding:2px 8px; display:inline-block; white-space:nowrap; }
+  .red { background:#fee2e2; color:#991b1b; } .amber { background:#fff4d6; color:#8a5300; } .green { background:#dcf5e9; color:#0d6b47; } .blue { background:#e3eefb; color:#1e4f86; } .gray { background:#eee; color:#555; } .violet { background:#efe7ff; color:#5b21b6; }
+  .btn { background:var(--wine); color:#fff; border:none; border-radius:9px; padding:8px 14px; font-weight:700; font-size:13px; cursor:pointer; }
+  .btn2 { background:#fff; color:var(--wine); border:1px solid var(--wine2); border-radius:8px; padding:6px 11px; font-weight:600; font-size:12.5px; cursor:pointer; }
+  .explain { background:#f3eef9; border:1px solid #ddd0f3; color:#3b2a63; border-radius:10px; padding:10px 14px; font-size:12.5px; margin-top:14px; line-height:1.6; }
+  .explain .db { display:inline-block; background:#fff; border:1px solid #ddd0f3; border-radius:6px; padding:1px 6px; font-size:11.5px; margin-top:4px; }
+
+  /* 1. Seguimiento */
+  .pipe { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; margin-bottom:14px; }
+  .stage { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:9px 10px; position:relative; }
+  .stage .v { font-size:22px; font-weight:800; } .stage .l { font-size:11.5px; color:var(--ink2); font-weight:600; }
+  .stage .bar { height:4px; border-radius:2px; background:var(--wine); margin-top:6px; transform-origin:left; animation:grow 1s ease both; }
+  @keyframes grow { from { transform:scaleX(0);} }
+  .seg { display:grid; grid-template-columns:230px 1fr 110px; gap:14px; align-items:center; padding:12px 4px; border-bottom:1px solid var(--line); }
+  .seg .nm b { font-size:14px; } .seg .nm small { display:block; color:var(--ink3); font-size:12px; }
+  .steps { display:grid; grid-template-columns:repeat(6,1fr); position:relative; }
+  .steps::before { content:""; position:absolute; top:11px; left:8%; right:8%; height:3px; background:var(--grid); border-radius:2px; }
+  .st { text-align:center; position:relative; font-size:10.5px; color:var(--ink3); }
+  .st i { width:24px; height:24px; border-radius:50%; background:var(--surface); border:3px solid var(--grid); display:block; margin:0 auto 4px; position:relative; z-index:1; font-style:normal; font-size:11px; line-height:18px; color:#fff; font-weight:800; }
+  .st.done i { background:var(--wine); border-color:var(--wine); }
+  .st.now i { background:#fff; border-color:var(--wine); box-shadow:0 0 0 4px color-mix(in srgb,var(--wine) 18%,transparent); animation:pulse 1.6s infinite; }
+  .st.stuck i { border-color:var(--crit); box-shadow:0 0 0 4px color-mix(in srgb,var(--crit) 18%,transparent); }
+  @keyframes pulse { 50% { box-shadow:0 0 0 7px color-mix(in srgb,var(--wine) 8%,transparent);} }
+  .st.done, .st.now { color:var(--ink); font-weight:600; }
+  .fill { position:absolute; top:11px; left:8%; height:3px; background:var(--wine); border-radius:2px; z-index:0; transform-origin:left; animation:grow 1.1s ease both; }
+  .days { text-align:right; font-size:12px; } .days b { font-size:18px; display:block; }
+
+  /* 2. Ficha lateral */
+  .split { display:grid; grid-template-columns:1fr 420px; gap:14px; }
+  .mini { display:flex; justify-content:space-between; align-items:center; background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--pos); border-radius:10px; padding:10px 12px; margin-bottom:8px; font-size:13px; }
+  .mini.sel { outline:2px solid var(--wine); }
+  .drawer { background:var(--surface); border:1px solid var(--line); border-radius:14px; box-shadow:-8px 0 30px rgba(109,33,66,.12); padding:0; overflow:hidden; animation:slide .45s cubic-bezier(.2,.7,.2,1); }
+  @keyframes slide { from { transform:translateX(30px); opacity:0; } }
+  .dh { background:linear-gradient(135deg,#f7eef2,#fff); padding:16px; border-bottom:1px solid var(--line); }
+  .dh .av { width:46px; height:46px; border-radius:50%; background:var(--wine); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:800; margin-right:10px; float:left; }
+  .dh b { font-size:16px; } .dh small { color:var(--ink2); display:block; font-size:12px; }
+  .alerts2 { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; clear:both; }
+  .tl { padding:14px 16px; } .tl h4 { margin:0 0 10px; font-size:13px; color:var(--ink2); text-transform:uppercase; letter-spacing:.4px; }
+  .ev { position:relative; padding:0 0 16px 26px; }
+  .ev::before { content:""; position:absolute; left:8px; top:18px; bottom:0; width:2px; background:var(--grid); }
+  .ev:last-child::before { display:none; }
+  .ev i { position:absolute; left:0; top:2px; width:18px; height:18px; border-radius:50%; border:3px solid var(--surface); box-shadow:0 0 0 2px currentColor; }
+  .ev .d { font-size:11.5px; color:var(--ink3); } .ev .t { font-size:13px; font-weight:600; } .ev .s { font-size:12px; color:var(--ink2); }
+
+  /* 3. Mapa */
+  .mapWrap { display:grid; grid-template-columns:310px 1fr; gap:14px; }
+  .modes { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+  .mode { border:1.5px solid var(--line); border-radius:999px; padding:5px 10px; font-size:12px; background:#fff; cursor:pointer; }
+  .mode.on { border-color:var(--crit); background:#fee2e2; color:#991b1b; font-weight:700; }
+  .barrio { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--line); font-size:13px; }
+  .barrio .cnt { font-weight:800; font-size:15px; } .barrio small { color:var(--ink3); display:block; font-size:11.5px; }
+  .fakemap { position:relative; height:430px; border-radius:12px; overflow:hidden; background:#efe9dc; border:1px solid var(--line); }
+  .fakemap svg { position:absolute; inset:0; width:100%; height:100%; }
+  .pin { position:absolute; width:16px; height:16px; border-radius:50%; background:var(--crit); border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.4); animation:drop .5s cubic-bezier(.2,.7,.2,1.4) both; }
+  @keyframes drop { from { transform:translateY(-20px); opacity:0; } }
+  .heat { position:absolute; border-radius:50%; background:radial-gradient(circle, rgba(220,38,38,.35), rgba(220,38,38,0) 70%); }
+  .routeTag { position:absolute; left:12px; bottom:12px; background:#fff; border-radius:10px; padding:8px 12px; font-size:12.5px; box-shadow:var(--shadow); }
+
+  /* 4. Balance */
+  table { width:100%; border-collapse:collapse; font-size:13px; background:var(--surface); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  th { text-align:left; background:#f6eef1; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--ink2); padding:8px 10px; }
+  td { padding:8px 10px; border-top:1px solid var(--line); }
+  tr.sent td { background:#f5fbf7; }
+  .chk { width:18px; height:18px; accent-color:var(--wine); }
+  .lote { display:flex; gap:10px; align-items:center; flex-wrap:wrap; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:10px; font-size:13px; }
+
+  /* 5. Registrar */
+  .stepper { display:flex; align-items:center; gap:0; margin:6px 0 18px; }
+  .sp { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink3); font-weight:600; }
+  .sp i { width:30px; height:30px; border-radius:50%; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-style:normal; background:#fff; }
+  .sp.on { color:var(--wine); } .sp.on i { background:var(--wine); border-color:var(--wine); color:#fff; }
+  .sp.done { color:var(--good); } .sp.done i { background:var(--good); border-color:var(--good); color:#fff; }
+  .spl { flex:1; height:3px; background:var(--line); margin:0 10px; border-radius:2px; overflow:hidden; } .spl b { display:block; height:100%; width:100%; background:var(--good); transform-origin:left; animation:grow .8s ease both; }
+  .form { display:grid; grid-template-columns:1fr 1fr; gap:12px 16px; }
+  .fld label { display:block; font-size:12.5px; font-weight:600; margin-bottom:4px; } .fld input, .fld select { width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:8px; font-size:14px; background:#fff; }
+  .draft { font-size:12px; color:var(--good); display:flex; align-items:center; gap:6px; } .draft::before { content:""; width:8px; height:8px; border-radius:50%; background:var(--good); animation:pulse2 1.6s infinite; }
+  @keyframes pulse2 { 50% { opacity:.3; } }
+  .foot { display:flex; justify-content:space-between; align-items:center; margin-top:18px; }
+
+  /* 6. Métodos */
+  .cal { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+  .day { background:var(--surface); border:1px solid var(--line); border-radius:10px; min-height:96px; padding:6px 7px; font-size:11.5px; }
+  .day .dn { font-weight:700; color:var(--ink2); margin-bottom:4px; display:flex; justify-content:space-between; }
+  .day.today { border:2px solid var(--wine); }
+  .chip { display:block; border-radius:6px; padding:2px 5px; margin-bottom:3px; font-size:11px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; animation:fade .4s ease both; }
+  @media (max-width:900px) { .split, .mapWrap { grid-template-columns:1fr; } .pipe { grid-template-columns:repeat(3,1fr); } .seg { grid-template-columns:1fr; } .cal { grid-template-columns:repeat(2,1fr); } .form { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="demoBar"><b>ESBOZO — elegí una pestaña:</b>
+  <button data-s="seg" class="on">1. PAP+ / VPH+</button>
+  <button data-s="ficha">2. Pacientes (ficha)</button>
+  <button data-s="mapa">3. Mapa (búsqueda activa)</button>
+  <button data-s="bal">4. Balance (envíos)</button>
+  <button data-s="reg">5. Registrar (3 pasos)</button>
+  <button data-s="met">6. Métodos (calendario)</button>
+</div>
+<div class="note">⚠️ Dibujos para aprobar: nombres y números de ejemplo. Nada de esto está aplicado todavía.</div>
+
+<!-- 1. SEGUIMIENTO -->
+<section class="frame on" id="s-seg">
+  <div class="hdr"><div class="n">SIVEC<span>PAP/VPH</span></div><div class="tab">PAP+ / VPH+</div></div>
+  <main>
+    <h2>Seguimiento de positivas</h2><p class="hint">Cada paciente positiva avanza por etapas. El sistema cuenta los días en cada una y marca en rojo cuando se traba.</p>
+    <div class="pipe">
+      <div class="stage"><div class="v">3</div><div class="l">Resultado recibido</div><div class="bar" style="width:30%"></div></div>
+      <div class="stage"><div class="v">5</div><div class="l">Notificada</div><div class="bar" style="width:50%"></div></div>
+      <div class="stage"><div class="v">4</div><div class="l">Colposcopia agendada</div><div class="bar" style="width:40%"></div></div>
+      <div class="stage"><div class="v">6</div><div class="l">Colposcopia realizada</div><div class="bar" style="width:60%"></div></div>
+      <div class="stage"><div class="v">2</div><div class="l">En tratamiento</div><div class="bar" style="width:20%"></div></div>
+      <div class="stage"><div class="v">9</div><div class="l">Alta / control</div><div class="bar" style="width:90%;background:var(--good)"></div></div>
+    </div>
+    <div class="card">
+      <div class="seg"><div class="nm"><b>Rosa Mamani</b> <span class="pill red">HSIL</span><small>5123456 SC · 44 años · Dra. Aguilera</small></div>
+        <div class="steps"><div class="fill" style="width:17%"></div><div class="st done"><i>✓</i>Resultado</div><div class="st now stuck"><i></i>Notificada</div><div class="st"><i></i>Colpo agendada</div><div class="st"><i></i>Colpo realizada</div><div class="st"><i></i>Tratamiento</div><div class="st"><i></i>Alta</div></div>
+        <div class="days"><b style="color:var(--crit)">38 días</b>sin avanzar ⚠</div></div>
+      <div class="seg"><div class="nm"><b>Carmen Rojas</b> <span class="pill amber">LSIL</span> <span class="pill violet">VPH 16</span><small>7788991 SC · 36 años · Dra. Ortuño</small></div>
+        <div class="steps"><div class="fill" style="width:50%"></div><div class="st done"><i>✓</i>Resultado</div><div class="st done"><i>✓</i>Notificada</div><div class="st done"><i>✓</i>Colpo agendada</div><div class="st now"><i></i>Colpo realizada</div><div class="st"><i></i>Tratamiento</div><div class="st"><i></i>Alta</div></div>
+        <div class="days"><b>6 días</b>cita: 30/09</div></div>
+      <div class="seg"><div class="nm"><b>Julia Vargas</b> <span class="pill red">ASC-H</span><small>6612345 SC · 51 años · Dr. Tola</small></div>
+        <div class="steps"><div class="fill" style="width:67%"></div><div class="st done"><i>✓</i>Resultado</div><div class="st done"><i>✓</i>Notificada</div><div class="st done"><i>✓</i>Colpo agendada</div><div class="st done"><i>✓</i>Colpo realizada</div><div class="st now"><i></i>Tratamiento</div><div class="st"><i></i>Alta</div></div>
+        <div class="days"><b>12 días</b>Oncológico</div></div>
+    </div>
+    <div class="explain"><b>Cómo se usa:</b> un toque en la etapa → se registra con fecha ("Notificada hoy"). Límite de días por etapa configurable (ej. 15 días) → pasa a rojo y aparece en "Para hacer hoy" del Panel.<br>
+      <span class="db">Base de datos: columnas nuevas <b>seg_etapa</b> + fecha de cada etapa (SQL sin riesgo)</span></div>
+  </main>
+</section>
+
+<!-- 2. FICHA -->
+<section class="frame" id="s-ficha">
+  <div class="hdr"><div class="n">SIVEC<span>PAP/VPH</span></div><div class="tab">Pacientes</div></div>
+  <main>
+    <h2>Pacientes</h2><p class="hint">Al tocar una paciente se abre su ficha al costado, con <b>todas sus tomas en línea de tiempo</b>. La lista sigue visible.</p>
+    <div class="split">
+      <div>
+        <div class="mini"><span><b>Ana Choque</b> · 29 años</span><span class="pill green">Al día</span></div>
+        <div class="mini sel" style="border-left-color:var(--vph)"><span><b>Rosa Mamani</b> · 44 años</span><span class="pill red">Definir seguimiento</span></div>
+        <div class="mini" style="border-left-color:var(--pend)"><span><b>Lucía Flores</b> · 33 años</span><span class="pill gray">Esperando resultado</span></div>
+        <div class="mini" style="border-left-color:var(--neg)"><span><b>Martha Guzmán</b> · 58 años</span><span class="pill amber">Entregar resultado</span></div>
+        <div class="mini"><span><b>Silvia Arce</b> · 41 años</span><span class="pill amber">Control vencido</span></div>
+      </div>
+      <div class="drawer">
+        <div class="dh"><span class="av">RM</span><b>Rosa Mamani</b><small>CI 5123456 SC · 44 años · 📞 7xx xxx xx</small><small>B. San Luis, C. Muchiri #245</small>
+          <div class="alerts2"><span class="pill red">➜ Definir seguimiento (HSIL)</span><span class="pill violet">VPH 16</span><span class="pill gray">3 tomas</span></div></div>
+        <div class="tl"><h4>Línea de tiempo</h4>
+          <div class="ev" style="color:var(--crit)"><i></i><div class="d">12/09/2026 · Dra. Aguilera</div><div class="t">Resultado PAP: HSIL</div><div class="s">Toma del 20/08/2026 · no entregado</div></div>
+          <div class="ev" style="color:var(--vph)"><i></i><div class="d">05/09/2026</div><div class="t">VPH Positiva · genotipo 16</div><div class="s">Seguimiento: pendiente</div></div>
+          <div class="ev" style="color:var(--pend)"><i></i><div class="d">20/08/2026</div><div class="t">Toma PAP + VPH</div><div class="s">N° SL-2026-PAP-000412</div></div>
+          <div class="ev" style="color:var(--good)"><i></i><div class="d">14/03/2023 · Dra. Ortuño</div><div class="t">PAP: NILM (negativo)</div><div class="s">Entregado 02/05/2023</div></div>
+          <div class="ev" style="color:var(--good)"><i></i><div class="d">09/02/2020</div><div class="t">PAP: NILM (negativo)</div><div class="s">Entregado</div></div>
+          <div style="display:flex;gap:8px;margin-top:6px"><button class="btn">Editar</button><button class="btn2">Imprimir</button><button class="btn2">Nueva toma</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="explain">Es el primer paso del <b>"Historial"</b> del SIVEC. No necesita cambios en la base de datos (usa las tomas que ya existen, agrupadas por paciente).</div>
+  </main>
+</section>
+
+<!-- 3. MAPA -->
+<section class="frame" id="s-mapa">
+  <div class="hdr"><div class="n">SIVEC<span>PAP/VPH</span></div><div class="tab">Mapa</div></div>
+  <main>
+    <h2>Mapa · búsqueda activa</h2><p class="hint">Elegí qué pacientes buscar y el mapa muestra solo esas, con la lista <b>agrupada por barrio</b> para planificar las visitas del día.</p>
+    <div class="mapWrap">
+      <div class="card">
+        <div class="modes"><span class="mode on">⏰ Resultado atrasado</span><span class="mode">🩺 Positivas sin seguimiento</span><span class="mode">📬 Entregar resultado</span><span class="mode">📅 Control vencido</span><span class="mode">🔥 Cobertura (calor)</span></div>
+        <div style="font-size:12.5px;color:var(--ink2);margin-bottom:6px"><b style="color:var(--ink)">22 pacientes</b> en 6 barrios</div>
+        <div class="barrio"><span><b>B. San Luis</b><small>C. Muchiri, C. Guaraní…</small></span><span class="cnt">7</span></div>
+        <div class="barrio"><span><b>B. Lazareto</b><small>Av. Grigotá 3er anillo</small></span><span class="cnt">5</span></div>
+        <div class="barrio"><span><b>B. Pompeya</b><small>C. Charagua</small></span><span class="cnt">4</span></div>
+        <div class="barrio"><span><b>UV-10</b><small>Mz 5, Mz 12</small></span><span class="cnt">3</span></div>
+        <div class="barrio"><span><b>B. Los Pinos</b><small></small></span><span class="cnt">2</span></div>
+        <div class="barrio"><span><b>Montero</b><small>provincia</small></span><span class="cnt">1</span></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn">🖨 Imprimir ruta del día</button><button class="btn2">Excel</button></div>
+      </div>
+      <div class="fakemap">
+        <svg viewBox="0 0 800 430" preserveAspectRatio="none"><g stroke="#fff" stroke-width="7" fill="none"><path d="M0 120 L800 80"/><path d="M0 300 L800 250"/><path d="M200 0 L260 430"/><path d="M520 0 L480 430"/><path d="M0 200 Q400 170 800 190"/></g><g stroke="#f5b98d" stroke-width="10" fill="none"><path d="M-20 380 Q400 250 820 40"/></g></svg>
+        <div class="heat" style="left:180px;top:120px;width:220px;height:220px"></div>
+        <div class="pin" style="left:230px;top:180px;animation-delay:.05s"></div><div class="pin" style="left:260px;top:205px;animation-delay:.1s"></div><div class="pin" style="left:245px;top:150px;animation-delay:.15s"></div>
+        <div class="pin" style="left:300px;top:230px;animation-delay:.2s"></div><div class="pin" style="left:520px;top:120px;animation-delay:.25s"></div><div class="pin" style="left:560px;top:150px;animation-delay:.3s"></div>
+        <div class="pin" style="left:420px;top:300px;animation-delay:.35s"></div><div class="pin" style="left:650px;top:260px;animation-delay:.4s"></div><div class="pin" style="left:120px;top:330px;animation-delay:.45s"></div>
+        <div class="routeTag">📍 Tocá un barrio → el mapa se acerca a esas pacientes</div>
+      </div>
+    </div>
+    <div class="explain">La "ruta del día" imprime por barrio: nombre, dirección, celular y qué hay que hacer con cada una. <b>Cobertura (calor)</b> muestra dónde se concentran las tomas y dónde faltan. No necesita cambios en la base.</div>
+  </main>
+</section>
+
+<!-- 4. BALANCE -->
+<section class="frame" id="s-bal">
+  <div class="hdr"><div class="n">SIVEC<span>PAP/VPH</span></div><div class="tab">Balance</div></div>
+  <main>
+    <h2>Balance semanal · 15/09 a 21/09</h2><p class="hint">Resumen arriba y control de qué muestras <b>ya se enviaron al Oncológico</b> y cuándo.</p>
+    <div class="tiles">
+      <div class="tile"><div class="v">24</div><div class="l">Tomas en la semana</div></div>
+      <div class="tile"><div class="v" style="color:var(--good)">18</div><div class="l">Enviadas</div></div>
+      <div class="tile"><div class="v" style="color:var(--warn)">6</div><div class="l">Falta enviar</div></div>
+      <div class="tile"><div class="l" style="margin-bottom:4px">Por doctora</div><div style="font-size:12px;line-height:1.7">Ortuño 9 · Aguilera 7<br>Delina 5 · Tola 3</div></div>
+    </div>
+    <div class="lote"><b>6 marcadas</b> → <span>Fecha de envío</span> <input type="date" value="2026-09-22" style="border:1px solid var(--line);border-radius:8px;padding:5px 8px"> <span>Lote</span> <input value="L-2026-38" style="border:1px solid var(--line);border-radius:8px;padding:5px 8px;width:110px"> <button class="btn">Marcar como enviadas</button> <button class="btn2">🖨 Imprimir planilla</button></div>
+    <table>
+      <thead><tr><th></th><th>#</th><th>Nombre</th><th>Carnet</th><th>Edad</th><th>Toma</th><th>Doctora</th><th>Envío</th></tr></thead>
+      <tbody>
+        <tr class="sent"><td><input type="checkbox" class="chk" disabled></td><td>1</td><td>María Quispe</td><td>7654321</td><td>38</td><td>15/09</td><td>Dra. Ortuño</td><td><span class="pill green">✓ 16/09 · L-2026-37</span></td></tr>
+        <tr class="sent"><td><input type="checkbox" class="chk" disabled></td><td>2</td><td>Ana Choque</td><td>8123456</td><td>29</td><td>15/09</td><td>Dra. Delina</td><td><span class="pill green">✓ 16/09 · L-2026-37</span></td></tr>
+        <tr><td><input type="checkbox" class="chk" checked></td><td>3</td><td>Lucía Flores</td><td>6543210</td><td>33</td><td>19/09</td><td>Dra. Aguilera</td><td><span class="pill amber">Falta enviar</span></td></tr>
+        <tr><td><input type="checkbox" class="chk" checked></td><td>4</td><td>Silvia Arce</td><td>5432109</td><td>41</td><td>20/09</td><td>Dr. Tola</td><td><span class="pill amber">Falta enviar</span></td></tr>
+      </tbody>
+    </table>
+    <div class="explain">Con la fecha de envío el sistema mide <b>cuánto tarda el laboratorio</b> (envío → resultado) separado de lo que depende del centro.<br><span class="db">Base de datos: columnas nuevas <b>fecha_envio</b> y <b>lote_envio</b> (SQL sin riesgo)</span></div>
+  </main>
+</section>
+
+<!-- 5. REGISTRAR -->
+<section class="frame" id="s-reg">
+  <div class="hdr"><div class="n">SIVEC<span>PAP/VPH</span></div><div class="tab">Registrar</div></div>
+  <main>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><h2>Registrar toma (PAP / VPH)</h2><span class="draft">Borrador guardado hace 5 s</span></div>
+    <div class="stepper">
+      <div class="sp done"><i>✓</i>Paciente</div><div class="spl"><b></b></div>
+      <div class="sp on"><i>2</i>Toma</div><div class="spl"><b style="width:0"></b></div>
+      <div class="sp"><i>3</i>Consentimientos</div>
+    </div>
+    <div class="card">
+      <div style="font-size:12.5px;color:var(--ink2);margin-bottom:12px">Paciente: <b style="color:var(--ink)">Lucía Flores</b> · 33 años · CI 6543210 <span class="pill blue">🔁 2ª toma (anterior: 03/2024 NILM)</span></div>
+      <div class="form">
+        <div class="fld"><label>Tipo de examen</label><select><option>Papanicolau + VPH</option></select></div>
+        <div class="fld"><label>Fecha de toma *</label><input type="date" value="2026-09-24"></div>
+        <div class="fld"><label>Doctora</label><select><option>Dra. Aguilera</option></select></div>
+        <div class="fld"><label>N° de registro</label><input value="SL-2026-PAP-000413 (automático)" readonly style="background:#f7f2f4"></div>
+      </div>
+      <div class="foot"><button class="btn2">← Paciente</button><button class="btn">Siguiente: Consentimientos →</button></div>
+    </div>
+    <div class="explain">• Formulario en <b>3 pasos cortos</b> en vez de uno largo.<br>• <b>Borrador automático</b>: si se corta la luz o internet, al volver sigue donde quedó.<br>• Si la paciente ya existe (por CI), se completan sus datos y se avisa que es una nueva toma.<br>• Al guardar: botón directo <b>"Imprimir documentos"</b>.</div>
+  </main>
+</section>
+
+<!-- 6. METODOS -->
+<section class="frame" id="s-met">
+  <div class="hdr"><div class="n">SIVEC<span>PAP/VPH</span></div><div class="tab">Métodos</div></div>
+  <main>
+    <h2>Métodos anticonceptivos</h2><p class="hint">Calendario de controles: quién tiene que volver cada día.</p>
+    <div class="tiles">
+      <div class="tile"><div class="v" style="color:var(--crit)">4</div><div class="l">Vencidos</div></div>
+      <div class="tile"><div class="v" style="color:var(--warn)">7</div><div class="l">Vencen esta semana</div></div>
+      <div class="tile"><div class="v">19</div><div class="l">Vencen este mes</div></div>
+      <div class="tile"><div class="v" style="color:var(--good)">86</div><div class="l">Al día</div></div>
+    </div>
+    <div class="cal">
+      <div class="day"><div class="dn">Lun 22</div><span class="chip red">Ana C. · Inyectable</span></div>
+      <div class="day"><div class="dn">Mar 23</div><span class="chip amber">Rosa M. · Implante</span><span class="chip amber">Luz V. · Píldora</span></div>
+      <div class="day today"><div class="dn">Mié 24 <span class="pill blue">hoy</span></div><span class="chip amber">Sara P. · Inyectable</span><span class="chip amber">Eva R. · DIU</span><span class="chip amber">Noemí T. · Inyectable</span></div>
+      <div class="day"><div class="dn">Jue 25</div><span class="chip gray">Julia V. · Píldora</span></div>
+      <div class="day"><div class="dn">Vie 26</div></div>
+      <div class="day"><div class="dn">Sáb 27</div><span class="chip gray">Paola S. · Inyectable</span></div>
+      <div class="day"><div class="dn">Dom 28</div></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px"><button class="btn2">← Semana anterior</button><button class="btn2">Semana siguiente →</button><button class="btn2">Vista mes</button></div>
+    <div class="explain">Tocar un nombre abre la ficha de la paciente. No necesita cambios en la base de datos.</div>
+  </main>
+</section>
+
+<script>
+document.querySelectorAll('.demoBar button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.demoBar button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.frame').forEach(s => s.classList.toggle('on', s.id === 's-' + b.dataset.s));
+  scrollTo(0, 0);
+}));
+document.querySelectorAll('.mode').forEach(m => m.addEventListener('click', () => { document.querySelectorAll('.mode').forEach(x => x.classList.toggle('on', x === m)); }));
+</script>
+</body>
+</html>
