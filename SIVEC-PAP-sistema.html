@@ -451,6 +451,23 @@
   .fxBtn { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 9px; padding: 9px 14px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
   .fxBtn.primary { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
   @media (prefers-reduced-motion: reduce) { #fichaPanel, .fxEv { transition: none !important; animation: none !important; } }
+  /* ===== Métodos: calendario ===== */
+  .metTiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 6px 0 14px; }
+  .metTile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; cursor: pointer; }
+  .metTile .v { font-size: 26px; font-weight: 800; } .metTile .l { font-size: 12px; color: var(--ink-soft); font-weight: 600; }
+  .metCalHead { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+  .metCalNav { display: flex; gap: 6px; align-items: center; }
+  .metCalNav > button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 6px 11px; cursor: pointer; font-family: inherit; }
+  .metCal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .metDay { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; min-height: 92px; padding: 6px 7px; font-size: 11.5px; overflow: hidden; }
+  .metCal.mes .metDay { min-height: 74px; }
+  .metDay.otro { opacity: .45; } .metDay.hoy { border: 2px solid var(--teal-700); }
+  .metDay .dn { font-weight: 700; color: var(--ink-soft); margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .metChip { display: block; width: 100%; text-align: left; border: none; border-radius: 6px; padding: 2px 5px; margin-bottom: 3px; font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; font-family: inherit; }
+  .metChip.venc { background: #fee2e2; color: #991b1b; } .metChip.prox { background: #fff4d6; color: #8a5300; } .metChip.fut { background: var(--paper); color: var(--ink-soft); border: 1px solid var(--line); }
+  .metMore { font-size: 10.5px; color: var(--ink-soft); }
+  #metodosView .pnSeg button.on { background: var(--teal-700); color: #fff; font-weight: 600; }
+  @media (max-width: 700px) { .metCal { grid-template-columns: repeat(2, 1fr); } .metCal.mes { grid-template-columns: repeat(7, 1fr); } .metCal.mes .metChip { font-size: 0; padding: 0; height: 6px; } }
   /* ===== Panel ===== */
   #panelView { --pn-grid: color-mix(in srgb, var(--line) 70%, transparent); --pn-one: #7d2a4c; --pn-good: #16a34a; --pn-warn: #d97706; --pn-crit: #dc2626; --pn-mute: #9a8690; }
   body.dark #panelView { --pn-one: #e88fb0; --pn-good: #4ade80; --pn-warn: #fbbf24; --pn-crit: #f87171; --pn-mute: #9d8490; }
@@ -913,6 +930,12 @@
     <div id="metodosView" class="view">
       <h2>Métodos Anticonceptivos</h2>
       <p class="hint">Pacientes que usan (o pidieron información sobre) un método anticonceptivo. Esto es salud reproductiva general — no forma parte del tamizaje de cuello uterino.</p>
+      <div class="metTiles" id="metTiles"></div>
+      <div class="metCalHead"><div><b id="metCalTitle">Semana</b></div>
+        <div class="metCalNav"><button type="button" data-nav="-1">←</button><button type="button" data-nav="0">Hoy</button><button type="button" data-nav="1">→</button>
+          <span class="pnSeg" style="margin-left:6px"><button type="button" data-vista="semana" class="on">Semana</button><button type="button" data-vista="mes">Mes</button></span></div></div>
+      <div class="metCal" id="metCal"></div>
+      <h3 style="margin:22px 0 8px;font-size:14px">Lista completa</h3>
       <table>
         <thead><tr>
           <th>Nombre</th><th>Carnet</th><th>¿Usa?</th><th>Método</th>
@@ -1689,7 +1712,7 @@ async function loadSegPap() {
   }).join('');
   tbody.querySelectorAll('.editBtn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const p = data.find(x => x.id === btn.dataset.id);
+      const p = data.find(x => String(x.id) === String(btn.dataset.id));
       if (p) openEdit(p);
     });
   });
@@ -1710,7 +1733,7 @@ async function loadSegVph() {
     </tr>`).join('');
   tbody.querySelectorAll('.editBtn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const p = data.find(x => x.id === btn.dataset.id);
+      const p = data.find(x => String(x.id) === String(btn.dataset.id));
       if (p) openEdit(p);
     });
   });
@@ -3379,6 +3402,57 @@ function openAsignarDoctora() {
   };
 }
 
+// ---- Calendario de controles de métodos anticonceptivos ----
+let metData = [], metVista = 'semana', metRef = new Date();
+function isoLocal(d) { return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); }
+function renderMetCal() {
+  const hoy = isoLocal(new Date()), en7 = addDays(hoy, 7), en30 = addDays(hoy, 30);
+  const conCtrl = metData.filter(p => p.anticonceptivo_proximo_control);
+  const venc = conCtrl.filter(p => p.anticonceptivo_proximo_control < hoy);
+  const sem = conCtrl.filter(p => p.anticonceptivo_proximo_control >= hoy && p.anticonceptivo_proximo_control <= en7);
+  const mes = conCtrl.filter(p => p.anticonceptivo_proximo_control >= hoy && p.anticonceptivo_proximo_control <= en30);
+  document.getElementById('metTiles').innerHTML =
+    `<div class="metTile" data-ir="${venc[0] ? venc[0].anticonceptivo_proximo_control : hoy}"><div class="v" style="color:#dc2626">${venc.length}</div><div class="l">Controles vencidos</div></div>` +
+    `<div class="metTile" data-ir="${hoy}"><div class="v" style="color:#d97706">${sem.length}</div><div class="l">Vencen en 7 días</div></div>` +
+    `<div class="metTile" data-ir="${hoy}"><div class="v">${mes.length}</div><div class="l">Vencen en 30 días</div></div>` +
+    `<div class="metTile"><div class="v" style="color:#16a34a">${metData.length - venc.length - mes.length}</div><div class="l">Al día</div></div>`;
+  const ref = new Date(metRef); ref.setHours(12, 0, 0, 0);
+  let ini, dias;
+  if (metVista === 'semana') { ini = new Date(ref); ini.setDate(ref.getDate() - ((ref.getDay() + 6) % 7)); dias = 7; }
+  else { const pri = new Date(ref.getFullYear(), ref.getMonth(), 1, 12); ini = new Date(pri); ini.setDate(pri.getDate() - ((pri.getDay() + 6) % 7)); dias = 42; }
+  const fin = new Date(ini); fin.setDate(ini.getDate() + dias - 1);
+  document.getElementById('metCalTitle').textContent = metVista === 'semana'
+    ? `Semana del ${ini.toLocaleDateString('es', { day: 'numeric', month: 'long' })} al ${fin.toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}`
+    : ref.toLocaleDateString('es', { month: 'long', year: 'numeric' }).replace(/^./, c => c.toUpperCase());
+  const porDia = {}; conCtrl.forEach(p => (porDia[p.anticonceptivo_proximo_control] = porDia[p.anticonceptivo_proximo_control] || []).push(p));
+  const cal = document.getElementById('metCal'); cal.className = 'metCal' + (metVista === 'mes' ? ' mes' : '');
+  const max = metVista === 'mes' ? 3 : 6;
+  let html = '';
+  for (let i = 0; i < dias; i++) {
+    const d = new Date(ini); d.setDate(ini.getDate() + i); const k = isoLocal(d);
+    const ps = porDia[k] || [];
+    const cls = k < hoy ? 'venc' : k <= en7 ? 'prox' : 'fut';
+    html += `<div class="metDay${k === hoy ? ' hoy' : ''}${metVista === 'mes' && d.getMonth() !== ref.getMonth() ? ' otro' : ''}"><div class="dn"><span>${d.toLocaleDateString('es', { weekday: 'short' }).replace('.', '')} ${d.getDate()}</span>${k === hoy ? '<span style="color:var(--teal-700)">hoy</span>' : ''}</div>` +
+      ps.slice(0, max).map(p => `<button type="button" class="metChip ${cls}" data-id="${esc(p.id)}" title="${esc(p.nombre)} · ${esc(p.anticonceptivo_metodo || '')}">${esc(String(p.nombre || '').split(' ').slice(0, 2).join(' '))} · ${esc(p.anticonceptivo_metodo || '')}</button>`).join('') +
+      (ps.length > max ? `<div class="metMore">+${ps.length - max} más</div>` : '') + '</div>';
+  }
+  cal.innerHTML = html;
+}
+document.getElementById('metodosView').addEventListener('click', e => {
+  const chip = e.target.closest('.metChip');
+  if (chip) { const p = metData.find(x => String(x.id) === chip.dataset.id); if (p) openFicha(p); return; }
+  const nav = e.target.closest('[data-nav]');
+  if (nav) {
+    const n = +nav.dataset.nav;
+    if (!n) metRef = new Date(); else if (metVista === 'semana') metRef.setDate(metRef.getDate() + 7 * n); else metRef.setMonth(metRef.getMonth() + n);
+    renderMetCal(); return;
+  }
+  const v = e.target.closest('[data-vista]');
+  if (v) { metVista = v.dataset.vista; document.querySelectorAll('#metodosView [data-vista]').forEach(b => b.classList.toggle('on', b === v)); renderMetCal(); return; }
+  const t = e.target.closest('.metTile[data-ir]');
+  if (t) { metRef = new Date(t.dataset.ir + 'T12:00:00'); renderMetCal(); }
+});
+
 async function loadMetodos() {
   const tbody = document.getElementById('metodosBody');
   tbody.innerHTML = '<tr><td colspan="8">Cargando...</td></tr>';
@@ -3389,6 +3463,8 @@ async function loadMetodos() {
   if (error) { tbody.innerHTML = `<tr><td colspan="8">Error: ${esc(error.message)}</td></tr>`; return; }
   if (!data.length) { tbody.innerHTML = '<tr><td colspan="8">Todavía no hay pacientes con datos de método anticonceptivo.</td></tr>'; return; }
   const hoy = new Date().toISOString().slice(0, 10);
+  metData = data;
+  renderMetCal();
   tbody.innerHTML = data.map(p => {
     const vence = p.anticonceptivo_proximo_control && p.anticonceptivo_proximo_control <= hoy;
     return `<tr>
@@ -3402,7 +3478,7 @@ async function loadMetodos() {
   }).join('');
   tbody.querySelectorAll('.editBtn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const p = data.find(x => x.id === btn.dataset.id);
+      const p = data.find(x => String(x.id) === String(btn.dataset.id));
       if (p) openEdit(p);
     });
   });
