@@ -458,3 +458,13 @@ Respostas às 5 decisões pendentes de Redes/centros ficam propostas no desenho:
 6. Tendências mês a mês (tomas de PAP, dias até resultado) com filtros e download.
 7. **Informes automáticos**: SNIS 301 e 302, prestações SUS, programa de câncer de colo, notificação imediata, informe mensal — saem do trabalho diário; o chefe revisa, assina com digital e envia; números fora do padrão são marcados antes.
 8. Informe mensal da rede (3 folhas: resumo, centros, programas) em PDF.
+
+### [24/09/2026] Módulo 6 · Painel do gestor — APROVADO. Módulo 7 · Materno — DESENHADO (`docs/esboco-materno.html`, `materno-01..07.png`)
+Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, em digital e compartilhado (centro, hospital, Mi salud).
+1. Carteirinha perinatal digital: semanas, FUM, data provável do parto, grupo/Rh, risco, os 8 contatos (OMS), laboratórios e vacinas da gestação.
+2. Controle pré-natal: sinais em uma linha, curvas de altura uterina e ganho de peso com faixa normal, conduta por toques, alertas (anemia, curva de glicose, dTpa), próximo controle agendado.
+3. Risco e plano de parto: fatores reunidos da história, classificação ARO → referir com um toque, plano (onde, como chega, casa materna, acompanhante), preferências culturais (parto vertical, idioma, placenta).
+4. Partograma digital com linhas de alerta e ação (também no 1º nível, com botão Referir + ambulância).
+5. Parto e RN: registro do parto, RN (peso, Apgar, cuidados); o bebê ganha ficha própria ligada à mãe; certificado de nascido vivo com digital; aviso ao centro.
+6. Puerpério: controles dia 7 e 40 agendados, planejamento familiar (liga ao módulo "Métodos" do SIVEC PAP), triagem de depressão pós-parto (Edimburgo), sinais de alarma mãe/bebê pelo Mi salud.
+7. Gestantes da rede: em controle, alto risco, captação no 1º trimestre e lista para buscar hoje.
