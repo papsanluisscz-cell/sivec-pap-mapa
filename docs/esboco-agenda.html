@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIVEC Agenda</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
+    --n1:#2f6fb0; --n2:#0e7490; --n3:#7c3aed; --n4:#b4235a; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .topbar { position:sticky; top:0; z-index:5; background:#2a1720; color:#fff; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; }
+  .topbar b { margin-right:6px; font-size:15px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; border:1px solid #6b4a58; background:transparent; color:#fff; border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tab.on { background:#fff; color:var(--wine-d); border-color:#fff; }
+  .warn { max-width:1100px; margin:14px auto 0; background:#fff7e0; border:1px solid #ecd9a0; border-radius:10px; padding:10px 14px; font-size:14px; color:#5b4712; }
+  .scr { display:none; max-width:1100px; margin:14px auto 30px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,.14); }
+  .scr.on { display:block; }
+  .app { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; }
+  .app .brand { font-weight:800; font-size:20px; letter-spacing:.04em; } .app .brand span { font-size:11px; background:#fff; color:var(--wine-d); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:3px; letter-spacing:.08em; }
+  .app .who { font-size:14px; opacity:.95; }
+  .body { padding:18px 22px 22px; }
+  h2 { margin:0 0 4px; font-size:20px; } .sub { color:var(--soft); font-size:14px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cols { display:grid; gap:14px; } .c2 { grid-template-columns:1fr 1fr; } .c3 { grid-template-columns:1fr 1fr 1fr; } .c21 { grid-template-columns:1.6fr 1fr; }
+  .lbl { font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); margin:10px 0 5px; }
+  .lbl:first-child { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:13px; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .chip.on { background:var(--tint); border-color:var(--wine); color:var(--wine-d); font-weight:700; }
+  .inp { border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13.5px; background:#fff; min-height:36px; }
+  .inp.tall { min-height:62px; line-height:1.45; }
+  .pri { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pri div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; }
+  .pri div b { display:block; font-size:14px; } .pri div.on { border:2px solid var(--wine); background:var(--tint); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .auto { background:#f3f7fb; border:1px dashed #b9cde3; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.55; }
+  .auto b { color:#1e4f8a; }
+  .att { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; } .att span { font-size:12.5px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13.5px; font-weight:700; border-radius:9px; padding:8px 14px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .btn.p { background:var(--wine); border-color:var(--wine); color:#fff; } .btn.g { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fp { width:26px; height:30px; vertical-align:middle; }
+  table.l { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; border-radius:12px; overflow:hidden; }
+  table.l th { text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); padding:9px 10px; border-bottom:1px solid var(--line); background:#fff; }
+  table.l td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .st { font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .st.bad { background:var(--badbg); color:var(--bad); } .st.warn { background:var(--warnbg); color:var(--warn); } .st.ok { background:var(--okbg); color:var(--ok); } .st.info { background:#e0ecfa; color:#1e4f8a; } .st.mut { background:#eee; color:#555; }
+  .lvl { font-size:11px; font-weight:800; color:#fff; border-radius:6px; padding:2px 7px; }
+  .mini { font-size:12px; color:var(--soft); }
+  .note { max-width:1100px; margin:-16px auto 30px; background:#fff; border-radius:10px; padding:12px 16px; font-size:14px; line-height:1.5; color:#3b3035; border-left:4px solid var(--wine); }
+  /* flujo */
+  .levels { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin:6px 0 4px; }
+  .lv { text-align:center; padding:0 8px; }
+  .lv .ic { width:74px; height:74px; border-radius:18px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; }
+  .lv b { display:block; font-size:15px; } .lv span { font-size:12.5px; color:var(--soft); }
+  .arrows { position:relative; height:74px; margin-top:-120px; margin-bottom:60px; pointer-events:none; }
+  .loop { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+  .loop div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12.3px; text-align:center; position:relative; }
+  .loop div b { display:block; font-size:13px; } .loop i { font-style:normal; display:block; font-size:18px; }
+  .loop div:not(:last-child)::after { content:"›"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--soft); font-size:18px; }
+  .world { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .world div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:12.3px; line-height:1.4; }
+  .world b { display:block; font-size:13px; color:var(--wine-d); }
+  /* seguimiento */
+  .steps { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin:8px 0 4px; }
+  .steps div { text-align:center; font-size:12px; position:relative; padding-top:30px; }
+  .steps div::before { content:""; position:absolute; top:9px; left:0; right:0; height:4px; background:#e3d6dc; }
+  .steps div:first-child::before { left:50%; } .steps div:last-child::before { right:50%; }
+  .steps div.done::before { background:var(--ok); } .steps div.cur::before { background:linear-gradient(90deg,var(--ok) 50%,#e3d6dc 50%); }
+  .steps i { position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:50%; background:#e3d6dc; color:#fff; font-style:normal; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:3px solid var(--paper); }
+  .steps .done i { background:var(--ok); } .steps .cur i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .steps b { display:block; font-size:12.5px; } .steps small { color:var(--soft); }
+  .tl { border-left:3px solid var(--line); margin-left:8px; padding-left:14px; }
+  .tl div { position:relative; font-size:13px; margin-bottom:10px; line-height:1.4; }
+  .tl div::before { content:""; position:absolute; left:-21px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--c,#999); border:2px solid #fff; }
+  .kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:600; } .kpi b { font-size:28px; letter-spacing:-.01em; } .kpi span { font-size:12px; color:var(--soft); }
+  .bars div.r { display:grid; grid-template-columns:170px 1fr 54px; align-items:center; gap:10px; font-size:13px; margin:7px 0; }
+  .bars .trk { height:14px; border-radius:0 4px 4px 0; background:transparent; position:relative; }
+  .bars .fill { height:14px; border-radius:0 4px 4px 0; background:var(--wine); }
+  .bars .ref { position:absolute; top:-3px; bottom:-3px; width:2px; background:#2d2429; }
+  .bars .v { font-weight:700; text-align:right; }
+  .alertc { border-left:4px solid var(--bad); }
+
+  .role .rh { display:flex; gap:10px; align-items:center; margin-bottom:8px; } .role .rh b { display:block; font-size:15px; } .role .rh small { color:var(--soft); font-size:12px; }
+  .ri { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .todo { display:flex; align-items:center; gap:10px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .todo:last-child { border-bottom:none; }
+  .todo .st { min-width:30px; text-align:center; font-size:13px; }
+  .mini2 { font-size:13px; line-height:1.5; } .mini2 b { display:block; margin-bottom:2px; }
+  .flowbar { display:flex; gap:6px; margin-bottom:12px; } .flowbar span { flex:1; text-align:center; font-size:13px; font-weight:700; padding:7px; border-radius:9px; background:#fff; border:1px solid var(--line); color:var(--soft); }
+  .flowbar span.on { background:var(--okbg); color:var(--ok); border-color:#b8e3c7; } .flowbar span.cur { background:var(--wine); color:#fff; border-color:var(--wine); }
+  .found { display:flex; gap:12px; align-items:center; margin-top:10px; padding:10px; border-radius:10px; background:#f3f9f5; border:1px solid #cfe9d8; }
+  .photo2 { width:64px; height:72px; border-radius:10px; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:24px; flex:none; }
+  .k2 { display:block; font-size:10.5px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.04em; }
+  .scanner { width:150px; height:160px; margin:6px auto 0; border-radius:18px; background:radial-gradient(circle at 50% 45%, #fff 0, #f7e9ef 70%); border:3px solid #d9b9c6; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -6px 12px rgba(125,42,76,.12); }
+  .ticket { margin-top:12px; text-align:center; }
+  .tk { border:2px dashed var(--wine); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:2px; font-size:13.5px; } .tk b { font-size:40px; color:var(--wine-d); letter-spacing:.04em; line-height:1.1; } .tk small { color:var(--soft); font-size:11.5px; }
+  .q2 { padding:8px 10px; border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:13.5px; background:#fff; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; } .q2 .mini { width:100%; }
+  .q2.cur { border:2px solid var(--wine); background:var(--tint); } .q2 .st { margin-left:auto; }
+  .vit2 { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .vit2 div { background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 8px; font-size:16px; font-weight:800; } .vit2 small { display:block; font-size:10.5px; color:var(--soft); font-weight:700; text-transform:uppercase; }
+  .tv { background:#120810; border-radius:16px; padding:14px; color:#fff; border:8px solid #2a2a2a; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
+  .tvh { display:flex; justify-content:space-between; font-size:13px; color:#cfb7c2; font-weight:700; letter-spacing:.08em; }
+  .tvnow { background:linear-gradient(135deg,#7d2a4c,#b4235a); border-radius:12px; padding:16px; text-align:center; } .tvnow small { display:block; font-size:13px; letter-spacing:.2em; font-weight:800; color:#ffe4ee; }
+  .tvnow b { display:block; font-size:64px; line-height:1.05; letter-spacing:.04em; } .tvnow span { display:block; font-size:24px; font-weight:700; } .tvnow em { display:block; font-style:normal; font-size:20px; margin-top:4px; color:#ffe4ee; }
+  .tvlist div { display:flex; gap:12px; align-items:baseline; font-size:18px; padding:6px 4px; border-bottom:1px solid #3a2530; } .tvlist b { color:#f1a7c3; min-width:70px; } .tvlist span { margin-left:auto; color:#cfb7c2; font-size:15px; }
+  .tvf { font-size:13px; color:#cfb7c2; }
+  .doc { display:grid; grid-template-columns:34px 1fr auto auto; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--line); font-size:13.5px; } .di { font-size:22px; text-align:center; } .dest { font-size:12.5px; color:var(--soft); font-weight:600; }
+  .st.warn { margin:0; max-width:none; padding:2px 9px; border:none; font-size:11.5px; }
+  .todo .st.warn { font-size:13px; }
+
+  .svc { display:flex; flex-wrap:wrap; gap:8px; } .svc span { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 12px; font-size:13.5px; font-weight:600; }
+  .prob { display:flex; align-items:center; gap:8px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .prob .mini { margin-left:auto; }
+  .dotc { width:10px; height:10px; border-radius:50%; flex:none; }
+  .tpl { border:1px solid; border-left-width:5px; border-radius:10px; padding:9px 11px; font-size:13px; line-height:1.45; background:#fff; } .tpl b { display:block; font-size:14px; margin-bottom:2px; }
+  .opt { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; } .opt span { border:1px solid var(--line); border-radius:12px; padding:10px; font-size:22px; background:#fff; text-align:center; } .opt b { display:block; font-size:14px; margin-top:4px; } .opt small { display:block; font-size:12px; color:var(--soft); }
+  .opt .sel { border:2px solid var(--wine); background:var(--tint); }
+  .side { border-left:4px solid var(--line); padding:5px 10px; margin-bottom:8px; font-size:13.5px; line-height:1.45; } .side b { display:block; }
+  .stk { display:grid; grid-template-columns:150px 1fr auto; gap:8px; align-items:center; font-size:13px; margin:6px 0; } .stk div { height:10px; background:#eee4e8; border-radius:5px; overflow:hidden; } .stk i { display:block; height:100%; background:#15803d; border-radius:5px; } .stk b { font-size:12.5px; }
+  .phn { background:#e5ddd5; border:9px solid #1f1f1f; border-radius:26px; padding:10px; display:flex; flex-direction:column; gap:8px; min-height:430px; }
+  .phh { background:#075e54; color:#fff; font-size:13px; font-weight:700; margin:-10px -10px 4px; padding:10px 12px; border-radius:16px 16px 0 0; }
+  .msg { font-size:13px; line-height:1.4; border-radius:10px; padding:7px 9px; max-width:88%; box-shadow:0 1px 1px rgba(0,0,0,.12); } .msg.in { background:#fff; align-self:flex-start; } .msg.out { background:#dcf8c6; align-self:flex-end; font-weight:800; }
+  .ck { font-size:13.5px; line-height:1.45; } .ck b { display:block; font-size:15px; margin-bottom:3px; }
+
+  .kv2 { display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:4px 0; border-bottom:1px dashed var(--line); } .kv2 span { color:var(--soft); }
+  .req { display:flex; flex-wrap:wrap; gap:6px; } .req span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .req .ok { background:var(--okbg); color:var(--ok); } .req .no { background:var(--warnbg); color:var(--warn); }
+  .qx { position:relative; height:30px; background:#f3eef0; border-radius:8px; margin:6px 0; padding-left:34px; } .qx b { position:absolute; left:8px; top:6px; font-size:13px; }
+  .qx span { position:absolute; top:3px; bottom:3px; margin-left:34px; border-radius:6px; color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; padding:0 6px; white-space:nowrap; overflow:hidden; }
+  .who2 { display:grid; gap:6px; } .who2 div { border:1px solid var(--line); border-radius:8px; padding:6px 9px; background:#f7fbf8; font-size:12.5px; } .who2 b { display:block; color:var(--wine-d); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; } .who2 span { color:#166534; }
+  .beds { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .bed { border-radius:10px; padding:8px; font-size:13px; font-weight:700; border:1px solid var(--line); min-height:76px; } .bed b { display:block; font-size:18px; } .bed small { display:block; font-weight:500; font-size:11.5px; color:var(--soft); }
+  .bed.p { background:#fbe4ee; } .bed.a { background:#fde2e2; } .bed.g { background:#ede4fb; } .bed.free { background:#ecf8f1; color:#15803d; } .bed.clean { background:#fdf0d5; color:#8a5a00; } .bed.sel { outline:3px solid var(--wine); }
+  .leg2 { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-left:6px; border:1px solid var(--line); }
+  .dose { border:1px solid var(--line); border-radius:10px; padding:7px 9px; margin-bottom:6px; font-size:13px; display:flex; flex-direction:column; } .dose span { color:var(--soft); font-size:12px; } .dose em { font-style:normal; margin-top:2px; }
+  .srch { border-left:4px solid #c2410c; background:#fff7f0; border-radius:6px; padding:6px 9px; margin-bottom:6px; font-size:13px; } .srch b { display:block; font-size:12px; color:#c2410c; text-transform:uppercase; letter-spacing:.04em; }
+  .amb { border:9px solid #1f1f1f; border-radius:26px; background:#fff; overflow:hidden; min-height:420px; display:flex; flex-direction:column; }
+  .ah { background:#ea580c; color:#fff; font-weight:800; font-size:14px; padding:10px 12px; } .ab { padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .big2 { font-size:40px; font-weight:900; text-align:center; color:#ea580c; margin-top:6px; }
+
+  .tree div { padding:6px 8px; border-radius:8px; font-size:13.5px; } .tree small { color:var(--soft); margin-left:4px; }
+  .tree .t0 { font-weight:800; } .tree .t1 { padding-left:18px; font-weight:700; } .tree .t2 { padding-left:32px; font-weight:700; } .tree .t3 { padding-left:50px; } .tree .mut { color:var(--soft); }
+  .tree .on { background:#f3eef0; } .tree .sel { background:var(--tint); outline:2px solid var(--wine); }
+  .fing { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:8px; } .fing span { font-size:12px; font-weight:700; border-radius:999px; padding:3px 9px; background:#f3eef0; } .fing .done { background:var(--okbg); color:var(--ok); } .fing .cur { background:var(--wine); color:#fff; }
+  table.mx td, table.mx th { text-align:center; font-size:12.5px; padding:8px 6px; } table.mx td:first-child, table.mx th:first-child { text-align:left; }
+  table.mx2 td, table.mx2 th { text-align:center; font-size:12.5px; } table.mx2 td:first-child, table.mx2 th:first-child { text-align:left; }
+  table.mx2 td.on { color:#15803d; font-size:18px; } table.mx2 td.pi { color:#c2410c; font-size:18px; } table.mx2 td { color:#c9bcc2; font-size:18px; } table.mx2 td:first-child { font-size:13.5px; color:var(--ink); }
+  .catl { padding:8px 10px; border-radius:9px; font-size:13.5px; margin-bottom:4px; display:flex; justify-content:space-between; } .catl small { color:var(--soft); } .catl.on { background:var(--tint); font-weight:700; }
+  table.mx2 { table-layout:fixed; } table.mx2 th { font-size:10px; padding:6px 3px; letter-spacing:.02em; white-space:normal; text-align:center; } table.mx2 th:first-child { width:170px; } table.mx2 td { padding:8px 3px; }
+  .lg { display:inline-block; width:12px; height:12px; border-radius:3px; margin:0 3px 0 10px; vertical-align:-2px; }
+  .cal { display:grid; grid-template-columns:62px repeat(4,1fr); gap:4px; }
+  .cal .ch { font-weight:800; font-size:14px; padding:6px 8px; } .cal .ch small { display:block; font-weight:600; color:var(--soft); font-size:11.5px; }
+  .cal .hr { font-size:12.5px; font-weight:700; color:var(--soft); padding-top:10px; }
+  .sl { border-radius:9px; padding:7px 9px; font-size:13px; font-weight:700; min-height:48px; } .sl small { display:block; font-weight:500; font-size:11.5px; color:#5b4a52; }
+  .sl.co { background:#dbeafe; } .sl.li { background:#dcf3e5; } .sl.at { background:#7d2a4c; color:#fff; } .sl.at small { color:#f6d6e3; } .sl.ok { background:#e7e5e4; color:#57534e; } .sl.fa { background:#fde2e2; color:#991b1b; } .sl.so { background:#fdf0d5; border:1.5px dashed #c2410c; } .sl.fr { background:#fff; border:1px dashed #d8c8cf; color:#b6a6ad; font-weight:600; } .sl.bl { background:repeating-linear-gradient(45deg,#f3eef0 0 6px,#fff 6px 12px); color:var(--soft); }
+  .slots { display:grid; grid-template-columns:1fr 1fr; gap:8px; } .slots div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; } .slots b { display:block; font-size:14px; } .slots .on { border:2px solid var(--wine); background:var(--tint); }
+  .wk .d { display:flex; gap:8px; align-items:center; padding:7px 0; border-bottom:1px dashed var(--line); } .wk .d b { width:40px; }
+  .bk { font-size:12.5px; font-weight:700; border-radius:8px; padding:5px 9px; } .bk.c { background:#dbeafe; color:#1e4f8a; } .bk.p { background:#f7e9ef; color:#7d2a4c; } .bk.q { background:#ede4fb; color:#5b21b6; } .bk.b { background:#f3eef0; color:var(--soft); }
+  .li2 { font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — 2 · Agenda y citas:</b>
+  <button class="tab on" data-t="g1">1. Agenda del día</button>
+  <button class="tab" data-t="g2">2. Dar una cita</button>
+  <button class="tab" data-t="g3">3. Agenda del médico</button>
+  <button class="tab" data-t="g4">4. Citas que llegan solas</button>
+  <button class="tab" data-t="g5">5. Médico ausente</button>
+  <button class="tab" data-t="g6">6. Faltas y lista de espera</button>
+  <button class="tab" data-t="g7">7. Indicadores</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos inventados. La agenda une recepción, consultorio, referencias, programas y los mensajes a la paciente.</div>
+
+<!-- ============ G1 ============ -->
+<section class="scr on" id="g1">
+  <div class="app"><div class="brand">SIVEC <span>AGENDA</span></div><div class="who">📅 C.S. San Luis · jueves 24/09</div></div>
+  <div class="body">
+    <div class="row" style="margin-bottom:10px"><span class="chip">◀</span><span class="chip on">Hoy</span><span class="chip">▶</span><span class="chip">Semana</span><span class="mini" style="margin-left:auto"><span class="lg" style="background:#dbeafe"></span>confirmada <span class="lg" style="background:#dcf3e5"></span>llegó <span class="lg" style="background:#7d2a4c"></span>en atención <span class="lg" style="background:#e7e5e4"></span>atendida <span class="lg" style="background:#fde2e2"></span>faltó <span class="lg" style="background:#fdf0d5"></span>sobreturno <span class="lg" style="background:#fff;border:1px dashed #cbb"></span>libre</span></div>
+    <div class="cal">
+      <div class="ch"></div><div class="ch">Dra. Aguilera<small>Ginecología · C3</small></div><div class="ch">Dra. Ortuño<small>Med. general · C1</small></div><div class="ch">Dr. Tola<small>Med. general · C4</small></div><div class="ch">Lic. Vargas<small>Nutrición · C2</small></div>
+      <div class="hr">08:00</div><div class="sl at">A-023 María Quispe<small>PAP + consulta</small></div><div class="sl li">A-021 Pedro López<small>control HTA</small></div><div class="sl ok">Ana Rojas<small>1ª vez</small></div><div class="sl co">Carla M.<small>control</small></div>
+      <div class="hr">08:20</div><div class="sl li">A-026 Ana Vaca<small>control PAP</small></div><div class="sl ok">Juan Pérez<small>receta crónica</small></div><div class="sl fr">libre</div><div class="sl co">Rosa V.<small>1ª vez</small></div>
+      <div class="hr">08:40</div><div class="sl co">Juana Rojas<small>referencia contrarref.</small></div><div class="sl fa">Luis T.<small>no vino</small></div><div class="sl co">Sara L.<small>control</small></div><div class="sl fr">libre</div>
+      <div class="hr">09:00</div><div class="sl co">Elena S.<small>puerperio · día 7</small></div><div class="sl co">Mario C.<small>1ª vez</small></div><div class="sl co">Tomás G.<small>niño sano</small></div><div class="sl fr">libre</div>
+      <div class="hr">09:20</div><div class="sl so">Rosa Mamani<small>sobreturno · sangrado</small></div><div class="sl co">Irma F.<small>control</small></div><div class="sl fr">libre</div><div class="sl fr">libre</div>
+      <div class="hr">09:40</div><div class="sl fr">libre</div><div class="sl bl">reunión de red</div><div class="sl co">Pablo R.<small>control</small></div><div class="sl fr">libre</div>
+    </div>
+    <div class="mini" style="margin-top:8px">La misma agenda la ven: recepción (quién llegó), el médico (su fila), la TV (llamadas) y la paciente (Mi salud / WhatsApp).</div>
+  </div>
+</section>
+
+<!-- ============ G2 ============ -->
+<section class="scr" id="g2">
+  <div class="app"><div class="brand">SIVEC <span>AGENDA</span></div><div class="who">➕ Dar una cita · Lic. Cruz (recepción)</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card">
+        <div class="lbl">Paciente</div>
+        <div class="found" style="margin-top:0"><div class="photo2" style="width:50px;height:56px">📷</div><div><b>ANA ROJAS VACA</b><div class="mini">34 a · C.I. 5566778 · 📱 7 222 3344 · último PAP: 2021 → <b style="color:#c2410c">toca tamizaje</b></div></div></div>
+        <div class="lbl">Tipo de cita</div>
+        <div class="chips"><span class="chip">1ª vez</span><span class="chip">Control</span><span class="chip on">Programa PAP/VPH</span><span class="chip">Prenatal</span><span class="chip">Niño sano</span><span class="chip">Retorno de referencia</span></div>
+        <div class="lbl">Con quién · el sistema sugiere los primeros cupos libres</div>
+        <div class="slots">
+          <div class="on"><b>mar 29/09 · 08:20</b>Dra. Aguilera · Gineco · 20 min</div>
+          <div><b>mar 29/09 · 10:00</b>Dra. Aguilera · Gineco</div>
+          <div><b>mié 30/09 · 08:00</b>Dra. Ortuño · Med. general</div>
+          <div><b>jue 01/10 · 09:40</b>Dra. Aguilera · Gineco</div>
+        </div>
+        <div class="lbl">Indicaciones que recibirá</div>
+        <div class="inp">No usar óvulos ni tener relaciones 48 h antes · no estar menstruando · traer C.I.</div>
+      </div>
+      <div>
+        <div class="card"><div class="lbl">Confirmación a la paciente</div>
+          <div class="phn" style="min-height:0;border-width:7px"><div class="phh">WhatsApp · C.S. San Luis</div><div class="msg in">Hola Ana 👋 Su cita de <b>PAP</b> es el <b>martes 29/09 a las 08:20</b> con la Dra. Aguilera.<br>No use óvulos 48 h antes.<br><b>1</b> Confirmo · <b>2</b> Otro día</div></div>
+          <div class="mini" style="margin-top:6px">🔔 Recordatorio automático el día anterior a las 18:00.</div></div>
+        <div class="row" style="justify-content:flex-end;margin-top:12px"><span class="btn">🖨 Comprobante</span><span class="btn p">✓ Dar cita</span></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">También se pide desde</div><div style="font-size:13px;line-height:1.6">📱 Mi salud (si el centro lo permite) · 🩺 el consultorio (“control en 15 días”) · 📤 una referencia · 🔁 una contrarreferencia</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ G3 ============ -->
+<section class="scr" id="g3">
+  <div class="app"><div class="brand">SIVEC <span>AGENDA</span></div><div class="who">⚙️ Agenda de la Dra. Aguilera · Ginecología · consultorio 3</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Semana tipo</div>
+        <div class="wk">
+          <div class="d"><b>Lun</b><span class="bk c">07:00–13:00 consulta</span></div>
+          <div class="d"><b>Mar</b><span class="bk c">07:00–13:00 consulta</span><span class="bk p">14:00–16:00 PAP/VPH</span></div>
+          <div class="d"><b>Mié</b><span class="bk q">07:00–12:00 colposcopia</span></div>
+          <div class="d"><b>Jue</b><span class="bk c">07:00–13:00 consulta</span></div>
+          <div class="d"><b>Vie</b><span class="bk c">07:00–11:00 consulta</span><span class="bk b">11:00–13:00 reunión / capacitación</span></div>
+        </div>
+        <div class="lbl">Bloqueos</div>
+        <div class="row"><span class="st warn">🏖 Vacaciones 02–13/11</span><span class="st info">📚 Curso 20/10</span><span class="btn">＋ Bloqueo</span></div></div>
+      <div>
+        <div class="card"><div class="lbl">Duración por tipo</div>
+          <div class="kv2"><span>1ª vez</span><b>30 min</b></div><div class="kv2"><span>Control</span><b>20 min</b></div><div class="kv2"><span>PAP/VPH</span><b>20 min</b></div><div class="kv2"><span>Colposcopia</span><b>40 min</b></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Cupos reservados</div>
+          <div class="kv2"><span>Para referencias de la red</span><b>2 por día</b></div><div class="kv2"><span>Sobreturnos (urgencias)</span><b>2 por día</b></div><div class="kv2"><span>Para Mi salud (la paciente elige)</span><b>30%</b></div>
+          <div class="mini" style="margin-top:6px">Los cupos de referencia se liberan 48 h antes si no se usan.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ G4 ============ -->
+<section class="scr" id="g4">
+  <div class="app"><div class="brand">SIVEC <span>AGENDA</span></div><div class="who">📥 Por agendar — citas que el sistema propone solo</div></div>
+  <div class="body">
+    <table class="l"><thead><tr><th>Origen</th><th>Paciente</th><th>Qué necesita</th><th>Para cuándo</th><th>Cupo sugerido</th><th></th></tr></thead><tbody>
+      <tr><td><span class="st info">🔁 Contrarreferencia</span></td><td><b>Lucía Flores</b><div class="mini">Hospital municipal</div></td><td>Retiro de puntos + control puerperal</td><td>día 7 · 01/10</td><td>01/10 09:00 · Dra. Ortuño</td><td><span class="btn g">Agendar y avisar</span></td></tr>
+      <tr><td><span class="st ok">🧾 Programa PAP</span></td><td><b>Irma Flores</b><div class="mini">PAP 2023 negativo</div></td><td>Tamizaje (vence en 3 años)</td><td>antes de 10/2026</td><td>06/10 14:00 · Dra. Aguilera</td><td><span class="btn g">Agendar y avisar</span></td></tr>
+      <tr><td><span class="st warn">🩺 “Retorno conmigo”</span></td><td><b>Pedro López</b><div class="mini">Dr. Tola · HTA</div></td><td>Control de presión</td><td>en 15 días</td><td>08/10 08:40 · Dr. Tola</td><td><span class="btn g">Agendar y avisar</span></td></tr>
+      <tr><td><span class="st bad">🔴 Resultado positivo</span></td><td><b>Rosa Mamani</b><div class="mini">PAP ASC-H</div></td><td>Entrega de resultado + derivar</td><td>esta semana</td><td>sobreturno 25/09 · Dra. Aguilera</td><td><span class="btn g">Agendar y avisar</span></td></tr>
+      <tr><td><span class="st ok">🤰 Prenatal</span></td><td><b>Carla Torres</b><div class="mini">28 semanas</div></td><td>5º control prenatal</td><td>semana 30</td><td>07/10 08:00 · Dra. Aguilera</td><td><span class="btn g">Agendar y avisar</span></td></tr>
+      <tr><td><span class="st info">💉 Vacunas</span></td><td><b>Tomás G.</b><div class="mini">3 años</div></td><td>SRP 2ª dosis</td><td>ya</td><td>cualquier día · vacunatorio</td><td><span class="btn g">Avisar</span></td></tr>
+    </tbody></table>
+    <div class="mini" style="margin-top:8px">Nadie tiene que acordarse: los programas, las contrarreferencias y los “retorno conmigo” crean la cita sugerida. Recepción solo confirma con un toque (o se agenda sola si el centro lo configura).</div>
+  </div>
+</section>
+
+<!-- ============ G5 ============ -->
+<section class="scr" id="g5">
+  <div class="app"><div class="brand">SIVEC <span>AGENDA</span></div><div class="who">⚠️ La Dra. Ortuño no vendrá mañana (viernes 25/09)</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">14 pacientes afectadas — el sistema propone</div>
+        <table class="l"><thead><tr><th>Paciente</th><th>Tipo</th><th>Propuesta</th></tr></thead><tbody>
+          <tr><td>Mario C.</td><td>1ª vez</td><td><span class="st ok">mismo día · Dr. Tola 08:00</span></td></tr>
+          <tr><td>Irma F.</td><td>control</td><td><span class="st ok">mismo día · Dr. Tola 08:20</span></td></tr>
+          <tr><td>Juan Pérez</td><td>receta crónica</td><td><span class="st info">receta renovada sin cita (lo aprueba el médico)</span></td></tr>
+          <tr><td>Luisa P.</td><td>control</td><td><span class="st warn">lunes 28/09 · Dra. Ortuño 08:00</span></td></tr>
+          <tr><td colspan="3" class="mini">+ 10 más…</td></tr></tbody></table></div>
+      <div>
+        <div class="card"><div class="lbl">Con un toque</div><div style="font-size:13.5px;line-height:1.6">✓ Mover a otro médico el mismo día<br>✓ o pasar al próximo día de la Dra. Ortuño<br>✓ avisar a todas por SMS/WhatsApp con la opción “1 acepto / 2 otro día”</div>
+          <div class="row" style="justify-content:flex-end;margin-top:10px"><span class="btn p">Reprogramar 14 y avisar</span></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Mensaje</div><div class="msg in" style="max-width:100%;border:1px solid var(--line)">Hola Mario, la Dra. Ortuño no atenderá el 25/09. Le pasamos con el <b>Dr. Tola a las 08:00</b> del mismo día. <b>1</b> Acepto · <b>2</b> Otro día</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ G6 ============ -->
+<section class="scr" id="g6">
+  <div class="app"><div class="brand">SIVEC <span>AGENDA</span></div><div class="who">🚫 Faltas, sobreturnos y lista de espera</div></div>
+  <div class="body">
+    <div class="cols c3" style="gap:12px">
+      <div class="card"><div class="lbl">Faltó hoy</div>
+        <div class="li2"><b>Luis T.</b> · 08:40 Dra. Ortuño<br><span class="mini">3ª falta este año</span></div>
+        <div class="row" style="margin-top:8px"><span class="btn">📞 Llamar</span><span class="btn">💬 Reagendar</span></div>
+        <div class="mini" style="margin-top:8px">Si la cita era de un programa (PAP positivo, prenatal, TB), la falta pasa a <b>búsqueda activa</b>.</div></div>
+      <div class="card"><div class="lbl">Se liberó un cupo</div>
+        <div class="li2"><b>09:40 · Dra. Aguilera</b> (cancelación)</div>
+        <div class="mini" style="margin:6px 0">Se ofrece a la lista de espera en orden:</div>
+        <div class="li2">1. Ana Vaca — <span class="st ok">aceptó por WhatsApp ✓</span></div>
+        <div class="li2">2. Juana R. — no hizo falta</div></div>
+      <div class="card"><div class="lbl">Sobreturnos de hoy</div>
+        <div class="li2"><b>Rosa Mamani</b> · sangrado · Dra. Aguilera</div>
+        <div class="li2"><b>—</b> 1 cupo libre de sobreturno</div>
+        <div class="mini" style="margin-top:8px">Solo con motivo; queda registrado quién lo autorizó.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ G7 ============ -->
+<section class="scr" id="g7">
+  <div class="app"><div class="brand">SIVEC <span>AGENDA</span></div><div class="who">📊 Indicadores de agenda · C.S. San Luis · septiembre</div></div>
+  <div class="body">
+    <div class="kpi"><div><small>Ocupación de cupos</small><b>86%</b></div><div><small>Faltas (no vino)</small><b>9%</b><span> meta &lt; 10%</span></div><div><small>Días hasta la cita</small><b>3</b><span> mediana</span></div><div><small>Confirmadas por WhatsApp</small><b>72%</b></div></div>
+    <div class="cols c2" style="margin-top:12px">
+      <div class="card bars"><div class="lbl">Faltas por médico</div>
+        <div class="r"><span>Dra. Aguilera</span><div class="trk"><div class="fill" style="width:30%"></div></div><span class="v">6%</span></div>
+        <div class="r"><span>Dra. Ortuño</span><div class="trk"><div class="fill" style="width:55%"></div></div><span class="v">11%</span></div>
+        <div class="r"><span>Dr. Tola</span><div class="trk"><div class="fill" style="width:45%"></div></div><span class="v">9%</span></div>
+        <div class="r"><span>Lic. Vargas</span><div class="trk"><div class="fill" style="width:40%"></div></div><span class="v">8%</span></div>
+        <div class="mini">Escala 0–20%.</div></div>
+      <div class="card bars"><div class="lbl">Días de espera por especialidad</div>
+        <div class="r"><span>Medicina general</span><div class="trk"><div class="fill" style="width:10%"></div></div><span class="v">1 d</span></div>
+        <div class="r"><span>Ginecología</span><div class="trk"><div class="fill" style="width:25%"></div></div><span class="v">5 d</span></div>
+        <div class="r"><span>Colposcopia (hospital)</span><div class="trk"><div class="fill" style="width:60%"></div></div><span class="v">12 d</span></div>
+        <div class="r"><span>Nutrición</span><div class="trk"><div class="fill" style="width:15%"></div></div><span class="v">3 d</span></div>
+        <div class="mini">Escala 0–20 días.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  const NOTES = {
+    g1: '<b>Agenda do dia:</b> todos os médicos em colunas, com o estado de cada cita (confirmada, chegou, em atendimento, atendida, faltou, encaixe, livre). A mesma agenda alimenta a recepção, a fila do médico, a TV e o Mi salud.',
+    g2: '<b>Dar uma cita:</b> busca a paciente (o sistema avisa o que lhe falta, ex.: tamizaje PAP), escolhe o tipo, sugere os primeiros horários livres e manda a confirmação por WhatsApp com as indicações.',
+    g3: '<b>Agenda do médico:</b> semana tipo por atividade, bloqueios (férias, cursos), duração por tipo de consulta e vagas reservadas para referências, encaixes e para o Mi salud.',
+    g4: '<b>Citas que chegam sozinhas:</b> contrarreferências, programas (PAP, pré-natal, vacinas), “retorno comigo” e resultados positivos geram a cita sugerida; a recepção só confirma.',
+    g5: '<b>Médico ausente:</b> o sistema mostra as pacientes afetadas, propõe outro médico no mesmo dia ou o próximo dia e avisa todas por WhatsApp.',
+    g6: '<b>Faltas e lista de espera:</b> faltas de programas viram busca ativa; vaga liberada é oferecida à lista de espera pelo WhatsApp; encaixes só com motivo.',
+    g7: '<b>Indicadores:</b> ocupação, faltas, dias de espera e confirmações — por médico e por especialidade.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 'g1');
+</script>
+
+</body>
+</html>

@@ -386,7 +386,7 @@ Fase 2 (a fase 1 é SMS/WhatsApp). Grátis para a paciente, Android e iPhone, e 
 - **Base (não aparece, mas sem ela não se vende):** segurança e proteção de dados, infraestrutura (nuvem/servidor, sem internet), integrações (SEGIP, SNIS, SUS, HL7 FHIR), legal (Ministério/SEDES, ADSIB, SENAPI), hardware por centro, implantação (piloto, migração, capacitação), suporte, qualidade.
 - **Fases:** 0 agora (PAP/VPH + login seguro + redes/centros) → 1 núcleo do centro → 2 rede e hospital → 3 apps e especialidades.
 
-### [24/09/2026] Módulo 1 · SIVEC Admin — DESENHADO (esboço `docs/esboco-admin.html`, imagens `admin-01..08.png`)
+### [24/09/2026] Módulo 1 · SIVEC Admin — APROVADO (esboço `docs/esboco-admin.html`, imagens `admin-01..08.png`)
 Trabalho "um por um, com imagens de tudo" para as apresentações de venda.
 1. Rede e estabelecimentos (árvore Ministério → SEDES → Rede → centros/hospitais; quem vê o quê).
 2. Usuários (um por pessoa; profissão, especialidade e código, perfil, centros, digital, último acesso; desativar, nunca apagar).
@@ -397,3 +397,12 @@ Trabalho "um por um, com imagens de tudo" para as apresentações de venda.
 7. Auditoria e segurança (quem viu o quê, alertas de uso estranho, backups).
 8. Equipamentos e configuração do centro (leitores, câmera, TV, impressoras, celular; regras clínicas).
 Respostas às 5 decisões pendentes de Redes/centros ficam propostas no desenho: responsável de Rede **vê** (edita só a regulação); um usuário **por profissional**; o administrador não vê dados clínicos.
+
+### [24/09/2026] Módulo 2 · Agenda e citas — DESENHADO (esboço `docs/esboco-agenda.html`, imagens `agenda-01..07.png`)
+1. Agenda do dia (médicos em colunas; estados: confirmada, chegou, em atendimento, atendida, faltou, encaixe, livre) — a mesma agenda alimenta recepção, fila do médico, TV e Mi salud.
+2. Dar uma cita (sistema avisa o que falta à paciente, sugere os primeiros horários livres, confirmação por WhatsApp com indicações e lembrete).
+3. Agenda do médico (semana tipo por atividade, bloqueios, duração por tipo, vagas reservadas para referências, encaixes e Mi salud; vagas de referência liberadas 48 h antes).
+4. Citas que chegam sozinhas (contrarreferência, programas PAP/pré-natal/vacinas, "retorno comigo", resultado positivo).
+5. Médico ausente → reprogramação em bloco + WhatsApp "1 aceito / 2 outro dia".
+6. Faltas (de programa → busca ativa), vaga liberada oferecida à lista de espera, encaixes só com motivo.
+7. Indicadores (ocupação, faltas, dias de espera, confirmações).
