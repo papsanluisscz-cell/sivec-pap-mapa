@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recorrido de la paciente</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .board { width:1200px; margin:0 auto 30px; background:#fbf7f5; padding:26px 30px 30px; }
+  .bh { display:flex; align-items:center; gap:14px; background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; border-radius:16px; padding:16px 22px; margin-bottom:18px; }
+  .bh b { font-size:30px; letter-spacing:.02em; } .bh span { font-size:17px; opacity:.95; }
+  .bh .n { margin-left:auto; font-size:14px; background:rgba(255,255,255,.18); border-radius:999px; padding:4px 12px; }
+  .step { display:grid; grid-template-columns:56px 190px 1fr 470px; gap:16px; align-items:center; background:#fff; border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:12px; position:relative; }
+  .step:not(:last-child)::after { content:"▼"; position:absolute; left:40px; bottom:-17px; color:var(--wine); font-size:16px; z-index:2; }
+  .num { width:48px; height:48px; border-radius:50%; background:var(--wine); color:#fff; font-size:24px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  .scene { height:130px; border-radius:14px; display:flex; align-items:center; justify-content:center; gap:4px; font-size:54px; line-height:1; position:relative; }
+  .scene small { position:absolute; bottom:6px; left:0; right:0; text-align:center; font-size:12px; font-weight:700; color:#5b4a52; letter-spacing:.04em; }
+  .tx h3 { margin:0 0 5px; font-size:20px; } .tx p { margin:0; font-size:15px; line-height:1.45; color:#43363d; }
+  .tx .who { display:inline-block; font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#fff; border-radius:6px; padding:2px 8px; margin-bottom:5px; }
+  .shot { border-radius:10px; overflow:hidden; border:1px solid var(--line); box-shadow:0 2px 10px rgba(0,0,0,.08); background:#fff; position:relative; }
+  .shot img { display:block; position:absolute; }
+  .foot { display:flex; gap:10px; margin-top:16px; }
+  .foot div { flex:1; background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 12px; font-size:14px; line-height:1.4; }
+  .foot b { display:block; color:var(--wine-d); }
+</style>
+</head>
+<body>
+
+<!-- =================== RECEPCIÓN =================== -->
+<section class="board" id="b1">
+  <div class="bh"><b>① Recepção</b><span>da chegada da paciente até ela ser chamada na TV</span><span class="n">SIVEC completo · esboço</span></div>
+
+  <div class="step"><div class="num">1</div>
+    <div class="scene" style="background:#eef4fb">🧍‍♀️<span style="font-size:40px">🪪</span><small>CHEGA COM A C.I.</small></div>
+    <div class="tx"><span class="who" style="background:#2f6fb0">Recepção</span><h3>A paciente chega e mostra a C.I.</h3><p>A recepcionista digita o número da C.I. O SIVEC encontra a paciente e traz os dados do <b>SEGIP</b>: nome, data de nascimento, foto. Mostra também alergias e se ela tem <b>cita hoje</b>.</p></div>
+    <div class="shot" data-src="rc-3-recepcion.png" data-crop="30,155,875,245" style="width:470px"></div></div>
+
+  <div class="step"><div class="num">2</div>
+    <div class="scene" style="background:#f7e9ef">👆<span style="font-size:44px">🟪</span><small>DIGITAL NO LEITOR</small></div>
+    <div class="tx"><span class="who" style="background:#2f6fb0">Recepção</span><h3>Coloca o dedo no leitor</h3><p>A digital confirma que é ela mesma (comparada com o SEGIP). Essa digital também vale como <b>assinatura</b> do consentimento de dados e da atenção SUS. Serve para quem não sabe assinar.</p></div>
+    <div class="shot" data-src="rc-3-recepcion.png" data-crop="948,160,562,375" style="width:470px"></div></div>
+
+  <div class="step"><div class="num">3</div>
+    <div class="scene" style="background:#eef4fb">🧾<span style="font-size:44px">➡️</span>👩‍⚕️<small>DERIVA E SAI A FICHA</small></div>
+    <div class="tx"><span class="who" style="background:#2f6fb0">Recepção</span><h3>Escolhe a área e sai a ficha</h3><p>Ela é enviada para <b>Ginecologia · Dra. Aguilera</b> (o sistema sugere pela cita). Sai a <b>ficha A-023</b>, em papel ou por SMS no celular. Antes do consultório, ela passa pela triagem.</p></div>
+    <div class="shot" data-src="rc-3-recepcion.png" data-crop="948,550,562,339" style="width:470px"></div></div>
+
+  <div class="step"><div class="num">4</div>
+    <div class="scene" style="background:#e3f4f6">🩺<span style="font-size:44px">❤️</span>⚖️<small>TRIAGEM</small></div>
+    <div class="tx"><span class="who" style="background:#0e7490">Enfermagem</span><h3>Triagem: sinais vitais</h3><p>A enfermeira mede pressão, pulso, temperatura, peso e altura. Os valores <b>entram sozinhos</b> na história clínica, então o médico não precisa copiar nada. Se houver sinal de alarme, a paciente <b>passa na frente</b>.</p></div>
+    <div class="shot" data-src="rc-4-triaje-tv.png" data-crop="30,95,730,625" style="width:470px"></div></div>
+
+  <div class="step"><div class="num">5</div>
+    <div class="scene" style="background:#1c0a13;color:#fff">📺<span style="font-size:44px">🔔</span><small style="color:#f1a7c3">TV DA SALA DE ESPERA</small></div>
+    <div class="tx"><span class="who" style="background:#7d2a4c">Sala de espera</span><h3>Espera e a TV chama</h3><p>Ela se senta na sala de espera. Quando a médica chama, a TV mostra <b>“A-023 · María Q. → Consultório 3”</b> com som e voz. Por privacidade, só aparece o nome curto.</p></div>
+    <div class="shot" data-src="rc-4-triaje-tv.png" data-crop="780,95,730,625" style="width:470px"></div></div>
+
+  <div class="foot"><div><b>⏱ Tudo com hora</b>chegada, digital, triagem e chamada: o centro sabe quanto se espera em cada área.</div><div><b>📄 Sem papel entre salas</b>a paciente não carrega folhas; tudo viaja pelo SIVEC.</div><div><b>📋 “Para hacer hoy” da recepção</b>citas do dia, pacientes para chamar (busca ativa), contrarreferências para agendar.</div></div>
+</section>
+
+<!-- =================== CONSULTORIO =================== -->
+<section class="board" id="b2">
+  <div class="bh"><b>② Consultório</b><span>da chamada até assinar D1, D8, história e consentimento</span><span class="n">SIVEC completo · esboço</span></div>
+
+  <div class="step"><div class="num">1</div>
+    <div class="scene" style="background:#f7e9ef">👩‍⚕️<span style="font-size:44px">🔔</span>📺<small>A MÉDICA CHAMA</small></div>
+    <div class="tx"><span class="who" style="background:#7d2a4c">Médica</span><h3>A médica vê sua fila e chama</h3><p>Na tela aparecem as pacientes que já passaram pela triagem. Ela toca <b>“Llamar A-023”</b> e o nome aparece na TV. Se a paciente não vier, marca <b>“No se presentó”</b>.</p></div>
+    <div class="shot" data-src="rc-5-consultorio.png" data-crop="30,95,350,520" style="width:470px"></div></div>
+
+  <div class="step"><div class="num">2</div>
+    <div class="scene" style="background:#f7e9ef">👩‍⚕️<span style="font-size:44px">💻</span>🧍‍♀️<small>ABRE A FICHA</small></div>
+    <div class="tx"><span class="who" style="background:#7d2a4c">Médica</span><h3>Abre a ficha com tudo pronto</h3><p>Aparecem os alertas (<b>alergia a penicilina</b>), os sinais vitais da triagem e a <b>linha do tempo de todos os centros</b>. Antes de começar, a médica já entende a trajetória da paciente.</p></div>
+    <div class="shot" data-src="rc-5-consultorio.png" data-crop="400,95,1110,520" style="width:470px"></div></div>
+
+  <div class="step"><div class="num">3</div>
+    <div class="scene" style="background:#fdf4e7">📝<span style="font-size:44px">👆</span>💊<small>CONSULTA COM FIGURAS</small></div>
+    <div class="tx"><span class="who" style="background:#7d2a4c">Médica</span><h3>Faz a consulta com toques</h3><p>É a consulta com figuras que <b>já existe no SIVEC PAP</b>: sintomas, gotas, cores e tratamentos em cartões. O texto do SOAP se escreve sozinho.</p></div>
+    <div class="shot" data-src="soap-1-SO.png" data-crop="60,200,1430,620" style="width:470px"></div></div>
+
+  <div class="step"><div class="num">4</div>
+    <div class="scene" style="background:#eef7f1">📄<span style="font-size:44px">🧪</span>📝<small>DOCUMENTOS PRONTOS</small></div>
+    <div class="tx"><span class="who" style="background:#15803d">Automático</span><h3>Os documentos se geram sozinhos</h3><p>Ao terminar, o sistema monta o <b>D-1</b> (receita + insumos + código da especialidade), o <b>D-8</b> (PAP, VPH), o registro de PAP, a <b>história clínica</b> e o consentimento. Não é preciso escrever nada de novo.</p></div>
+    <div class="shot" data-src="rc-6-firmar-documentos.png" data-crop="30,95,898,445" style="width:470px"></div></div>
+
+  <div class="step"><div class="num">5</div>
+    <div class="scene" style="background:#f7e9ef;font-size:40px;padding-bottom:18px">👩‍⚕️👆<span style="font-size:30px">+</span>🧍‍♀️👆<small>AS DUAS DIGITAIS</small></div>
+    <div class="tx"><span class="who" style="background:#7d2a4c">Médica + paciente</span><h3>Assinam com a digital</h3><p>A médica assina <b>todos os documentos de uma vez</b> com a digital + um PIN. Depois, a paciente coloca o dedo no leitor da mesa para o consentimento e as indicações. Para quem não sabe assinar, <b>a digital é a assinatura</b>.</p></div>
+    <div class="shot" data-src="rc-6-firmar-documentos.png" data-crop="948,95,562,462" style="width:470px"></div></div>
+
+  <div class="step"><div class="num">6</div>
+    <div class="scene" style="background:#eef7f1">💊<span style="font-size:44px">🔬</span>📱<small>CADA COISA AO SEU LUGAR</small></div>
+    <div class="tx"><span class="who" style="background:#15803d">Automático</span><h3>Cada documento vai ao seu destino</h3><p>A <b>receita aparece na farmácia</b> (lá ela confirma com a digital ao receber), o <b>D-8 no laboratório</b> e tudo fica na <b>linha do tempo</b>. Imprime-se só a receita, e ela recebe um SMS com a data do resultado. A TV chama a próxima ficha.</p></div>
+    <div class="shot" data-src="rc-6-firmar-documentos.png" data-crop="948,592,562,200" style="width:470px"></div></div>
+</section>
+
+<script>
+  document.querySelectorAll('.shot').forEach(d => {
+    const [x, y, w, h] = d.dataset.crop.split(',').map(Number), W = Math.min(470, 270 * w / h), k = W / w;
+    d.style.width = W + 'px'; d.style.justifySelf = 'center';
+    d.style.height = Math.round(h * k) + 'px';
+    const im = new Image(); im.src = d.dataset.src;
+    im.onload = () => { im.style.width = im.naturalWidth * k + 'px'; im.style.left = -x * k + 'px'; im.style.top = -y * k + 'px'; };
+    d.appendChild(im);
+  });
+</script>
+</body>
+</html>
