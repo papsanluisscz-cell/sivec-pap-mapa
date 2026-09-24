@@ -478,3 +478,24 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - **Destino del bebé:** alojamiento conjunto, observación, UCIN o referir (la cama y la ambulancia se piden desde ahí). También salen la ficha propia, el certificado de nacido vivo y el aviso al centro.
 - **1er nivel sin pediatra:** el mismo formulario lo llena quien atiende el parto.
 - Imágenes: docs/materno-05 (entrega), 06 (atención inmediata), 07 (examen y destino).
+
+### Carnet e historia clínica prenatal digital (modelo propio SIVEC) — dibujado, para aprobar
+- Problema: la HCP CLAP-OPS en papel tiene ~450 casillas en una hoja, se llena a mano, la mamá no la ve y se copia al SIP a mano.
+- Modelo recomendado en el mundo: guías digitales de la OMS para el control prenatal (SMART Guidelines / DAK prenatal, 8 contactos), registro en manos de la mujer (OMS) y SIP del CLAP.
+- **5 reglas:**
+  1. cada dato se escribe una vez, donde ocurre;
+  2. la pantalla muestra solo lo de ese momento;
+  3. las casillas amarillas del CLAP pasan a ser alertas automáticas;
+  4. la mujer tiene su carnet en el celular, con QR;
+  5. la HCP oficial, el SIP y el SNIS salen solos (CIE-10, HL7 FHIR).
+- **Pantallas:**
+  - resumen del embarazo en una mirada: alertas arriba, antecedentes solo positivos, labs por trimestre, vacunas, 8 contactos;
+  - control prenatal guiado en 6 pasos: signos por toques, curvas, la guía sugiere y un toque pide el lab/vacuna/receta; la fila de la HCP se arma sola;
+  - app **Mi embarazo**: semana y bebé, próximo control, tareas, carnet con QR, plan de parto, señales de alarma, conteo de movimientos, preguntas;
+  - HCP oficial automática con % completado y lo que falta; carnet impreso para quien no tiene celular.
+- **RN también en cesárea:** el mismo formulario de Pediatría sirve en sala de partos, quirófano y sala de recuperación, con control del binomio mamá-RN cada 15 min.
+- **Dos líneas de tiempo vinculadas:**
+  - en la ficha de la mamá aparece “nació su bebé” con enlace;
+  - el RN tiene su ficha propia, que hereda los datos del embarazo;
+  - en Mi salud la mamá ve las dos.
+- Imágenes: docs/perinatal-01..07.png · esboco-carnet-perinatal.html

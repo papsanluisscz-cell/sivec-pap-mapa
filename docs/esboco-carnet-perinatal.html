@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carnet perinatal digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
+    --n1:#2f6fb0; --n2:#0e7490; --n3:#7c3aed; --n4:#b4235a; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .topbar { position:sticky; top:0; z-index:5; background:#2a1720; color:#fff; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; }
+  .topbar b { margin-right:6px; font-size:15px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; border:1px solid #6b4a58; background:transparent; color:#fff; border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tab.on { background:#fff; color:var(--wine-d); border-color:#fff; }
+  .warn { max-width:1100px; margin:14px auto 0; background:#fff7e0; border:1px solid #ecd9a0; border-radius:10px; padding:10px 14px; font-size:14px; color:#5b4712; }
+  .scr { display:none; max-width:1100px; margin:14px auto 30px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,.14); }
+  .scr.on { display:block; }
+  .app { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; }
+  .app .brand { font-weight:800; font-size:20px; letter-spacing:.04em; } .app .brand span { font-size:11px; background:#fff; color:var(--wine-d); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:3px; letter-spacing:.08em; }
+  .app .who { font-size:14px; opacity:.95; }
+  .body { padding:18px 22px 22px; }
+  h2 { margin:0 0 4px; font-size:20px; } .sub { color:var(--soft); font-size:14px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cols { display:grid; gap:14px; } .c2 { grid-template-columns:1fr 1fr; } .c3 { grid-template-columns:1fr 1fr 1fr; } .c21 { grid-template-columns:1.6fr 1fr; }
+  .lbl { font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); margin:10px 0 5px; }
+  .lbl:first-child { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:13px; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .chip.on { background:var(--tint); border-color:var(--wine); color:var(--wine-d); font-weight:700; }
+  .inp { border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13.5px; background:#fff; min-height:36px; }
+  .inp.tall { min-height:62px; line-height:1.45; }
+  .pri { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pri div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; }
+  .pri div b { display:block; font-size:14px; } .pri div.on { border:2px solid var(--wine); background:var(--tint); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .auto { background:#f3f7fb; border:1px dashed #b9cde3; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.55; }
+  .auto b { color:#1e4f8a; }
+  .att { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; } .att span { font-size:12.5px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13.5px; font-weight:700; border-radius:9px; padding:8px 14px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .btn.p { background:var(--wine); border-color:var(--wine); color:#fff; } .btn.g { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fp { width:26px; height:30px; vertical-align:middle; }
+  table.l { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; border-radius:12px; overflow:hidden; }
+  table.l th { text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); padding:9px 10px; border-bottom:1px solid var(--line); background:#fff; }
+  table.l td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .st { font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .st.bad { background:var(--badbg); color:var(--bad); } .st.warn { background:var(--warnbg); color:var(--warn); } .st.ok { background:var(--okbg); color:var(--ok); } .st.info { background:#e0ecfa; color:#1e4f8a; } .st.mut { background:#eee; color:#555; }
+  .lvl { font-size:11px; font-weight:800; color:#fff; border-radius:6px; padding:2px 7px; }
+  .mini { font-size:12px; color:var(--soft); }
+  .note { max-width:1100px; margin:-16px auto 30px; background:#fff; border-radius:10px; padding:12px 16px; font-size:14px; line-height:1.5; color:#3b3035; border-left:4px solid var(--wine); }
+  /* flujo */
+  .levels { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin:6px 0 4px; }
+  .lv { text-align:center; padding:0 8px; }
+  .lv .ic { width:74px; height:74px; border-radius:18px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; }
+  .lv b { display:block; font-size:15px; } .lv span { font-size:12.5px; color:var(--soft); }
+  .arrows { position:relative; height:74px; margin-top:-120px; margin-bottom:60px; pointer-events:none; }
+  .loop { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+  .loop div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12.3px; text-align:center; position:relative; }
+  .loop div b { display:block; font-size:13px; } .loop i { font-style:normal; display:block; font-size:18px; }
+  .loop div:not(:last-child)::after { content:"›"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--soft); font-size:18px; }
+  .world { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .world div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:12.3px; line-height:1.4; }
+  .world b { display:block; font-size:13px; color:var(--wine-d); }
+  /* seguimiento */
+  .steps { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin:8px 0 4px; }
+  .steps div { text-align:center; font-size:12px; position:relative; padding-top:30px; }
+  .steps div::before { content:""; position:absolute; top:9px; left:0; right:0; height:4px; background:#e3d6dc; }
+  .steps div:first-child::before { left:50%; } .steps div:last-child::before { right:50%; }
+  .steps div.done::before { background:var(--ok); } .steps div.cur::before { background:linear-gradient(90deg,var(--ok) 50%,#e3d6dc 50%); }
+  .steps i { position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:50%; background:#e3d6dc; color:#fff; font-style:normal; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:3px solid var(--paper); }
+  .steps .done i { background:var(--ok); } .steps .cur i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .steps b { display:block; font-size:12.5px; } .steps small { color:var(--soft); }
+  .tl { border-left:3px solid var(--line); margin-left:8px; padding-left:14px; }
+  .tl div { position:relative; font-size:13px; margin-bottom:10px; line-height:1.4; }
+  .tl div::before { content:""; position:absolute; left:-21px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--c,#999); border:2px solid #fff; }
+  .kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:600; } .kpi b { font-size:28px; letter-spacing:-.01em; } .kpi span { font-size:12px; color:var(--soft); }
+  .bars div.r { display:grid; grid-template-columns:170px 1fr 54px; align-items:center; gap:10px; font-size:13px; margin:7px 0; }
+  .bars .trk { height:14px; border-radius:0 4px 4px 0; background:transparent; position:relative; }
+  .bars .fill { height:14px; border-radius:0 4px 4px 0; background:var(--wine); }
+  .bars .ref { position:absolute; top:-3px; bottom:-3px; width:2px; background:#2d2429; }
+  .bars .v { font-weight:700; text-align:right; }
+  .alertc { border-left:4px solid var(--bad); }
+
+  .role .rh { display:flex; gap:10px; align-items:center; margin-bottom:8px; } .role .rh b { display:block; font-size:15px; } .role .rh small { color:var(--soft); font-size:12px; }
+  .ri { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .todo { display:flex; align-items:center; gap:10px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .todo:last-child { border-bottom:none; }
+  .todo .st { min-width:30px; text-align:center; font-size:13px; }
+  .mini2 { font-size:13px; line-height:1.5; } .mini2 b { display:block; margin-bottom:2px; }
+  .flowbar { display:flex; gap:6px; margin-bottom:12px; } .flowbar span { flex:1; text-align:center; font-size:13px; font-weight:700; padding:7px; border-radius:9px; background:#fff; border:1px solid var(--line); color:var(--soft); }
+  .flowbar span.on { background:var(--okbg); color:var(--ok); border-color:#b8e3c7; } .flowbar span.cur { background:var(--wine); color:#fff; border-color:var(--wine); }
+  .found { display:flex; gap:12px; align-items:center; margin-top:10px; padding:10px; border-radius:10px; background:#f3f9f5; border:1px solid #cfe9d8; }
+  .photo2 { width:64px; height:72px; border-radius:10px; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:24px; flex:none; }
+  .k2 { display:block; font-size:10.5px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.04em; }
+  .scanner { width:150px; height:160px; margin:6px auto 0; border-radius:18px; background:radial-gradient(circle at 50% 45%, #fff 0, #f7e9ef 70%); border:3px solid #d9b9c6; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -6px 12px rgba(125,42,76,.12); }
+  .ticket { margin-top:12px; text-align:center; }
+  .tk { border:2px dashed var(--wine); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:2px; font-size:13.5px; } .tk b { font-size:40px; color:var(--wine-d); letter-spacing:.04em; line-height:1.1; } .tk small { color:var(--soft); font-size:11.5px; }
+  .q2 { padding:8px 10px; border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:13.5px; background:#fff; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; } .q2 .mini { width:100%; }
+  .q2.cur { border:2px solid var(--wine); background:var(--tint); } .q2 .st { margin-left:auto; }
+  .vit2 { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .vit2 div { background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 8px; font-size:16px; font-weight:800; } .vit2 small { display:block; font-size:10.5px; color:var(--soft); font-weight:700; text-transform:uppercase; }
+  .tv { background:#120810; border-radius:16px; padding:14px; color:#fff; border:8px solid #2a2a2a; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
+  .tvh { display:flex; justify-content:space-between; font-size:13px; color:#cfb7c2; font-weight:700; letter-spacing:.08em; }
+  .tvnow { background:linear-gradient(135deg,#7d2a4c,#b4235a); border-radius:12px; padding:16px; text-align:center; } .tvnow small { display:block; font-size:13px; letter-spacing:.2em; font-weight:800; color:#ffe4ee; }
+  .tvnow b { display:block; font-size:64px; line-height:1.05; letter-spacing:.04em; } .tvnow span { display:block; font-size:24px; font-weight:700; } .tvnow em { display:block; font-style:normal; font-size:20px; margin-top:4px; color:#ffe4ee; }
+  .tvlist div { display:flex; gap:12px; align-items:baseline; font-size:18px; padding:6px 4px; border-bottom:1px solid #3a2530; } .tvlist b { color:#f1a7c3; min-width:70px; } .tvlist span { margin-left:auto; color:#cfb7c2; font-size:15px; }
+  .tvf { font-size:13px; color:#cfb7c2; }
+  .doc { display:grid; grid-template-columns:34px 1fr auto auto; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--line); font-size:13.5px; } .di { font-size:22px; text-align:center; } .dest { font-size:12.5px; color:var(--soft); font-weight:600; }
+  .st.warn { margin:0; max-width:none; padding:2px 9px; border:none; font-size:11.5px; }
+  .todo .st.warn { font-size:13px; }
+
+  .svc { display:flex; flex-wrap:wrap; gap:8px; } .svc span { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 12px; font-size:13.5px; font-weight:600; }
+  .prob { display:flex; align-items:center; gap:8px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .prob .mini { margin-left:auto; }
+  .dotc { width:10px; height:10px; border-radius:50%; flex:none; }
+  .tpl { border:1px solid; border-left-width:5px; border-radius:10px; padding:9px 11px; font-size:13px; line-height:1.45; background:#fff; } .tpl b { display:block; font-size:14px; margin-bottom:2px; }
+  .opt { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; } .opt span { border:1px solid var(--line); border-radius:12px; padding:10px; font-size:22px; background:#fff; text-align:center; } .opt b { display:block; font-size:14px; margin-top:4px; } .opt small { display:block; font-size:12px; color:var(--soft); }
+  .opt .sel { border:2px solid var(--wine); background:var(--tint); }
+  .side { border-left:4px solid var(--line); padding:5px 10px; margin-bottom:8px; font-size:13.5px; line-height:1.45; } .side b { display:block; }
+  .stk { display:grid; grid-template-columns:150px 1fr auto; gap:8px; align-items:center; font-size:13px; margin:6px 0; } .stk div { height:10px; background:#eee4e8; border-radius:5px; overflow:hidden; } .stk i { display:block; height:100%; background:#15803d; border-radius:5px; } .stk b { font-size:12.5px; }
+  .phn { background:#e5ddd5; border:9px solid #1f1f1f; border-radius:26px; padding:10px; display:flex; flex-direction:column; gap:8px; min-height:430px; }
+  .phh { background:#075e54; color:#fff; font-size:13px; font-weight:700; margin:-10px -10px 4px; padding:10px 12px; border-radius:16px 16px 0 0; }
+  .msg { font-size:13px; line-height:1.4; border-radius:10px; padding:7px 9px; max-width:88%; box-shadow:0 1px 1px rgba(0,0,0,.12); } .msg.in { background:#fff; align-self:flex-start; } .msg.out { background:#dcf8c6; align-self:flex-end; font-weight:800; }
+  .ck { font-size:13.5px; line-height:1.45; } .ck b { display:block; font-size:15px; margin-bottom:3px; }
+
+  .kv2 { display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:4px 0; border-bottom:1px dashed var(--line); } .kv2 span { color:var(--soft); }
+  .req { display:flex; flex-wrap:wrap; gap:6px; } .req span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .req .ok { background:var(--okbg); color:var(--ok); } .req .no { background:var(--warnbg); color:var(--warn); }
+  .qx { position:relative; height:30px; background:#f3eef0; border-radius:8px; margin:6px 0; padding-left:34px; } .qx b { position:absolute; left:8px; top:6px; font-size:13px; }
+  .qx span { position:absolute; top:3px; bottom:3px; margin-left:34px; border-radius:6px; color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; padding:0 6px; white-space:nowrap; overflow:hidden; }
+  .who2 { display:grid; gap:6px; } .who2 div { border:1px solid var(--line); border-radius:8px; padding:6px 9px; background:#f7fbf8; font-size:12.5px; } .who2 b { display:block; color:var(--wine-d); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; } .who2 span { color:#166534; }
+  .beds { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .bed { border-radius:10px; padding:8px; font-size:13px; font-weight:700; border:1px solid var(--line); min-height:76px; } .bed b { display:block; font-size:18px; } .bed small { display:block; font-weight:500; font-size:11.5px; color:var(--soft); }
+  .bed.p { background:#fbe4ee; } .bed.a { background:#fde2e2; } .bed.g { background:#ede4fb; } .bed.free { background:#ecf8f1; color:#15803d; } .bed.clean { background:#fdf0d5; color:#8a5a00; } .bed.sel { outline:3px solid var(--wine); }
+  .leg2 { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-left:6px; border:1px solid var(--line); }
+  .dose { border:1px solid var(--line); border-radius:10px; padding:7px 9px; margin-bottom:6px; font-size:13px; display:flex; flex-direction:column; } .dose span { color:var(--soft); font-size:12px; } .dose em { font-style:normal; margin-top:2px; }
+  .srch { border-left:4px solid #c2410c; background:#fff7f0; border-radius:6px; padding:6px 9px; margin-bottom:6px; font-size:13px; } .srch b { display:block; font-size:12px; color:#c2410c; text-transform:uppercase; letter-spacing:.04em; }
+  .amb { border:9px solid #1f1f1f; border-radius:26px; background:#fff; overflow:hidden; min-height:420px; display:flex; flex-direction:column; }
+  .ah { background:#ea580c; color:#fff; font-weight:800; font-size:14px; padding:10px 12px; } .ab { padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .big2 { font-size:40px; font-weight:900; text-align:center; color:#ea580c; margin-top:6px; }
+
+  .tree div { padding:6px 8px; border-radius:8px; font-size:13.5px; } .tree small { color:var(--soft); margin-left:4px; }
+  .tree .t0 { font-weight:800; } .tree .t1 { padding-left:18px; font-weight:700; } .tree .t2 { padding-left:32px; font-weight:700; } .tree .t3 { padding-left:50px; } .tree .mut { color:var(--soft); }
+  .tree .on { background:#f3eef0; } .tree .sel { background:var(--tint); outline:2px solid var(--wine); }
+  .fing { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:8px; } .fing span { font-size:12px; font-weight:700; border-radius:999px; padding:3px 9px; background:#f3eef0; } .fing .done { background:var(--okbg); color:var(--ok); } .fing .cur { background:var(--wine); color:#fff; }
+  table.mx td, table.mx th { text-align:center; font-size:12.5px; padding:8px 6px; } table.mx td:first-child, table.mx th:first-child { text-align:left; }
+  table.mx2 td, table.mx2 th { text-align:center; font-size:12.5px; } table.mx2 td:first-child, table.mx2 th:first-child { text-align:left; }
+  table.mx2 td.on { color:#15803d; font-size:18px; } table.mx2 td.pi { color:#c2410c; font-size:18px; } table.mx2 td { color:#c9bcc2; font-size:18px; } table.mx2 td:first-child { font-size:13.5px; color:var(--ink); }
+  .catl { padding:8px 10px; border-radius:9px; font-size:13.5px; margin-bottom:4px; display:flex; justify-content:space-between; } .catl small { color:var(--soft); } .catl.on { background:var(--tint); font-weight:700; }
+  table.mx2 { table-layout:fixed; } table.mx2 th { font-size:10px; padding:6px 3px; letter-spacing:.02em; white-space:normal; text-align:center; } table.mx2 th:first-child { width:170px; } table.mx2 td { padding:8px 3px; }
+  .ring2 { width:150px; height:150px; border-radius:50%; margin:6px auto 0; background:conic-gradient(#7d2a4c 0 71%, #eadde3 71% 100%); display:flex; align-items:center; justify-content:center; } .ring2 > div { width:118px; height:118px; border-radius:50%; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; color:var(--soft); } .ring2 b { font-size:40px; color:var(--ink); line-height:1; }
+  .ctl { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; } .ctl span { text-align:center; border-radius:10px; padding:8px 4px; font-weight:800; font-size:14px; background:#f3eef0; color:#9c8b92; } .ctl small { display:block; font-weight:600; font-size:11px; } .ctl .d { background:#dcf3e5; color:#15803d; } .ctl .n { background:var(--wine); color:#fff; }
+  .chk3 { display:flex; flex-direction:column; gap:4px; } .chk3 span { font-size:12.8px; font-weight:600; border-radius:7px; padding:3px 8px; } .chk3 .ok { background:#ecf8f1; color:#15803d; } .chk3 .no { background:#fdf0d5; color:#8a5a00; }
+  .rk { display:flex; gap:10px; align-items:center; font-size:14px; padding:7px 0; border-bottom:1px dashed var(--line); } .rk .st { min-width:44px; text-align:center; }
+  .flow3 { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; } .flow3 span { text-align:center; font-size:12.5px; font-weight:700; border-radius:10px; padding:8px 4px; background:#f3eef0; color:#8a7a81; } .flow3 span small { display:block; font-weight:600; font-size:11px; } .flow3 .d { background:#dcf3e5; color:#15803d; } .flow3 .n { background:var(--wine); color:#fff; }
+  .al { display:flex; flex-wrap:wrap; gap:6px; } .al span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .al .r { background:#fde2e2; color:#991b1b; } .al .y { background:#fdf0d5; color:#8a5a00; } .al .g { background:#ecf8f1; color:#15803d; }
+  table.lab { width:100%; border-collapse:collapse; font-size:12.8px; } table.lab th { font-size:11px; text-transform:uppercase; color:var(--soft); text-align:left; padding:4px 6px; border-bottom:1px solid var(--line); } table.lab td { padding:5px 6px; border-bottom:1px dashed var(--line); }
+  .dt { display:inline-block; min-width:22px; text-align:center; border-radius:6px; padding:1px 6px; font-weight:800; font-size:12px; } .dt.ok { background:#dcf3e5; color:#15803d; } .dt.w { background:#fdf0d5; color:#8a5a00; } .dt.b { background:#fde2e2; color:#991b1b; } .dt.p { background:#eee; color:#888; }
+  .phs { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .dev { width:280px; height:560px; margin:0 auto; border-radius:36px; border:9px solid #17121a; background:#fff; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 14px 30px rgba(60,20,40,.2); }
+  .dev .sb { height:24px; display:flex; justify-content:space-between; align-items:center; padding:0 16px; font-size:10.5px; font-weight:700; color:#fff; background:var(--wine-d); flex:none; }
+  .dev .hd { background:linear-gradient(145deg,#8a3056,#5a1c36); color:#fff; padding:8px 14px 12px; flex:none; font-size:12px; } .dev .hd strong { display:block; font-size:16px; }
+  .dev .ct { flex:1; overflow:hidden; padding:10px; display:flex; flex-direction:column; gap:8px; background:#faf6f8; }
+  .dev .c { background:#fff; border:1px solid var(--line); border-radius:14px; padding:9px 11px; font-size:12.3px; line-height:1.4; }
+  .dev .c .t { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--soft); font-weight:800; margin-bottom:3px; }
+  .dev .nv { flex:none; display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); background:#fff; padding:5px 0 8px; text-align:center; font-size:10px; font-weight:700; color:#8a7a81; } .dev .nv .o { color:var(--wine); }
+  .dev .li { display:flex; justify-content:space-between; gap:6px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .dev .bt2 { display:block; text-align:center; font-weight:800; font-size:12.5px; border-radius:10px; padding:8px; background:var(--wine); color:#fff; margin-top:6px; } .dev .bt2.o2 { background:#fff; color:var(--wine); border:1.5px solid var(--wine); }
+  .cap2 { text-align:center; font-size:13.5px; margin-top:10px; color:#43363d; line-height:1.4; }
+  .bar { height:9px; border-radius:6px; background:#eee; overflow:hidden; } .bar i { display:block; height:100%; background:var(--ok,#15803d); }
+  .tl2 { display:grid; grid-template-columns:1fr 70px 1fr; gap:0; }
+  .tlc { border-radius:14px; padding:12px 14px; } .tlc h4 { margin:0 0 10px; font-size:15px; }
+  .ev { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 10px; font-size:12.8px; margin-bottom:7px; line-height:1.35; } .ev small { color:var(--soft); display:block; font-size:11.5px; }
+  .ev.lk { border:2px solid var(--wine); }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — Carnet e historia prenatal digital:</b>
+  <button class="tab on" data-t="q1">1. Hoy vs. modelo SIVEC</button>
+  <button class="tab" data-t="q2">2. Resumen del embarazo</button>
+  <button class="tab" data-t="q3">3. Control prenatal guiado</button>
+  <button class="tab" data-t="q4">4. App: Mi embarazo</button>
+  <button class="tab" data-t="q5">5. HCP oficial automática</button>
+  <button class="tab" data-t="q6">6. RN: sala de partos o recuperación</button>
+  <button class="tab" data-t="q7">7. Dos líneas de tiempo</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Modelo basado en las guías digitales de la OMS para el control prenatal (SMART Guidelines / DAK prenatal), el registro en manos de la mujer (OMS) y el Sistema Informático Perinatal del CLAP-OPS. La HCP oficial sigue saliendo, pero la llena el sistema.</div>
+
+<!-- ============ Q1 ============ -->
+<section class="scr on" id="q1">
+  <div class="app"><div class="brand">SIVEC <span>MATERNO</span></div><div class="who">🧭 Del formulario de papel al modelo digital</div></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:330px 1fr">
+      <div class="card"><div class="lbl">Hoy · HCP CLAP en papel</div>
+        <img src="hcp-clap-actual.png" alt="HCP CLAP actual" style="width:100%;border:1px solid var(--line);border-radius:8px">
+        <div class="al" style="margin-top:8px"><span class="r">~450 casillas en 1 hoja</span><span class="r">se llena a mano</span><span class="r">la mamá no la ve</span><span class="y">se copia al SIP a mano</span></div></div>
+      <div>
+        <div class="card"><div class="lbl">Modelo recomendado en el mundo · 5 reglas</div>
+          <div class="rk"><span class="st ok">1</span><div><strong>Cada dato se escribe una vez, donde ocurre</strong> · recepción, control, laboratorio, sala de partos, Pediatría… nadie lo vuelve a copiar.</div></div>
+          <div class="rk"><span class="st ok">2</span><div><strong>La pantalla muestra solo lo de ese momento</strong> · el control sigue pasos (OMS: 8 contactos), no una hoja entera.</div></div>
+          <div class="rk"><span class="st ok">3</span><div><strong>Las casillas amarillas del CLAP son alertas automáticas</strong> · el sistema las calcula y las pone arriba en rojo.</div></div>
+          <div class="rk"><span class="st ok">4</span><div><strong>La mujer tiene su carnet en el celular</strong> (OMS recomienda el registro en manos de la mujer) · con QR para mostrar en cualquier centro.</div></div>
+          <div class="rk" style="border:none"><span class="st ok">5</span><div><strong>La HCP oficial, el SIP y el SNIS salen solos</strong> · con códigos CIE-10 · en estándar HL7 FHIR.</div></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">¿Dónde se llena cada parte de la HCP en SIVEC?</div>
+          <table class="lab"><thead><tr><th>Sección HCP</th><th>Se llena en…</th><th>Quién</th></tr></thead><tbody>
+            <tr><td><strong>Identificación</strong></td><td>Recepción (SEGIP + huella)</td><td>admisión</td></tr>
+            <tr><td><strong>1. Antecedentes</strong></td><td>1er control · precargado de su historia SIVEC</td><td>médico/a · licenciada</td></tr>
+            <tr><td><strong>2. Gestación actual + consultas</strong></td><td>cada control guiado · labs llegan del laboratorio</td><td>médico/a · lab</td></tr>
+            <tr><td><strong>3. Parto / aborto</strong></td><td>partograma · sala de partos · quirófano</td><td>obstetricia</td></tr>
+            <tr><td><strong>4. Recién nacido · 6. Egreso RN</strong></td><td>atención inmediata · neonatología</td><td>Pediatría</td></tr>
+            <tr><td><strong>5. Puerperio · 7. Egreso · anticoncepción</strong></td><td>piso / recuperación · módulo Métodos</td><td>enfermería · médico/a</td></tr></tbody></table></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Q2 ============ -->
+<section class="scr" id="q2">
+  <div class="app"><div class="brand">SIVEC <span>MATERNO</span></div><div class="who">🤰 Carla Torres · 26 a · CI 8.456.221 · C.S. San Luis</div></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:1fr auto;align-items:center">
+      <div style="display:flex;gap:18px;align-items:center">
+        <div class="ring2" style="width:110px;height:110px;margin:0"><div style="width:86px;height:86px"><b style="font-size:30px">28</b>+4 días</div></div>
+        <div style="font-size:14px;line-height:1.6"><strong style="font-size:18px">Embarazo actual</strong><br>FUM 08/03/2026 · <strong>FPP 13/12/2026</strong> · eco 1er trim. concuerda<br>G2 · P1 · C0 · A0 · grupo <strong>O Rh+</strong> · IMC inicial 27</div>
+      </div>
+      <div style="text-align:right"><span class="st warn" style="font-size:14px;padding:5px 12px">riesgo moderado</span><div class="mini" style="margin-top:4px">plan de parto: Hosp. de la Mujer</div></div>
+    </div>
+    <div class="card" style="margin-top:12px"><div class="lbl">Alertas (antes eran las casillas amarillas del CLAP)</div>
+      <div class="al"><span class="r">⚠ Anemia leve · Hb 10,8</span><span class="y">⏳ Curva de glucosa pendiente (24–28 sem)</span><span class="y">⏳ dTpa desde la semana 27</span><span class="y">IMC 27 · sobrepeso</span><span class="g">✓ VIH y sífilis negativos</span><span class="g">✓ sin antecedentes graves</span></div></div>
+    <div class="cols" style="grid-template-columns:1fr 1.35fr 1fr;margin-top:12px">
+      <div class="card"><div class="lbl">Antecedentes · solo lo positivo</div>
+        <div style="font-size:13px;line-height:1.6">👩 1 parto vaginal 2021 · 3.100 g<br>👨‍👩‍👧 Madre con diabetes tipo 2<br>🚭 no fuma · no alcohol · no drogas<br>🛡 violencia: pregunta hecha · no</div>
+        <div class="mini" style="margin-top:6px">✓ 22 ítems más negados (TBC, cardiopatía, cirugía pélvica…) · <u>ver todo</u></div></div>
+      <div class="card"><div class="lbl">Laboratorios por trimestre · llegan solos del laboratorio</div>
+        <table class="lab"><thead><tr><th>Examen</th><th>1er</th><th>2º</th><th>3er</th></tr></thead><tbody>
+          <tr><td>Hemoglobina</td><td><span class="dt ok">12,1</span></td><td><span class="dt b">10,8</span></td><td><span class="dt p">34 s</span></td></tr>
+          <tr><td>Glucemia / curva</td><td><span class="dt ok">84</span></td><td><span class="dt w">pedir</span></td><td></td></tr>
+          <tr><td>VIH · sífilis (prueba rápida)</td><td><span class="dt ok">– / –</span></td><td></td><td><span class="dt p">34 s</span></td></tr>
+          <tr><td>Toxoplasma · Chagas · hep. B</td><td><span class="dt ok">– – –</span></td><td></td><td></td></tr>
+          <tr><td>Orina · urocultivo</td><td><span class="dt ok">normal</span></td><td><span class="dt ok">normal</span></td><td><span class="dt p">34 s</span></td></tr>
+          <tr><td>Estreptococo B</td><td></td><td></td><td><span class="dt p">35–37 s</span></td></tr></tbody></table></div>
+      <div class="card"><div class="lbl">Vacunas · suplementos · otros</div>
+        <div class="chk3"><span class="ok">✓ dT (antitetánica) vigente</span><span class="no">⏳ dTpa · desde sem 27</span><span class="ok">✓ Influenza</span><span class="ok">✓ Hierro + ácido fólico</span><span class="ok">✓ Examen odontológico</span><span class="ok">✓ PAP 2025 · NILM</span></div></div>
+    </div>
+    <div class="card" style="margin-top:12px"><div class="lbl">Contactos (OMS: 8) · cada uno es una fila de la HCP, llenada sola</div>
+      <div class="ctl"><span class="d">1º<small>12 sem</small></span><span class="d">2º<small>16 sem</small></span><span class="d">3º<small>20 sem</small></span><span class="d">4º<small>26 sem</small></span><span class="n">5º<small>hoy · 28</small></span><span>6º<small>30</small></span><span>7º<small>34</small></span><span>8º<small>36–40</small></span></div></div>
+  </div>
+</section>
+
+<!-- ============ Q3 ============ -->
+<section class="scr" id="q3">
+  <div class="app"><div class="brand">SIVEC <span>CONTROL PRENATAL</span></div><div class="who">🩺 5º contacto · Carla Torres · 28+4 sem · Dra. Méndez</div></div>
+  <div class="body">
+    <div class="flow3"><span class="d">1 · Verificación rápida<small>señales de peligro</small></span><span class="d">2 · ¿Algo nuevo?<small>perfil / síntomas</small></span><span class="n">3 · Signos y examen<small>paso actual</small></span><span>4 · Pruebas<small>según semanas</small></span><span>5 · Consejería y tto.<small>según guía</small></span><span>6 · Cierre<small>próxima cita</small></span></div>
+    <div class="cols c21" style="margin-top:12px">
+      <div class="card"><div class="lbl">Signos y examen obstétrico · por toques</div>
+        <div class="vit2" style="grid-template-columns:repeat(4,1fr)"><div><small>Peso</small>71,2 kg</div><div><small>PA</small>112/70</div><div><small>Altura uterina</small>28 cm</div><div><small>FCF</small>142</div><div><small>Mov. fetales</small>sí</div><div><small>Presentación</small>cefálica</div><div><small>Edema</small>no</div><div><small>Proteinuria</small>—</div></div>
+        <div class="cols c2" style="margin-top:10px;gap:10px">
+          <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px"><div class="lbl" style="margin:0 0 2px">Altura uterina</div>
+            <svg viewBox="0 0 260 110" width="100%"><path d="M20 95 L240 20 L240 50 L20 105Z" fill="#dcf3e5"/><polyline points="40,93 90,78 140,62 175,53" fill="none" stroke="#7d2a4c" stroke-width="2.5"/><circle cx="175" cy="53" r="4.5" fill="#7d2a4c"/><text x="182" y="50" font-size="11" font-family="Source Sans 3" font-weight="700" fill="#15803d">p50 ✓</text></svg></div>
+          <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px"><div class="lbl" style="margin:0 0 2px">Ganancia de peso (IMC 27)</div>
+            <svg viewBox="0 0 260 110" width="100%"><path d="M20 100 L240 45 L240 70 L20 105Z" fill="#dcf3e5"/><polyline points="40,99 90,92 140,80 175,64" fill="none" stroke="#7d2a4c" stroke-width="2.5"/><circle cx="175" cy="64" r="4.5" fill="#b45309"/><text x="130" y="52" font-size="11" font-family="Source Sans 3" font-weight="700" fill="#b45309">+7,2 kg · alto</text></svg></div>
+        </div></div>
+      <div>
+        <div class="card" style="border:2px solid #cfe0f1"><div class="lbl" style="color:#1e4f8a">La guía sugiere hoy (OMS / norma MSD)</div>
+          <div class="chk3"><span class="no">Pedir curva de glucosa 75 g (sem 24–28 · madre diabética)</span><span class="no">Aplicar dTpa hoy</span><span class="no">Anemia leve → hierro 60 mg + control Hb 34 sem</span><span class="ok">Consejería: alimentación y actividad (peso alto)</span></div>
+          <div class="mini" style="margin-top:6px">Un toque acepta: se pide el examen al laboratorio (D-8), la vacuna va a enfermería y la receta a farmacia.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Así queda la fila de “Consultas antenatales” de la HCP</div>
+          <table class="lab"><thead><tr><th>Fecha</th><th>EG</th><th>Peso</th><th>PA</th><th>AU</th><th>FCF</th><th>Prox.</th></tr></thead><tbody><tr><td>24/09</td><td>28+4</td><td>71,2</td><td>112/70</td><td>28</td><td>142</td><td>08/10</td></tr></tbody></table>
+          <div class="mini" style="margin-top:4px">Nadie la copia: se arma sola con este control.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Q4 ============ -->
+<section class="scr" id="q4">
+  <div class="app"><div class="brand">SIVEC <span>MI SALUD</span></div><div class="who">📱 Mi embarazo · lo que ve Carla en su celular</div></div>
+  <div class="body">
+    <div class="phs">
+      <div><div class="dev"><div class="sb"><span>9:41</span><span>SIVEC Mi salud</span></div>
+        <div class="hd">Hola, Carla<strong>Semana 28 + 4 días</strong>faltan 11 semanas · FPP 13/12</div>
+        <div class="ct">
+          <div class="c" style="display:flex;gap:10px;align-items:center"><div style="font-size:34px">🍆</div><div><div class="t">Tu bebé</div>del tamaño de una berenjena · ~1,1 kg · ya abre los ojos</div></div>
+          <div class="c"><div class="t">Próximo control</div><strong>Mié 08/10 · 08:30</strong><br>C.S. San Luis · Dra. Méndez<span class="bt2 o2">Agregar al calendario</span></div>
+          <div class="c"><div class="t">Para hacer esta semana</div><div class="li"><span>💊 Tomar hierro (1 al día)</span><span>✓</span></div><div class="li"><span>🧪 Curva de glucosa · en ayunas</span><span>⏳</span></div><div class="li" style="border:none"><span>💉 Vacuna dTpa</span><span>✓ hoy</span></div></div>
+        </div>
+        <div class="nv"><span class="o">🤰<br>Inicio</span><span>📋<br>Carnet</span><span>🧳<br>Parto</span><span>👤<br>Perfil</span></div></div>
+        <div class="cap2"><strong>Inicio:</strong> semana, tamaño del bebé, próximo control y tareas.</div></div>
+      <div><div class="dev"><div class="sb"><span>9:41</span><span>SIVEC Mi salud</span></div>
+        <div class="hd">Mi carnet perinatal<strong>Carla Torres · O Rh+</strong>G2 P1 · riesgo moderado</div>
+        <div class="ct">
+          <div class="c"><div class="t">Mis controles · 5 de 8</div><div class="ctl" style="grid-template-columns:repeat(8,1fr);gap:3px"><span class="d" style="padding:4px 0;font-size:11px">1</span><span class="d" style="padding:4px 0;font-size:11px">2</span><span class="d" style="padding:4px 0;font-size:11px">3</span><span class="d" style="padding:4px 0;font-size:11px">4</span><span class="d" style="padding:4px 0;font-size:11px">5</span><span style="padding:4px 0;font-size:11px">6</span><span style="padding:4px 0;font-size:11px">7</span><span style="padding:4px 0;font-size:11px">8</span></div><div class="li" style="margin-top:4px"><span>Hoy: PA 112/70 · peso 71,2</span><span>✓</span></div></div>
+          <div class="c"><div class="t">Mis exámenes</div><div class="li"><span>Hemoglobina</span><span style="color:#991b1b;font-weight:700">10,8 · baja</span></div><div class="li"><span>VIH · sífilis</span><span style="color:#15803d;font-weight:700">negativos</span></div><div class="li" style="border:none"><span>Orina</span><span style="color:#15803d;font-weight:700">normal</span></div></div>
+          <div class="c" style="text-align:center"><div class="t">Mostrar en cualquier centro</div><svg viewBox="0 0 21 21" width="84" height="84" shape-rendering="crispEdges"><rect width="21" height="21" fill="#fff"/><g fill="#2d2429"><rect x="0" y="0" width="7" height="7"/><rect x="14" y="0" width="7" height="7"/><rect x="0" y="14" width="7" height="7"/><rect x="9" y="2" width="2" height="3"/><rect x="8" y="8" width="5" height="2"/><rect x="15" y="9" width="3" height="3"/><rect x="9" y="13" width="3" height="2"/><rect x="14" y="15" width="2" height="4"/><rect x="18" y="17" width="3" height="2"/><rect x="2" y="9" width="3" height="2"/></g><g fill="#fff"><rect x="1" y="1" width="5" height="5"/><rect x="15" y="1" width="5" height="5"/><rect x="1" y="15" width="5" height="5"/></g><g fill="#2d2429"><rect x="2" y="2" width="3" height="3"/><rect x="16" y="2" width="3" height="3"/><rect x="2" y="16" width="3" height="3"/></g></svg><div class="mini">el hospital abre tu carnet completo</div></div>
+        </div>
+        <div class="nv"><span>🤰<br>Inicio</span><span class="o">📋<br>Carnet</span><span>🧳<br>Parto</span><span>👤<br>Perfil</span></div></div>
+        <div class="cap2"><strong>Carnet:</strong> controles, exámenes y vacunas · QR en vez del carnet de papel.</div></div>
+      <div><div class="dev"><div class="sb"><span>9:41</span><span>SIVEC Mi salud</span></div>
+        <div class="hd">Mi plan de parto<strong>Hospital de la Mujer</strong>a 25 min · en micro 18 o taxi</div>
+        <div class="ct">
+          <div class="c"><div class="t">Mi plan</div><div class="li"><span>Acompañante</span><span>Luis (esposo)</span></div><div class="li"><span>Posición preferida</span><span>semisentada</span></div><div class="li" style="border:none"><span>Bolso listo</span><span>6 de 9 ✓</span></div></div>
+          <div class="c" style="border-color:#fecaca;background:#fff7f7"><div class="t" style="color:#991b1b">Vaya al hospital si tiene…</div>🩸 sangrado · 💧 pérdida de líquido · 🤕 dolor de cabeza fuerte o ve lucecitas · 🔥 fiebre · 👶 el bebé se mueve menos</div>
+          <div class="c"><div class="t">Movimientos del bebé</div>Hoy: <strong>10 en 1 h 20 min</strong> ✓<span class="bt2 o2">Contar ahora</span></div>
+          <div class="c"><div class="t">Mis preguntas para el control</div>¿Puedo seguir trabajando de pie? ✏️</div>
+        </div>
+        <div class="nv"><span>🤰<br>Inicio</span><span>📋<br>Carnet</span><span class="o">🧳<br>Parto</span><span>👤<br>Perfil</span></div></div>
+        <div class="cap2"><strong>Parto:</strong> plan de parto, señales de alarma, conteo de movimientos y preguntas.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Q5 ============ -->
+<section class="scr" id="q5">
+  <div class="app"><div class="brand">SIVEC <span>MATERNO</span></div><div class="who">🖨️ Documentos que salen solos · Carla Torres</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">HCP CLAP-OPS (formato oficial) · cuánto ya está lleno</div>
+        <div class="rk"><div style="width:230px"><strong>Identificación</strong></div><div style="flex:1" class="bar"><i style="width:100%"></i></div><span class="dt ok">100%</span></div>
+        <div class="rk"><div style="width:230px"><strong>1. Antecedentes</strong></div><div style="flex:1" class="bar"><i style="width:100%"></i></div><span class="dt ok">100%</span></div>
+        <div class="rk"><div style="width:230px"><strong>2. Gestación actual</strong></div><div style="flex:1" class="bar"><i style="width:92%"></i></div><span class="dt w">92%</span></div>
+        <div class="rk"><div style="width:230px"><strong>Consultas antenatales</strong></div><div style="flex:1" class="bar"><i style="width:100%"></i></div><span class="dt ok">5 filas</span></div>
+        <div class="rk"><div style="width:230px"><strong>3. Parto · 4. RN · 5. Puerperio</strong></div><div style="flex:1" class="bar"><i style="width:0"></i></div><span class="dt p">en el parto</span></div>
+        <div class="card" style="margin-top:10px;background:#fff7e0;border-color:#ecd9a0"><div class="lbl" style="color:#8a5a00">Falta para cerrar la sección 2</div>
+          <div style="font-size:13px;line-height:1.6">• Curva de glucosa (sem 24–28) → <u>pedir</u><br>• Consejería de lactancia registrada → <u>marcar</u></div></div>
+        <div class="mini" style="margin-top:8px">Los diagnósticos se codifican solos con la lista CLAP / CIE-10 (ej. “Anemia por deficiencia de hierro” → 27 · D50).</div></div>
+      <div>
+        <div class="card"><div class="lbl">Imprimir o enviar</div>
+          <div class="chk3"><span class="ok">📄 HCP CLAP oficial (se imprime llena)</span><span class="ok">🪪 Carnet perinatal impreso (para quien no tiene celular)</span><span class="ok">📤 SIP del CLAP · exportación automática</span><span class="ok">📊 SNIS · controles, captación, parto institucional</span></div>
+          <div style="display:flex;gap:8px;margin-top:10px"><span class="btn p">Formato oficial</span><span class="btn">Formato SIVEC</span></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Mismo dato, muchos usos</div><div style="font-size:13px;line-height:1.55">La Hb 10,8 del laboratorio aparece en: <strong>HCP</strong> · <strong>alerta</strong> del control · <strong>Mi salud</strong> de Carla · <strong>tablero del gestor</strong> (anemia en embarazadas) · <strong>SNIS</strong>.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Q6 ============ -->
+<section class="scr" id="q6">
+  <div class="app"><div class="brand">SIVEC <span>NEONATOLOGÍA</span></div><div class="who">👶 El mismo formulario del RN · en sala de partos o en cesárea</div></div>
+  <div class="body">
+    <div class="card"><div class="lbl">¿Dónde nació? (el SIVEC ya lo sabe por la sala donde está la mamá)</div>
+      <div class="chips"><span class="chip">🛏 Sala de partos</span><span class="chip on">🔪 Quirófano · cesárea</span><span class="chip">🏠 Domicilio / en camino</span></div></div>
+    <div class="cols c3" style="margin-top:12px">
+      <div class="card"><div class="lbl">① Quirófano · 10:40</div>
+        <div style="font-size:13px;line-height:1.6">Cesárea (Dr. Paz) · extracción 10:40<br>Pediatra recibe en <strong>cuna radiante del quirófano</strong><br>Atención inmediata: secar, calor, Apgar 1′/5′, <strong>aspirar solo si hace falta</strong><br>Pulsera mamá-bebé antes de salir</div>
+        <div class="mini" style="margin-top:6px">Mismas pantallas que en sala de partos (atención inmediata · examen · destino).</div></div>
+      <div class="card"><div class="lbl">② Sala de recuperación · 11:20</div>
+        <div style="font-size:13px;line-height:1.6">RN llega con la mamá · <strong>apego y lactancia en recuperación</strong><br>Pediatría completa: vitamina K, profilaxis ocular, medidas, examen físico, vestir</div>
+        <div class="mini" style="margin-top:6px">Si la mamá aún no puede: el RN va a observación y se anota la hora del apego.</div></div>
+      <div class="card"><div class="lbl">③ Control del binomio · cada 15 min</div>
+        <table class="lab"><thead><tr><th>Hora</th><th>👩 Mamá</th><th>👶 RN</th></tr></thead><tbody>
+          <tr><td>11:20</td><td>PA 118/74 · sangrado normal · útero contraído</td><td>T° 36,7 · FR 48 · rosado</td></tr>
+          <tr><td>11:35</td><td>PA 116/72 · dolor 3/10</td><td>mamando ✓</td></tr>
+          <tr><td>11:50</td><td>PA 114/70</td><td>T° 36,8</td></tr></tbody></table></div>
+    </div>
+    <div class="card" style="margin-top:12px;display:flex;gap:14px;align-items:center"><div style="font-size:26px">🔗</div><div style="font-size:13.5px;line-height:1.55">Cada registro va a <strong>dos lugares a la vez</strong>: lo de la mamá a su ficha, lo del bebé a su ficha propia, y un resumen del bebé aparece en la línea de tiempo de la mamá. <strong>En sala de partos, en quirófano o en recuperación el flujo es el mismo;</strong> solo cambia el lugar que queda anotado.</div></div>
+  </div>
+</section>
+
+<!-- ============ Q7 ============ -->
+<section class="scr" id="q7">
+  <div class="app"><div class="brand">SIVEC <span>LÍNEA DE TIEMPO</span></div><div class="who">🔗 Mamá y bebé · dos fichas vinculadas</div></div>
+  <div class="body">
+    <div class="tl2">
+      <div class="tlc" style="background:#f7e9ef"><h4>👩 Carla Torres · su ficha</h4>
+        <div class="ev"><small>12/06 · C.S. San Luis</small>1er control · embarazo 12 sem · riesgo moderado</div>
+        <div class="ev"><small>24/09 · C.S. San Luis</small>5º control · anemia leve · dTpa</div>
+        <div class="ev"><small>10/12 · Hosp. de la Mujer</small>Ingreso en trabajo de parto · partograma</div>
+        <div class="ev"><small>11/12 10:40 · Quirófano</small>Cesárea · indicación: desproporción (CLAP 03)</div>
+        <div class="ev lk"><small>11/12 10:40 · vinculado</small>👶 Nació su bebé · niña 3.250 g · Apgar 8/9 → <u>abrir ficha del RN</u></div>
+        <div class="ev"><small>11/12 11:20 · Recuperación</small>Binomio estable · apego y lactancia ✓</div>
+        <div class="ev"><small>13/12 · Alta</small>Implante · control día 7 agendado</div></div>
+      <div style="display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 70 60" width="70"><path d="M5 30 H65" stroke="#7d2a4c" stroke-width="3" stroke-dasharray="6 4"/><circle cx="35" cy="30" r="13" fill="#7d2a4c"/><text x="35" y="35" text-anchor="middle" font-size="14" fill="#fff">🔗</text></svg></div>
+      <div class="tlc" style="background:#e8f1fb"><h4>👶 RN de Carla Torres · ficha propia</h4>
+        <div class="ev"><small>heredado del embarazo</small>EG 39 sem · mamá O Rh+ · VIH – · sífilis – · madre con anemia · abuela diabética</div>
+        <div class="ev lk"><small>11/12 10:40 · Quirófano · Dr. Vargas 🖐</small>Nacimiento por cesárea · atención inmediata · Apgar 8/9 · sin reanimación</div>
+        <div class="ev"><small>11/12 11:20 · Recuperación</small>Vit. K · profilaxis ocular · 3.250 g · 50 cm · examen normal</div>
+        <div class="ev"><small>11/12 · Neonatología</small>BCG · hepatitis B · certificado de nacido vivo 🖐</div>
+        <div class="ev"><small>13/12 · Alta con la mamá</small>Tamizaje neonatal tomado · lactancia exclusiva</div>
+        <div class="ev"><small>18/12 · C.S. San Luis</small>Control del RN día 7 · Pediatría</div>
+        <div class="ev"><small>de aquí en adelante</small>vacunas, crecimiento y controles del niño sano</div></div>
+    </div>
+    <div class="mini" style="margin-top:10px;text-align:center">En Mi salud, Carla ve las dos fichas: la suya y la de su bebé (como “familia”).</div>
+  </div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  const NOTES = {
+    q1: '<b>Hoje vs. modelo SIVEC:</b> a HCP do CLAP tem ~450 casinhas numa folha só. O modelo recomendado (OMS SMART/DAK pré-natal + registro nas mãos da mulher + SIP do CLAP) segue 5 regras: cada dado uma vez, tela por momento, alertas automáticos, carnê no celular e HCP/SIP/SNIS gerados sozinhos. A tabela mostra onde cada seção da HCP é preenchida.',
+    q2: '<b>Resumo da gravidez:</b> tudo numa olhada — semanas, FPP, fórmula obstétrica, grupo, risco; os alertas (as antigas casinhas amarelas) no topo; antecedentes só o positivo; laboratórios por trimestre chegando do laboratório; vacinas e os 8 contatos.',
+    q3: '<b>Controle pré-natal guiado:</b> 6 passos como no kit digital da OMS. Sinais por toques com curvas de altura uterina e ganho de peso; a guia sugere o que fazer hoje e com um toque vira pedido de laboratório, vacina e receita. A linha da HCP se preenche sozinha.',
+    q4: '<b>App Mi embarazo:</b> o que a mãe vê — semana e tamanho do bebê, próximo controle e tarefas; o carnê com controles, exames e QR para mostrar em qualquer centro; plano de parto, sinais de alarme, contagem de movimentos e perguntas para o controle.',
+    q5: '<b>HCP oficial automática:</b> o sistema mostra quanto da HCP já está preenchido e o que falta; imprime o formato oficial ou SIVEC, carnê impresso para quem não tem celular, exporta ao SIP do CLAP e ao SNIS, com códigos CLAP/CIE-10 automáticos.',
+    q6: '<b>RN na sala de parto ou na recuperação:</b> o mesmo formulário da Pediatria funciona no parto normal e na cesárea: recepção no quirófano, completa na sala de recuperação com apego, e controle do binômio mãe-bebê a cada 15 min. Só muda o lugar registrado.',
+    q7: '<b>Duas linhas do tempo vinculadas:</b> na ficha da mãe aparece o nascimento com link para o bebê; o bebê tem a própria ficha, que herda os dados da gravidez e segue com vacinas e controles. No Mi salud a mãe vê as duas.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 'q1');
+</script>
+
+</body>
+</html>
