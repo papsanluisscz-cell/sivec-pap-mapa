@@ -213,3 +213,8 @@ Números animados com tendência, embudo "Del tamizaje al seguimiento", "Para ha
 - Vender o SIVEC PAP/VPH (estimativa do autor: USD 8.000–16.000), escalável por redes/centros.
 - Depois vender a **atualização para o SIVEC completo** (todos os módulos).
 - Pontos a resolver antes de vender: titularidade/direitos do software, hospedagem e backups profissionais, segurança (login+RLS), contrato de suporte e manutenção, adequação às regras de contratação pública.
+
+### [24/09/2026] Piloto, autoria e financeiro
+- **Piloto:** o SIVEC PAP/VPH já funciona como piloto no C.S. San Luis com dados **desde janeiro de 2026**. Usar esses dados como evidência na proposta (indicadores reais: tomas, tempo toma→entrega, % entregues, positivas com seguimento, cobertura por idade, busca ativa).
+- **Autoria:** a instituição quer dar ao autor um **reconhecimento e um documento de autoria** do programa. Depois, conversa sobre o **financeiro**.
+- Incluir na proposta a seção **"Modelo de implantação e sustentabilidade"** (implantação + suporte/manutenção, por centro/rede; valores a completar pelo autor).
