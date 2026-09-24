@@ -160,9 +160,11 @@
   <button class="tab" data-t="p2">2. Control prenatal</button>
   <button class="tab" data-t="p3">3. Riesgo y plan de parto</button>
   <button class="tab" data-t="p4">4. Partograma</button>
-  <button class="tab" data-t="p5">5. Parto y recién nacido</button>
-  <button class="tab" data-t="p6">6. Puerperio</button>
-  <button class="tab" data-t="p7">7. Embarazadas de la red</button>
+  <button class="tab" data-t="p5">5. Parto → entrega a Pediatría</button>
+  <button class="tab" data-t="p5a">6. RN · atención inmediata</button>
+  <button class="tab" data-t="p5b">7. RN · examen, ficha y destino</button>
+  <button class="tab" data-t="p6">8. Puerperio</button>
+  <button class="tab" data-t="p7">9. Embarazadas de la red</button>
 </div>
 <div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Basado en la historia clínica perinatal (CLAP/OPS) y el carnet perinatal, pero en digital y compartido entre centro, hospital y la app Mi salud.</div>
 
@@ -267,11 +269,62 @@
     <div class="cols c2">
       <div class="card"><div class="lbl">Parto</div>
         <div class="kv2"><span>Tipo</span><b>vaginal · posición semisentada</b></div><div class="kv2"><span>Hora</span><b>10:12</b></div><div class="kv2"><span>Alumbramiento</span><b>dirigido · placenta completa</b></div><div class="kv2"><span>Sangrado</span><b>300 mL</b></div><div class="kv2"><span>Desgarro</span><b>grado 1 · sutura</b></div><div class="kv2"><span>Atendió</span><b>Dra. Suárez · Int. Rojas 🖐</b></div></div>
-      <div class="card"><div class="lbl">Recién nacido</div>
-        <div class="vit2" style="grid-template-columns:repeat(4,1fr)"><div><small>Sexo</small>F</div><div><small>Peso</small>3.250 g</div><div><small>Talla</small>50 cm</div><div><small>PC</small>34 cm</div><div><small>Apgar 1′</small>8</div><div><small>Apgar 5′</small>9</div><div><small>EG</small>39 sem</div><div><small>Reanimación</small>no</div></div>
-        <div class="chk3" style="margin-top:8px"><span class="ok">✓ Apego precoz</span><span class="ok">✓ Pinzamiento tardío</span><span class="ok">✓ Lactancia 1ª hora</span><span class="ok">✓ Vitamina K</span><span class="ok">✓ Profilaxis ocular</span><span class="ok">✓ BCG / Hepatitis B</span><span class="no">⏳ Tamizaje neonatal</span></div></div>
+      <div class="card"><div class="lbl">Entrega del bebé a Pediatría</div>
+        <div class="kv2"><span>Nacimiento</span><b>10:12:40 · cefálico</b></div><div class="kv2"><span>Pinzamiento del cordón</span><b>10:14:10 · tardío (90 s)</b></div><div class="kv2"><span>Líquido amniótico</span><b>claro</b></div><div class="kv2"><span>Pediatra en sala</span><b>Dr. Vargas · avisado 09:55 ✓</b></div>
+        <div style="margin-top:10px;display:flex;gap:8px;align-items:center;background:#f3f8fd;border:1px solid #cfe0f1;border-radius:12px;padding:9px 11px;font-size:13.5px"><span style="font-size:22px">🤝</span><div><strong>Entregado 10:14:20</strong> · Obstetra Dra. Suárez 🖐 → Pediatra Dr. Vargas 🖐<br><span style="color:var(--soft)">desde aquí el RN tiene su propia ficha y su propio reloj</span></div></div>
+        <div class="mini" style="margin-top:8px">Al pasar a “expulsivo”, el SIVEC avisa a Pediatría con los riesgos del bebé (EG, líquido meconial, FCF alterada, diabetes, RPM…).</div></div>
     </div>
-    <div class="card" style="margin-top:12px;display:flex;gap:16px;align-items:center"><div style="font-size:30px">🪪</div><div style="font-size:13.5px;line-height:1.55">Al registrar el parto: <b>el bebé recibe su propia ficha SIVEC</b> (vinculada a la mamá), sale el <b>certificado de nacido vivo</b> para firmar con huella, y el C.S. San Luis recibe aviso para el control del RN y la vacunación.</div></div>
+    <div class="card" style="margin-top:12px;display:flex;gap:16px;align-items:center"><div style="font-size:30px">🪪</div><div style="font-size:13.5px;line-height:1.55"><b>Dos responsables, dos fichas:</b> Obstetricia sigue con la mamá (alumbramiento, sangrado, sutura) y <b>Pediatría recibe al bebé</b> al cortar el cordón. Las dos pantallas corren al mismo tiempo en la sala de partos.</div></div>
+  </div>
+</section>
+
+<!-- ============ P5a ============ -->
+<section class="scr" id="p5a">
+  <div class="app"><div class="brand">SIVEC <span>NEONATOLOGÍA</span></div><div class="who">👶 RN de Lucía F. · nacida 10:12 · Pediatra Dr. Vargas · ⏱ 00:06:10</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Atención inmediata · cada toque guarda la hora</div>
+        <table class="l"><thead><tr><th style="width:70px">Hora</th><th>Paso</th><th>Registro</th></tr></thead><tbody>
+          <tr><td>10:13:40</td><td><strong>Apgar 1′</strong></td><td>8 (sobre la mamá, cordón aún pulsando) · <span style="color:var(--soft)">FC 2 · resp 2 · tono 1 · reflejos 2 · color 1</span></td></tr>
+          <tr><td>10:14:20</td><td><strong>Recibe en cuna radiante</strong></td><td>cuna precalentada 36,5 °C ✓</td></tr>
+          <tr><td>10:14:30</td><td><strong>Secar y abrigar</strong></td><td>secado, cambio de campo, gorro ✓</td></tr>
+          <tr><td>10:14:40</td><td><strong>¿Respira / llora? ¿Tono?</strong></td><td>llora fuerte · buen tono → <span class="st ok">sin reanimación</span></td></tr>
+          <tr><td>10:14:45</td><td><strong>Aspiración</strong></td><td>no necesaria (líquido claro) · <span style="color:var(--soft)">no rutinaria</span></td></tr>
+          <tr><td>10:16:00</td><td><strong>Apego piel a piel</strong></td><td>con la mamá · lactancia iniciada 10:40 ✓</td></tr>
+          <tr><td>10:17:40</td><td><strong>Apgar 5′</strong></td><td>9</td></tr>
+          <tr><td>10:20:00</td><td><strong>Identificación</strong></td><td>pulsera mamá-bebé <strong>#RN-2026-0917</strong> · huella plantar 🦶</td></tr>
+          <tr><td style="color:var(--soft)">≈ 11:15</td><td><strong>Después del apego</strong></td><td>vitamina K · profilaxis ocular · peso y medidas · vestir</td></tr>
+        </tbody></table></div>
+      <div>
+        <div class="card"><div class="lbl">Apgar con toques</div>
+          <div class="vit2" style="grid-template-columns:repeat(5,1fr)"><div><small>FC</small>2</div><div><small>Resp.</small>2</div><div><small>Tono</small>1</div><div><small>Reflejo</small>2</div><div><small>Color</small>1</div></div>
+          <div style="text-align:center;font-size:13px;margin-top:6px">1′ = <strong style="font-size:22px">8</strong> &nbsp; 5′ = <strong style="font-size:22px">9</strong> &nbsp; 10′ = <span style="color:var(--soft)">solo si &lt; 7</span></div>
+          <div class="mini" style="margin-top:6px">El reloj arranca solo al registrar el nacimiento y avisa a los 1, 5 y 10 min.</div></div>
+        <div class="card" style="margin-top:12px;border:2px solid #fecaca"><div class="lbl" style="color:#991b1b">Si no respira: reanimación neonatal</div>
+          <div style="font-size:12.8px;line-height:1.55">① calor, posición, <strong>aspirar solo si obstruye</strong>, estimular (30 s)<br>② no respira o FC &lt; 100 → <strong>ventilación con bolsa</strong> (“minuto de oro”)<br>③ FC &lt; 60 → masaje + O₂ · ④ adrenalina</div>
+          <div class="mini" style="margin-top:6px">Un toque por paso: queda la hora exacta en la ficha del RN y se llama a UCIN.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ P5b ============ -->
+<section class="scr" id="p5b">
+  <div class="app"><div class="brand">SIVEC <span>NEONATOLOGÍA</span></div><div class="who">🩺 RN de Lucía F. · examen físico y destino · Dr. Vargas</div></div>
+  <div class="body">
+    <div class="cols c3" style="gap:12px">
+      <div class="card"><div class="lbl">Medidas y cuidados</div>
+        <div class="vit2" style="grid-template-columns:repeat(3,1fr)"><div><small>Peso</small>3.250 g</div><div><small>Talla</small>50 cm</div><div><small>PC</small>34 cm</div><div><small>T°</small>36,8</div><div><small>FC</small>142</div><div><small>FR</small>46</div></div>
+        <div class="mini" style="margin-top:6px">Curvas OMS: peso p50 · talla p50 · <strong>AEG</strong> (adecuado para la edad gestacional). EG por Capurro: 39 sem.</div>
+        <div class="chk3" style="margin-top:8px"><span class="ok">✓ Vitamina K 1 mg IM · 11:12</span><span class="ok">✓ Profilaxis ocular · 11:13</span><span class="ok">✓ Vestido y abrigado · 11:20</span><span class="ok">✓ BCG · Hepatitis B</span><span class="no">⏳ Tamizaje neonatal (48–72 h)</span></div></div>
+      <div class="card"><div class="lbl">Examen físico del RN · por toques</div>
+        <div class="chk3"><span class="ok">✓ Piel rosada · sin ictericia</span><span class="ok">✓ Fontanela normotensa</span><span class="ok">✓ Paladar íntegro</span><span class="ok">✓ Tórax y soplo: normal</span><span class="ok">✓ Abdomen · cordón 2A-1V</span><span class="ok">✓ Genitales femeninos normales</span><span class="ok">✓ Ano permeable</span><span class="ok">✓ Caderas (Ortolani) negativo</span><span class="ok">✓ Reflejos: succión, Moro</span><span class="no">⏳ 1ª micción / meconio</span></div></div>
+      <div class="card"><div class="lbl">Destino del bebé</div>
+        <div class="chips"><span class="chip on">Alojamiento conjunto</span><span class="chip">Observación</span><span class="chip">UCIN / Neonatología</span><span class="chip">Referir a 3er nivel</span></div>
+        <div class="mini" style="margin-top:8px">Si elige UCIN o referir: la cama y la ambulancia se piden desde aquí.</div>
+        <div style="margin-top:10px;font-size:13px;line-height:1.55;border-top:1px dashed var(--line);padding-top:8px">🪪 <strong>Ficha SIVEC propia</strong> (vinculada a la mamá)<br>📄 <strong>Certificado de nacido vivo</strong> · firma 🖐<br>🏥 Aviso al C.S. San Luis: control RN día 3–7<br>📱 Mi salud: carnet del bebé y vacunas</div></div>
+    </div>
+    <div class="card" style="margin-top:12px;display:flex;gap:16px;align-items:center"><div style="font-size:28px">🔀</div><div style="font-size:13.5px;line-height:1.55"><strong>2º y 3er nivel:</strong> este formulario lo llena <b>Pediatría</b> y lo firma el pediatra (el interno puede registrar, el residente valida). <strong>1er nivel sin pediatra:</strong> el mismo formulario lo llena quien atiende el parto (médico/a o licenciada), con las mismas alertas.</div></div>
   </div>
 </section>
 
@@ -312,7 +365,9 @@
     p2: '<b>Controle pré-natal:</b> sinais em uma linha, curvas de altura uterina e ganho de peso com faixa normal, conduta por toques, alertas (anemia, curva de glicose, dTpa) e próximo controle já agendado.',
     p3: '<b>Risco e plano de parto:</b> fatores de risco reunidos da história, classificação (ARO → referir com um toque), plano de parto (onde, como chega, casa materna, acompanhante) e preferências culturais.',
     p4: '<b>Partograma:</b> dilatação por hora com linhas de alerta e ação; frequência cardíaca fetal, contrações, descida e membranas. No 1º nível o mesmo partograma, com botão para referir se cruzar a linha.',
-    p5: '<b>Parto e recém-nascido:</b> registro do parto; RN com peso, Apgar e cuidados (apego, vitamina K, BCG…). O bebê ganha a própria ficha ligada à mãe, sai o certificado de nascido vivo e o centro é avisado.',
+    p5: '<b>Parto → entrega à Pediatria:</b> a obstetra registra o parto e o corte do cordão; o bebê é entregue ao pediatra com hora e as duas huellas. Obstetrícia segue com a mãe, Pediatria com o bebê.',
+    p5a: '<b>Atenção imediata do RN (Pediatria):</b> cada passo com a hora exata — berço aquecido, secar e aquecer, respira?, aspirar só se precisar, Apgar 1′ e 5′ com relógio, apego, pulseira mãe-bebê. Se não respira, o fluxo de reanimação neonatal passo a passo.',
+    p5b: '<b>Exame, ficha e destino do RN:</b> medidas com curvas, vitamina K, profilaxia ocular, vestir, vacinas, exame físico por toques e destino (alojamento conjunto, UCIN, referir). O bebê ganha a própria ficha e o certificado de nascido vivo. No 1º nível sem pediatra, quem atende o parto preenche o mesmo formulário.',
     p6: '<b>Puerpério:</b> controles do dia 7 e 40 já agendados, planejamento familiar, triagem de depressão pós-parto e sinais de alarma da mãe e do bebê pelo Mi salud.',
     p7: '<b>Gestantes da rede:</b> quantas em controle, alto risco, captação no 1º trimestre e lista para buscar hoje (faltou à consulta, sem plano de parto, passou da data).',
   };

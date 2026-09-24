@@ -468,3 +468,13 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 5. Parto e RN: registro do parto, RN (peso, Apgar, cuidados); o bebê ganha ficha própria ligada à mãe; certificado de nascido vivo com digital; aviso ao centro.
 6. Puerpério: controles dia 7 e 40 agendados, planejamento familiar (liga ao módulo "Métodos" do SIVEC PAP), triagem de depressão pós-parto (Edimburgo), sinais de alarma mãe/bebê pelo Mi salud.
 7. Gestantes da rede: em controle, alto risco, captação no 1º trimestre e lista para buscar hoje.
+
+### Materno · atención inmediata del RN por Pediatría (2º nivel) — agregado
+- Al pasar a “expulsivo”, el SIVEC avisa a Pediatría con los riesgos del bebé.
+- **Entrega obstetra → pediatra** con hora exacta y las dos huellas; desde ahí el RN tiene su propia ficha y su propio reloj. Obstetricia sigue con la mamá y Pediatría con el bebé, en dos pantallas al mismo tiempo.
+- **Atención inmediata con hora en cada toque:** cuna radiante, secar y abrigar, ¿respira?, aspiración solo si hace falta, Apgar 1′/5′ (10′ si < 7) con reloj automático, apego, pulsera mamá-bebé + huella plantar, y luego vitamina K, profilaxis ocular, medidas y vestir.
+- **Reanimación neonatal paso a paso** (minuto de oro): cada paso queda con su hora y se llama a UCIN.
+- **Examen físico del RN por toques**, curvas OMS/Capurro, vacunas BCG/HepB y tamizaje neonatal.
+- **Destino del bebé:** alojamiento conjunto, observación, UCIN o referir (la cama y la ambulancia se piden desde ahí). También salen la ficha propia, el certificado de nacido vivo y el aviso al centro.
+- **1er nivel sin pediatra:** el mismo formulario lo llena quien atiende el parto.
+- Imágenes: docs/materno-05 (entrega), 06 (atención inmediata), 07 (examen y destino).
