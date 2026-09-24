@@ -409,6 +409,40 @@
   #loginBox { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 32px; width: 340px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
   #loginBox .field input { width: 100%; }
   #blocker button { background: var(--teal-700); color: #fff; border: none; padding: 9px 18px; border-radius: 7px; cursor: pointer; font-size: 13.5px; }
+  /* ===== Ficha de la paciente ===== */
+  .patientCard { cursor: pointer; }
+  .patientCard.fichaSel { outline: 2px solid var(--teal-700); outline-offset: -1px; }
+  #fichaDrawer { position: fixed; inset: 0; z-index: 940; pointer-events: none; }
+  #fichaBackdrop { position: absolute; inset: 0; background: rgba(30,10,20,.25); opacity: 0; transition: opacity .25s; }
+  #fichaPanel { position: absolute; top: 0; right: 0; height: 100%; width: min(460px, 100%); background: var(--surface); color: var(--ink); box-shadow: -10px 0 40px rgba(60,20,40,.22); transform: translateX(105%); transition: transform .35s cubic-bezier(.2,.7,.2,1); display: flex; flex-direction: column; }
+  #fichaDrawer.open { pointer-events: auto; } #fichaDrawer.open #fichaBackdrop { opacity: 1; } #fichaDrawer.open #fichaPanel { transform: none; }
+  .fxHead { padding: 18px 18px 14px; background: linear-gradient(135deg, color-mix(in srgb, var(--teal-700) 10%, var(--surface)), var(--surface)); border-bottom: 1px solid var(--line); position: relative; }
+  .fxClose { position: absolute; right: 12px; top: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); width: 30px; height: 30px; border-radius: 8px; cursor: pointer; }
+  .fxId { display: flex; gap: 12px; align-items: flex-start; padding-right: 36px; }
+  .fxId b { font-size: 17px; display: block; } .fxId small { display: block; color: var(--ink-soft); font-size: 12.5px; margin-top: 2px; }
+  .fxAv { width: 48px; height: 48px; border-radius: 50%; background: var(--teal-700); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; }
+  .fxPills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; align-items: center; }
+  .fxPills .pcPaso { margin-top: 0; }
+  .fxPill { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 3px 9px; background: var(--paper); color: var(--ink-soft); border: 1px solid var(--line); }
+  .fxPill.violet { background: #efe7ff; color: #5b21b6; border-color: #ddd0f7; } .fxPill.amber { background: #fff4d6; color: #8a5300; border-color: #f7dd9c; } .fxPill.red { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+  .fxBody { padding: 16px 18px; overflow-y: auto; flex: 1; }
+  .fxBody h4 { margin: 0 0 12px; font-size: 11.5px; letter-spacing: .5px; text-transform: uppercase; color: var(--ink-soft); }
+  .fxEv { position: relative; padding: 0 0 18px 28px; animation: fxIn .4s ease both; }
+  @keyframes fxIn { from { opacity: 0; transform: translateX(10px); } }
+  .fxEv::before { content: ""; position: absolute; left: 8px; top: 20px; bottom: 0; width: 2px; background: var(--line); }
+  .fxEv:last-of-type::before { display: none; }
+  .fxEv > i { position: absolute; left: 0; top: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--surface); border: 3px solid currentColor; }
+  .fxEv.alto { color: #dc2626; } .fxEv.bajo { color: #d97706; } .fxEv.neg { color: #16a34a; } .fxEv.pend { color: #2f6fb0; } .fxEv.colpo { color: #7c3aed; } .fxEv.met { color: #9a8690; }
+  .fxDate { font-size: 11.5px; color: var(--ink-soft); } .fxTit { font-size: 13.5px; font-weight: 700; color: var(--ink); margin: 1px 0 3px; }
+  .fxLine { font-size: 12.5px; color: var(--ink); margin-top: 2px; }
+  .fxRes { font-weight: 700; } .fxRes.alto { color: #dc2626; } .fxRes.bajo { color: #b45309; } .fxRes.neg { color: #15803d; } .fxRes.pend { color: #2f6fb0; }
+  body.dark .fxRes.alto { color: #fca5a5; } body.dark .fxRes.bajo { color: #fcd34d; } body.dark .fxRes.neg { color: #6ee7b7; } body.dark .fxRes.pend { color: #93c5fd; }
+  .fxMut { color: var(--ink-soft); } .fxWarn { color: #b45309; font-weight: 600; }
+  .fxLink { border: none; background: none; color: var(--teal-700); font-size: 11.5px; text-decoration: underline; cursor: pointer; padding: 0 0 0 6px; font-weight: 500; }
+  .fxFoot { display: flex; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--line); background: var(--surface); }
+  .fxBtn { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 9px; padding: 9px 14px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .fxBtn.primary { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
+  @media (prefers-reduced-motion: reduce) { #fichaPanel, .fxEv { transition: none !important; animation: none !important; } }
   /* ===== Panel ===== */
   #panelView { --pn-grid: color-mix(in srgb, var(--line) 70%, transparent); --pn-one: #7d2a4c; --pn-good: #16a34a; --pn-warn: #d97706; --pn-crit: #dc2626; --pn-mute: #9a8690; }
   body.dark #panelView { --pn-one: #e88fb0; --pn-good: #4ade80; --pn-warn: #fbbf24; --pn-crit: #f87171; --pn-mute: #9d8490; }
@@ -2014,6 +2048,8 @@ function renderPatientCards(data, base) {
     const atrasado = estado === 'Pendiente' && fechaEst && fechaEst < hoy;
     const card = document.createElement('div');
     card.className = 'patientCard';
+    card.dataset.id = p.id;
+    card.title = 'Tocá para ver la ficha y la línea de tiempo';
     card.style.borderLeftColor = COLORS[estado];
     const paso = proximoPaso(p), bet = bethesdaDe(p), fueraEdad = fueraDeRangoEdad(p);
     const ctrl = paso.key === 'anterior' ? null : proximoControlDe(p);
@@ -2903,6 +2939,114 @@ async function deletePatient(p) {
   showToast('Paciente movida a la Papelera ✔', 'ok');
   loadList();
 }
+
+// ================= Ficha de la paciente (línea de tiempo) =================
+// Base del futuro "Historial" del SIVEC: todas las tomas, resultados, entregas, seguimientos y colposcopias
+// de la misma paciente (agrupadas por carnet o nombre + nacimiento), de la más reciente a la más antigua.
+let fichaPaciente = null;
+function fichaEl() {
+  let d = document.getElementById('fichaDrawer');
+  if (!d) {
+    d = document.createElement('div'); d.id = 'fichaDrawer';
+    d.innerHTML = '<div id="fichaBackdrop"></div><aside id="fichaPanel" aria-label="Ficha de la paciente"></aside>';
+    document.body.appendChild(d);
+    d.querySelector('#fichaBackdrop').addEventListener('click', closeFicha);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && d.classList.contains('open')) closeFicha(); });
+  }
+  return d;
+}
+function closeFicha() {
+  const d = document.getElementById('fichaDrawer'); if (d) d.classList.remove('open');
+  document.querySelectorAll('.patientCard.fichaSel').forEach(c => c.classList.remove('fichaSel'));
+}
+function fichaEventos(grupo, colpos) {
+  const ev = [];
+  grupo.forEach(p => {
+    const bet = bethesdaDe(p), nivel = bet && BETHESDA_BY_CODE[bet].nivel;
+    const soloVph = esSoloVph(p);
+    const tipo = soloVph ? 'Prueba de VPH' : (p.hizo_prueba_vph || p.resultado_vph ? 'Toma PAP + VPH' : 'Toma de PAP');
+    const lineas = [];
+    if (!soloVph) {
+      if (bet) lineas.push(`<span class="fxRes ${nivel}">PAP: ${esc(bet)}</span>${normTxtGeo(p.resultado_pap) !== normTxtGeo(bet) ? ` <span class="fxMut">${esc(String(p.resultado_pap).slice(0, 60))}</span>` : ''}`);
+      else if (p.estado_pap === 'Positivo' || p.estado_pap === 'Negativo') lineas.push(`<span class="fxRes ${p.estado_pap === 'Positivo' ? 'alto' : 'neg'}">PAP: ${esc(p.estado_pap)}</span>`);
+      else lineas.push(`<span class="fxRes pend">PAP: esperando resultado</span>${p.fecha_estimada || p.fecha_toma ? ` <span class="fxMut">· estimado ${fmtFecha(p.fecha_estimada || addDays(p.fecha_toma, 90))}</span>` : ''}`);
+    }
+    if (p.resultado_vph) lineas.push(`<span class="fxRes ${p.resultado_vph === 'Positiva' ? 'alto' : 'neg'}">VPH: ${esc(p.resultado_vph)}${p.vph_genotipo ? ' · genotipo ' + esc(p.vph_genotipo) : ''}</span>`);
+    else if (p.hizo_prueba_vph || soloVph) lineas.push('<span class="fxRes pend">VPH: esperando resultado</span>');
+    const conRes = bet || p.estado_pap === 'Positivo' || p.estado_pap === 'Negativo' || p.resultado_vph;
+    if (conRes) lineas.push(p.recibio_resultado ? `✅ Resultado entregado${p.fecha_recibio_resultado ? ' el ' + fmtFecha(p.fecha_recibio_resultado) : ''}` : '<span class="fxWarn">📬 Resultado no entregado</span>');
+    if (p.seguimiento_pap) lineas.push(`🩺 Seguimiento PAP: ${esc(p.seguimiento_pap)}${p.fecha_seguimiento_pap ? ' (' + fmtFecha(p.fecha_seguimiento_pap) + ')' : ''}`);
+    if (p.derivacion_pap) lineas.push(`➡️ Derivada a: ${esc(p.derivacion_pap)}`);
+    if (p.seguimiento_vph || p.recibio_tratamiento_vph) lineas.push(`🩺 Seguimiento VPH: ${esc(p.seguimiento_vph || 'tratamiento recibido')}${p.fecha_seguimiento_vph ? ' (' + fmtFecha(p.fecha_seguimiento_vph) + ')' : ''}`);
+    if (p.observaciones) lineas.push(`<span class="fxMut">📝 ${esc(String(p.observaciones).slice(0, 140))}</span>`);
+    const ctrl = proximoControlDe(p);
+    if (ctrl && p.recibio_resultado) lineas.push(`<span class="fxMut">📅 Próximo control: ${fmtFecha(ctrl)}</span>`);
+    const tono = nivel === 'alto' || p.resultado_vph === 'Positiva' || p.estado_pap === 'Positivo' ? 'alto' : nivel === 'bajo' ? 'bajo' : conRes ? 'neg' : 'pend';
+    ev.push({ fecha: p.fecha_toma || '', tono, titulo: tipo, meta: [p.doctora, p.numero_folio_pap ? 'N° ' + p.numero_folio_pap : ''].filter(Boolean).join(' · '), lineas, id: p.id });
+    if (p.anticonceptivo_metodo && p.anticonceptivo_fecha_inicio) ev.push({ fecha: p.anticonceptivo_fecha_inicio, tono: 'met', titulo: 'Método anticonceptivo: ' + esc(p.anticonceptivo_metodo), meta: '', lineas: p.anticonceptivo_proximo_control ? [`<span class="fxMut">Próximo control: ${fmtFecha(p.anticonceptivo_proximo_control)}</span>`] : [] });
+  });
+  (colpos || []).forEach(c => ev.push({ fecha: c.fecha || '', tono: 'colpo', titulo: 'Colposcopia', meta: '', lineas: [c.lesion ? 'Lesión: ' + esc(c.lesion) : '', c.zona_afectada ? 'Zona: ' + esc(c.zona_afectada) : '', c.prueba_schiller ? 'Schiller: ' + esc(c.prueba_schiller) : ''].filter(Boolean) }));
+  return ev.sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
+}
+async function openFicha(p) {
+  fichaPaciente = p;
+  const d = fichaEl(), panel = d.querySelector('#fichaPanel');
+  const info = tomasIndex.get(p.id), grupo = info ? info.grupo : [p];
+  const ultima = grupo[grupo.length - 1];
+  const paso = proximoPaso(ultima), edad = edadDe(ultima.fecha_nacimiento), fuera = fueraDeRangoEdad(ultima);
+  const ini = String(p.nombre || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(s => s[0]).join('').toUpperCase();
+  const gen = grupo.map(x => x.vph_genotipo).filter(Boolean).pop();
+  const render = colpos => {
+    const ev = fichaEventos(grupo, colpos);
+    panel.innerHTML = `
+      <div class="fxHead">
+        <button type="button" class="fxClose" onclick="closeFicha()" aria-label="Cerrar">✕</button>
+        <div class="fxId"><span class="fxAv">${esc(ini)}</span><div><b>${esc(ultima.nombre)}</b>
+          <small>${ultima.carnet ? 'CI ' + esc(ultima.carnet) : 'Sin carnet'}${edad != null ? ' · ' + edad + ' años' : ''}${ultima.celular ? ' · 📞 ' + esc(ultima.celular) : ''}</small>
+          ${ultima.direccion ? `<small>📍 ${esc(ultima.direccion)}</small>` : ''}</div></div>
+        <div class="fxPills"><span class="pcPaso tone-${paso.tone}">➜ ${esc(paso.txt)}</span>${gen ? `<span class="fxPill violet">VPH ${esc(gen)}</span>` : ''}<span class="fxPill">${grupo.length} toma${grupo.length > 1 ? 's' : ''}</span>${fuera ? `<span class="fxPill amber">fuera de rango ${fuera.tipo}</span>` : ''}${info && info.mismaFecha ? '<span class="fxPill red">⚠ posible duplicado</span>' : ''}</div>
+      </div>
+      <div class="fxBody"><h4>Línea de tiempo</h4>
+        ${ev.map((e, i) => `<div class="fxEv ${e.tono}" style="animation-delay:${Math.min(i, 10) * 60}ms"><i></i>
+          <div class="fxDate">${e.fecha ? fmtFecha(e.fecha) : 'Sin fecha'}${e.meta ? ' · ' + esc(e.meta) : ''}</div>
+          <div class="fxTit">${e.titulo}${e.id != null && grupo.length > 1 ? ` <button type="button" class="fxLink" data-edit="${esc(e.id)}">editar esta toma</button>` : ''}</div>
+          ${e.lineas.map(l => `<div class="fxLine">${l}</div>`).join('')}</div>`).join('')}
+        ${colpos === null ? '<div class="fxMut" style="padding-left:26px">Cargando colposcopias…</div>' : ''}
+      </div>
+      <div class="fxFoot"><button type="button" class="fxBtn primary" data-act="edit">Editar</button><button type="button" class="fxBtn" data-act="print">Imprimir</button><button type="button" class="fxBtn" data-act="nueva">+ Nueva toma</button></div>`;
+  };
+  render(null);
+  d.classList.add('open');
+  panel.scrollTop = 0;
+  panel.onclick = e => {
+    const ed = e.target.closest('[data-edit]');
+    if (ed) { const t = grupo.find(x => String(x.id) === ed.dataset.edit); if (t) { closeFicha(); openEdit(t); } return; }
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    if (b.dataset.act === 'edit') { closeFicha(); openEdit(ultima); }
+    if (b.dataset.act === 'print') printPatientDocs(ultima);
+    if (b.dataset.act === 'nueva') { closeFicha(); nuevaTomaDe(ultima); }
+  };
+  const { data } = await sb.from('colposcopias').select('*').in('paciente_id', grupo.map(x => x.id)).order('fecha', { ascending: false });
+  if (fichaPaciente === p) render(data || []);
+}
+// "+ Nueva toma": abre Registrar con los datos personales ya completados.
+function nuevaTomaDe(p) {
+  switchView('form');
+  const f = document.getElementById('patientForm');
+  ['nombre', 'carnet', 'fecha_nacimiento', 'celular', 'direccion', 'estado_civil', 'ocupacion', 'doctora'].forEach(k => { if (f[k] && p[k] != null) f[k].value = p[k]; });
+  if (f.fecha_nacimiento) f.fecha_nacimiento.dispatchEvent(new Event('change'));
+  showToast('Datos de la paciente cargados. Completá los de la nueva toma.', 'ok');
+  f.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+// Tocar la tarjeta (fuera de los botones) abre la ficha
+document.getElementById('tableBody').addEventListener('click', e => {
+  if (e.target.closest('button, a, .moreWrap, input, select')) return;
+  const card = e.target.closest('.patientCard'); if (!card) return;
+  const p = currentPatients.find(x => String(x.id) === String(card.dataset.id)); if (!p) return;
+  document.querySelectorAll('.patientCard.fichaSel').forEach(c => c.classList.remove('fichaSel'));
+  card.classList.add('fichaSel');
+  openFicha(p);
+});
 
 // ================= Panel =================
 let pnData = [];

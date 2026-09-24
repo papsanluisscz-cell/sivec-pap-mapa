@@ -190,3 +190,11 @@ O autor aprovou o esboço `docs/esboco-redes-centros.html` (painel de administra
 
 ### [23/09/2026] Panel novo (esboço `docs/esboco-panel.html`, aguardando aprovação)
 Números animados com tendência, embudo "Del tamizaje al seguimiento", "Para hacer hoy", barras em vez de tortas, filtros de período e doutora, modo escuro.
+
+### [24/09/2026] Linha do tempo da paciente — IMPLEMENTADA no PAP/VPH e base do "Historial" do SIVEC
+
+**Decisão do autor:** a ficha lateral com **linha do tempo** é exatamente o modelo de história clínica que se quer para o **SIVEC completo** (não só PAP).
+- Já implementada no SIVEC PAP/VPH (aba Pacientes → tocar a paciente): identificação, próximo passo, alertas e todos os eventos em ordem (tomas, resultados PAP/Bethesda, VPH e genótipo, entregas, seguimento, derivação, colposcopias, método anticonceptivo, próximo controle), com botões Editar / Imprimir / Nova toma.
+- **No SIVEC completo** a mesma linha do tempo recebe eventos de todos os módulos, cada um com ícone/cor própria e o **centro** onde aconteceu:
+  consultas, **resultados de laboratório** (valores + referência), **imagens e laudos** (RX/eco), receitas, vacinas, programas (TB, Chagas, Raiva…), derivações/contrarreferências, internações.
+- Filtros por tipo de evento e por período; no topo, o **Resumo clínico** (alergias, resistências, antecedentes) e a foto da recepção.
