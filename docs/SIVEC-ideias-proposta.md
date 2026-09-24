@@ -218,3 +218,26 @@ Números animados com tendência, embudo "Del tamizaje al seguimiento", "Para ha
 - **Piloto:** o SIVEC PAP/VPH já funciona como piloto no C.S. San Luis com dados **desde janeiro de 2026**. Usar esses dados como evidência na proposta (indicadores reais: tomas, tempo toma→entrega, % entregues, positivas com seguimento, cobertura por idade, busca ativa).
 - **Autoria:** a instituição quer dar ao autor um **reconhecimento e um documento de autoria** do programa. Depois, conversa sobre o **financeiro**.
 - Incluir na proposta a seção **"Modelo de implantação e sustentabilidade"** (implantação + suporte/manutenção, por centro/rede; valores a completar pelo autor).
+
+### [24/09/2026] Seguimento dentro da linha do tempo — "onde está a paciente agora" (SIVEC completo)
+**Ideia do autor:** a linha do tempo do SIVEC geral deve mostrar também o **seguimento**, para saber em que ponto do caminho a paciente está:
+- se já **fez os exames** pedidos ou ainda não;
+- se **foi ao laboratório** (amostra colhida, enviada, resultado pronto, entregue);
+- se foi **derivada** e se chegou ao outro serviço (contrarreferência);
+- se **faltou** ou **abandonou** (e há quantos dias).
+
+**Requisito:** funciona de verdade só com **todos os centros e redes no SIVEC geral** (não só o PAP), porque cada passo acontece num lugar diferente (centro, laboratório, hospital, Oncológico).
+
+**Sugestão do Claude:** no topo da ficha, uma **barra de etapas** do caso aberto (ex.: *Pedido → Laboratório → Resultado → Entregue → Tratamento → Alta*), com a etapa atual destacada, o centro responsável e os dias parado nela; cada etapa concluída vira um evento da linha do tempo. Casos parados há mais de X dias aparecem no Panel da rede ("para resgatar"). No PAP/VPH já existe uma versão disso (Seguimiento por etapas).
+
+### [24/09/2026] Consulta com figuras (SOAP visual) — APROVADO e em implementação
+- S e O com toques: sintomas, tempo de evolução, dados gineco-obstétricos, aspecto do colo, secreção em gotas, cor em amostras de cor.
+- A e P: diagnósticos com sugestão (a doutora decide), **tratamento em cartões com ícone**, e a possibilidade de **acrescentar medicamentos e ícones próprios**.
+- **Seletor de especialidade** com o código que vai no D1 (controle): Medicina general **17576016** · Ginecología **17576012**.
+- O SOAP continua saindo na **folha de Historia clínica** oficial, como antes.
+- Colposcopia com o **relógio do colo** (lesões por hora).
+
+### [24/09/2026] Formulários próprios do SIVEC
+**Ideia do autor:** criar **formulários próprios** do SIVEC, baseados nos oficiais que já usamos (D1, D8, PAP, Consentimento, Historia clínica), gerados pelo sistema na hora de imprimir, com letra mais legível e espaço para as figuras (ex.: relógio do colo na HC).
+- Esboço em `docs/esboco-formularios.html` (aguardando aprovação).
+- **Ponto a verificar na proposta:** quais formulários podem ser próprios e quais precisam manter o **modelo oficial do SUS/Ministério** (D1 e D8 costumam ser exigidos no formato oficial); para esses, o próprio pode reproduzir o mesmo layout com melhor letra.

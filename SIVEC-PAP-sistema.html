@@ -478,7 +478,7 @@
   /* ===== Consulta (SOAP) ===== */
   #consultaOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 960; padding: 16px; }
   #consultaOverlay.open { display: flex; }
-  #consultaModal { background: var(--surface); color: var(--ink); border-radius: 12px; padding: 22px 24px; width: 640px; max-width: 100%; max-height: 90vh; overflow-y: auto; }
+  #consultaModal { background: var(--surface); color: var(--ink); border-radius: 12px; padding: 22px 24px; width: 1040px; max-width: 100%; max-height: 90vh; overflow-y: auto; }
   #consultaModal h2 { margin: 0 0 14px; font-size: 18px; }
   #consultaModal .field, #regSoap .field { margin-bottom: 10px; }
   #consultaModal textarea, #consultaModal select, #consultaModal input, #regSoap textarea, #regSoap select, #regSoap input:not([type=checkbox]) { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 7px; font-size: 13.5px; font-family: inherit; background: var(--surface); color: var(--ink); }
@@ -491,6 +491,84 @@
   #consultaModal .actions button { padding: 9px 16px; border-radius: 7px; border: none; cursor: pointer; font-size: 13.5px; font-weight: 600; font-family: inherit; }
   #consultaModal .cancelBtn { background: var(--paper); color: var(--ink); } #consultaModal .saveBtn { background: var(--teal-700); color: #fff; }
   @media (max-width: 600px) { .soapO, .soapPlan { grid-template-columns: 1fr; } }
+  /* ---- Consulta con figuras ---- */
+  .soapV { --chipOn: #f7e2ea; --chipOnBd: #9c3a5f; --cardBg: #fff; }
+  body.dark .soapV { --chipOn: #43202f; --chipOnBd: #e88fb0; --cardBg: var(--surface); }
+  .cHead { display: grid; grid-template-columns: 180px 1fr; gap: 10px; max-width: 520px; }
+  .soapV .sEspRow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 2px 0 10px; }
+  .soapV .sEspRow .sLbl { margin: 0 6px 0 0; }
+  .soapV .sEsp small { color: var(--ink-soft); font-weight: 500; margin-left: 4px; }
+  .soapV .sGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .soapV .sCard.sFull { grid-column: 1 / -1; }
+  .soapV .sCard { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--cardBg); min-width: 0; }
+  .soapV .sCard h4 { margin: 0 0 8px; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  .soapV .sCard h4 i { font-style: normal; background: var(--teal-700); color: #fff; width: 24px; height: 24px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; }
+  body.dark .soapV .sCard h4 i { color: #211419; }
+  .soapV .sLbl { font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft); margin: 10px 0 5px; }
+  .soapV .sChips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .soapV .sChip { font: inherit; font-size: 13px; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--cardBg); color: var(--ink); cursor: pointer; line-height: 1.3; }
+  .soapV .sChip:hover { border-color: var(--teal-500); }
+  .soapV .sChip.on { background: var(--chipOn); border-color: var(--chipOnBd); color: var(--teal-900); font-weight: 700; }
+  .soapV .sDrops { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .soapV .sDrop { border-radius: 10px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 4px; }
+  .soapV .sDrop .dr { height: 16px; display: flex; gap: 2px; align-items: center; }
+  .soapV .sDrop .dr0 { color: var(--ink-soft); font-size: 18px; line-height: 10px; }
+  .soapV .sColors { display: flex; flex-wrap: wrap; gap: 4px; }
+  .soapV .sColor { border: none; background: none; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 6px; border-radius: 10px; font-size: 12px; }
+  .soapV .sColor .sw { width: 30px; height: 30px; border-radius: 50%; border: 1px solid rgba(0,0,0,.12); box-shadow: inset 0 -2px 4px rgba(0,0,0,.08); }
+  .soapV .sColor .sw.grum { background-image: radial-gradient(#fff 22%, transparent 24%); background-size: 8px 8px; }
+  .soapV .sColor.on { background: var(--chipOn); }
+  .soapV .sColor.on .sw { box-shadow: 0 0 0 3px var(--cardBg), 0 0 0 5px var(--chipOnBd); }
+  .soapV .gRow { display: flex; flex-wrap: wrap; gap: 6px; }
+  .soapV .gIn { display: flex; flex-direction: column; font-size: 11px; color: var(--ink-soft); gap: 2px; font-weight: 600; margin: 0 !important; }
+  .soapV .gIn input { width: 100% !important; padding: 6px 7px !important; font-size: 13px; }
+  .soapV textarea, .soapV input[data-s="observaciones"] { margin-top: 8px; width: 100%; }
+  .soapV .sSug { margin-top: 8px; background: #f1ebfa; border: 1px solid #ddd0f3; color: #3f2a66; border-radius: 10px; padding: 8px 10px; font-size: 12.5px; line-height: 1.7; }
+  body.dark .soapV .sSug { background: #2a2140; border-color: #43365f; color: #ddd0f3; }
+  .soapV .sSugBtn { font: inherit; font-weight: 700; font-size: 12.5px; border: 1px dashed #8b6cc4; background: transparent; color: inherit; border-radius: 999px; padding: 1px 9px; cursor: pointer; }
+  .soapV .sMut { opacity: .75; }
+  .soapV .sMedGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; }
+  .soapV .medCard { position: relative; font: inherit; text-align: left; display: flex; gap: 8px; align-items: flex-start; padding: 7px 9px; border-radius: 10px; border: 1px solid var(--line); background: var(--cardBg); color: var(--ink); cursor: pointer; }
+  .soapV .medCard:hover { border-color: var(--teal-500); }
+  .soapV .medCard.on { border-color: #2f9e62; background: #ecf8f1; }
+  body.dark .soapV .medCard.on { background: #173226; }
+  .soapV .medCard.on b::after { content: ' ✓'; color: #2f9e62; }
+  .soapV .mIco { font-size: 19px; line-height: 1.1; }
+  .soapV .mTx { display: flex; flex-direction: column; min-width: 0; }
+  .soapV .mTx b { font-size: 12.5px; }
+  .soapV .mTx small { font-size: 11px; color: var(--ink-soft); line-height: 1.3; }
+  .soapV .mDel { position: absolute; top: 2px; right: 6px; color: var(--ink-soft); font-size: 15px; }
+  .soapV .mDel:hover { color: #c0392b; }
+  .soapV .sAddMed { margin-top: 8px; font: inherit; font-size: 12.5px; font-weight: 700; color: var(--teal-700); background: none; border: 1px dashed var(--teal-500); border-radius: 9px; padding: 6px 12px; cursor: pointer; }
+  .soapV .sMedForm { margin-top: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--paper); }
+  .soapV .sIcons { display: flex; flex-wrap: wrap; gap: 4px; }
+  .soapV .sIco { font-size: 17px; width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--line); background: var(--cardBg); cursor: pointer; }
+  .soapV .sIco.on { border: 2px solid var(--chipOnBd); background: var(--chipOn); }
+  .soapV .mfD1 { display: flex !important; align-items: center; gap: 6px; font-size: 12.5px; margin: 8px 0 0 !important; font-weight: 500 !important; }
+  .soapV .mfD1 input { width: auto !important; }
+  .soapV .sMfBtns { display: flex; justify-content: flex-end; gap: 6px; margin-top: 6px; }
+  .soapV .sMfBtns button { font: inherit; font-size: 12.5px; font-weight: 600; border-radius: 7px; padding: 6px 12px; cursor: pointer; border: 1px solid var(--line); background: var(--cardBg); color: var(--ink); }
+  .soapV .sMfBtns .sMfOk { background: var(--teal-700); color: #fff; border-color: var(--teal-700); }
+  .soapV .sReceta { margin-top: 4px; }
+  .soapV .sRecRow { display: grid; grid-template-columns: 26px minmax(120px, 1fr) minmax(140px, 1.6fr) 56px; gap: 6px; align-items: center; font-size: 12.5px; padding: 3px 0; border-bottom: 1px dashed var(--line); }
+  .soapV .sRecRow input { padding: 5px 7px !important; font-size: 12.5px; width: 100%; }
+  .soapV .rNoD1 { text-align: center; color: var(--ink-soft); }
+  @media (max-width: 800px) { .soapV .sGrid { grid-template-columns: 1fr; } .soapV .sDrops { grid-template-columns: repeat(2, 1fr); } .soapV .sRecRow { grid-template-columns: 26px 1fr 56px; } .soapV .sRecRow b { grid-column: 2 / 4; } .soapV .sRecRow .rIndic { grid-column: 2; } }
+  .printEspLbl { color: #fff; font-size: 12.5px; display: flex; align-items: center; gap: 6px; margin-right: 6px; }
+  .printEspLbl select { font: inherit; font-size: 12.5px; padding: 5px 8px; border-radius: 7px; border: none; }
+  /* Mapa del cuello en colposcopia */
+  .cuelloWrap { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+  .cuelloSvg .cHr { cursor: pointer; transition: opacity .15s; } .cuelloSvg .cHr:hover { opacity: .8; }
+  .cuelloTools { display: flex; flex-direction: column; gap: 5px; min-width: 170px; }
+  .cuelloTools .cTool { font: inherit; font-size: 13px; display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; text-align: left; }
+  .cuelloTools .cTool i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+  .cuelloTools .cTool.on { border: 2px solid var(--teal-700); font-weight: 700; }
+  .cuelloRes { margin-top: 6px; font-size: 12.5px; background: var(--paper); border: 1px dashed var(--line); border-radius: 9px; padding: 7px 10px; color: var(--ink); }
+  .cLbl { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin-bottom: 4px; }
+  .cuelloChips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cuelloChips button { font: inherit; font-size: 12.5px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .cuelloChips button.on { background: #f7e2ea; border-color: #9c3a5f; color: #6d2142; font-weight: 700; }
+  body.dark .cuelloChips button.on { background: #43202f; border-color: #e88fb0; color: #f1a7c3; }
   /* ===== Balance: envíos ===== */
   .balTiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin: 4px 0 12px; }
   .balTile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
@@ -1098,6 +1176,7 @@
       <span id="printTitle">Documentos</span>
       <div class="printBoxActions">
         <span style="color:#cfe3e3;font-size:12px;align-self:center;margin-right:6px">Cada documento tiene su propio botón de imprimir ⎙ arriba a la derecha</span>
+        <label class="printEspLbl">Especialidad (D1) <select id="printEsp" onchange="cambiarEspImpresion(this.value)"></select></label>
         <button onclick="saveDocsToDrive()" class="primaryBtn" id="saveDriveBtn">Guardar en Drive</button>
         <button onclick="closePrintOverlay()" class="cancelBtn">Cerrar</button>
       </div>
@@ -1123,6 +1202,16 @@
           <select name="prueba_schiller"><option value="">— Seleccionar —</option><option>Positiva</option><option>Negativa</option></select>
         </div>
       </div>
+      <div id="cuelloBlock" class="field" style="display:none"><label>Mapa del cuello — 1) elegí el hallazgo · 2) tocá las horas donde está</label>
+        <div class="cuelloWrap"><div id="cuelloSvgBox"></div>
+          <div class="cuelloTools" id="cuelloTools"></div></div>
+        <div class="row2" style="margin-top:8px">
+          <div><div class="cLbl">Zona de transformación</div><div class="cuelloChips" data-cg="zt"><button type="button" data-v="Tipo 1">Tipo 1 (visible)</button><button type="button" data-v="Tipo 2">Tipo 2 (parcial)</button><button type="button" data-v="Tipo 3">Tipo 3 (no visible)</button></div></div>
+          <div><div class="cLbl">Impresión colposcópica</div><div class="cuelloChips" data-cg="impresion"><button type="button" data-v="Normal">Normal</button><button type="button" data-v="Cambios menores (bajo grado)">Cambios menores</button><button type="button" data-v="Cambios mayores (alto grado)">Cambios mayores</button><button type="button" data-v="Sospecha de invasión">Sospecha de invasión</button></div></div>
+        </div>
+        <div class="cuelloRes" id="cuelloRes"></div>
+      </div>
+      <div id="cuelloNota" class="segNote" style="display:none">🕐 Para marcar las lesiones en el <b>reloj del cuello</b>, ejecutá el Paso 6 del SQL en Supabase.</div>
       <div class="field"><label>Zona afectada</label>
         <select name="zona_afectada">
           <option value="">— Seleccionar —</option>
@@ -3369,54 +3458,351 @@ async function deletePatient(p) {
 // La nota de consulta (S-O-A-P) se guarda aparte de la colposcopia (tabla "consultas", Paso 5 del SQL).
 // Al imprimir, la Historia clínica junta la consulta + los hallazgos de la colposcopia.
 // Si la tabla todavía no existe, todo sigue como antes (el SOAP va dentro de la colposcopia).
-const SOAP_PLAN_OPC = ['Metronidazol 500mg VV x10 noches', 'Clotrimazol 500mg VV x10 noches', 'Aseo vulvoperineal', 'Orientación sexual', 'Cauterización'];
-let consultasTablaPromise = null;
+// Consulta "con figuras": casi todo se marca con toques (chips, gotas, colores, tarjetas de tratamiento)
+// y se convierte en texto clínico para la Historia clínica oficial (hoja 2, S-O-A-P), como antes.
+let consultasTablaPromise = null, consultasExtraPromise = null;
 function consultasOk() {
   if (!sb) return Promise.resolve(false);
   if (!consultasTablaPromise) consultasTablaPromise = sb.from('consultas').select('id').limit(1).then(({ error }) => !error, () => false);
   return consultasTablaPromise;
 }
+// Paso 6 del SQL: especialidad, código y el detalle de lo marcado (para volver a abrir la consulta con sus toques)
+function consultasExtraOk() {
+  if (!sb) return Promise.resolve(false);
+  if (!consultasExtraPromise) consultasExtraPromise = sb.from('consultas').select('detalle,especialidad,codigo_esp').limit(1).then(({ error }) => !error, () => false);
+  return consultasExtraPromise;
+}
+async function consultaFila(v) {
+  const row = Object.assign({}, v);
+  if (!(await consultasExtraOk())) { delete row.detalle; delete row.especialidad; delete row.codigo_esp; }
+  return row;
+}
+
+// ---- Especialidad (código que va en el D1: "Otro diagnóstico: T - código") ----
+const ESPECIALIDADES = [
+  { id: 'mg', nombre: 'Medicina general', codigo: '17576016' },
+  { id: 'gin', nombre: 'Ginecología', codigo: '17576012' },
+];
+function espBuscar(x) { return ESPECIALIDADES.find(e => e.id === x || e.codigo === x || e.nombre === x) || null; }
+function espPorDoctora(doctora) {
+  try { const m = JSON.parse(localStorage.getItem('sivec_esp_doctora') || '{}'); return espBuscar(m[doctora]) || ESPECIALIDADES[0]; } catch (e) { return ESPECIALIDADES[0]; }
+}
+function espRecordar(doctora, esp) {
+  if (!doctora || !esp) return;
+  try { const m = JSON.parse(localStorage.getItem('sivec_esp_doctora') || '{}'); m[doctora] = esp.id; localStorage.setItem('sivec_esp_doctora', JSON.stringify(m)); } catch (e) { /* sin almacenamiento */ }
+}
+
+// ---- Listas de la consulta ----
+const SOAP_SINTOMAS = ['Flujo vaginal', 'Prurito', 'Mal olor', 'Ardor al orinar', 'Dolor pélvico', 'Sangrado postcoital', 'Sangrado intermenstrual', 'Dispareunia', 'Asintomática (control)'];
+const SOAP_EVOL = ['< 1 semana', '1–4 semanas', '1–6 meses', '> 6 meses'];
+const SOAP_OCE = ['Íntegro', 'Eritematoso', 'Erosionado', 'Con Pólipo', 'Friable', 'Con Quiste de Naboth', 'Leucoplasia', 'Ectropión'];
+const SOAP_LEU = ['Ausente', 'Escasa', 'Moderada', 'Abundante'];
+const SOAP_COLOR = [['Blanquecina', '#f4f0e6'], ['Grumosa', '#efe4c8'], ['Amarillenta', '#e8cf55'], ['Verdosa', '#98bd62'], ['Grisácea', '#c3c3bd'], ['Sanguinolenta', '#b8403e']];
+const SOAP_O_OTROS = ['Mal olor', 'Test de aminas +', 'Toma de PAP realizada', 'Toma de VPH realizada'];
+const SOAP_DX = ['Sin patología', 'Cervicitis', 'Candidiasis (micosis)', 'Vaginosis bacteriana', 'Tricomoniasis', 'Cervicovaginitis', 'Ectropión', 'Pólipo cervical', 'Infección urinaria baja', 'Lesión sospechosa → colposcopia'];
+const SOAP_DERIV = ['Colposcopia', 'Ginecología', 'Oncología'];
+const SOAP_CONTROL = ['15 días', 'Al resultado del PAP', '6 meses', '1 año'];
+
+// ---- Tratamientos (tarjetas con ícono). d1: va como renglón en el D1 (recetario) ----
+const MED_ICONOS = ['💊', '🥚', '🧴', '💉', '🧪', '🩹', '🛡️', '🧼', '🗣️', '👫', '🔥', '❄️', '🌿', '🩺', '📋', '⭐'];
+const MED_GRUPOS = [['vag', 'Vía vaginal'], ['vo', 'Por boca / inyectable'], ['ind', 'Indicaciones y procedimientos'], ['mio', 'Agregados por el centro']];
+const MEDS_BASE = [
+  { id: 'metro_ov', g: 'vag', icon: '🥚', nombre: 'Metronidazol 500 mg óvulo', indic: '1 óvulo vaginal cada noche x 10 noches', cant: '10', d1: true },
+  { id: 'clotri_ov', g: 'vag', icon: '🥚', nombre: 'Clotrimazol 500 mg óvulo', indic: '1 óvulo vaginal cada noche x 10 noches', cant: '10', d1: true },
+  { id: 'nist_ov', g: 'vag', icon: '🥚', nombre: 'Nistatina 100.000 UI óvulo', indic: '1 óvulo vaginal cada noche x 14 noches', cant: '14', d1: true },
+  { id: 'metnis_ov', g: 'vag', icon: '🥚', nombre: 'Metronidazol + Nistatina óvulo', indic: '1 óvulo vaginal cada noche x 10 noches', cant: '10', d1: true },
+  { id: 'clotri_cr', g: 'vag', icon: '🧴', nombre: 'Clotrimazol 1% crema vaginal', indic: 'Aplicar con aplicador cada noche x 7 días', cant: '1', d1: true },
+  { id: 'metro_vo', g: 'vo', icon: '💊', nombre: 'Metronidazol 500 mg comprimido', indic: '1 comp. VO cada 12 h x 7 días', cant: '14', d1: true },
+  { id: 'fluco', g: 'vo', icon: '💊', nombre: 'Fluconazol 150 mg cápsula', indic: '1 cápsula VO, dosis única', cant: '1', d1: true },
+  { id: 'tinid', g: 'vo', icon: '💊', nombre: 'Tinidazol 500 mg comprimido', indic: '4 comp. VO juntos, dosis única', cant: '4', d1: true },
+  { id: 'azitro', g: 'vo', icon: '💊', nombre: 'Azitromicina 500 mg comprimido', indic: '2 comp. VO juntos, dosis única', cant: '2', d1: true },
+  { id: 'doxi', g: 'vo', icon: '💊', nombre: 'Doxiciclina 100 mg comprimido', indic: '1 comp. VO cada 12 h x 7 días', cant: '14', d1: true },
+  { id: 'ceftri', g: 'vo', icon: '💉', nombre: 'Ceftriaxona 500 mg ampolla', indic: '500 mg IM, dosis única', cant: '1', d1: true },
+  { id: 'paracet', g: 'vo', icon: '💊', nombre: 'Paracetamol 500 mg comprimido', indic: '1 comp. VO cada 8 h si dolor', cant: '9', d1: true },
+  { id: 'ibup', g: 'vo', icon: '💊', nombre: 'Ibuprofeno 400 mg comprimido', indic: '1 comp. VO cada 8 h con comida, si dolor', cant: '9', d1: true },
+  { id: 'preserv', g: 'vo', icon: '🛡️', nombre: 'Preservativos', indic: 'Usar en cada relación durante el tratamiento', cant: '10', d1: true },
+  { id: 'aseo', g: 'ind', icon: '🧼', nombre: 'Aseo vulvoperineal', indic: 'Indicaciones de higiene', cant: '', d1: false },
+  { id: 'orient', g: 'ind', icon: '🗣️', nombre: 'Orientación sexual', indic: 'Preservativo, conducta sexual segura', cant: '', d1: false },
+  { id: 'pareja', g: 'ind', icon: '👫', nombre: 'Tratar a la pareja', indic: 'Mismo esquema para la pareja', cant: '', d1: false },
+  { id: 'abst', g: 'ind', icon: '⛔', nombre: 'Abstinencia sexual', indic: 'Durante el tratamiento', cant: '', d1: false },
+  { id: 'cauter', g: 'ind', icon: '🔥', nombre: 'Cauterización', indic: 'Programar', cant: '', d1: false },
+  { id: 'crio', g: 'ind', icon: '❄️', nombre: 'Crioterapia', indic: 'Programar', cant: '', d1: false },
+];
+function medsCfg() { try { return JSON.parse(localStorage.getItem('sivec_meds_v1') || '{}') || {}; } catch (e) { return {}; } }
+function medsGuardarCfg(c) { try { localStorage.setItem('sivec_meds_v1', JSON.stringify(c)); } catch (e) { alert('No se pudo guardar en este navegador.'); } }
+function medsLista() { const c = medsCfg(); return [...MEDS_BASE, ...(c.extra || []).map(m => Object.assign({ g: 'mio', custom: true }, m))]; }
+
+function listaY(a) { return a.length < 2 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' y ' + a[a.length - 1]; }
+const GOTA_SVG = '<svg viewBox="0 0 12 16" width="11" height="15"><path d="M6 1C6 1 1 7.5 1 10.5a5 5 0 0 0 10 0C11 7.5 6 1 6 1z" fill="#4fa3e0"/></svg>';
+
 function soapCamposHTML() {
-  const sel = (k, ops) => `<select data-s="${k}"><option value="">— Seleccionar —</option>${ops.map(o => `<option>${o}</option>`).join('')}</select>`;
-  return `
-    <div class="field"><label>S — Subjetivo</label><textarea data-s="subjetivo" rows="2" placeholder="Motivo de consulta / síntomas referidos"></textarea></div>
-    <div class="soapO">
-      <div class="field"><label>O — Aspecto del cuello uterino</label>${sel('objetivo_oce', ['Íntegro', 'Eritematoso', 'Erosionado', 'Con Pólipo', 'Friable', 'Con Quiste de Naboth', 'Leucoplasia'])}</div>
-      <div class="field"><label>O — Leucorrea</label>${sel('objetivo_leucorrea', ['Ausente', 'Escasa', 'Moderada', 'Abundante'])}</div>
-      <div class="field"><label>O — Color</label>${sel('objetivo_color', ['Blanquecina', 'Amarillenta', 'Verdosa', 'Sanguinolenta'])}</div>
-    </div>
-    <div class="field"><label>O — Otros hallazgos del examen</label><textarea data-s="objetivo" rows="2" placeholder="Signos vitales, examen físico, especuloscopía…"></textarea></div>
-    <div class="field"><label>A — Análisis (diagnóstico)</label><textarea data-s="analisis" rows="2"></textarea></div>
-    <div class="field"><label>P — Plan (marcar los que correspondan)</label>
-      <div class="soapPlan">${SOAP_PLAN_OPC.map(o => `<label><input type="checkbox" data-s="plan" value="${esc(o)}"> ${esc(o)}</label>`).join('')}</div>
-      <textarea data-s="plan_texto" rows="2" placeholder="Otras indicaciones, receta, controles…" style="margin-top:6px"></textarea></div>
-    <div class="row2">
-      <div class="field"><label>Derivación</label>${sel('derivacion', ['Oncología', 'Ginecología', 'Colposcopia', 'Control en 6 meses', 'Control en 1 año'])}</div>
-      <div class="field"><label>Observaciones</label><input data-s="observaciones"></div>
-    </div>`;
+  const chips = (g, ops, extra) => ops.map(o => `<button type="button" class="sChip" data-g="${g}" data-v="${esc(o)}">${extra ? extra(o) : esc(o)}</button>`).join('');
+  const inp = (k, ph, w, type) => `<label class="gIn" style="width:${w}"><span>${ph}</span><input data-s="${k}" type="${type || 'text'}"></label>`;
+  return `<div class="soapV">
+    <div class="sEspRow"><span class="sLbl">Especialidad <span class="helpTip" data-tip="El código va en el D1 (Otro diagnóstico: T - código) y queda registrado para control.">ⓘ</span></span>
+      ${ESPECIALIDADES.map(e => `<button type="button" class="sChip sEsp" data-g="esp" data-v="${e.id}">${esc(e.nombre)} <small>${e.codigo}</small></button>`).join('')}</div>
+    <div class="sGrid">
+      <section class="sCard"><h4><i>S</i> ¿Qué refiere la paciente?</h4>
+        <div class="sChips">${chips('sint', SOAP_SINTOMAS)}</div>
+        <div class="sLbl">Tiempo de evolución</div><div class="sChips">${chips('evol', SOAP_EVOL)}</div>
+        <div class="sLbl">Datos gineco-obstétricos</div>
+        <div class="gRow">${inp('g_fum', 'FUM', '130px', 'date')}${inp('g_g', 'G', '44px')}${inp('g_p', 'P', '44px')}${inp('g_c', 'C', '44px')}${inp('g_a', 'A', '44px')}${inp('g_irs', 'IRS (edad)', '78px')}${inp('g_parejas', 'Parejas', '62px')}${inp('g_pap', 'Último PAP', '150px')}</div>
+        <textarea data-s="s_libre" rows="2" placeholder="Texto libre (opcional)…"></textarea>
+      </section>
+      <section class="sCard"><h4><i>O</i> Especuloscopía</h4>
+        <div class="sLbl">Aspecto del cuello</div><div class="sChips">${chips('oce', SOAP_OCE)}</div>
+        <div class="sLbl">Cantidad de secreción (leucorrea)</div>
+        <div class="sDrops">${SOAP_LEU.map((o, i) => `<button type="button" class="sChip sDrop" data-g="leu" data-v="${o}"><span class="dr">${i ? GOTA_SVG.repeat(i) : '<span class="dr0">·</span>'}</span>${o}</button>`).join('')}</div>
+        <div class="sLbl">Color / aspecto de la secreción</div>
+        <div class="sColors">${SOAP_COLOR.map(([o, c]) => `<button type="button" class="sChip sColor" data-g="color" data-v="${o}"><span class="sw${o === 'Grumosa' ? ' grum' : ''}" style="background-color:${c}"></span>${o}</button>`).join('')}</div>
+        <div class="sLbl">Otros</div><div class="sChips">${chips('ootros', SOAP_O_OTROS)}</div>
+        <textarea data-s="o_libre" rows="2" placeholder="Signos vitales, examen físico… (opcional)"></textarea>
+      </section>
+      <section class="sCard sFull"><h4><i>A</i> Diagnóstico</h4>
+        <div class="sChips">${chips('dx', SOAP_DX)}</div>
+        <div class="sSug" hidden></div>
+        <textarea data-s="a_libre" rows="2" placeholder="Otro diagnóstico / detalle (opcional)…"></textarea>
+      </section>
+      <section class="sCard sFull"><h4><i>P</i> Tratamiento e indicaciones</h4>
+        <div class="sMeds"></div>
+        <button type="button" class="sAddMed">＋ Agregar medicamento o indicación</button>
+        <div class="sMedForm" hidden>
+          <div class="sLbl">Ícono</div><div class="sIcons">${MED_ICONOS.map((ic, i) => `<button type="button" class="sIco${i ? '' : ' on'}" data-ic="${ic}">${ic}</button>`).join('')}</div>
+          <div class="gRow"><label class="gIn" style="flex:2 1 200px"><span>Nombre y presentación</span><input class="mfNombre" placeholder="Ej.: Secnidazol 1 g comprimido"></label>
+            <label class="gIn" style="flex:3 1 240px"><span>Indicación habitual</span><input class="mfIndic" placeholder="Ej.: 2 comp. VO, dosis única"></label>
+            <label class="gIn" style="width:70px"><span>Cantidad</span><input class="mfCant"></label></div>
+          <label class="mfD1"><input type="checkbox" class="mfEsD1" checked> Va como renglón en el D1 (recetario)</label>
+          <div class="sMfBtns"><button type="button" class="sMfCancel">Cancelar</button><button type="button" class="sMfOk">Guardar en la lista</button></div>
+        </div>
+        <div class="sReceta" hidden><div class="sLbl">Receta — se puede ajustar para esta paciente</div><div class="sRecRows"></div></div>
+        <div class="sLbl">Derivación</div><div class="sChips">${chips('deriv', SOAP_DERIV)}</div>
+        <div class="sLbl">Próximo control</div><div class="sChips">${chips('control', SOAP_CONTROL)}</div>
+        <textarea data-s="p_libre" rows="2" placeholder="Otras indicaciones (opcional)…"></textarea>
+        <input data-s="observaciones" placeholder="Observaciones (opcional)">
+      </section>
+    </div></div>`;
+}
+
+const SOAP_UNICOS = new Set(['esp', 'evol', 'oce', 'leu', 'color', 'deriv', 'control']);
+function soapMedsRender(root) {
+  const box = root.querySelector('.sMeds'); if (!box) return;
+  const on = new Set([...root.querySelectorAll('.sRecRow')].map(r => r.dataset.id));
+  const lista = medsLista();
+  box.innerHTML = MED_GRUPOS.map(([g, t]) => {
+    const ms = lista.filter(m => m.g === g); if (!ms.length) return '';
+    return `<div class="sLbl">${t}</div><div class="sMedGrid">${ms.map(m => `<button type="button" class="medCard${on.has(m.id) ? ' on' : ''}" data-id="${esc(m.id)}"><span class="mIco">${m.icon}</span><span class="mTx"><b>${esc(m.nombre)}</b><small>${esc(m.indic || '')}</small></span>${m.custom ? '<span class="mDel" title="Quitar de la lista">×</span>' : ''}</button>`).join('')}</div>`;
+  }).join('');
+}
+function soapRecetaAdd(root, m, indic, cant) {
+  const rows = root.querySelector('.sRecRows');
+  if (rows.querySelector(`.sRecRow[data-id="${CSS.escape(m.id)}"]`)) return;
+  const r = document.createElement('div'); r.className = 'sRecRow'; r.dataset.id = m.id;
+  r.dataset.m = JSON.stringify({ id: m.id, icon: m.icon, nombre: m.nombre, d1: !!m.d1 });
+  r.innerHTML = `<span class="mIco">${m.icon}</span><b>${esc(m.nombre)}</b><input class="rIndic" value="${esc(indic != null ? indic : (m.indic || ''))}" placeholder="Indicación">${m.d1 ? `<input class="rCant" value="${esc(cant != null ? cant : (m.cant || ''))}" placeholder="Cant." title="Cantidad (D1)">` : '<span class="rNoD1" title="No va en el D1">—</span>'}`;
+  rows.appendChild(r);
+  root.querySelector('.sReceta').hidden = false;
+}
+function soapSugerir(root) {
+  const on = g => [...root.querySelectorAll(`.sChip[data-g="${g}"].on`)].map(b => b.dataset.v);
+  const s = new Set([...on('sint'), ...on('oce'), ...on('color'), ...on('ootros')]);
+  const sug = new Set();
+  if ((s.has('Flujo vaginal') || s.has('Prurito')) && (s.has('Grumosa') || s.has('Blanquecina')) && s.has('Prurito')) sug.add('Candidiasis (micosis)');
+  if (s.has('Mal olor') || s.has('Test de aminas +') || s.has('Grisácea')) sug.add('Vaginosis bacteriana');
+  if ((s.has('Verdosa') || s.has('Amarillenta')) && (s.has('Mal olor') || s.has('Prurito') || s.has('Ardor al orinar'))) sug.add('Tricomoniasis');
+  if (s.has('Eritematoso') || s.has('Friable') || s.has('Erosionado')) sug.add('Cervicitis');
+  if (s.has('Sangrado postcoital') || s.has('Leucoplasia') || s.has('Friable')) sug.add('Lesión sospechosa → colposcopia');
+  if (s.has('Ardor al orinar')) sug.add('Infección urinaria baja');
+  if (s.has('Con Pólipo')) sug.add('Pólipo cervical');
+  if (s.has('Ectropión')) sug.add('Ectropión');
+  const ya = new Set(on('dx')), falta = [...sug].filter(x => !ya.has(x));
+  const box = root.querySelector('.sSug');
+  box.hidden = !falta.length;
+  box.innerHTML = falta.length ? `💡 Por lo marcado, considerar: ${falta.map(x => `<button type="button" class="sSugBtn" data-v="${esc(x)}">${esc(x)}</button>`).join(' ')} <span class="sMut">(solo ayuda-memoria; decide la profesional)</span>` : '';
+}
+function soapInit(root) {
+  if (root.dataset.soapInit) return; root.dataset.soapInit = '1';
+  soapMedsRender(root);
+  root.addEventListener('click', e => {
+    const chip = e.target.closest('.sChip');
+    if (chip && root.contains(chip)) {
+      const g = chip.dataset.g, was = chip.classList.contains('on');
+      if (SOAP_UNICOS.has(g)) root.querySelectorAll(`.sChip[data-g="${g}"]`).forEach(b => b.classList.remove('on'));
+      chip.classList.toggle('on', !was);
+      if (g === 'sint' && chip.dataset.v === 'Asintomática (control)' && !was) root.querySelectorAll('.sChip[data-g="sint"]').forEach(b => { if (b !== chip) b.classList.remove('on'); });
+      else if (g === 'sint' && !was) root.querySelector('.sChip[data-g="sint"][data-v="Asintomática (control)"]')?.classList.remove('on');
+      if (g === 'dx' && chip.dataset.v === 'Sin patología' && !was) root.querySelectorAll('.sChip[data-g="dx"]').forEach(b => { if (b !== chip) b.classList.remove('on'); });
+      else if (g === 'dx' && !was) root.querySelector('.sChip[data-g="dx"][data-v="Sin patología"]')?.classList.remove('on');
+      soapSugerir(root); return;
+    }
+    const sugBtn = e.target.closest('.sSugBtn');
+    if (sugBtn) { root.querySelector(`.sChip[data-g="dx"][data-v="${CSS.escape(sugBtn.dataset.v)}"]`)?.classList.add('on'); soapSugerir(root); return; }
+    const del = e.target.closest('.mDel');
+    if (del) {
+      e.stopPropagation();
+      const id = del.closest('.medCard').dataset.id, c = medsCfg();
+      const m = (c.extra || []).find(x => x.id === id);
+      if (!m || !confirm(`¿Quitar "${m.nombre}" de la lista de este centro? (las consultas ya guardadas no cambian)`)) return;
+      c.extra = c.extra.filter(x => x.id !== id); medsGuardarCfg(c);
+      root.querySelector(`.sRecRow[data-id="${CSS.escape(id)}"]`)?.remove();
+      soapMedsRender(root); return;
+    }
+    const card = e.target.closest('.medCard');
+    if (card) {
+      const id = card.dataset.id, row = root.querySelector(`.sRecRow[data-id="${CSS.escape(id)}"]`);
+      if (row) { row.remove(); card.classList.remove('on'); root.querySelector('.sReceta').hidden = !root.querySelector('.sRecRow'); }
+      else { const m = medsLista().find(x => x.id === id); if (m) { soapRecetaAdd(root, m); card.classList.add('on'); } }
+      return;
+    }
+    const f = root.querySelector('.sMedForm');
+    if (e.target.closest('.sAddMed')) { f.hidden = !f.hidden; if (!f.hidden) f.querySelector('.mfNombre').focus(); return; }
+    const ic = e.target.closest('.sIco');
+    if (ic) { f.querySelectorAll('.sIco').forEach(b => b.classList.toggle('on', b === ic)); return; }
+    if (e.target.closest('.sMfCancel')) { f.hidden = true; return; }
+    if (e.target.closest('.sMfOk')) {
+      const nombre = f.querySelector('.mfNombre').value.trim();
+      if (!nombre) { alert('Escribí el nombre del medicamento o la indicación.'); return; }
+      const esD1 = f.querySelector('.mfEsD1').checked;
+      const m = { id: 'x' + Date.now().toString(36), g: 'mio', icon: f.querySelector('.sIco.on')?.dataset.ic || '💊', nombre, indic: f.querySelector('.mfIndic').value.trim(), cant: f.querySelector('.mfCant').value.trim(), d1: esD1 };
+      const c = medsCfg(); c.extra = [...(c.extra || []), m]; medsGuardarCfg(c);
+      f.querySelectorAll('input:not([type=checkbox])').forEach(i => { i.value = ''; }); f.hidden = true;
+      soapRecetaAdd(root, Object.assign({ custom: true }, m)); soapMedsRender(root);
+      showToast('Agregado a la lista de este centro ✔', 'ok');
+    }
+  });
+  root.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.closest('.sMedForm')) { e.preventDefault(); root.querySelector('.sMfOk').click(); } });
+}
+function soapSetEsp(root, esp) {
+  root.querySelectorAll('.sChip[data-g="esp"]').forEach(b => b.classList.toggle('on', !!esp && b.dataset.v === esp.id));
+}
+
+function soapTextos(d, one) {
+  const S = [];
+  const sint = (d.sintomas || []).filter(x => x !== 'Asintomática (control)');
+  if (sint.length) S.push('Refiere ' + listaY(sint.map(x => x.toLowerCase())) + (d.evolucion ? ' de ' + d.evolucion + ' de evolución' : '') + '.');
+  else if ((d.sintomas || []).length) S.push('Asintomática, acude a control.');
+  const g = d.gineco || {};
+  if (g.fum) S.push('FUM: ' + (fmtFecha(g.fum) || g.fum) + '.');
+  if ([g.g, g.p, g.c, g.a].some(x => x !== '' && x != null)) S.push(`G${g.g || 0} P${g.p || 0} C${g.c || 0} A${g.a || 0}.`);
+  if (g.irs) S.push('IRS: ' + g.irs + ' años.');
+  if (g.parejas) S.push('Parejas sexuales: ' + g.parejas + '.');
+  if (g.ultimo_pap) S.push('Último PAP: ' + g.ultimo_pap + '.');
+  if (d.s_libre) S.push(d.s_libre);
+  const O = [];
+  const oo = new Set(d.o_otros || []);
+  if (oo.has('Mal olor')) O.push('Secreción con mal olor.');
+  if (oo.has('Test de aminas +')) O.push('Test de aminas positivo.');
+  const tomas = [oo.has('Toma de PAP realizada') && 'PAP', oo.has('Toma de VPH realizada') && 'VPH'].filter(Boolean);
+  if (tomas.length) O.push('Se realiza toma de ' + tomas.join(' y ') + '.');
+  if (d.o_libre) O.push(d.o_libre);
+  const A = [...(d.diagnosticos || [])];
+  if (d.a_libre) A.push(d.a_libre);
+  const P = [];
+  if (d.p_libre) P.push(d.p_libre.replace(/\.?$/, '.'));
+  if (d.control) P.push('Próximo control: ' + d.control.charAt(0).toLowerCase() + d.control.slice(1) + '.');
+  return { subjetivo: S.join(' ') || null, objetivo: O.join(' ') || null, analisis: A.length ? A.join('. ').replace(/\.?$/, '.') : null, plan_texto: P.join(' ') || null };
 }
 function soapLeer(root) {
-  const v = {};
-  root.querySelectorAll('[data-s]').forEach(el => {
-    if (el.type === 'checkbox') { if (el.checked) (v[el.dataset.s] = v[el.dataset.s] || []).push(el.value); }
-    else v[el.dataset.s] = el.value.trim() || null;
+  const on = g => [...root.querySelectorAll(`.sChip[data-g="${g}"].on`)].map(b => b.dataset.v);
+  const one = g => on(g)[0] || null;
+  const val = k => { const el = root.querySelector(`[data-s="${k}"]`); return el ? el.value.trim() : ''; };
+  const meds = [...root.querySelectorAll('.sRecRow')].map(r => Object.assign(JSON.parse(r.dataset.m), { indic: r.querySelector('.rIndic').value.trim(), cant: r.querySelector('.rCant') ? r.querySelector('.rCant').value.trim() : '' }));
+  const d = {
+    sintomas: on('sint'), evolucion: one('evol'),
+    gineco: { fum: val('g_fum'), g: val('g_g'), p: val('g_p'), c: val('g_c'), a: val('g_a'), irs: val('g_irs'), parejas: val('g_parejas'), ultimo_pap: val('g_pap') },
+    o_otros: on('ootros'), diagnosticos: on('dx'), control: one('control'),
+    s_libre: val('s_libre'), o_libre: val('o_libre'), a_libre: val('a_libre'), p_libre: val('p_libre'), meds,
+  };
+  const esp = espBuscar(one('esp'));
+  return Object.assign(soapTextos(d), {
+    objetivo_oce: one('oce'), objetivo_leucorrea: one('leu'), objetivo_color: one('color'),
+    plan: meds.map(m => m.nombre + (m.indic ? ' — ' + m.indic : '')), derivacion: one('deriv'), observaciones: val('observaciones') || null,
+    especialidad: esp ? esp.nombre : null, codigo_esp: esp ? esp.codigo : null, detalle: d,
   });
-  v.plan = v.plan || [];
-  return v;
 }
-function soapEscribir(root, c) {
-  root.querySelectorAll('[data-s]').forEach(el => {
-    const k = el.dataset.s;
-    if (el.type === 'checkbox') el.checked = Array.isArray(c && c.plan) && c.plan.includes(el.value);
-    else el.value = (c && c[k]) || '';
-  });
+function soapEscribir(root, c, opts) {
+  soapInit(root);
+  root.querySelectorAll('.sChip').forEach(b => b.classList.remove('on'));
+  root.querySelectorAll('[data-s]').forEach(el => { if (el.dataset.s !== 'fecha' && el.dataset.s !== 'doctora') el.value = ''; });
+  root.querySelector('.sRecRows').innerHTML = ''; root.querySelector('.sReceta').hidden = true; root.querySelector('.sMedForm').hidden = true;
+  const set = (g, v) => { if (v == null || v === '') return; root.querySelector(`.sChip[data-g="${g}"][data-v="${CSS.escape(v)}"]`)?.classList.add('on'); };
+  const put = (k, v) => { const el = root.querySelector(`[data-s="${k}"]`); if (el && v) el.value = v; };
+  const d = c && c.detalle;
+  if (c) {
+    set('oce', c.objetivo_oce); set('leu', c.objetivo_leucorrea); set('color', c.objetivo_color); set('deriv', c.derivacion);
+    put('observaciones', c.observaciones);
+    soapSetEsp(root, espBuscar(c.codigo_esp) || espBuscar(c.especialidad));
+  }
+  if (d) {
+    (d.sintomas || []).forEach(v => set('sint', v)); set('evol', d.evolucion);
+    (d.o_otros || []).forEach(v => set('ootros', v)); (d.diagnosticos || []).forEach(v => set('dx', v)); set('control', d.control);
+    ['s_libre', 'o_libre', 'a_libre', 'p_libre'].forEach(k => put(k, d[k]));
+    (d.meds || []).forEach(m => soapRecetaAdd(root, m, m.indic, m.cant));
+  } else if (c) { // consulta anterior al formato con figuras: el texto va a los cuadros libres
+    put('s_libre', c.subjetivo); put('o_libre', c.objetivo); put('a_libre', c.analisis);
+    put('p_libre', [...(Array.isArray(c.plan) ? c.plan : []), c.plan_texto].filter(Boolean).join('. '));
+  }
+  const g = (d && d.gineco) || (opts && opts.gineco) || {};
+  put('g_fum', g.fum); put('g_g', g.g); put('g_p', g.p); put('g_c', g.c); put('g_a', g.a); put('g_irs', g.irs); put('g_parejas', g.parejas); put('g_pap', g.ultimo_pap);
+  if (opts && opts.esp && !(c && (c.codigo_esp || c.especialidad))) soapSetEsp(root, opts.esp);
+  (opts && opts.ootros || []).forEach(v => set('ootros', v));
+  soapMedsRender(root); soapSugerir(root);
 }
-function soapVacio(v) { return !['subjetivo', 'objetivo_oce', 'objetivo_leucorrea', 'objetivo_color', 'objetivo', 'analisis', 'plan_texto', 'derivacion', 'observaciones'].some(k => v[k]) && !(v.plan || []).length; }
+function soapVacio(v) {
+  const d = v.detalle || {};
+  return !['subjetivo', 'objetivo_oce', 'objetivo_leucorrea', 'objetivo_color', 'objetivo', 'analisis', 'plan_texto', 'derivacion', 'observaciones'].some(k => v[k]) && !(v.plan || []).length
+    && !Object.values(d.gineco || {}).some(Boolean);
+}
 async function getLatestConsulta(pacienteId) {
   if (!(await consultasOk())) return null;
   const { data, error } = await sb.from('consultas').select('*').eq('paciente_id', String(pacienteId)).order('fecha', { ascending: false }).order('created_at', { ascending: false }).limit(1);
   return error || !data || !data.length ? null : data[0];
 }
+// Última consulta de cualquier toma de la misma paciente (para traer los datos gineco-obstétricos)
+async function ultimaConsultaDelGrupo(p) {
+  if (!(await consultasOk()) || !(await consultasExtraOk())) return null;
+  const t = tomasIndex && tomasIndex.get(p.id);
+  const ids = ((t && t.grupo) || [p]).map(x => String(x.id));
+  const { data } = await sb.from('consultas').select('fecha,detalle').in('paciente_id', ids.length ? ids : [String(p.id)]).order('fecha', { ascending: false }).limit(5);
+  return (data || []).find(c => c.detalle && c.detalle.gineco && Object.values(c.detalle.gineco).some(Boolean)) || null;
+}
+
+// ---- Mapa del cuello (colposcopia): hallazgos por hora del reloj ----
+const CUELLO_TIPOS = [
+  { id: 'acetoblanco', nombre: 'Acetoblanco', color: '#e98a8f' }, { id: 'mosaico', nombre: 'Mosaico', color: '#b98be6' },
+  { id: 'puntillado', nombre: 'Puntillado', color: '#f0b27a' }, { id: 'leucoplasia', nombre: 'Leucoplasia', color: '#a9a9a9' },
+  { id: 'vasos', nombre: 'Vasos atípicos', color: '#7fcf9a' }, { id: 'biopsia', nombre: 'Biopsia', color: '#6f95c9' },
+];
+function cuelloHoras(hs) { return [...hs].sort((a, b) => (a % 12) - (b % 12)).map(String); }
+function cuelloTexto(m) {
+  if (!m) return '';
+  const partes = CUELLO_TIPOS.filter(t => (m.marcas && m.marcas[t.id] || []).length).map(t => (t.id === 'biopsia' ? 'biopsia' : t.nombre.toLowerCase()) + ' en ' + listaY(cuelloHoras(m.marcas[t.id])) + ' h');
+  const out = [];
+  if (partes.length) out.push(partes.join('; ').replace(/^./, x => x.toUpperCase()) + '.');
+  if (m.zt) out.push('ZT ' + m.zt.toLowerCase() + '.');
+  if (m.impresion) out.push('Impresión: ' + m.impresion.toLowerCase() + '.');
+  return out.join(' ');
+}
+function cuelloSVG(m, size) {
+  const R = 100, r0 = 16, cx = 120, cy = 120, marcas = (m && m.marcas) || {};
+  const pt = (ang, rad) => [cx + rad * Math.cos(ang), cy + rad * Math.sin(ang)];
+  let s = `<svg viewBox="0 0 240 240" width="${size || 240}" height="${size || 240}" class="cuelloSvg" role="img" aria-label="Mapa del cuello uterino">`;
+  s += `<circle cx="${cx}" cy="${cy}" r="${R + 6}" fill="#fbe9ee" stroke="#e7b9c7" stroke-width="2"/>`;
+  for (let h = 1; h <= 12; h++) {
+    const a0 = (h * 30 - 105) * Math.PI / 180, a1 = (h * 30 - 75) * Math.PI / 180;
+    const tipos = CUELLO_TIPOS.filter(t => t.id !== 'biopsia' && (marcas[t.id] || []).includes(h));
+    const fill = tipos.length ? tipos[0].color : '#f6d5de';
+    const [x0, y0] = pt(a0, R), [x1, y1] = pt(a1, R), [x2, y2] = pt(a1, r0), [x3, y3] = pt(a0, r0);
+    s += `<path class="cHr" data-h="${h}" d="M${x3},${y3} L${x0},${y0} A${R},${R} 0 0 1 ${x1},${y1} L${x2},${y2} A${r0},${r0} 0 0 0 ${x3},${y3} Z" fill="${fill}" stroke="#fff" stroke-width="1.5"/>`;
+    if (tipos.length > 1) { const [tx, ty] = pt((h * 30 - 90) * Math.PI / 180, R * 0.55); tipos.slice(1).forEach((t, i) => { s += `<circle cx="${tx + (i - (tipos.length - 2) / 2) * 9}" cy="${ty}" r="4" fill="${t.color}" stroke="#fff" stroke-width="1" pointer-events="none"/>`; }); }
+    if ((marcas.biopsia || []).includes(h)) { const [bx, by] = pt((h * 30 - 90) * Math.PI / 180, R * 0.8); s += `<circle cx="${bx}" cy="${by}" r="6" fill="#6f95c9" stroke="#fff" stroke-width="2" pointer-events="none"/>`; }
+    const [lx, ly] = pt((h * 30 - 90) * Math.PI / 180, R + 16);
+    s += `<text x="${lx}" y="${ly + 4}" text-anchor="middle" font-size="11" fill="#8a7078" font-family="sans-serif">${h}</text>`;
+  }
+  s += `<circle cx="${cx}" cy="${cy}" r="${R * 0.55}" fill="none" stroke="#c98ea2" stroke-dasharray="3 4"/>`;
+  s += `<ellipse cx="${cx}" cy="${cy}" rx="12" ry="5" fill="#7d2a4c"/></svg>`;
+  return s;
+}
+
 // Arma los 4 campos S-O-A-P de la Historia clínica con la consulta + la colposcopia
 function hcSoapDatos(consulta, colp) {
   const up = s => (s || '').toUpperCase();
@@ -3427,10 +3813,12 @@ function hcSoapDatos(consulta, colp) {
   const oce = c.objetivo_oce || (!consulta && colp && colp.soap_objetivo_oce);
   const leu = c.objetivo_leucorrea || (!consulta && colp && colp.soap_objetivo_leucorrea);
   const col = c.objetivo_color || (!consulta && colp && colp.soap_objetivo_color);
-  if (oce) O.push('Cuello uterino: ' + oce + '.'); if (leu) O.push('Leucorrea: ' + leu + '.'); if (col) O.push('Color: ' + col + '.');
+  const esp = [oce && 'cuello ' + oce.toLowerCase(), leu && 'leucorrea ' + leu.toLowerCase(), col && 'secreción ' + col.toLowerCase()].filter(Boolean);
+  if (esp.length) O.push('Especuloscopía: ' + esp.join(', ') + '.');
   if (c.objetivo) O.push(c.objetivo.replace(/\.?$/, '.'));
-  if (colp && (colp.prueba_schiller || colp.zona_afectada || colp.otros_hallazgos) && consulta) {
-    O.push('Colposcopia' + (colp.fecha ? ' (' + fmtFecha(colp.fecha) + ')' : '') + ':' + (colp.prueba_schiller ? ' Schiller ' + colp.prueba_schiller.toLowerCase() + '.' : '') + (colp.otros_hallazgos ? ' ' + colp.otros_hallazgos + '.' : ''));
+  const mapa = colp && cuelloTexto(colp.cuello_mapa);
+  if (colp && (colp.prueba_schiller || colp.otros_hallazgos || mapa) && (consulta || mapa)) {
+    O.push('Colposcopia' + (colp.fecha ? ' (' + fmtFecha(colp.fecha) + ')' : '') + ':' + (colp.prueba_schiller ? ' Schiller ' + colp.prueba_schiller.toLowerCase() + '.' : '') + (mapa ? ' ' + mapa : '') + (colp.otros_hallazgos ? ' ' + colp.otros_hallazgos + '.' : ''));
   }
   const A = [];
   if (colp && arr(colp.lesion).length) A.push(arr(colp.lesion).join(', ') + '.');
@@ -3438,17 +3826,31 @@ function hcSoapDatos(consulta, colp) {
   const an = c.analisis || (!consulta && colp && colp.soap_analisis);
   if (an) A.push(an);
   const P = [];
-  const planes = [...new Set([...arr(c.plan), ...arr(colp && colp.plan)])];
+  // Con la consulta nueva: en la HC van los nombres; las dosis completas van en la receta (D1)
+  const meds = (c.detalle && c.detalle.meds) || null;
+  const planC = meds ? [meds.filter(m => m.d1).map(m => m.nombre).join(', ') + (meds.some(m => m.d1) ? ' (según receta D1)' : ''), ...meds.filter(m => !m.d1).map(m => m.nombre)].filter(Boolean) : arr(c.plan);
+  const planes = [...new Set([...planC, ...arr(colp && colp.plan)])];
   if (planes.length) P.push(planes.join('. ') + '.');
   if (c.plan_texto) P.push(c.plan_texto.replace(/\.?$/, '.'));
   const derivs = [...new Set([c.derivacion, colp && colp.derivacion].filter(Boolean))];
   if (derivs.length) P.push('Derivación: ' + derivs.join(', ') + '.');
   return { colp_fecha: fmtFecha((consulta && consulta.fecha) || (colp && colp.fecha)) || '', colp_subjetivo: up(S), colp_objetivo: up(O.join(' ')), colp_analisis: up(A.join(' ')), colp_plan: up(P.join(' ')) };
 }
+// Renglones del D1 con los medicamentos de la consulta (los 4 del PAP ya vienen impresos)
+function d1Datos(consulta) {
+  const out = {};
+  const meds = ((consulta && consulta.detalle && consulta.detalle.meds) || []).filter(m => m.d1).slice(0, 10);
+  meds.forEach((m, i) => { out['d1_item_' + (i + 1)] = up1(m.nombre); out['d1_indic_' + (i + 1)] = m.indic || ''; out['d1_cant_' + (i + 1)] = m.cant ? String(m.cant).padStart(2, '0') : ''; });
+  return out;
+}
+function up1(s) { return (s || '').toUpperCase(); }
 async function completarHc(data, p) {
   const [colp, consulta] = await Promise.all([getLatestColposcopia(p.id), getLatestConsulta(p.id)]);
   if (colp || consulta) Object.assign(data, hcSoapDatos(consulta, colp));
-  return { colp, consulta };
+  Object.assign(data, d1Datos(consulta));
+  const esp = (consulta && (espBuscar(consulta.codigo_esp) || espBuscar(consulta.especialidad))) || espPorDoctora(p.doctora);
+  data.__codigo_d1 = esp.codigo;
+  return { colp, consulta, esp };
 }
 
 // ---- Modal de consulta ----
@@ -3457,26 +3859,31 @@ function consultaModalEl() {
   let ov = document.getElementById('consultaOverlay');
   if (ov) return ov;
   ov = document.createElement('div'); ov.id = 'consultaOverlay';
-  ov.innerHTML = `<div id="consultaModal"><h2>📝 Consulta (SOAP) — <span id="consultaNombre"></span></h2>
-    <form id="consultaForm"><div class="row2"><div class="field"><label>Fecha</label><input type="date" data-s="fecha" required></div>
+  ov.innerHTML = `<div id="consultaModal"><h2>📝 Consulta — <span id="consultaNombre"></span></h2>
+    <form id="consultaForm"><div class="cHead"><div class="field"><label>Fecha</label><input type="date" data-s="fecha" required></div>
       <div class="field"><label>Profesional</label><select data-s="doctora">${DOCTORAS_BASE.map(d => `<option>${esc(d)}</option>`).join('')}</select></div></div>
       ${soapCamposHTML()}
       <div class="actions"><button type="button" class="cancelBtn" id="consultaCancel">Cancelar</button><button type="submit" class="saveBtn">Guardar consulta</button></div>
     </form></div>`;
   document.body.appendChild(ov);
+  const form = ov.querySelector('#consultaForm');
+  soapInit(form);
   ov.querySelector('#consultaCancel').onclick = () => ov.classList.remove('open');
-  ov.querySelector('#consultaForm').addEventListener('submit', async e => {
+  form.querySelector('[data-s="doctora"]').addEventListener('change', e => soapSetEsp(form, espPorDoctora(e.target.value)));
+  form.addEventListener('submit', async e => {
     e.preventDefault();
-    const v = soapLeer(e.target);
+    const v = soapLeer(form);
     if (soapVacio(v)) { alert('La consulta está vacía.'); return; }
-    const row = Object.assign(v, { paciente_id: String(consultaPaciente.id) });
+    const doctora = form.querySelector('[data-s="doctora"]').value;
+    const row = await consultaFila(Object.assign(v, { paciente_id: String(consultaPaciente.id), fecha: form.querySelector('[data-s="fecha"]').value || hoyISO(), doctora }));
     const q = consultaEditId ? sb.from('consultas').update(row).eq('id', consultaEditId) : sb.from('consultas').insert([row]);
     const { error } = await q;
     if (error) { alert('Error al guardar la consulta: ' + error.message); return; }
+    espRecordar(doctora, espBuscar(v.codigo_esp));
     ov.classList.remove('open');
     const p = consultaPaciente;
     showToast('Consulta guardada ✔', 'ok');
-    if (confirm('Consulta guardada. ¿Imprimir los documentos (con la Historia clínica) ahora?')) printPatientDocs(p);
+    if (confirm('Consulta guardada. ¿Imprimir los documentos (D1 con la receta + Historia clínica con el SOAP) ahora?')) printPatientDocs(p);
     if (fichaPaciente && document.getElementById('fichaDrawer')?.classList.contains('open')) openFicha(fichaPaciente);
   });
   return ov;
@@ -3491,13 +3898,19 @@ async function openConsulta(p) {
   const prev = await getLatestConsulta(p.id);
   if (prev && confirm(`${p.nombre} ya tiene una consulta del ${fmtFecha(prev.fecha) || '—'} para esta toma.\n\nAceptar = modificar esa consulta · Cancelar = crear una nueva`)) {
     consultaEditId = prev.id; soapEscribir(form, prev);
+    form.querySelector('[data-s="fecha"]').value = prev.fecha || hoyISO();
+    form.querySelector('[data-s="doctora"]').value = prev.doctora || p.doctora || DOCTORAS_BASE[0];
   } else {
-    soapEscribir(form, null);
+    const doctora = p.doctora || DOCTORAS_BASE[0];
+    const ant = await ultimaConsultaDelGrupo(p);
+    soapEscribir(form, null, { esp: espPorDoctora(doctora), gineco: ant && ant.detalle.gineco });
     form.querySelector('[data-s="fecha"]').value = hoyISO();
-    form.querySelector('[data-s="doctora"]').value = p.doctora || DOCTORAS_BASE[0];
+    form.querySelector('[data-s="doctora"]').value = doctora;
   }
+  if (!(await consultasExtraOk())) showToast('Tip: ejecutá el Paso 6 del SQL para que la consulta guarde la especialidad y se pueda reabrir con sus toques.', 'ok');
   ov.querySelector('#consultaNombre').textContent = p.nombre || '';
   ov.classList.add('open');
+  ov.querySelector('#consultaModal').scrollTop = 0;
 }
 
 // En "Colposcopia", el bloque SOAP se oculta cuando existe la tabla de consultas (queda solo el procedimiento)
@@ -3512,19 +3925,26 @@ async function ajustarColposcopiaSoap() {
 (function () {
   const form = document.getElementById('patientForm');
   const det = document.createElement('details'); det.className = 'consentBox'; det.id = 'regSoap'; det.dataset.step = '3';
-  det.innerHTML = `<summary>Nota de consulta — SOAP (opcional) <span class="helpTip" data-tip="Si la completás acá, la Historia clínica sale con el SOAP al imprimir. También se puede cargar después desde la tarjeta de la paciente (⋯ → Consulta).">ⓘ</span></summary><div class="regSoapBody">${soapCamposHTML()}</div>`;
+  det.innerHTML = `<summary>Nota de consulta — SOAP con figuras (opcional) <span class="helpTip" data-tip="Si la completás acá, la Historia clínica sale con el SOAP y el D1 con la receta al imprimir. También se puede cargar después desde la tarjeta de la paciente (⋯ → Consulta).">ⓘ</span></summary><div class="regSoapBody">${soapCamposHTML()}</div>`;
   const primero = form.querySelector('details.consentBox');
   form.insertBefore(det, primero || document.getElementById('formMsg'));
   det.style.display = 'none';
+  soapInit(det);
+  soapEscribir(det, null, { esp: espPorDoctora(form.doctora && form.doctora.value), ootros: ['Toma de PAP realizada'] });
+  if (form.doctora) form.doctora.addEventListener('change', () => soapSetEsp(det, espPorDoctora(form.doctora.value)));
   window.onRegPaso = n => { if (n === 3) consultasOk().then(ok => { det.style.display = ok ? '' : 'none'; }); };
 })();
 async function guardarSoapDeRegistro(nueva) {
   const det = document.getElementById('regSoap'); if (!det || !nueva || !(await consultasOk())) return;
-  const v = soapLeer(det); if (soapVacio(v)) return;
-  const row = Object.assign(v, { paciente_id: String(nueva.id), fecha: nueva.fecha_toma || hoyISO(), doctora: nueva.doctora || null });
+  const v = soapLeer(det);
+  // Si solo quedó marcada la "Toma de PAP realizada" que viene por defecto, no se guarda consulta
+  const soloToma = soapVacio(Object.assign({}, v, { objetivo: v.detalle.o_libre || ((v.detalle.o_otros || []).some(x => !x.startsWith('Toma')) ? 'x' : null) }));
+  if (soapVacio(v) || soloToma) { soapEscribir(det, null, { esp: espPorDoctora(nueva.doctora), ootros: ['Toma de PAP realizada'] }); return; }
+  const row = await consultaFila(Object.assign(v, { paciente_id: String(nueva.id), fecha: nueva.fecha_toma || hoyISO(), doctora: nueva.doctora || null }));
   const { error } = await sb.from('consultas').insert([row]);
   if (error) showToast('La toma se guardó, pero la consulta no: ' + error.message, 'err');
-  soapEscribir(det, null); det.open = false;
+  else espRecordar(nueva.doctora, espBuscar(v.codigo_esp));
+  soapEscribir(det, null, { esp: espPorDoctora(nueva.doctora), ootros: ['Toma de PAP realizada'] }); det.open = false;
 }
 
 // ================= Ficha de la paciente (línea de tiempo) =================
@@ -3572,10 +3992,10 @@ function fichaEventos(grupo, colpos) {
     ev.push({ fecha: p.fecha_toma || '', tono, titulo: tipo, meta: [p.doctora, p.numero_folio_pap ? 'N° ' + p.numero_folio_pap : ''].filter(Boolean).join(' · '), lineas, id: p.id });
     if (p.anticonceptivo_metodo && p.anticonceptivo_fecha_inicio) ev.push({ fecha: p.anticonceptivo_fecha_inicio, tono: 'met', titulo: 'Método anticonceptivo: ' + esc(p.anticonceptivo_metodo), meta: '', lineas: p.anticonceptivo_proximo_control ? [`<span class="fxMut">Próximo control: ${fmtFecha(p.anticonceptivo_proximo_control)}</span>`] : [] });
   });
-  (fichaConsultas || []).filter(c => grupo.some(g => String(g.id) === String(c.paciente_id))).forEach(c => ev.push({ fecha: c.fecha || '', tono: 'soap', titulo: 'Consulta (SOAP)', meta: c.doctora || '', lineas: [
+  (fichaConsultas || []).filter(c => grupo.some(g => String(g.id) === String(c.paciente_id))).forEach(c => ev.push({ fecha: c.fecha || '', tono: 'soap', titulo: 'Consulta (SOAP)', meta: [c.doctora, c.especialidad && c.codigo_esp ? c.especialidad + ' · ' + c.codigo_esp : c.especialidad].filter(Boolean).join(' · '), lineas: [
     c.subjetivo ? '<b>S:</b> ' + esc(c.subjetivo) : '', c.analisis ? '<b>A:</b> ' + esc(c.analisis) : '',
     (Array.isArray(c.plan) && c.plan.length) || c.plan_texto ? '<b>P:</b> ' + esc([...(Array.isArray(c.plan) ? c.plan : []), c.plan_texto].filter(Boolean).join('. ')) : '', c.derivacion ? '➡️ Derivación: ' + esc(c.derivacion) : ''].filter(Boolean) }));
-  (colpos || []).forEach(c => ev.push({ fecha: c.fecha || '', tono: 'colpo', titulo: 'Colposcopia', meta: '', lineas: [c.lesion ? 'Lesión: ' + esc(c.lesion) : '', c.zona_afectada ? 'Zona: ' + esc(c.zona_afectada) : '', c.prueba_schiller ? 'Schiller: ' + esc(c.prueba_schiller) : ''].filter(Boolean) }));
+  (colpos || []).forEach(c => ev.push({ fecha: c.fecha || '', tono: 'colpo', titulo: 'Colposcopia', meta: '', lineas: [c.lesion ? 'Lesión: ' + esc(c.lesion) : '', c.zona_afectada ? 'Zona: ' + esc(c.zona_afectada) : '', c.prueba_schiller ? 'Schiller: ' + esc(c.prueba_schiller) : '', c.cuello_mapa && cuelloTexto(c.cuello_mapa) ? '🕐 ' + esc(cuelloTexto(c.cuello_mapa)) : ''].filter(Boolean) }));
   return ev.sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
 }
 async function openFicha(p) {
@@ -4003,6 +4423,54 @@ async function loadTrash() {
 let colpPatient = null;
 let colpEditingId = null;
 
+// ---- Reloj del cuello dentro del formulario de colposcopia ----
+let cuelloMapa = { marcas: {}, zt: null, impresion: null }, cuelloTool = 'acetoblanco', cuelloColPromise = null;
+function cuelloOk() {
+  if (!sb) return Promise.resolve(false);
+  if (!cuelloColPromise) cuelloColPromise = sb.from('colposcopias').select('cuello_mapa').limit(1).then(({ error }) => !error, () => false);
+  return cuelloColPromise;
+}
+function cuelloRender() {
+  const box = document.getElementById('cuelloSvgBox'); if (!box) return;
+  box.innerHTML = cuelloSVG(cuelloMapa, 240);
+  document.getElementById('cuelloTools').innerHTML = CUELLO_TIPOS.map(t => {
+    const hs = cuelloMapa.marcas[t.id] || [];
+    return `<button type="button" class="cTool${cuelloTool === t.id ? ' on' : ''}" data-t="${t.id}"><i style="background:${t.color}"></i>${t.id === 'biopsia' ? '📍 ' : ''}${t.nombre}${hs.length ? ` <small style="color:var(--ink-soft)">· ${cuelloHoras(hs).join(', ')} h</small>` : ''}</button>`;
+  }).join('') + '<button type="button" class="cTool" data-t="__limpiar" style="justify-content:center;color:var(--ink-soft)">Borrar todo</button>';
+  document.querySelectorAll('#cuelloBlock .cuelloChips').forEach(g => g.querySelectorAll('button').forEach(b => b.classList.toggle('on', cuelloMapa[g.dataset.cg] === b.dataset.v)));
+  const txt = cuelloTexto(cuelloMapa);
+  document.getElementById('cuelloRes').innerHTML = txt ? '<b>Se escribe solo en la Historia clínica:</b> ' + esc(txt) : '<span style="color:var(--ink-soft)">Sin marcas todavía.</span>';
+}
+(function () {
+  const blk = document.getElementById('cuelloBlock'); if (!blk) return;
+  blk.addEventListener('click', e => {
+    const hr = e.target.closest('.cHr');
+    if (hr) {
+      const h = Number(hr.dataset.h), l = cuelloMapa.marcas[cuelloTool] = cuelloMapa.marcas[cuelloTool] || [];
+      const i = l.indexOf(h); if (i >= 0) l.splice(i, 1); else l.push(h);
+      cuelloRender(); return;
+    }
+    const tool = e.target.closest('.cTool');
+    if (tool) {
+      if (tool.dataset.t === '__limpiar') { if (confirm('¿Borrar todas las marcas del reloj?')) cuelloMapa.marcas = {}; }
+      else cuelloTool = tool.dataset.t;
+      cuelloRender(); return;
+    }
+    const ch = e.target.closest('.cuelloChips button');
+    if (ch) { const g = ch.parentElement.dataset.cg; cuelloMapa[g] = cuelloMapa[g] === ch.dataset.v ? null : ch.dataset.v; cuelloRender(); }
+  });
+})();
+async function cuelloPreparar(colp) {
+  const m = colp && colp.cuello_mapa;
+  cuelloMapa = { marcas: JSON.parse(JSON.stringify((m && m.marcas) || {})), zt: (m && m.zt) || null, impresion: (m && m.impresion) || null };
+  cuelloTool = 'acetoblanco';
+  const ok = await cuelloOk();
+  document.getElementById('cuelloBlock').style.display = ok ? '' : 'none';
+  document.getElementById('cuelloNota').style.display = ok ? 'none' : '';
+  cuelloRender();
+}
+function cuelloVacio(m) { return !m.zt && !m.impresion && !Object.values(m.marcas || {}).some(l => l.length); }
+
 function fillColpForm(form, colp) {
   form.fecha.value = colp.fecha || '';
   form.prueba_schiller.value = colp.prueba_schiller || '';
@@ -4039,6 +4507,7 @@ async function openColposcopia(p) {
     colpEditingId = null;
     form.reset();
   }
+  await cuelloPreparar(colpEditingId ? existing : null);
   document.getElementById('colpPatientName').textContent = p.nombre || '';
   document.getElementById('colpOverlay').classList.add('open');
 }
@@ -4066,6 +4535,7 @@ document.getElementById('colpForm').addEventListener('submit', async (e) => {
     plan: fd.getAll('plan'),
     derivacion: fd.get('derivacion') || null,
   };
+  if (await cuelloOk()) data.cuello_mapa = cuelloVacio(cuelloMapa) ? null : cuelloMapa;
   let error;
   if (colpEditingId) {
     ({ error } = await sb.from('colposcopias').update(data).eq('id', colpEditingId));
@@ -4185,13 +4655,26 @@ function buildTemplateData(p) {
   };
 }
 
+const HC_WRAP = new Set(['colp_subjetivo', 'colp_objetivo', 'colp_analisis', 'colp_plan']);
+function lineasDe(font, text, size, maxW) {
+  let n = 0;
+  String(text).split('\n').forEach(par => {
+    let line = '';
+    n++;
+    par.split(/\s+/).forEach(w => {
+      const t = line ? line + ' ' + w : w;
+      if (font.widthOfTextAtSize(t, size) > maxW && line) { n++; line = w; } else line = t;
+    });
+  });
+  return n;
+}
 async function fillPdfForm(b64, data) {
   const bytes = b64ToBytes(b64);
   const pdfDoc = await PDFLib.PDFDocument.load(bytes);
   const form = pdfDoc.getForm();
   const helv = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
   const forcedSizes = {
-    colp_fecha: 7, fecha_toma: 7,
+    colp_fecha: 6, fecha_toma: 7,
   };
   const fitFields = new Set(['direccion', 'colp_subjetivo', 'colp_objetivo', 'colp_analisis', 'colp_plan']);
   const getBaseFontSize = (field, fallback) => {
@@ -4207,8 +4690,17 @@ async function fillPdfForm(b64, data) {
       const field = form.getTextField(key);
       const text = value == null ? '' : String(value);
       field.setText(text);
-      if (fitFields.has(key)) {
-        const baseSize = getBaseFontSize(field, 7);
+      if (HC_WRAP.has(key)) {
+        // S-O-A-P de la HC: texto en varias líneas con la letra más grande que entre en el cuadro
+        const w = field.acroField.getWidgets()[0];
+        { const r = w.getRectangle(); w.setRectangle(key === 'colp_plan' ? { x: r.x, y: 352, width: 320, height: 19 } : { x: r.x, y: r.y, width: Math.min(r.width, 402), height: r.height }); } // dentro del borde de la tabla
+        const r = w.getRectangle();
+        field.enableMultiline();
+        let size = 8;
+        for (; size > 4; size -= 0.25) if (lineasDe(helv, text, size, r.width - 4) * size * 1.22 <= r.height - 1) break;
+        field.setFontSize(size);
+      } else if (fitFields.has(key) || /^d1_(item|indic)_/.test(key)) {
+        const baseSize = key.startsWith('d1_item') ? 9.5 : key.startsWith('d1_indic') ? 8 : getBaseFontSize(field, 7);
         let size = baseSize;
         try {
           const rect = field.acroField.getWidgets()[0].getRectangle();
@@ -4219,12 +4711,23 @@ async function fillPdfForm(b64, data) {
           }
         } catch (e) { /* fallback to base size */ }
         field.setFontSize(size);
+      } else if (key.startsWith('d1_cant')) {
+        field.setFontSize(10);
       } else if (forcedSizes[key]) {
         field.setFontSize(forcedSizes[key]);
       }
     } catch (e) { /* field doesn't exist in this doc, skip */ }
   }
   form.updateFieldAppearances();
+  // D1: "Otro diagnóstico: T - código" según la especialidad (el del modelo viene impreso con 17576016)
+  if (data.__codigo_d1) {
+    try {
+      form.getTextField('d1_item_1');
+      const page = pdfDoc.getPage(0), times = await pdfDoc.embedFont(PDFLib.StandardFonts.TimesRoman);
+      page.drawRectangle({ x: 93, y: 531.5, width: 62, height: 11, color: PDFLib.rgb(1, 1, 1) });
+      page.drawText('T - ' + data.__codigo_d1, { x: 95.6, y: 533.9, size: 8.7, font: times, color: PDFLib.rgb(0, 0, 0) });
+    } catch (e) { /* no es el D1 */ }
+  }
   try {
     const boldFont = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
     const numeroField = form.getTextField('numero');
@@ -4243,7 +4746,11 @@ async function printPatientDocs(p) {
   data.sexo_f = 'X';
   data.sexo_f2 = 'X';
 
-  await completarHc(data, p); // consulta (SOAP) + colposcopia
+  const info = await completarHc(data, p); // consulta (SOAP + receta) + colposcopia
+  printEspElegida = info.esp.id; currentPrintData = data;
+  const selEsp = document.getElementById('printEsp');
+  selEsp.innerHTML = ESPECIALIDADES.map(e => `<option value="${e.id}">${esc(e.nombre)} · ${e.codigo}</option>`).join('');
+  selEsp.value = info.esp.id;
   document.getElementById('printTitle').textContent = 'Documentos — ' + (p.nombre || '');
   document.getElementById('printOverlay').classList.add('open');
   document.getElementById('printLoading').style.display = 'block';
@@ -4268,6 +4775,16 @@ async function printPatientDocs(p) {
   document.getElementById('printLoading').style.display = 'none';
 }
 
+let printEspElegida = null, currentPrintData = null;
+async function cambiarEspImpresion(id) {
+  const esp = espBuscar(id); if (!esp || !currentPrintData || !currentPrintPatient) return;
+  printEspElegida = esp.id; currentPrintData.__codigo_d1 = esp.codigo;
+  espRecordar(currentPrintPatient.doctora, esp);
+  const blob = await fillPdfForm(PDFTPL_D1, { ...currentPrintData, numero: currentPrintPatient.numero_folio_d1 || '' });
+  const url = URL.createObjectURL(blob); currentPdfUrls.push(url);
+  document.getElementById('prevD1').src = url;
+  showToast('D1 con código ' + esp.codigo + ' (' + esp.nombre + ')', 'ok');
+}
 function closePrintOverlay() {
   document.getElementById('printOverlay').classList.remove('open');
   currentPdfUrls.forEach(u => URL.revokeObjectURL(u));
@@ -4384,7 +4901,8 @@ async function saveDocsToDrive() {
     const data = buildTemplateData(p);
     data.sexo_f = 'X';
     data.sexo_f2 = 'X';
-    await completarHc(data, p); // consulta (SOAP) + colposcopia
+    await completarHc(data, p); // consulta (SOAP + receta) + colposcopia
+    if (printEspElegida && espBuscar(printEspElegida)) data.__codigo_d1 = espBuscar(printEspElegida).codigo;
 
     const targets = [
       { tpl: PDFTPL_D1, numero: p.numero_folio_d1 },

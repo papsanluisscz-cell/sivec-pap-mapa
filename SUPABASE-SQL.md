@@ -80,6 +80,21 @@ grant select, insert, update, delete on consultas to anon, authenticated;
 
 ---
 
+## Paso 6 — Consulta con figuras, especialidad y reloj del cuello (recomendado, sin riesgo)
+
+- `consultas.detalle`: lo marcado con toques (síntomas, gotas, colores, tratamientos) para volver a abrir la consulta tal cual.
+- `consultas.especialidad` / `codigo_esp`: Medicina general (17576016) o Ginecología (17576012); el código sale en el D1.
+- `colposcopias.cuello_mapa`: las lesiones marcadas en el reloj del cuello.
+
+```sql
+alter table consultas add column if not exists detalle jsonb;
+alter table consultas add column if not exists especialidad text;
+alter table consultas add column if not exists codigo_esp text;
+alter table colposcopias add column if not exists cuello_mapa jsonb;
+```
+
+---
+
 ## Paso 3 — Proteger los datos de las pacientes (IMPORTANTE)
 
 Hoy cualquiera que tenga la URL y la clave *anon* de Supabase puede leer todos los datos.
