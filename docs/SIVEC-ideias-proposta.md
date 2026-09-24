@@ -198,3 +198,18 @@ Números animados com tendência, embudo "Del tamizaje al seguimiento", "Para ha
 - **No SIVEC completo** a mesma linha do tempo recebe eventos de todos os módulos, cada um com ícone/cor própria e o **centro** onde aconteceu:
   consultas, **resultados de laboratório** (valores + referência), **imagens e laudos** (RX/eco), receitas, vacinas, programas (TB, Chagas, Raiva…), derivações/contrarreferências, internações.
 - Filtros por tipo de evento e por período; no topo, o **Resumo clínico** (alergias, resistências, antecedentes) e a foto da recepção.
+
+### [24/09/2026] Linha do tempo completa (SIVEC) — organização
+**Ideia do autor:** a linha do tempo do SIVEC deve ter **todas** as informações, organizadas por tipo:
+- **Laboratórios recentes** (destacados no topo);
+- **Laboratórios de rotina** (histórico, com evolução dos valores);
+- **Imagens** (RX, eco — laudo + imagem);
+- **Pedidos de laboratório/imagem não realizados** (pendentes, com dias de espera);
+- tudo se completando automaticamente à medida que os centros ficam interligados.
+
+**Sugestão do Claude para a tela:** abas/filtros no topo da ficha — *Tudo · Laboratório · Imagens · Pedidos pendentes · Programas · Receitas* — e um bloco fixo "Últimos resultados" (os 5 mais recentes, com seta ↑↓ comparando com o anterior).
+
+### [24/09/2026] Modelo de negócio (ideia do autor, a desenvolver)
+- Vender o SIVEC PAP/VPH (estimativa do autor: USD 8.000–16.000), escalável por redes/centros.
+- Depois vender a **atualização para o SIVEC completo** (todos os módulos).
+- Pontos a resolver antes de vender: titularidade/direitos do software, hospedagem e backups profissionais, segurança (login+RLS), contrato de suporte e manutenção, adequação às regras de contratação pública.
