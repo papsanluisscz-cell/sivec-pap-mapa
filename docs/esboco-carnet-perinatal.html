@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Carnet perinatal digital</title>
+<title>Historia perinatal SIVEC</title>
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
@@ -172,6 +172,21 @@
   .tlc { border-radius:14px; padding:12px 14px; } .tlc h4 { margin:0 0 10px; font-size:15px; }
   .ev { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 10px; font-size:12.8px; margin-bottom:7px; line-height:1.35; } .ev small { color:var(--soft); display:block; font-size:11.5px; }
   .ev.lk { border:2px solid var(--wine); }
+  .paper { background:#fff; max-width:1000px; margin:0 auto; border:1px solid #ddd; box-shadow:0 4px 16px rgba(0,0,0,.10); padding:26px 30px; font-size:12px; color:#222; line-height:1.35; }
+  .ph1 { display:flex; align-items:center; gap:12px; border-bottom:3px solid var(--wine); padding-bottom:8px; }
+  .ph1 .lg { width:40px; height:40px; border-radius:24%; background:linear-gradient(145deg,#9c3a5f,#5a1c36); color:#fff; font-weight:900; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .ph1 h3 { margin:0; font-size:18px; letter-spacing:.02em; } .ph1 .sm { font-size:11px; color:#666; }
+  .sec { margin-top:10px; border:1px solid #d8cdd2; border-radius:6px; overflow:hidden; }
+  .sec > h5 { margin:0; background:#f3e7ec; color:var(--wine-d); font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; padding:4px 8px; }
+  .sec .in2 { padding:6px 8px; }
+  .fg { display:grid; gap:4px 10px; } .fg div { border-bottom:1px solid #eee; padding:2px 0; } .fg small { display:block; font-size:9.5px; color:#8a7a81; text-transform:uppercase; letter-spacing:.03em; } .fg b { font-size:12.5px; }
+  .pt { width:100%; border-collapse:collapse; font-size:11.3px; } .pt th { background:#faf5f7; font-size:9.8px; text-transform:uppercase; color:#6f6168; border:1px solid #e6dce0; padding:3px 4px; text-align:left; } .pt td { border:1px solid #eee4e8; padding:3px 4px; }
+  .ya { color:#991b1b; font-weight:800; } .no2 { color:#15803d; }
+  .alx { background:#fff4f4; border:1px solid #f3c4c4; border-radius:6px; padding:5px 8px; }
+  .sig { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:12px; } .sig div { border-top:1px solid #999; padding-top:3px; font-size:10.5px; color:#555; text-align:center; }
+  .cn { display:grid; grid-template-columns:1fr 1fr; gap:0; max-width:1000px; margin:0 auto; background:#fff; border:1px solid #ddd; box-shadow:0 4px 16px rgba(0,0,0,.10); }
+  .cn > div { padding:16px 18px; font-size:12px; line-height:1.4; } .cn > div + div { border-left:2px dashed #ccc; }
+  .cn h6 { margin:10px 0 4px; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--wine-d); }
 </style>
 </head>
 <body>
@@ -179,10 +194,12 @@
   <button class="tab on" data-t="q1">1. Hoy vs. modelo SIVEC</button>
   <button class="tab" data-t="q2">2. Resumen del embarazo</button>
   <button class="tab" data-t="q3">3. Control prenatal guiado</button>
-  <button class="tab" data-t="q4">4. App: Mi embarazo</button>
-  <button class="tab" data-t="q5">5. HCP oficial automática</button>
-  <button class="tab" data-t="q6">6. RN: sala de partos o recuperación</button>
-  <button class="tab" data-t="q7">7. Dos líneas de tiempo</button>
+  <button class="tab" data-t="qa">4. Historia perinatal SIVEC · hoja 1</button>
+  <button class="tab" data-t="qb">5. Historia perinatal · hoja 2</button>
+  <button class="tab" data-t="q4">6. Carnet impreso de la mamá</button>
+  <button class="tab" data-t="q5">7. HCP oficial y envíos</button>
+  <button class="tab" data-t="q6">8. RN: sala de partos o recuperación</button>
+  <button class="tab" data-t="q7">9. Dos líneas de tiempo</button>
 </div>
 <div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Modelo basado en las guías digitales de la OMS para el control prenatal (SMART Guidelines / DAK prenatal), el registro en manos de la mujer (OMS) y el Sistema Informático Perinatal del CLAP-OPS. La HCP oficial sigue saliendo, pero la llena el sistema.</div>
 
@@ -199,7 +216,7 @@
           <div class="rk"><span class="st ok">1</span><div><strong>Cada dato se escribe una vez, donde ocurre</strong> · recepción, control, laboratorio, sala de partos, Pediatría… nadie lo vuelve a copiar.</div></div>
           <div class="rk"><span class="st ok">2</span><div><strong>La pantalla muestra solo lo de ese momento</strong> · el control sigue pasos (OMS: 8 contactos), no una hoja entera.</div></div>
           <div class="rk"><span class="st ok">3</span><div><strong>Las casillas amarillas del CLAP son alertas automáticas</strong> · el sistema las calcula y las pone arriba en rojo.</div></div>
-          <div class="rk"><span class="st ok">4</span><div><strong>La mujer tiene su carnet en el celular</strong> (OMS recomienda el registro en manos de la mujer) · con QR para mostrar en cualquier centro.</div></div>
+          <div class="rk"><span class="st ok">4</span><div><strong>La mujer lleva su carnet impreso</strong> (OMS recomienda el registro en manos de la mujer) · sale del sistema, con QR · sin app nueva.</div></div>
           <div class="rk" style="border:none"><span class="st ok">5</span><div><strong>La HCP oficial, el SIP y el SNIS salen solos</strong> · con códigos CIE-10 · en estándar HL7 FHIR.</div></div></div>
         <div class="card" style="margin-top:12px"><div class="lbl">¿Dónde se llena cada parte de la HCP en SIVEC?</div>
           <table class="lab"><thead><tr><th>Sección HCP</th><th>Se llena en…</th><th>Quién</th></tr></thead><tbody>
@@ -273,39 +290,117 @@
   </div>
 </section>
 
+<!-- ============ QA ============ -->
+<section class="scr" id="qa">
+  <div class="app"><div class="brand">SIVEC <span>HISTORIA PERINATAL</span></div><div class="who">📄 Hoja 1 · embarazo · se llena sola con los datos del SIVEC</div></div>
+  <div class="body" style="background:#ece6e9">
+   <div class="paper">
+    <div class="ph1"><div class="lg">S</div><div style="flex:1"><h3>HISTORIA CLÍNICA PERINATAL · SIVEC</h3><div class="sm">Red Centro · C.S. San Luis → Hosp. de la Mujer · estructura OMS (control prenatal) + campos CLAP-SIP</div></div>
+      <div style="text-align:right;font-size:11px">HC Nº <b>SL-2026-00418</b><br>Cód. seguro <b>SUS 8456221</b><br>Hoja 1 de 2</div>
+      <svg viewBox="0 0 21 21" width="52" height="52" shape-rendering="crispEdges"><rect width="21" height="21" fill="#fff"/><g fill="#222"><rect width="7" height="7"/><rect x="14" width="7" height="7"/><rect y="14" width="7" height="7"/><rect x="9" y="2" width="2" height="3"/><rect x="8" y="8" width="5" height="2"/><rect x="15" y="9" width="3" height="3"/><rect x="9" y="13" width="3" height="2"/><rect x="14" y="15" width="2" height="4"/><rect x="18" y="17" width="3" height="2"/></g><g fill="#fff"><rect x="1" y="1" width="5" height="5"/><rect x="15" y="1" width="5" height="5"/><rect x="1" y="15" width="5" height="5"/></g><g fill="#222"><rect x="2" y="2" width="3" height="3"/><rect x="16" y="2" width="3" height="3"/><rect x="2" y="16" width="3" height="3"/></g></svg></div>
+
+    <div class="sec"><h5>A · Identificación</h5><div class="in2 fg" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr">
+      <div><small>Nombre</small><b>Carla Torres Rojas</b></div><div><small>CI</small><b>8.456.221 SC</b></div><div><small>Nacimiento · edad</small><b>14/05/2000 · 26 a</b></div><div><small>Autoidentificación</small><b>mestiza</b></div><div><small>Estudios</small><b>secundaria · 12 años</b></div>
+      <div><small>Domicilio</small><b>B/ San Luis, calle 4 Nº 118 · UV 92</b></div><div><small>Teléfono</small><b>7xx-xx-412</b></div><div><small>Estado civil</small><b>unión estable</b></div><div><small>Idioma</small><b>castellano</b></div><div><small>Contacto</small><b>Luis T. (esposo)</b></div></div></div>
+
+    <div class="sec"><h5>B · Resumen del embarazo y alertas</h5><div class="in2" style="display:grid;grid-template-columns:1.3fr 1fr;gap:10px">
+      <div class="fg" style="grid-template-columns:repeat(4,1fr)"><div><small>FUM</small><b>08/03/2026</b></div><div><small>FPP</small><b>13/12/2026</b></div><div><small>EG confiable por</small><b>FUM + eco &lt;20 s</b></div><div><small>Fórmula</small><b>G2 P1 C0 A0</b></div><div><small>Grupo · Rh</small><b>O +</b></div><div><small>Riesgo</small><b class="ya">moderado</b></div><div><small>Embarazo planeado</small><b>no</b></div><div><small>Plan de parto</small><b>Hosp. de la Mujer</b></div></div>
+      <div class="alx"><b class="ya">ALERTAS</b><br>• Anemia leve (Hb 10,8 · 2º trim.)<br>• Sobrepeso (IMC 27) · ganancia alta<br>• Madre con diabetes tipo 2 → curva de glucosa</div></div></div>
+
+    <div class="sec"><h5>C · Antecedentes <span style="text-transform:none;font-weight:600;color:#6f6168">· se imprime todo; lo positivo en rojo</span></h5><div class="in2" style="display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:10px">
+      <div><b>Familiares</b><br><span class="ya">Diabetes (madre)</span><br><span class="no2">No: TBC · HTA · preeclampsia · eclampsia · otra grave</span></div>
+      <div><b>Personales</b><br><span class="no2">No: TBC · diabetes · HTA · preeclampsia · cirugía pélvica · infertilidad · cardiopatía · nefropatía · violencia · VIH</span></div>
+      <div><b>Obstétricos</b><table class="pt" style="margin-top:3px"><tr><th>Año</th><th>Terminación</th><th>Peso RN</th><th>Complicación</th></tr><tr><td>2021</td><td>parto vaginal</td><td>3.100 g</td><td>ninguna</td></tr></table>
+        <span style="font-size:10.5px">Gemelares previos: no · Fracaso anticonceptivo: no usaba</span></div></div></div>
+
+    <div class="sec"><h5>D · Gestación actual</h5><div class="in2 fg" style="grid-template-columns:repeat(6,1fr)">
+      <div><small>Peso anterior</small><b>64 kg</b></div><div><small>Talla</small><b>154 cm</b></div><div><small>IMC inicial</small><b>27,0</b></div><div><small>Fuma / alcohol / drogas</small><b>no · no · no</b></div><div><small>Violencia (1er·2º·3er)</small><b>no · no · —</b></div><div><small>Ex. odontológico · mamas</small><b>normal · normal</b></div>
+      <div><small>Vacuna antitetánica</small><b>vigente</b></div><div><small>dTpa</small><b>24/09 · 28 s</b></div><div><small>Influenza</small><b>12/06</b></div><div><small>Hierro · ácido fólico</small><b>sí · sí</b></div><div><small>Cérvix / PAP</small><b>2025 · NILM</b></div><div><small>Consejería lactancia</small><b>—</b></div></div></div>
+
+    <div class="sec"><h5>E · Laboratorios</h5><div class="in2"><table class="pt"><tr><th>Examen</th><th>1er trimestre</th><th>2º trimestre</th><th>3er trimestre</th></tr>
+      <tr><td>Hemoglobina</td><td>12,1 · 12/06</td><td class="ya">10,8 · 26/08</td><td>pedir 34 s</td></tr>
+      <tr><td>Glucemia / curva 75 g</td><td>84 · 12/06</td><td>pedida 24/09</td><td></td></tr>
+      <tr><td>VIH · sífilis (prueba rápida)</td><td>no reactivo · no reactivo</td><td></td><td>pedir 34 s</td></tr>
+      <tr><td>Toxoplasma · Chagas · hepatitis B</td><td>IgG – · negativo · negativo</td><td></td><td></td></tr>
+      <tr><td>Orina / urocultivo</td><td>normal</td><td>normal</td><td></td></tr>
+      <tr><td>Estreptococo B (35–37 s)</td><td></td><td></td><td>pendiente</td></tr></table></div></div>
+
+    <div class="sec"><h5>F · Contactos prenatales <span style="text-transform:none;font-weight:600;color:#6f6168">· 1 fila por control, desde el control guiado</span></h5><div class="in2"><table class="pt">
+      <tr><th>Fecha</th><th>EG</th><th>Peso</th><th>PA</th><th>AU</th><th>Present.</th><th>FCF</th><th>Mov.</th><th>Prot.</th><th>Conducta / alarmas</th><th>Responsable</th><th>Próx.</th></tr>
+      <tr><td>12/06</td><td>12+3</td><td>64,5</td><td>108/68</td><td>—</td><td>—</td><td>156</td><td>—</td><td>–</td><td>captación · labs 1er trim.</td><td>Dra. Méndez</td><td>03/07</td></tr>
+      <tr><td>03/07</td><td>16+6</td><td>66,0</td><td>110/70</td><td>15</td><td>—</td><td>150</td><td>—</td><td>–</td><td>normal</td><td>Lic. Cuéllar</td><td>31/07</td></tr>
+      <tr><td>31/07</td><td>20+6</td><td>67,8</td><td>112/68</td><td>20</td><td>—</td><td>146</td><td>sí</td><td>–</td><td>eco morfológica normal</td><td>Dra. Méndez</td><td>10/09</td></tr>
+      <tr><td>10/09</td><td>26+4</td><td>70,1</td><td>110/72</td><td>26</td><td>cef.</td><td>144</td><td>sí</td><td>–</td><td class="ya">anemia leve → hierro 60 mg</td><td>Dra. Méndez</td><td>24/09</td></tr>
+      <tr><td>24/09</td><td>28+4</td><td>71,2</td><td>112/70</td><td>28</td><td>cef.</td><td>142</td><td>sí</td><td>–</td><td>dTpa · curva de glucosa</td><td>Dra. Méndez</td><td>08/10</td></tr></table></div></div>
+    <div style="font-size:10px;color:#777;margin-top:6px">Generado por SIVEC 24/09/2026 10:32 · cada dato tiene origen (quién y cuándo) en la línea de tiempo · Códigos CLAP/CIE-10 en hoja 2</div>
+   </div>
+  </div>
+</section>
+
+<!-- ============ QB ============ -->
+<section class="scr" id="qb">
+  <div class="app"><div class="brand">SIVEC <span>HISTORIA PERINATAL</span></div><div class="who">📄 Hoja 2 · parto, RN, puerperio y egreso · se completa sola (ejemplo al alta)</div></div>
+  <div class="body" style="background:#ece6e9">
+   <div class="paper">
+    <div class="ph1"><div class="lg">S</div><div style="flex:1"><h3>HISTORIA CLÍNICA PERINATAL · SIVEC</h3><div class="sm">Carla Torres Rojas · CI 8.456.221 · HC SL-2026-00418</div></div><div style="text-align:right;font-size:11px">Hoja 2 de 2</div></div>
+
+    <div class="sec"><h5>G · Ingreso y trabajo de parto</h5><div class="in2 fg" style="grid-template-columns:repeat(6,1fr)">
+      <div><small>Ingreso</small><b>10/12 · 22:10</b></div><div><small>EG al ingreso</small><b>39+3 (FUM y eco)</b></div><div><small>Presentación</small><b>cefálica</b></div><div><small>Membranas</small><b>íntegras</b></div><div><small>Corticoide antenatal</small><b>no corresponde</b></div><div><small>Acompañante</small><b>pareja</b></div>
+      <div style="grid-column:span 3"><small>Partograma (resumen)</small><b>4 cm 23:00 → 7 cm 05:00 · detenido 7 cm 09:00 · cruza línea de acción</b></div><div style="grid-column:span 3"><small>Enfermedades del embarazo</small><b class="ya">anemia (71) · sobrepeso</b></div></div></div>
+
+    <div class="sec"><h5>H · Nacimiento</h5><div class="in2 fg" style="grid-template-columns:repeat(6,1fr)">
+      <div><small>Fecha · hora</small><b>11/12 · 10:40</b></div><div><small>Terminación</small><b class="ya">cesárea</b></div><div><small>Indicación</small><b>desproporción c-p (03)</b></div><div><small>Lugar</small><b>Quirófano 2</b></div><div><small>Anestesia</small><b>raquídea</b></div><div><small>Alumbramiento</small><b>placenta completa</b></div>
+      <div><small>Sangrado</small><b>600 mL</b></div><div><small>Oxitócicos</small><b>sí</b></div><div><small>Antibiótico</small><b>cefazolina</b></div><div><small>Pinzamiento</small><b>tardío 60 s</b></div><div><small>Atendió</small><b>Dr. Paz 🖐</b></div><div><small>Transfusión</small><b>no</b></div></div></div>
+
+    <div class="sec"><h5>I · Recién nacido <span style="text-transform:none;font-weight:600;color:#6f6168">· llenado por Pediatría · ficha propia RN-2026-0932</span></h5><div class="in2">
+      <div class="fg" style="grid-template-columns:repeat(8,1fr)"><div><small>Sexo</small><b>F</b></div><div><small>Peso</small><b>3.250 g</b></div><div><small>Talla</small><b>50 cm</b></div><div><small>PC</small><b>34 cm</b></div><div><small>EG (Capurro)</small><b>39 s</b></div><div><small>Peso p/EG</small><b>adecuado</b></div><div><small>Apgar 1′ · 5′</small><b>8 · 9</b></div><div><small>Reanimación</small><b>no</b></div></div>
+      <div style="margin-top:5px;font-size:11.3px"><b>Atención inmediata:</b> cuna radiante 10:41 · secado y abrigo ✓ · aspiración no necesaria · apego en recuperación 11:20 · lactancia 1ª hora ✓ · vitamina K ✓ · profilaxis ocular ✓ · pulsera ✓ · BCG ✓ · hepatitis B ✓ · VDRL/VIH madre neg. · defectos congénitos: no · tamizaje neonatal 13/12</div>
+      <div class="fg" style="grid-template-columns:repeat(4,1fr);margin-top:4px"><div><small>Destino</small><b>alojamiento conjunto</b></div><div><small>Egreso RN</small><b>13/12 · vivo · 3.140 g</b></div><div><small>Alimentación al alta</small><b>lactancia exclusiva</b></div><div><small>Pediatra</small><b>Dr. Vargas 🖐</b></div></div></div></div>
+
+    <div class="sec"><h5>J · Puerperio</h5><div class="in2"><table class="pt"><tr><th>Fecha · hora</th><th>Lugar</th><th>T°</th><th>PA</th><th>Pulso</th><th>Involución</th><th>Loquios</th><th>Responsable</th></tr>
+      <tr><td>11/12 11:20</td><td>recuperación</td><td>36,6</td><td>118/74</td><td>84</td><td>contraído</td><td>normales</td><td>Lic. Rivero</td></tr>
+      <tr><td>12/12 08:00</td><td>piso</td><td>36,8</td><td>112/70</td><td>80</td><td>contraído</td><td>normales</td><td>Dra. Salinas</td></tr>
+      <tr><td>18/12</td><td>C.S. San Luis</td><td>36,5</td><td>110/70</td><td>76</td><td>adecuada</td><td>escasos</td><td>Dra. Méndez</td></tr></table></div></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="sec"><h5>K · Egreso materno y anticoncepción</h5><div class="in2 fg" style="grid-template-columns:1fr 1fr"><div><small>Egreso</small><b>13/12 · viva · día 2</b></div><div><small>Hb posparto</small><b>10,2</b></div><div><small>Consejería</small><b>sí</b></div><div><small>Método elegido</small><b>implante</b></div></div></div>
+      <div class="sec"><h5>L · Diagnósticos codificados</h5><div class="in2" style="font-size:11.3px">71 Anemia · O99.0 / D50<br>Indicación cesárea 03 · desproporción c-p · O65<br>RN sano · Z38.0</div></div></div>
+
+    <div class="sig"><div>Obstetra · Dr. Paz 🖐</div><div>Pediatra · Dr. Vargas 🖐</div><div>Enfermería · Lic. Rivero 🖐</div></div>
+    <div style="font-size:10px;color:#777;margin-top:6px">Las mismas variables del SIP (CLAP-OPS) → se exporta al SIP y al SNIS sin volver a digitar · también se puede imprimir en el formato oficial HCP</div>
+   </div>
+  </div>
+</section>
+
 <!-- ============ Q4 ============ -->
 <section class="scr" id="q4">
-  <div class="app"><div class="brand">SIVEC <span>MI SALUD</span></div><div class="who">📱 Mi embarazo · lo que ve Carla en su celular</div></div>
-  <div class="body">
-    <div class="phs">
-      <div><div class="dev"><div class="sb"><span>9:41</span><span>SIVEC Mi salud</span></div>
-        <div class="hd">Hola, Carla<strong>Semana 28 + 4 días</strong>faltan 11 semanas · FPP 13/12</div>
-        <div class="ct">
-          <div class="c" style="display:flex;gap:10px;align-items:center"><div style="font-size:34px">🍆</div><div><div class="t">Tu bebé</div>del tamaño de una berenjena · ~1,1 kg · ya abre los ojos</div></div>
-          <div class="c"><div class="t">Próximo control</div><strong>Mié 08/10 · 08:30</strong><br>C.S. San Luis · Dra. Méndez<span class="bt2 o2">Agregar al calendario</span></div>
-          <div class="c"><div class="t">Para hacer esta semana</div><div class="li"><span>💊 Tomar hierro (1 al día)</span><span>✓</span></div><div class="li"><span>🧪 Curva de glucosa · en ayunas</span><span>⏳</span></div><div class="li" style="border:none"><span>💉 Vacuna dTpa</span><span>✓ hoy</span></div></div>
-        </div>
-        <div class="nv"><span class="o">🤰<br>Inicio</span><span>📋<br>Carnet</span><span>🧳<br>Parto</span><span>👤<br>Perfil</span></div></div>
-        <div class="cap2"><strong>Inicio:</strong> semana, tamaño del bebé, próximo control y tareas.</div></div>
-      <div><div class="dev"><div class="sb"><span>9:41</span><span>SIVEC Mi salud</span></div>
-        <div class="hd">Mi carnet perinatal<strong>Carla Torres · O Rh+</strong>G2 P1 · riesgo moderado</div>
-        <div class="ct">
-          <div class="c"><div class="t">Mis controles · 5 de 8</div><div class="ctl" style="grid-template-columns:repeat(8,1fr);gap:3px"><span class="d" style="padding:4px 0;font-size:11px">1</span><span class="d" style="padding:4px 0;font-size:11px">2</span><span class="d" style="padding:4px 0;font-size:11px">3</span><span class="d" style="padding:4px 0;font-size:11px">4</span><span class="d" style="padding:4px 0;font-size:11px">5</span><span style="padding:4px 0;font-size:11px">6</span><span style="padding:4px 0;font-size:11px">7</span><span style="padding:4px 0;font-size:11px">8</span></div><div class="li" style="margin-top:4px"><span>Hoy: PA 112/70 · peso 71,2</span><span>✓</span></div></div>
-          <div class="c"><div class="t">Mis exámenes</div><div class="li"><span>Hemoglobina</span><span style="color:#991b1b;font-weight:700">10,8 · baja</span></div><div class="li"><span>VIH · sífilis</span><span style="color:#15803d;font-weight:700">negativos</span></div><div class="li" style="border:none"><span>Orina</span><span style="color:#15803d;font-weight:700">normal</span></div></div>
-          <div class="c" style="text-align:center"><div class="t">Mostrar en cualquier centro</div><svg viewBox="0 0 21 21" width="84" height="84" shape-rendering="crispEdges"><rect width="21" height="21" fill="#fff"/><g fill="#2d2429"><rect x="0" y="0" width="7" height="7"/><rect x="14" y="0" width="7" height="7"/><rect x="0" y="14" width="7" height="7"/><rect x="9" y="2" width="2" height="3"/><rect x="8" y="8" width="5" height="2"/><rect x="15" y="9" width="3" height="3"/><rect x="9" y="13" width="3" height="2"/><rect x="14" y="15" width="2" height="4"/><rect x="18" y="17" width="3" height="2"/><rect x="2" y="9" width="3" height="2"/></g><g fill="#fff"><rect x="1" y="1" width="5" height="5"/><rect x="15" y="1" width="5" height="5"/><rect x="1" y="15" width="5" height="5"/></g><g fill="#2d2429"><rect x="2" y="2" width="3" height="3"/><rect x="16" y="2" width="3" height="3"/><rect x="2" y="16" width="3" height="3"/></g></svg><div class="mini">el hospital abre tu carnet completo</div></div>
-        </div>
-        <div class="nv"><span>🤰<br>Inicio</span><span class="o">📋<br>Carnet</span><span>🧳<br>Parto</span><span>👤<br>Perfil</span></div></div>
-        <div class="cap2"><strong>Carnet:</strong> controles, exámenes y vacunas · QR en vez del carnet de papel.</div></div>
-      <div><div class="dev"><div class="sb"><span>9:41</span><span>SIVEC Mi salud</span></div>
-        <div class="hd">Mi plan de parto<strong>Hospital de la Mujer</strong>a 25 min · en micro 18 o taxi</div>
-        <div class="ct">
-          <div class="c"><div class="t">Mi plan</div><div class="li"><span>Acompañante</span><span>Luis (esposo)</span></div><div class="li"><span>Posición preferida</span><span>semisentada</span></div><div class="li" style="border:none"><span>Bolso listo</span><span>6 de 9 ✓</span></div></div>
-          <div class="c" style="border-color:#fecaca;background:#fff7f7"><div class="t" style="color:#991b1b">Vaya al hospital si tiene…</div>🩸 sangrado · 💧 pérdida de líquido · 🤕 dolor de cabeza fuerte o ve lucecitas · 🔥 fiebre · 👶 el bebé se mueve menos</div>
-          <div class="c"><div class="t">Movimientos del bebé</div>Hoy: <strong>10 en 1 h 20 min</strong> ✓<span class="bt2 o2">Contar ahora</span></div>
-          <div class="c"><div class="t">Mis preguntas para el control</div>¿Puedo seguir trabajando de pie? ✏️</div>
-        </div>
-        <div class="nv"><span>🤰<br>Inicio</span><span>📋<br>Carnet</span><span class="o">🧳<br>Parto</span><span>👤<br>Perfil</span></div></div>
-        <div class="cap2"><strong>Parto:</strong> plan de parto, señales de alarma, conteo de movimientos y preguntas.</div></div>
+  <div class="app"><div class="brand">SIVEC <span>MATERNO</span></div><div class="who">🖨️ Carnet de la mamá · 1 hoja A4 doblada · se reimprime en cada control</div></div>
+  <div class="body" style="background:#ece6e9">
+    <div class="cn">
+      <div>
+        <div class="ph1" style="border-bottom-width:2px"><div class="lg" style="width:32px;height:32px;font-size:16px">S</div><div style="flex:1"><h3 style="font-size:15px">MI CARNET PERINATAL</h3><div class="sm">C.S. San Luis · Red Centro</div></div>
+          <svg viewBox="0 0 21 21" width="58" height="58" shape-rendering="crispEdges"><rect width="21" height="21" fill="#fff"/><g fill="#222"><rect width="7" height="7"/><rect x="14" width="7" height="7"/><rect y="14" width="7" height="7"/><rect x="9" y="2" width="2" height="3"/><rect x="8" y="8" width="5" height="2"/><rect x="15" y="9" width="3" height="3"/><rect x="9" y="13" width="3" height="2"/><rect x="14" y="15" width="2" height="4"/><rect x="18" y="17" width="3" height="2"/></g><g fill="#fff"><rect x="1" y="1" width="5" height="5"/><rect x="15" y="1" width="5" height="5"/><rect x="1" y="15" width="5" height="5"/></g><g fill="#222"><rect x="2" y="2" width="3" height="3"/><rect x="16" y="2" width="3" height="3"/><rect x="2" y="16" width="3" height="3"/></g></svg></div>
+        <div style="font-size:16px;font-weight:800;margin-top:8px">Carla Torres Rojas</div><div>CI 8.456.221 · 26 años · <b>grupo O Rh+</b></div>
+        <div class="fg" style="grid-template-columns:1fr 1fr 1fr;margin-top:6px"><div><small>Fecha probable de parto</small><b style="font-size:15px">13/12/2026</b></div><div><small>Semanas hoy</small><b style="font-size:15px">28 + 4</b></div><div><small>Riesgo</small><b class="ya">moderado</b></div></div>
+        <h6>Mis controles</h6>
+        <table class="pt"><tr><th>Fecha</th><th>Sem.</th><th>Peso</th><th>Presión</th><th>Bebé (latidos)</th></tr>
+          <tr><td>12/06</td><td>12</td><td>64,5</td><td>108/68</td><td>156</td></tr><tr><td>03/07</td><td>16</td><td>66,0</td><td>110/70</td><td>150</td></tr><tr><td>31/07</td><td>20</td><td>67,8</td><td>112/68</td><td>146</td></tr><tr><td>10/09</td><td>26</td><td>70,1</td><td>110/72</td><td>144</td></tr><tr><td>24/09</td><td>28</td><td>71,2</td><td>112/70</td><td>142</td></tr></table>
+        <div style="margin-top:8px;background:#f3e7ec;border-radius:8px;padding:8px 10px;font-size:13px"><b>Próximo control: miércoles 08/10 · 08:30</b><br>C.S. San Luis · Dra. Méndez · traer este carnet</div>
+        <h6>Mis vacunas y remedios</h6><div>✓ antitetánica · ✓ influenza · ✓ dTpa (24/09) · 💊 hierro 1 al día · ácido fólico</div>
+      </div>
+      <div>
+        <h6 style="margin-top:0">Mis exámenes</h6>
+        <table class="pt"><tr><th>Examen</th><th>Resultado</th></tr><tr><td>Hemoglobina</td><td class="ya">10,8 · un poco baja → hierro</td></tr><tr><td>VIH · sífilis</td><td class="no2">negativos</td></tr><tr><td>Orina</td><td class="no2">normal</td></tr><tr><td>Curva de glucosa</td><td>ir en ayunas · antes del 08/10</td></tr></table>
+        <h6>Mi plan de parto</h6><div>🏥 <b>Hospital de la Mujer</b> · micro 18 o taxi · 25 min<br>👨 Acompañante: Luis (esposo) · 🧳 bolso listo a las 36 semanas</div>
+        <div style="margin-top:8px;border:2px solid #f3c4c4;background:#fff6f6;border-radius:8px;padding:8px 10px"><b class="ya">VAYA AL HOSPITAL SI TIENE:</b><br>🩸 sangrado · 💧 pérdida de líquido · 🤕 dolor de cabeza fuerte o ve lucecitas · 🦶 hinchazón de cara y manos · 🔥 fiebre · 👶 el bebé se mueve menos · ⏱ contracciones cada 5 min<br><b>Emergencia: 160</b></div>
+        <h6>Movimientos del bebé</h6><div>Desde la semana 28: cuente por la tarde; <b>10 movimientos en menos de 2 horas</b> es normal.</div>
+        <div style="margin-top:10px;font-size:10.5px;color:#777">Impreso por SIVEC 24/09/2026 · el QR abre su historia en cualquier centro de la red (solo personal de salud con huella)</div>
+      </div>
+    </div>
+    <div class="cols c3" style="margin-top:14px">
+      <div class="card" style="font-size:13px"><div class="lbl">Sin app nueva</div>La mamá lleva <b>papel</b>, como está acostumbrada; los datos viven en <b>una sola historia</b> en el SIVEC.</div>
+      <div class="card" style="font-size:13px"><div class="lbl">Siempre al día</div>Al cerrar cada control sale el carnet nuevo (1 hoja). Si lo pierde, se reimprime igual.</div>
+      <div class="card" style="font-size:13px"><div class="lbl">QR</div>En otro centro u hospital escanean el QR y abren la historia completa: nadie depende de lo que está escrito a mano.</div>
     </div>
   </div>
 </section>
@@ -326,9 +421,9 @@
         <div class="mini" style="margin-top:8px">Los diagnósticos se codifican solos con la lista CLAP / CIE-10 (ej. “Anemia por deficiencia de hierro” → 27 · D50).</div></div>
       <div>
         <div class="card"><div class="lbl">Imprimir o enviar</div>
-          <div class="chk3"><span class="ok">📄 HCP CLAP oficial (se imprime llena)</span><span class="ok">🪪 Carnet perinatal impreso (para quien no tiene celular)</span><span class="ok">📤 SIP del CLAP · exportación automática</span><span class="ok">📊 SNIS · controles, captación, parto institucional</span></div>
+          <div class="chk3"><span class="ok">📄 HCP CLAP oficial (se imprime llena)</span><span class="ok">🪪 Carnet de la mamá (1 hoja · se reimprime en cada control)</span><span class="ok">📤 SIP del CLAP · exportación automática</span><span class="ok">📊 SNIS · controles, captación, parto institucional</span></div>
           <div style="display:flex;gap:8px;margin-top:10px"><span class="btn p">Formato oficial</span><span class="btn">Formato SIVEC</span></div></div>
-        <div class="card" style="margin-top:12px"><div class="lbl">Mismo dato, muchos usos</div><div style="font-size:13px;line-height:1.55">La Hb 10,8 del laboratorio aparece en: <strong>HCP</strong> · <strong>alerta</strong> del control · <strong>Mi salud</strong> de Carla · <strong>tablero del gestor</strong> (anemia en embarazadas) · <strong>SNIS</strong>.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Mismo dato, muchos usos</div><div style="font-size:13px;line-height:1.55">La Hb 10,8 del laboratorio aparece en: <strong>HCP</strong> · <strong>alerta</strong> del control · <strong>carnet</strong> de Carla · <strong>tablero del gestor</strong> (anemia en embarazadas) · <strong>SNIS</strong>.</div></div>
       </div>
     </div>
   </div>
@@ -380,20 +475,22 @@
         <div class="ev"><small>18/12 · C.S. San Luis</small>Control del RN día 7 · Pediatría</div>
         <div class="ev"><small>de aquí en adelante</small>vacunas, crecimiento y controles del niño sano</div></div>
     </div>
-    <div class="mini" style="margin-top:10px;text-align:center">En Mi salud, Carla ve las dos fichas: la suya y la de su bebé (como “familia”).</div>
+    <div class="mini" style="margin-top:10px;text-align:center">Una sola base de datos: la historia perinatal de la mamá y la ficha del bebé quedan enlazadas; en papel, la mamá lleva su carnet y el bebé su carnet de salud infantil.</div>
   </div>
 </section>
 
 <div class="note" id="note"></div>
 <script>
   const NOTES = {
-    q1: '<b>Hoje vs. modelo SIVEC:</b> a HCP do CLAP tem ~450 casinhas numa folha só. O modelo recomendado (OMS SMART/DAK pré-natal + registro nas mãos da mulher + SIP do CLAP) segue 5 regras: cada dado uma vez, tela por momento, alertas automáticos, carnê no celular e HCP/SIP/SNIS gerados sozinhos. A tabela mostra onde cada seção da HCP é preenchida.',
+    q1: '<b>Hoje vs. modelo SIVEC:</b> a HCP do CLAP tem ~450 casinhas numa folha só. O modelo recomendado (OMS SMART/DAK pré-natal + registro nas mãos da mulher + SIP do CLAP) segue 5 regras: cada dado uma vez, tela por momento, alertas automáticos, carnê impresso e HCP/SIP/SNIS gerados sozinhos. A tabela mostra onde cada seção da HCP é preenchida.',
     q2: '<b>Resumo da gravidez:</b> tudo numa olhada — semanas, FPP, fórmula obstétrica, grupo, risco; os alertas (as antigas casinhas amarelas) no topo; antecedentes só o positivo; laboratórios por trimestre chegando do laboratório; vacinas e os 8 contatos.',
     q3: '<b>Controle pré-natal guiado:</b> 6 passos como no kit digital da OMS. Sinais por toques com curvas de altura uterina e ganho de peso; a guia sugere o que fazer hoje e com um toque vira pedido de laboratório, vacina e receita. A linha da HCP se preenche sozinha.',
-    q4: '<b>App Mi embarazo:</b> o que a mãe vê — semana e tamanho do bebê, próximo controle e tarefas; o carnê com controles, exames e QR para mostrar em qualquer centro; plano de parto, sinais de alarme, contagem de movimentos e perguntas para o controle.',
-    q5: '<b>HCP oficial automática:</b> o sistema mostra quanto da HCP já está preenchido e o que falta; imprime o formato oficial ou SIVEC, carnê impresso para quem não tem celular, exporta ao SIP do CLAP e ao SNIS, com códigos CLAP/CIE-10 automáticos.',
+    qa: '<b>História perinatal SIVEC · folha 1:</b> nosso formato, na ordem do modelo da OMS e com os mesmos campos do SIP/CLAP: identificação, resumo com alertas, antecedentes (positivo em vermelho), gestação atual, laboratórios por trimestre e uma linha por controle. Tudo preenchido pelo sistema.',
+    qb: '<b>História perinatal · folha 2:</b> ingresso e partograma, nascimento (parto ou cesárea), recém-nascido preenchido pela Pediatria, puerpério, alta com anticoncepção, diagnósticos codificados e assinaturas com huella.',
+    q4: '<b>Carnê impresso da mãe:</b> sem app novo. Uma folha A4 dobrada, que sai do sistema ao fechar cada controle: controles, próximo controle, exames, vacinas, plano de parto, sinais de alarme e QR para abrir a história em qualquer centro.',
+    q5: '<b>HCP oficial e envios:</b> o sistema mostra quanto da HCP já está preenchido e o que falta; imprime o formato oficial ou SIVEC, carnê da mãe, exporta ao SIP do CLAP e ao SNIS, com códigos CLAP/CIE-10 automáticos.',
     q6: '<b>RN na sala de parto ou na recuperação:</b> o mesmo formulário da Pediatria funciona no parto normal e na cesárea: recepção no quirófano, completa na sala de recuperação com apego, e controle do binômio mãe-bebê a cada 15 min. Só muda o lugar registrado.',
-    q7: '<b>Duas linhas do tempo vinculadas:</b> na ficha da mãe aparece o nascimento com link para o bebê; o bebê tem a própria ficha, que herda os dados da gravidez e segue com vacinas e controles. No Mi salud a mãe vê as duas.',
+    q7: '<b>Duas linhas do tempo vinculadas:</b> na ficha da mãe aparece o nascimento com link para o bebê; o bebê tem a própria ficha, que herda os dados da gravidez e segue com vacinas e controles. Uma só base de dados; em papel a mãe leva o carnê dela.',
   };
   const tabs = document.querySelectorAll('.tab');
   function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }

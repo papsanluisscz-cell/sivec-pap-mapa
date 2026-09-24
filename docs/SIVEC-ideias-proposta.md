@@ -479,23 +479,28 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - **1er nivel sin pediatra:** el mismo formulario lo llena quien atiende el parto.
 - Imágenes: docs/materno-05 (entrega), 06 (atención inmediata), 07 (examen y destino).
 
-### Carnet e historia clínica prenatal digital (modelo propio SIVEC) — dibujado, para aprobar
+### Historia clínica perinatal SIVEC + carnet impreso de la mamá — dibujado, para aprobar
 - Problema: la HCP CLAP-OPS en papel tiene ~450 casillas en una hoja, se llena a mano, la mamá no la ve y se copia al SIP a mano.
-- Modelo recomendado en el mundo: guías digitales de la OMS para el control prenatal (SMART Guidelines / DAK prenatal, 8 contactos), registro en manos de la mujer (OMS) y SIP del CLAP.
+- Modelo recomendado en el mundo: guías digitales de la OMS para el control prenatal (SMART Guidelines / DAK prenatal, 8 contactos), registro en manos de la mujer (OMS) y variables del SIP del CLAP.
+- **Decisión (usuario): NO hacer app de embarazo** (demasiadas apps para coordinar).
+  - Los datos viven en **una sola historia** dentro del SIVEC.
+  - La mamá lleva un **carnet impreso**.
 - **5 reglas:**
   1. cada dato se escribe una vez, donde ocurre;
   2. la pantalla muestra solo lo de ese momento;
   3. las casillas amarillas del CLAP pasan a ser alertas automáticas;
-  4. la mujer tiene su carnet en el celular, con QR;
+  4. carnet impreso con QR, sin app nueva;
   5. la HCP oficial, el SIP y el SNIS salen solos (CIE-10, HL7 FHIR).
 - **Pantallas:**
-  - resumen del embarazo en una mirada: alertas arriba, antecedentes solo positivos, labs por trimestre, vacunas, 8 contactos;
-  - control prenatal guiado en 6 pasos: signos por toques, curvas, la guía sugiere y un toque pide el lab/vacuna/receta; la fila de la HCP se arma sola;
-  - app **Mi embarazo**: semana y bebé, próximo control, tareas, carnet con QR, plan de parto, señales de alarma, conteo de movimientos, preguntas;
-  - HCP oficial automática con % completado y lo que falta; carnet impreso para quien no tiene celular.
+  - resumen del embarazo en una mirada;
+  - control prenatal guiado en 6 pasos; la fila de la HCP se arma sola.
+- **Historia Clínica Perinatal SIVEC (formato propio, 2 hojas A4)**, llenada por el sistema:
+  - Hoja 1: A identificación · B resumen y alertas · C antecedentes (lo positivo en rojo) · D gestación actual · E laboratorios por trimestre · F contactos prenatales (1 fila por control).
+  - Hoja 2: G ingreso y partograma · H nacimiento (parto o cesárea) · I recién nacido (Pediatría) · J puerperio · K egreso materno y anticoncepción · L diagnósticos codificados · firmas con huella.
+- **Carnet de la mamá:** 1 hoja A4 doblada, que se reimprime al cerrar cada control. Incluye controles, próximo control, exámenes, vacunas, plan de parto, señales de alarma, movimientos del bebé y un QR que abre la historia (solo personal con huella).
+- También se puede imprimir la HCP en formato oficial y exportar al SIP y al SNIS.
 - **RN también en cesárea:** el mismo formulario de Pediatría sirve en sala de partos, quirófano y sala de recuperación, con control del binomio mamá-RN cada 15 min.
-- **Dos líneas de tiempo vinculadas:**
-  - en la ficha de la mamá aparece “nació su bebé” con enlace;
-  - el RN tiene su ficha propia, que hereda los datos del embarazo;
-  - en Mi salud la mamá ve las dos.
-- Imágenes: docs/perinatal-01..07.png · esboco-carnet-perinatal.html
+- **Dos fichas vinculadas:**
+  - la línea de tiempo de la mamá muestra “nació su bebé” con enlace;
+  - el RN tiene su ficha propia, que hereda los datos del embarazo.
+- Imágenes: docs/perinatal-01..09.png · esboco-carnet-perinatal.html
