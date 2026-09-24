@@ -150,6 +150,8 @@
   table.mx2 { table-layout:fixed; } table.mx2 th { font-size:10px; padding:6px 3px; letter-spacing:.02em; white-space:normal; text-align:center; } table.mx2 th:first-child { width:170px; } table.mx2 td { padding:8px 3px; }
   .lab { border:1.5px solid #2a2026; border-radius:6px; padding:8px 10px; font-size:12px; font-family:"Source Sans 3",monospace; background:#fff; text-align:left; } .lab b { font-size:13px; } .barc { margin:6px 0 4px; }
   .bth { display:flex; flex-wrap:wrap; gap:5px; } .bth span { font-size:13px; font-weight:700; border-radius:8px; padding:6px 10px; border:1px solid var(--line); background:#fff; } .bth .on { background:#dcf3e5; border-color:#15803d; color:#15803d; }
+  .secg { columns:4; column-gap:10px; } .sec2 { break-inside:avoid; background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-bottom:10px; }
+  .sh { color:#fff; font-weight:800; font-size:13.5px; padding:6px 10px; } .sb2 { padding:6px 10px 8px; display:flex; flex-direction:column; gap:2px; } .sb2 span { font-size:12.5px; border-bottom:1px dashed var(--line); padding:2px 0; } .sb2 span:last-child { border-bottom:none; }
 </style>
 </head>
 <body>
@@ -162,6 +164,7 @@
   <button class="tab" data-t="l6">6. Portal PAP (citología)</button>
   <button class="tab" data-t="l7">7. Resultado al médico</button>
   <button class="tab" data-t="l8">8. Indicadores</button>
+  <button class="tab" data-t="l9">9. Todos los exámenes</button>
 </div>
 <div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Sirve para el laboratorio del centro, el del hospital y el laboratorio de patología que lee los PAP.</div>
 
@@ -343,6 +346,20 @@
   </div>
 </section>
 
+<!-- ============ L9 ============ -->
+<section class="scr" id="l9">
+  <div class="app"><div class="brand">SIVEC <span>LABORATORIO</span></div><div class="who">📚 Catálogo de exámenes — todos, no solo PAP y glicemia</div></div>
+  <div class="body">
+    <div class="row" style="margin-bottom:10px"><div class="inp" style="flex:1">🔎 Buscar examen… (ej.: “transaminasas”, “gota gruesa”)</div><span class="chip on">Perfiles rápidos:</span><span class="chip">🤰 Prenatal</span><span class="chip">🫘 Renal</span><span class="chip">🟤 Hepático</span><span class="chip">🩺 Preoperatorio</span><span class="chip">🍬 Diabetes</span><span class="chip">🌡️ Síndrome febril</span></div>
+    <div class="secg"><div class="sec2"><div class="sh" style="background:#b91c1c">🩸 Hematología</div><div class="sb2"><span>Hemograma completo</span><span>Hemoglobina y hematocrito</span><span>Plaquetas</span><span>VES</span><span>Reticulocitos</span><span>Grupo sanguíneo y Rh</span><span>Coombs directo/indirecto</span></div></div><div class="sec2"><div class="sh" style="background:#c2410c">⚗️ Química sanguínea</div><div class="sb2"><span>Glicemia</span><span>Curva de tolerancia</span><span>HbA1c</span><span>Urea · nitrógeno ureico</span><span>Creatinina</span><span>Ácido úrico</span><span>Colesterol · triglicéridos · HDL · LDL</span><span>Proteínas totales · albúmina</span></div></div><div class="sec2"><div class="sh" style="background:#a16207">🟤 Hepático</div><div class="sb2"><span>Transaminasas TGO · TGP</span><span>Bilirrubinas total y fracciones</span><span>Fosfatasa alcalina</span><span>Fosfatasa ácida</span><span>GGT</span><span>Amilasa · lipasa</span></div></div><div class="sec2"><div class="sh" style="background:#0e7490">🧂 Electrolitos</div><div class="sb2"><span>Sodio</span><span>Potasio</span><span>Cloro</span><span>Calcio</span><span>Magnesio</span></div></div><div class="sec2"><div class="sh" style="background:#6d28d9">🛡️ Inmunología / serología</div><div class="sb2"><span>PCR (proteína C reactiva)</span><span>Factor reumatoide</span><span>ASTO</span><span>Widal</span><span>VIH rápida</span><span>Sífilis rápida · RPR/VDRL</span><span>Hepatitis B · C</span><span>Chagas</span><span>Toxoplasma</span><span>Test de embarazo HCG</span></div></div><div class="sec2"><div class="sh" style="background:#9f1239">🩸 Coagulación</div><div class="sb2"><span>Tiempo de protrombina</span><span>TPT</span><span>Tiempo de coagulación y sangría</span><span>Fibrinógeno</span></div></div><div class="sec2"><div class="sh" style="background:#ca8a04">🧪 Orina</div><div class="sb2"><span>Examen general de orina</span><span>Urocultivo</span><span>Proteinuria 24 h</span><span>Creatinina en orina</span></div></div><div class="sec2"><div class="sh" style="background:#78350f">💩 Heces</div><div class="sb2"><span>Coproparasitológico simple</span><span>Coproparasitológico seriado</span><span>Moco fecal</span><span>Sangre oculta</span><span>Rotavirus</span></div></div><div class="sec2"><div class="sh" style="background:#15803d">🦟 Parasitología / vectores</div><div class="sb2"><span>Gota gruesa + frotis (malaria)</span><span>Chagas (micro / serología)</span><span>Leishmania</span></div></div><div class="sec2"><div class="sh" style="background:#1d4ed8">🧫 Microbiología</div><div class="sb2"><span>Baciloscopía seriada (TB)</span><span>GeneXpert TB</span><span>Cultivo y antibiograma</span><span>Frotis y tinción Gram</span><span>Secreción vaginal (fresco, KOH)</span></div></div><div class="sec2"><div class="sh" style="background:#7d2a4c">🔬 Citología / patología</div><div class="sb2"><span>PAP (Bethesda)</span><span>VPH · genotipo</span><span>Biopsia</span><span>Pieza quirúrgica (cono, útero…)</span></div></div><div class="sec2"><div class="sh" style="background:#be185d">🧬 Hormonas</div><div class="sb2"><span>TSH · T4 libre</span><span>Beta-HCG cuantitativa</span><span>Prolactina</span><span>FSH · LH</span></div></div></div>
+    <div class="cols c3" style="margin-top:12px;gap:12px">
+      <div class="card mini2"><b>Cada examen trae</b>tubo o muestra · ayuno/preparación · rangos por edad y sexo · sección del laboratorio · tiempo de resultado · código SUS</div>
+      <div class="card mini2"><b>Dónde se hace</b>el sistema sabe qué exámenes hace cada laboratorio; si el centro no lo hace, la muestra va en lote al hospital o al laboratorio de la red</div>
+      <div class="card mini2"><b>Se amplía sin programar</b>el administrador agrega exámenes nuevos al catálogo (módulo Admin → Catálogos) y aparecen en toda la red</div>
+    </div>
+  </div>
+</section>
+
 <div class="note" id="note"></div>
 <script>
   function bc(el, seed) { let x = seed, h = '', pos = 0; const r = () => (x = (x * 9301 + 49297) % 233280) / 233280;
@@ -357,6 +374,7 @@
     l5: '<b>Mesa de trabalho:</b> resultados vindos do equipamento, com faixas de referência; valor crítico avisa o médico na hora e exige registrar a quem se avisou. Controle de qualidade.',
     l6: '<b>Portal PAP (citologia):</b> o laboratório de patologia lê e carrega o resultado Bethesda, VPH e genótipo por toques, com dupla leitura e assinatura. Ao liberar, o resultado aparece direto no SIVEC PAP do centro e calcula o próximo passo.',
     l7: '<b>Resultado ao médico:</b> lista por prioridade com o próximo passo sugerido (derivar, receitar, controle). Normais podem ser avisados sozinhos; alterados só com “venha, já tem cita”.',
+    l9: '<b>Todos os exames:</b> o catálogo inclui todas as áreas (hematologia, química, hepático, eletrólitos, sorologia, coagulação, urina, fezes, parasitologia, microbiologia, citologia, hormônios), com perfis rápidos (pré-natal, renal, pré-operatório…). Cada exame sabe tubo, preparo, faixas, setor e onde se faz. Exames novos se somam pelo Admin.',
     l8: '<b>Indicadores:</b> PAP lidos, dias coleta→resultado por centro, amostras rejeitadas e o motivo (para capacitar), percentagem de positivos.',
   };
   const tabs = document.querySelectorAll('.tab');
