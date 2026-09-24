@@ -340,3 +340,26 @@ Princípios para o SIVEC: dados mínimos obrigatórios + resumo clínico automá
 - **SIVEC Tránsito (frota de ambulâncias):** inventário (placa, tipo, equipamentos), estado (operativa / manutenção / fora de serviço), manutenção preventiva por km/data, combustível, **GPS em tempo real** (rastreador com chip 4G ou app no celular do motorista — **AirTag não serve**: não dá posição em tempo real, depende de iPhones por perto e alerta como rastreamento indevido), equipe por turno (motorista, paramédico, enfermeiro), **despacho** (pedido → ambulância mais próxima disponível → a caminho → com paciente → entregue → disponível) com tempos, checklist de oxigênio/equipamento, ligado à referência e à linha do tempo.
 - **O que mais contabilizar:** agenda e citas; **camas** (censo hospitalar); estoque de insumos (não só farmácia); **equipamentos biomédicos** e manutenção; pessoal, turnos e permissões; **informes automáticos para o SNIS** e prestações SUS; notificação epidemiológica obrigatória; banco de sangue; cadeia de frio das vacinas; certificados (nascimento, óbito); satisfação e reclamações; custos; auditoria, backups e modo sem internet.
 - Esboço em `docs/esboco-plataforma.html`.
+
+### [24/09/2026] PLANO — Organização da plataforma aprovada pelo autor
+As ideias de "um só SIVEC" (vistas por função, paciente única, botão Derivar, hoja de tránsito, farmácia, mensagens, ambulâncias e a lista do que contabilizar) foram **aprovadas e entram no plano do projeto**.
+
+### [24/09/2026] SIVEC Tránsito — app da ambulância ("tipo Uber", mas com regulação)
+- **1 smartphone institucional por ambulância** (não o celular pessoal do motorista), com o app **SIVEC Tránsito**: login da tripulação do turno, GPS contínuo do próprio celular (+ rastreador veicular opcional como reserva).
+- **Despacho:** o centro pede o traslado (botão Derivar → "precisa ambulância"); a **central de regulação** escolhe a ambulância (o sistema sugere a mais próxima disponível do tipo certo); o celular da ambulância **toca**, a tripulação **aceita** (se não aceitar em 60 s, passa para a próxima e a central é avisada).
+- No celular: **ficha da paciente** (foto, dados, diagnóstico, sinais vitais, alergias), **origem e destino**, navegação, e se o **hospital receptor já aceitou** (serviço/cama). Estados: aceita → a caminho → no local → com paciente → chegou → entregue (com digital de quem recebe) → disponível.
+- **A central telefônica continua:** chamadas do público e de emergência, e plano B quando falhar internet/app. O operador registra a chamada no SIVEC e despacha pelo mesmo sistema → tudo fica medido (tempos, km, quem atendeu) e na linha do tempo.
+
+### [24/09/2026] Fluxo cirúrgico e hospitalar completo (pedido do autor)
+Formulários/telas a ter, todos ligados à linha do tempo e ao "onde está a paciente agora":
+- **Solicitação de quirófano** (diagnóstico, procedimento, prioridade, tempo estimado, anestesia sugerida, sangue reservado, exames pré-op, consentimento).
+- **Avaliação pré-anestésica** + **receita da anestesiologia**.
+- **Protocolo quirúrgico** (já esboçado) e **protocolo de anestesia** (técnica, fármacos, registro de sinais vitais intraoperatórios, balanço hídrico).
+- **Registro de enfermagem do quirófano** (checklist OMS, contagem, amostras) e **saída do quirófano**.
+- **Recuperação pós-anestésica (sala de observação):** sinais vitais a cada 15 min, **escala de Aldrete**, dor, sangramento; alta da sala com ≥ 9.
+- **Nota de ingresso ao piso** e **atribuição de cama** conforme a especialidade/procedimento (cesárea → piso de gineco-obstetrícia/puerpério; ARO; cirurgia; medicina interna…), com **horas na cama**.
+- **Painel do chefe de piso:** ocupação, estância média, altas previstas, pendentes, **interconsultas entre pisos**.
+- **Alta**: epicrise, indicações, receita, **contrarreferência** ao centro de saúde (ex.: retirada de pontos no dia 7, controle puerperal, planejamento familiar, controle do RN).
+- **Monitorização fetal (NST/cardiotocografia)** como exame pedido na emergência gineco-obstétrica, com resultado e classificação no sistema — dentro de um **catálogo de exames**.
+- **SIVEC Pediatria:** **calculadora de doses por peso**, **busca de medicamento por indicação**, controles (crescimento com curvas OMS, desenvolvimento, vacinas).
+- Esboço em `docs/esboco-hospital.html`.

@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hospital y quirófano SIVEC</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
+    --n1:#2f6fb0; --n2:#0e7490; --n3:#7c3aed; --n4:#b4235a; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .topbar { position:sticky; top:0; z-index:5; background:#2a1720; color:#fff; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; }
+  .topbar b { margin-right:6px; font-size:15px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; border:1px solid #6b4a58; background:transparent; color:#fff; border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tab.on { background:#fff; color:var(--wine-d); border-color:#fff; }
+  .warn { max-width:1100px; margin:14px auto 0; background:#fff7e0; border:1px solid #ecd9a0; border-radius:10px; padding:10px 14px; font-size:14px; color:#5b4712; }
+  .scr { display:none; max-width:1100px; margin:14px auto 30px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,.14); }
+  .scr.on { display:block; }
+  .app { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; }
+  .app .brand { font-weight:800; font-size:20px; letter-spacing:.04em; } .app .brand span { font-size:11px; background:#fff; color:var(--wine-d); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:3px; letter-spacing:.08em; }
+  .app .who { font-size:14px; opacity:.95; }
+  .body { padding:18px 22px 22px; }
+  h2 { margin:0 0 4px; font-size:20px; } .sub { color:var(--soft); font-size:14px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cols { display:grid; gap:14px; } .c2 { grid-template-columns:1fr 1fr; } .c3 { grid-template-columns:1fr 1fr 1fr; } .c21 { grid-template-columns:1.6fr 1fr; }
+  .lbl { font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); margin:10px 0 5px; }
+  .lbl:first-child { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:13px; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .chip.on { background:var(--tint); border-color:var(--wine); color:var(--wine-d); font-weight:700; }
+  .inp { border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13.5px; background:#fff; min-height:36px; }
+  .inp.tall { min-height:62px; line-height:1.45; }
+  .pri { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pri div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; }
+  .pri div b { display:block; font-size:14px; } .pri div.on { border:2px solid var(--wine); background:var(--tint); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .auto { background:#f3f7fb; border:1px dashed #b9cde3; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.55; }
+  .auto b { color:#1e4f8a; }
+  .att { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; } .att span { font-size:12.5px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13.5px; font-weight:700; border-radius:9px; padding:8px 14px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .btn.p { background:var(--wine); border-color:var(--wine); color:#fff; } .btn.g { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fp { width:26px; height:30px; vertical-align:middle; }
+  table.l { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; border-radius:12px; overflow:hidden; }
+  table.l th { text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); padding:9px 10px; border-bottom:1px solid var(--line); background:#fff; }
+  table.l td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .st { font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .st.bad { background:var(--badbg); color:var(--bad); } .st.warn { background:var(--warnbg); color:var(--warn); } .st.ok { background:var(--okbg); color:var(--ok); } .st.info { background:#e0ecfa; color:#1e4f8a; } .st.mut { background:#eee; color:#555; }
+  .lvl { font-size:11px; font-weight:800; color:#fff; border-radius:6px; padding:2px 7px; }
+  .mini { font-size:12px; color:var(--soft); }
+  .note { max-width:1100px; margin:-16px auto 30px; background:#fff; border-radius:10px; padding:12px 16px; font-size:14px; line-height:1.5; color:#3b3035; border-left:4px solid var(--wine); }
+  /* flujo */
+  .levels { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin:6px 0 4px; }
+  .lv { text-align:center; padding:0 8px; }
+  .lv .ic { width:74px; height:74px; border-radius:18px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; }
+  .lv b { display:block; font-size:15px; } .lv span { font-size:12.5px; color:var(--soft); }
+  .arrows { position:relative; height:74px; margin-top:-120px; margin-bottom:60px; pointer-events:none; }
+  .loop { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+  .loop div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12.3px; text-align:center; position:relative; }
+  .loop div b { display:block; font-size:13px; } .loop i { font-style:normal; display:block; font-size:18px; }
+  .loop div:not(:last-child)::after { content:"›"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--soft); font-size:18px; }
+  .world { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .world div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:12.3px; line-height:1.4; }
+  .world b { display:block; font-size:13px; color:var(--wine-d); }
+  /* seguimiento */
+  .steps { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin:8px 0 4px; }
+  .steps div { text-align:center; font-size:12px; position:relative; padding-top:30px; }
+  .steps div::before { content:""; position:absolute; top:9px; left:0; right:0; height:4px; background:#e3d6dc; }
+  .steps div:first-child::before { left:50%; } .steps div:last-child::before { right:50%; }
+  .steps div.done::before { background:var(--ok); } .steps div.cur::before { background:linear-gradient(90deg,var(--ok) 50%,#e3d6dc 50%); }
+  .steps i { position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:50%; background:#e3d6dc; color:#fff; font-style:normal; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:3px solid var(--paper); }
+  .steps .done i { background:var(--ok); } .steps .cur i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .steps b { display:block; font-size:12.5px; } .steps small { color:var(--soft); }
+  .tl { border-left:3px solid var(--line); margin-left:8px; padding-left:14px; }
+  .tl div { position:relative; font-size:13px; margin-bottom:10px; line-height:1.4; }
+  .tl div::before { content:""; position:absolute; left:-21px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--c,#999); border:2px solid #fff; }
+  .kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:600; } .kpi b { font-size:28px; letter-spacing:-.01em; } .kpi span { font-size:12px; color:var(--soft); }
+  .bars div.r { display:grid; grid-template-columns:170px 1fr 54px; align-items:center; gap:10px; font-size:13px; margin:7px 0; }
+  .bars .trk { height:14px; border-radius:0 4px 4px 0; background:transparent; position:relative; }
+  .bars .fill { height:14px; border-radius:0 4px 4px 0; background:var(--wine); }
+  .bars .ref { position:absolute; top:-3px; bottom:-3px; width:2px; background:#2d2429; }
+  .bars .v { font-weight:700; text-align:right; }
+  .alertc { border-left:4px solid var(--bad); }
+
+  .role .rh { display:flex; gap:10px; align-items:center; margin-bottom:8px; } .role .rh b { display:block; font-size:15px; } .role .rh small { color:var(--soft); font-size:12px; }
+  .ri { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .todo { display:flex; align-items:center; gap:10px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .todo:last-child { border-bottom:none; }
+  .todo .st { min-width:30px; text-align:center; font-size:13px; }
+  .mini2 { font-size:13px; line-height:1.5; } .mini2 b { display:block; margin-bottom:2px; }
+  .flowbar { display:flex; gap:6px; margin-bottom:12px; } .flowbar span { flex:1; text-align:center; font-size:13px; font-weight:700; padding:7px; border-radius:9px; background:#fff; border:1px solid var(--line); color:var(--soft); }
+  .flowbar span.on { background:var(--okbg); color:var(--ok); border-color:#b8e3c7; } .flowbar span.cur { background:var(--wine); color:#fff; border-color:var(--wine); }
+  .found { display:flex; gap:12px; align-items:center; margin-top:10px; padding:10px; border-radius:10px; background:#f3f9f5; border:1px solid #cfe9d8; }
+  .photo2 { width:64px; height:72px; border-radius:10px; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:24px; flex:none; }
+  .k2 { display:block; font-size:10.5px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.04em; }
+  .scanner { width:150px; height:160px; margin:6px auto 0; border-radius:18px; background:radial-gradient(circle at 50% 45%, #fff 0, #f7e9ef 70%); border:3px solid #d9b9c6; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -6px 12px rgba(125,42,76,.12); }
+  .ticket { margin-top:12px; text-align:center; }
+  .tk { border:2px dashed var(--wine); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:2px; font-size:13.5px; } .tk b { font-size:40px; color:var(--wine-d); letter-spacing:.04em; line-height:1.1; } .tk small { color:var(--soft); font-size:11.5px; }
+  .q2 { padding:8px 10px; border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:13.5px; background:#fff; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; } .q2 .mini { width:100%; }
+  .q2.cur { border:2px solid var(--wine); background:var(--tint); } .q2 .st { margin-left:auto; }
+  .vit2 { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .vit2 div { background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 8px; font-size:16px; font-weight:800; } .vit2 small { display:block; font-size:10.5px; color:var(--soft); font-weight:700; text-transform:uppercase; }
+  .tv { background:#120810; border-radius:16px; padding:14px; color:#fff; border:8px solid #2a2a2a; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
+  .tvh { display:flex; justify-content:space-between; font-size:13px; color:#cfb7c2; font-weight:700; letter-spacing:.08em; }
+  .tvnow { background:linear-gradient(135deg,#7d2a4c,#b4235a); border-radius:12px; padding:16px; text-align:center; } .tvnow small { display:block; font-size:13px; letter-spacing:.2em; font-weight:800; color:#ffe4ee; }
+  .tvnow b { display:block; font-size:64px; line-height:1.05; letter-spacing:.04em; } .tvnow span { display:block; font-size:24px; font-weight:700; } .tvnow em { display:block; font-style:normal; font-size:20px; margin-top:4px; color:#ffe4ee; }
+  .tvlist div { display:flex; gap:12px; align-items:baseline; font-size:18px; padding:6px 4px; border-bottom:1px solid #3a2530; } .tvlist b { color:#f1a7c3; min-width:70px; } .tvlist span { margin-left:auto; color:#cfb7c2; font-size:15px; }
+  .tvf { font-size:13px; color:#cfb7c2; }
+  .doc { display:grid; grid-template-columns:34px 1fr auto auto; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--line); font-size:13.5px; } .di { font-size:22px; text-align:center; } .dest { font-size:12.5px; color:var(--soft); font-weight:600; }
+  .st.warn { margin:0; max-width:none; padding:2px 9px; border:none; font-size:11.5px; }
+  .todo .st.warn { font-size:13px; }
+
+  .svc { display:flex; flex-wrap:wrap; gap:8px; } .svc span { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 12px; font-size:13.5px; font-weight:600; }
+  .prob { display:flex; align-items:center; gap:8px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .prob .mini { margin-left:auto; }
+  .dotc { width:10px; height:10px; border-radius:50%; flex:none; }
+  .tpl { border:1px solid; border-left-width:5px; border-radius:10px; padding:9px 11px; font-size:13px; line-height:1.45; background:#fff; } .tpl b { display:block; font-size:14px; margin-bottom:2px; }
+  .opt { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; } .opt span { border:1px solid var(--line); border-radius:12px; padding:10px; font-size:22px; background:#fff; text-align:center; } .opt b { display:block; font-size:14px; margin-top:4px; } .opt small { display:block; font-size:12px; color:var(--soft); }
+  .opt .sel { border:2px solid var(--wine); background:var(--tint); }
+  .side { border-left:4px solid var(--line); padding:5px 10px; margin-bottom:8px; font-size:13.5px; line-height:1.45; } .side b { display:block; }
+  .stk { display:grid; grid-template-columns:150px 1fr auto; gap:8px; align-items:center; font-size:13px; margin:6px 0; } .stk div { height:10px; background:#eee4e8; border-radius:5px; overflow:hidden; } .stk i { display:block; height:100%; background:#15803d; border-radius:5px; } .stk b { font-size:12.5px; }
+  .phn { background:#e5ddd5; border:9px solid #1f1f1f; border-radius:26px; padding:10px; display:flex; flex-direction:column; gap:8px; min-height:430px; }
+  .phh { background:#075e54; color:#fff; font-size:13px; font-weight:700; margin:-10px -10px 4px; padding:10px 12px; border-radius:16px 16px 0 0; }
+  .msg { font-size:13px; line-height:1.4; border-radius:10px; padding:7px 9px; max-width:88%; box-shadow:0 1px 1px rgba(0,0,0,.12); } .msg.in { background:#fff; align-self:flex-start; } .msg.out { background:#dcf8c6; align-self:flex-end; font-weight:800; }
+  .ck { font-size:13.5px; line-height:1.45; } .ck b { display:block; font-size:15px; margin-bottom:3px; }
+
+  .kv2 { display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:4px 0; border-bottom:1px dashed var(--line); } .kv2 span { color:var(--soft); }
+  .req { display:flex; flex-wrap:wrap; gap:6px; } .req span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .req .ok { background:var(--okbg); color:var(--ok); } .req .no { background:var(--warnbg); color:var(--warn); }
+  .qx { position:relative; height:30px; background:#f3eef0; border-radius:8px; margin:6px 0; padding-left:34px; } .qx b { position:absolute; left:8px; top:6px; font-size:13px; }
+  .qx span { position:absolute; top:3px; bottom:3px; margin-left:34px; border-radius:6px; color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; padding:0 6px; white-space:nowrap; overflow:hidden; }
+  .who2 { display:grid; gap:6px; } .who2 div { border:1px solid var(--line); border-radius:8px; padding:6px 9px; background:#f7fbf8; font-size:12.5px; } .who2 b { display:block; color:var(--wine-d); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; } .who2 span { color:#166534; }
+  .beds { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .bed { border-radius:10px; padding:8px; font-size:13px; font-weight:700; border:1px solid var(--line); min-height:76px; } .bed b { display:block; font-size:18px; } .bed small { display:block; font-weight:500; font-size:11.5px; color:var(--soft); }
+  .bed.p { background:#fbe4ee; } .bed.a { background:#fde2e2; } .bed.g { background:#ede4fb; } .bed.free { background:#ecf8f1; color:#15803d; } .bed.clean { background:#fdf0d5; color:#8a5a00; } .bed.sel { outline:3px solid var(--wine); }
+  .leg2 { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-left:6px; border:1px solid var(--line); }
+  .dose { border:1px solid var(--line); border-radius:10px; padding:7px 9px; margin-bottom:6px; font-size:13px; display:flex; flex-direction:column; } .dose span { color:var(--soft); font-size:12px; } .dose em { font-style:normal; margin-top:2px; }
+  .srch { border-left:4px solid #c2410c; background:#fff7f0; border-radius:6px; padding:6px 9px; margin-bottom:6px; font-size:13px; } .srch b { display:block; font-size:12px; color:#c2410c; text-transform:uppercase; letter-spacing:.04em; }
+  .amb { border:9px solid #1f1f1f; border-radius:26px; background:#fff; overflow:hidden; min-height:420px; display:flex; flex-direction:column; }
+  .ah { background:#ea580c; color:#fff; font-weight:800; font-size:14px; padding:10px 12px; } .ab { padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .big2 { font-size:40px; font-weight:900; text-align:center; color:#ea580c; margin-top:6px; }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — Hospital, quirófano y ambulancia:</b>
+  <button class="tab on" data-t="h1">1. Recorrido</button>
+  <button class="tab" data-t="h2">2. Monitoreo fetal</button>
+  <button class="tab" data-t="h3">3. Solicitud de quirófano</button>
+  <button class="tab" data-t="h4">4. Anestesia</button>
+  <button class="tab" data-t="h5">5. Enfermería y salida</button>
+  <button class="tab" data-t="h6">6. Recuperación</button>
+  <button class="tab" data-t="h7">7. Ingreso a piso · camas</button>
+  <button class="tab" data-t="h8">8. Jefe de piso</button>
+  <button class="tab" data-t="h9">9. Alta y contrarreferencia</button>
+  <button class="tab" data-t="h10">10. Pediatría</button>
+  <button class="tab" data-t="h11">11. App de ambulancia</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Paciente de ejemplo: <b>Lucía Flores</b>, 29 años, embarazo de 39 semanas, cesárea anterior — referida desde el C.S. San Luis.</div>
+
+<!-- ============ H1 ============ -->
+<section class="scr on" id="h1">
+  <div class="app"><div class="brand">SIVEC <span>HOSPITAL</span></div><div class="who">📍 ¿Dónde está la paciente ahora? — Lucía Flores</div></div>
+  <div class="body">
+    <div class="card">
+      <div class="lbl">Recorrido completo — cada paso es un formulario del SIVEC y queda en la línea de tiempo</div>
+      <div class="steps" style="grid-template-columns:repeat(9,1fr)">
+        <div class="done"><i>✓</i><b>Llega</b><small>ambulancia 07:40</small></div>
+        <div class="done"><i>✓</i><b>Emergencia GO</b><small>monitoreo fetal</small></div>
+        <div class="done"><i>✓</i><b>Pide quirófano</b><small>08:10</small></div>
+        <div class="done"><i>✓</i><b>Preanestesia</b><small>08:25</small></div>
+        <div class="done"><i>✓</i><b>Quirófano 2</b><small>08:50 – 09:40</small></div>
+        <div class="done"><i>✓</i><b>Recuperación</b><small>09:45 – 11:00</small></div>
+        <div class="cur"><i>7</i><b>Piso GO · cama 12</b><small>hace 27 h</small></div>
+        <div><i>8</i><b>Alta</b><small>prevista día 3</small></div>
+        <div><i>9</i><b>Contrarreferencia</b><small>C.S. San Luis</small></div>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:12px">
+      <div class="card"><div class="lbl">Línea de tiempo de hoy</div>
+        <div class="tl">
+          <div style="--c:#ea580c"><b>07:40</b> Llegó en AMB-07 desde C.S. San Luis (referencia REF-2026-0203)</div>
+          <div style="--c:#db2777"><b>07:55</b> Monitoreo fetal: NST reactivo</div>
+          <div style="--c:#be185d"><b>08:10</b> Solicitud de quirófano: cesárea iterativa · urgencia relativa</div>
+          <div style="--c:#0f766e"><b>08:50</b> Cesárea · RN vivo, femenino, Apgar 8/9, 3.250 g</div>
+          <div style="--c:#0e7490"><b>11:00</b> Alta de recuperación (Aldrete 10) → Piso GO cama 12</div>
+        </div></div>
+      <div class="card"><div class="lbl">Regla del sistema</div>
+        <div style="font-size:14px;line-height:1.6">El <b>tipo de procedimiento</b> decide el piso:<br>🤱 cesárea / parto → <b>Gineco-obstetricia · puerperio</b><br>⚠️ con riesgo → <b>ARO (alto riesgo obstétrico)</b><br>🔪 apendicectomía → <b>Cirugía</b><br>🫀 descompensación → <b>Medicina interna</b><br><br>El piso lo puede cambiar el jefe de piso; queda registrado quién y por qué.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ H2 ============ -->
+<section class="scr" id="h2">
+  <div class="app"><div class="brand">SIVEC <span>EMERGENCIA GO</span></div><div class="who">🫀 Monitoreo fetal (NST) — Lucía Flores · 39 semanas</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card">
+        <div class="lbl">Registro cardiotocográfico · 20 min</div>
+        <svg viewBox="0 0 640 230" width="100%" role="img" aria-label="Trazado de frecuencia cardíaca fetal">
+          <rect x="40" y="10" width="590" height="150" fill="#fff" stroke="#eadde3"/>
+          <rect x="40" y="46" width="590" height="75" fill="#ecf8f1"/>
+          <g font-family="Source Sans 3, sans-serif" font-size="11" fill="#7a6a71"><text x="34" y="18" text-anchor="end">180</text><text x="34" y="50" text-anchor="end">160</text><text x="34" y="125" text-anchor="end">110</text><text x="34" y="160" text-anchor="end">90</text>
+            <text x="44" y="176">0 min</text><text x="330" y="176" text-anchor="middle">10</text><text x="626" y="176" text-anchor="end">20</text></g>
+          <path d="M40 92 L70 88 L90 95 L110 90 L130 60 L150 58 L170 86 L200 94 L230 89 L260 96 L290 91 L320 64 L340 62 L360 88 L400 93 L440 90 L470 95 L500 91 L530 66 L550 63 L570 90 L600 94 L630 90" fill="none" stroke="#be185d" stroke-width="2" stroke-linejoin="round"/>
+          <g fill="#be185d" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="700"><text x="140" y="52" text-anchor="middle">▲ aceleración</text><text x="330" y="56" text-anchor="middle">▲</text><text x="540" y="58" text-anchor="middle">▲</text></g>
+          <text x="46" y="200" font-family="Source Sans 3, sans-serif" font-size="11.5" fill="#7a6a71">Contracciones</text>
+          <path d="M40 222 L150 222 Q180 196 210 222 L380 222 Q410 200 440 222 L630 222" fill="none" stroke="#0e7490" stroke-width="2"/>
+        </svg>
+        <div class="mini">Franja verde = frecuencia normal (110–160 lpm). El equipo de monitoreo puede enviar el trazado directo al SIVEC.</div>
+      </div>
+      <div>
+        <div class="card"><div class="lbl">Resultado</div>
+          <div class="kv2"><span>FCF basal</span><b>140 lpm</b></div><div class="kv2"><span>Variabilidad</span><b>10–15 lpm (normal)</b></div><div class="kv2"><span>Aceleraciones</span><b>3 en 20 min</b></div><div class="kv2"><span>Desaceleraciones</span><b>no</b></div><div class="kv2"><span>Contracciones</span><b>2 en 20 min</b></div>
+          <div style="margin-top:8px"><span class="st ok" style="font-size:14px">NST REACTIVO</span></div>
+          <div class="mini" style="margin-top:6px">Firmado 🖐 Dra. Suárez (GO) · 07:55</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Catálogo de exámenes de la emergencia GO</div>
+          <div class="chips"><span class="chip on">🫀 Monitoreo fetal (NST)</span><span class="chip">Ecografía obstétrica</span><span class="chip">Doppler</span><span class="chip">Hemograma</span><span class="chip">Grupo y Rh</span><span class="chip">Coagulación</span><span class="chip">VIH / sífilis rápida</span><span class="chip">Proteinuria</span><span class="chip">Examen de orina</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ H3 ============ -->
+<section class="scr" id="h3">
+  <div class="app"><div class="brand">SIVEC <span>CIRUGÍA</span></div><div class="who">📝 Solicitud de quirófano — Lucía Flores</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card">
+        <div class="cols c2" style="gap:8px">
+          <div class="inp"><small class="k2">Diagnóstico (CIE-10)</small>O34.2 · Cesárea anterior · embarazo 39 sem</div>
+          <div class="inp"><small class="k2">Procedimiento</small>Cesárea segmentaria iterativa</div>
+          <div class="inp"><small class="k2">Cirujano / ayudante</small>Dra. Suárez · Dr. Vaca (R2)</div>
+          <div class="inp"><small class="k2">Tiempo estimado</small>60 min</div>
+        </div>
+        <div class="lbl">Prioridad</div>
+        <div class="chips"><span class="chip">Electiva (programada)</span><span class="chip on">Urgencia relativa (&lt; 6 h)</span><span class="chip">Emergencia (inmediata)</span></div>
+        <div class="lbl">Anestesia sugerida · sangre</div>
+        <div class="chips"><span class="chip on">Raquídea</span><span class="chip">General</span><span class="chip">Local + sedación</span><span class="chip on">🩸 Reservar 2 unidades</span></div>
+        <div class="lbl">Requisitos — el sistema marca solo lo que ya existe</div>
+        <div class="req"><span class="ok">✓ Hemograma (Hb 11,8)</span><span class="ok">✓ Grupo O+</span><span class="ok">✓ Coagulación normal</span><span class="ok">✓ VIH / sífilis no reactivos</span><span class="ok">✓ Consentimiento 🖐</span><span class="no">✗ Evaluación preanestésica</span></div>
+      </div>
+      <div>
+        <div class="card"><div class="lbl">Programación de quirófanos — hoy</div>
+          <div class="qx"><b>Q1</b><span style="left:0;width:40%;background:#0f766e">Colecistectomía</span><span style="left:48%;width:30%;background:#6b7280">Hernia</span></div>
+          <div class="qx"><b>Q2</b><span style="left:10%;width:30%;background:#be185d">Cesárea · Lucía F.</span><span style="left:48%;width:32%;background:#6b7280">LEEP · María Q.</span></div>
+          <div class="qx"><b>Q3</b><span style="left:0;width:26%;background:#dc2626">Emergencia</span></div>
+          <div class="mini" style="display:flex;justify-content:space-between;margin-top:4px"><span>07:00</span><span>12:00</span><span>17:00</span></div></div>
+        <div class="row" style="justify-content:flex-end;margin-top:12px"><span class="btn p">📤 Enviar a quirófano y anestesia</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ H4 ============ -->
+<section class="scr" id="h4">
+  <div class="app"><div class="brand">SIVEC <span>ANESTESIA</span></div><div class="who">💉 Dr. Paz · Evaluación preanestésica, receta y protocolo de anestesia</div></div>
+  <div class="body">
+    <div class="cols c3" style="gap:12px">
+      <div class="card"><div class="lbl">1 · Evaluación preanestésica</div>
+        <div class="kv2"><span>ASA</span><b>II</b></div><div class="kv2"><span>Vía aérea</span><b>Mallampati II</b></div><div class="kv2"><span>Ayuno</span><b>8 h</b></div><div class="kv2"><span>Alergias</span><b>no</b></div><div class="kv2"><span>Peso</span><b>72 kg</b></div>
+        <div class="mini" style="margin-top:6px">Plan: raquídea · riesgo bajo · 🖐 firmado 08:25</div></div>
+      <div class="card"><div class="lbl">2 · Receta de anestesiología</div>
+        <div style="font-size:13px;line-height:1.6">💉 Bupivacaína hiperbárica 0,5% — 10 mg<br>💉 Fentanilo — 20 mcg intratecal<br>💧 Ringer lactato — 1.000 mL<br>💉 Oxitocina — según protocolo<br>💉 Ondansetrón 4 mg IV</div>
+        <div class="mini" style="margin-top:6px">→ va a <b>farmacia del quirófano</b> y descuenta stock</div></div>
+      <div class="card"><div class="lbl">3 · Protocolo de anestesia</div>
+        <div class="kv2"><span>Técnica</span><b>Raquídea L3–L4</b></div><div class="kv2"><span>Inicio · fin</span><b>08:50 · 09:40</b></div><div class="kv2"><span>Líquidos</span><b>1.200 mL</b></div><div class="kv2"><span>Sangrado</span><b>500 mL</b></div><div class="kv2"><span>Diuresis</span><b>200 mL</b></div><div class="kv2"><span>Incidentes</span><b>ninguno</b></div></div>
+    </div>
+    <div class="cols c2" style="margin-top:12px">
+      <div class="card"><div class="lbl">Presión arterial sistólica intraoperatoria (mmHg)</div>
+        <svg viewBox="0 0 460 120" width="100%" role="img" aria-label="Presión sistólica durante la cirugía"><g font-family="Source Sans 3, sans-serif" font-size="11" fill="#7a6a71"><text x="4" y="20">140</text><text x="4" y="104">80</text><text x="30" y="118">08:50</text><text x="420" y="118">09:40</text></g>
+          <path d="M34 14H456M34 100H456" stroke="#eadde3"/><polyline points="34,40 80,58 126,70 172,62 218,52 264,48 310,46 356,44 402,42 448,40" fill="none" stroke="#7d2a4c" stroke-width="2"/><circle cx="126" cy="70" r="4" fill="#7d2a4c"/><text x="132" y="86" font-family="Source Sans 3, sans-serif" font-size="11" fill="#7d2a4c">hipotensión leve → efedrina 6 mg</text><circle cx="448" cy="40" r="4" fill="#7d2a4c"/><text x="444" y="32" text-anchor="end" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="700" fill="#2d2429">118</text></svg></div>
+      <div class="card"><div class="lbl">Frecuencia cardíaca intraoperatoria (lpm)</div>
+        <svg viewBox="0 0 460 120" width="100%" role="img" aria-label="Frecuencia cardíaca durante la cirugía"><g font-family="Source Sans 3, sans-serif" font-size="11" fill="#7a6a71"><text x="4" y="20">120</text><text x="4" y="104">60</text><text x="30" y="118">08:50</text><text x="420" y="118">09:40</text></g>
+          <path d="M34 14H456M34 100H456" stroke="#eadde3"/><polyline points="34,56 80,50 126,44 172,52 218,58 264,60 310,62 356,64 402,62 448,64" fill="none" stroke="#7d2a4c" stroke-width="2"/><circle cx="448" cy="64" r="4" fill="#7d2a4c"/><text x="444" y="56" text-anchor="end" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="700" fill="#2d2429">84</text></svg></div>
+    </div>
+    <div class="mini" style="margin-top:6px">Los signos vitales pueden entrar solos desde el monitor del quirófano (si el equipo lo permite) o cargarse cada 5 minutos.</div>
+  </div>
+</section>
+
+<!-- ============ H5 ============ -->
+<section class="scr" id="h5">
+  <div class="app"><div class="brand">SIVEC <span>QUIRÓFANO</span></div><div class="who">🩺 Lic. Flores · Registro de enfermería del quirófano y salida</div></div>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card"><div class="lbl">Registro de enfermería del quirófano</div>
+        <div class="who2"><div><b>Antes de la anestesia</b><span>✓ Identidad (pulsera + huella) ✓ Consentimiento ✓ Sitio ✓ Alergias ✓ Riesgo de sangrado</span></div><div><b>Antes de la incisión</b><span>✓ Equipo presentado ✓ Profilaxis ✓ Monitoreo fetal revisado</span></div><div><b>Antes de salir</b><span>✓ Procedimiento registrado ✓ Conteo correcto ✓ Muestras rotuladas</span></div></div>
+        <div class="lbl">Conteo de gasas, compresas e instrumental</div>
+        <table class="l"><thead><tr><th>Ítem</th><th>Inicial</th><th>Agregado</th><th>Final</th><th></th></tr></thead><tbody>
+          <tr><td>Gasas</td><td>20</td><td>10</td><td>30</td><td><span class="st ok">✓</span></td></tr>
+          <tr><td>Compresas</td><td>5</td><td>0</td><td>5</td><td><span class="st ok">✓</span></td></tr>
+          <tr><td>Agujas</td><td>4</td><td>0</td><td>4</td><td><span class="st ok">✓</span></td></tr></tbody></table>
+        <div class="mini" style="margin-top:6px">Insumos usados → descuentan del stock del quirófano.</div></div>
+      <div>
+        <div class="card"><div class="lbl">Salida de quirófano — 09:42</div>
+          <div class="kv2"><span>Estado</span><b>despierta, estable</b></div><div class="kv2"><span>Destino</span><b>Recuperación (URPA) cama 3</b></div><div class="kv2"><span>Recién nacido</span><b>alojamiento conjunto · Pediatría avisada</b></div><div class="kv2"><span>Vías</span><b>vía periférica · sonda vesical</b></div><div class="kv2"><span>Pendientes</span><b>oxitocina en goteo · Hb control 6 h</b></div>
+          <div class="row" style="margin-top:10px;font-size:13px"><span class="st ok">🖐 entrega Lic. Flores</span><span class="st ok">🖐 recibe Lic. Rojas (URPA)</span></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Protocolo quirúrgico</div><div style="font-size:13.5px">Se completa en la misma pantalla del cirujano (modelo ya dibujado: equipo, lista OMS, técnica, hallazgos, muestras, firmas con huella).</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ H6 ============ -->
+<section class="scr" id="h6">
+  <div class="app"><div class="brand">SIVEC <span>RECUPERACIÓN</span></div><div class="who">🛏 Sala de observación post-quirúrgica (URPA) · cama 3 · Lucía Flores</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Control de signos vitales — cada 15 minutos</div>
+        <table class="l"><thead><tr><th>Hora</th><th>PA</th><th>FC</th><th>SatO₂</th><th>T°</th><th>Dolor (0–10)</th><th>Sangrado</th><th>Útero</th><th>Aldrete</th></tr></thead><tbody>
+          <tr><td>09:45</td><td>110/70</td><td>88</td><td>97%</td><td>36,4</td><td>2</td><td>escaso</td><td>contraído</td><td><span class="st warn">8</span></td></tr>
+          <tr><td>10:00</td><td>112/72</td><td>84</td><td>98%</td><td>36,5</td><td>3</td><td>escaso</td><td>contraído</td><td><span class="st warn">8</span></td></tr>
+          <tr><td>10:15</td><td>115/74</td><td>82</td><td>98%</td><td>36,5</td><td>3</td><td>escaso</td><td>contraído</td><td><span class="st ok">9</span></td></tr>
+          <tr><td>10:30</td><td>116/74</td><td>80</td><td>98%</td><td>36,6</td><td>2</td><td>escaso</td><td>contraído</td><td><span class="st ok">9</span></td></tr>
+          <tr><td>10:45</td><td>118/76</td><td>78</td><td>99%</td><td>36,6</td><td>2</td><td>escaso</td><td>contraído</td><td><span class="st ok">10</span></td></tr></tbody></table>
+        <div class="mini" style="margin-top:6px">⚠ Si un valor sale del rango (PA &lt; 90, SatO₂ &lt; 92%, sangrado abundante), avisa al anestesiólogo y al médico de turno.</div></div>
+      <div>
+        <div class="card"><div class="lbl">Escala de Aldrete · 10:45</div>
+          <div class="kv2"><span>Actividad</span><b>2</b></div><div class="kv2"><span>Respiración</span><b>2</b></div><div class="kv2"><span>Circulación</span><b>2</b></div><div class="kv2"><span>Conciencia</span><b>2</b></div><div class="kv2"><span>SatO₂</span><b>2</b></div>
+          <div style="margin-top:8px;font-size:22px;font-weight:800">10 / 10 <span class="st ok" style="font-size:13px;vertical-align:4px">puede salir (≥ 9)</span></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Alta de recuperación</div><div style="font-size:13.5px;line-height:1.55">El sistema <b>sugiere</b> el piso según el procedimiento: <b>Gineco-obstetricia · puerperio quirúrgico</b>. Enfermería elige la cama libre y firma con huella.</div>
+          <div class="row" style="justify-content:flex-end;margin-top:8px"><span class="btn p">🛏 Enviar a piso GO · cama 12</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ H7 ============ -->
+<section class="scr" id="h7">
+  <div class="app"><div class="brand">SIVEC <span>PISO GO</span></div><div class="who">🛏 Gineco-obstetricia · 2º piso · mapa de camas</div></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:1.5fr 1fr">
+      <div class="card">
+        <div class="lbl">Camas — color por tipo de paciente · horas en la cama</div>
+        <div class="beds">
+          <div class="bed p"><b>9</b>Ana R.<small>puerperio · 40 h</small></div>
+          <div class="bed p"><b>10</b>Rosa V.<small>puerperio · 18 h</small></div>
+          <div class="bed free"><b>11</b>libre<small>limpia</small></div>
+          <div class="bed p sel"><b>12</b>Lucía F.<small>post-cesárea · 27 h</small></div>
+          <div class="bed a"><b>13</b>Juana M.<small>ARO · preeclampsia · 52 h</small></div>
+          <div class="bed a"><b>14</b>Carla T.<small>ARO · APP · 30 h</small></div>
+          <div class="bed g"><b>15</b>Elena S.<small>gineco · post-histerectomía · 20 h</small></div>
+          <div class="bed clean"><b>16</b>en limpieza<small>alta 10:30</small></div>
+          <div class="bed free"><b>17</b>libre<small>limpia</small></div>
+          <div class="bed p"><b>18</b>Sara L.<small>puerperio · 60 h ⏳ alta hoy</small></div>
+        </div>
+        <div class="mini" style="margin-top:6px"><span class="leg2" style="background:#fbe4ee"></span>puerperio &nbsp; <span class="leg2" style="background:#fde2e2"></span>alto riesgo obstétrico &nbsp; <span class="leg2" style="background:#ede4fb"></span>ginecología &nbsp; <span class="leg2" style="background:#ecf8f1"></span>libre &nbsp; <span class="leg2" style="background:#fdf0d5"></span>limpieza</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Nota de ingreso a piso · cama 12 · 11:05</div>
+        <div style="font-size:13.5px;line-height:1.6"><b>Diagnóstico:</b> puerperio quirúrgico inmediato (cesárea iterativa)<br><b>Estado:</b> estable, útero contraído, loquios normales<br><b>Indicaciones:</b> oxitocina en goteo · paracetamol 1 g c/8 h · deambulación precoz · lactancia · Hb control 17:00<br><b>RN:</b> alojamiento conjunto · control por Pediatría<br><span class="mini">🖐 Dra. Suárez · recibe Lic. Rojas</span></div>
+        <div class="lbl">Pendientes de la cama 12</div>
+        <div class="req"><span class="no">⏳ Hb control 17:00</span><span class="ok">✓ Vacuna anti-D: no corresponde (O+)</span><span class="no">⏳ Control de herida día 2</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ H8 ============ -->
+<section class="scr" id="h8">
+  <div class="app"><div class="brand">SIVEC <span>JEFE DE PISO</span></div><div class="who">📊 Dra. Méndez · Gineco-obstetricia · hoy</div></div>
+  <div class="body">
+    <div class="kpi" style="grid-template-columns:repeat(5,1fr)">
+      <div><small>Ocupación</small><b>80%</b><span> 8 de 10 camas</span></div>
+      <div><small>Estancia media</small><b>2,6 d</b><span> meta ≤ 3</span></div>
+      <div><small>Altas previstas hoy</small><b>2</b></div>
+      <div><small>Ingresos esperados</small><b>3</b><span> quirófano + emergencia</span></div>
+      <div><small>Interconsultas abiertas</small><b>2</b></div>
+    </div>
+    <div class="cols c2" style="margin-top:12px">
+      <div class="card"><div class="lbl">Interconsultas entre pisos</div>
+        <table class="l"><thead><tr><th>Cama</th><th>De → a</th><th>Motivo</th><th>Estado</th></tr></thead><tbody>
+          <tr><td>13</td><td>GO → Medicina interna</td><td>Preeclampsia · control PA</td><td><span class="st warn">pedida hace 3 h</span></td></tr>
+          <tr><td>12</td><td>GO → Pediatría</td><td>Control del RN</td><td><span class="st ok">respondida</span></td></tr>
+          <tr><td>C-5 (Cirugía)</td><td>Cirugía → GO</td><td>Dolor pélvico · descartar ovario</td><td><span class="st info">para nosotros</span></td></tr></tbody></table></div>
+      <div class="card"><div class="lbl">Alertas del piso</div>
+        <div style="font-size:13.5px;line-height:1.7">🔴 Cama 13: PA 160/105 hace 20 min → médico avisado<br>🟠 Cama 18: alta indicada, falta receta firmada<br>🟠 Cama 14: 30 h sin evolución médica escrita<br>🟢 2 camas libres · 1 en limpieza (tiempo medio 45 min)</div>
+        <div class="lbl">Personal de turno</div><div class="mini" style="font-size:13px">2 médicos · 1 residente · 3 enfermeras · 2 auxiliares</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ H9 ============ -->
+<section class="scr" id="h9">
+  <div class="app"><div class="brand">SIVEC <span>ALTA</span></div><div class="who">🏠 Alta médica — Lucía Flores · día 3</div></div>
+  <div class="body">
+    <div class="cols c3" style="gap:12px">
+      <div class="card"><div class="lbl">Epicrisis (se arma sola)</div><div style="font-size:13px;line-height:1.55"><b>Ingreso:</b> 07:40 por referencia · 39 sem · cesárea anterior<br><b>Procedimiento:</b> cesárea iterativa, raquídea<br><b>Evolución:</b> favorable, sin complicaciones<br><b>RN:</b> femenino, 3.250 g, Apgar 8/9<br><b>Estancia:</b> 2 días 20 h</div></div>
+      <div class="card"><div class="lbl">Indicaciones y receta</div><div style="font-size:13px;line-height:1.6">💊 Paracetamol 500 mg c/8 h x 5 días<br>💊 Sulfato ferroso 1 c/día x 3 meses<br>🧼 Curación de herida seca, ducha diaria<br>🤱 Lactancia materna exclusiva<br>⚠️ Volver si: fiebre, sangrado abundante, herida roja o con pus</div><div class="mini">→ receta a farmacia del hospital (dispensa con huella)</div></div>
+      <div class="card" style="border:2px solid #6d28d9"><div class="lbl">Contrarreferencia → C.S. San Luis</div><div style="font-size:13px;line-height:1.6">📅 <b>Retiro de puntos:</b> día 7 (01/10)<br>📅 Control puerperal: día 7 y día 40<br>👶 Control del recién nacido y vacunas<br>💊 Planificación familiar (consejería)<br>🧾 Tamizaje PAP al día 40 si corresponde</div><div class="mini">Cada ítem crea una <b>tarea con fecha</b> en el centro y un SMS a la paciente.</div></div>
+    </div>
+    <div class="card" style="margin-top:12px;display:flex;gap:14px;align-items:center"><div style="font-size:28px">🖐</div><div style="font-size:13.5px;line-height:1.5">Firman con huella: <b>médica</b> (alta y receta), <b>paciente</b> (recibí indicaciones y a mi bebé). La cama 12 pasa a <b>limpieza</b> y el jefe de piso lo ve. El C.S. San Luis recibe la contrarreferencia en su “Para hacer hoy”.</div></div>
+  </div>
+</section>
+
+<!-- ============ H10 ============ -->
+<section class="scr" id="h10">
+  <div class="app"><div class="brand">SIVEC <span>PEDIATRÍA</span></div><div class="who">🧸 Dr. Rivas · Tomás G. · 3 años · 14 kg · 95 cm</div></div>
+  <div class="body">
+    <div class="cols c3" style="gap:12px">
+      <div class="card"><div class="lbl">Calculadora de dosis por peso</div>
+        <div class="inp" style="margin-bottom:8px">Peso: <b>14 kg</b> (del triaje de hoy)</div>
+        <div class="dose"><b>Paracetamol</b><span>15 mg/kg/dosis c/6 h</span><em>210 mg = <b>8,7 mL</b> (susp. 120 mg/5 mL)</em></div>
+        <div class="dose"><b>Ibuprofeno</b><span>10 mg/kg/dosis c/8 h</span><em>140 mg = <b>7 mL</b> (susp. 100 mg/5 mL)</em></div>
+        <div class="dose"><b>Amoxicilina</b><span>50 mg/kg/día ÷ 3</span><em>233 mg c/8 h = <b>4,7 mL</b> (susp. 250 mg/5 mL)</em></div>
+        <div class="mini">⚠ Avisa si pasa la dosis máxima. Valores referenciales: se configuran según el protocolo del hospital.</div></div>
+      <div class="card"><div class="lbl">Buscar medicamento por indicación</div>
+        <div class="inp" style="margin-bottom:8px">🔎 otitis media aguda</div>
+        <div class="srch"><b>1ª elección</b>Amoxicilina — 80–90 mg/kg/día c/12 h · 10 días</div>
+        <div class="srch"><b>Alergia a penicilina</b>Azitromicina — 10 mg/kg día 1, luego 5 mg/kg</div>
+        <div class="srch"><b>Dolor / fiebre</b>Paracetamol o ibuprofeno</div>
+        <div class="mini">Con un toque pasa a la receta con la dosis ya calculada y el stock de farmacia.</div></div>
+      <div class="card"><div class="lbl">Controles del niño sano</div>
+        <svg viewBox="0 0 300 150" width="100%" role="img" aria-label="Curva de peso para la edad"><g font-family="Source Sans 3, sans-serif" font-size="10" fill="#7a6a71"><text x="4" y="14">kg</text><text x="26" y="146">0</text><text x="150" y="146">1,5</text><text x="276" y="146">3 años</text></g>
+          <path d="M28 128 C 90 80, 180 58, 296 42" fill="none" stroke="#cfe0f2" stroke-width="18" stroke-linecap="round"/>
+          <path d="M28 128 C 90 80, 180 58, 296 42" fill="none" stroke="#9fbde0" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <polyline points="28,128 70,98 110,82 150,72 190,62 230,56 270,48" fill="none" stroke="#c2410c" stroke-width="2"/><circle cx="270" cy="48" r="4" fill="#c2410c"/><text x="266" y="40" text-anchor="end" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="700" fill="#2d2429">14 kg · normal</text></svg>
+        <div class="mini">Banda = rango normal OMS · peso, talla y perímetro cefálico</div>
+        <div class="req" style="margin-top:6px"><span class="ok">✓ Vacunas al día</span><span class="no">⏳ Desarrollo: evaluar lenguaje</span><span class="ok">✓ Hb 11,5</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ H11 ============ -->
+<section class="scr" id="h11">
+  <div class="app"><div class="brand">SIVEC <span>TRÁNSITO</span></div><div class="who">🚑 App en el celular de la ambulancia AMB-07 · y la central</div></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:230px 230px 230px 1fr;gap:14px">
+      <div class="amb"><div class="ah">🔔 Nuevo traslado</div><div class="ab"><b style="font-size:16px">C.S. San Luis → Hospital municipal</b><div class="mini">a 2,1 km de ustedes · prioridad <b style="color:#c2410c">urgente</b></div><div class="big2">00:48</div><div class="mini" style="text-align:center">para aceptar</div><span class="btn g" style="justify-content:center">✓ Aceptar</span><span class="btn" style="justify-content:center">✗ No puedo (motivo)</span></div></div>
+      <div class="amb"><div class="ah">🧍‍♀️ Paciente</div><div class="ab"><div class="row"><div class="photo2" style="width:46px;height:52px">📷</div><div><b>Lucía Flores</b><div class="mini">29 a · C.I. 6677889</div></div></div><div style="font-size:12.5px;line-height:1.5">🤰 39 sem · cesárea anterior · contracciones<br>PA 120/80 · FC 90<br>⚠ sin alergias<br>🏥 <b>Hospital ya aceptó</b> · Emergencia GO</div><span class="st ok" style="text-align:center">destino confirmado ✓</span></div></div>
+      <div class="amb"><div class="ah">🧭 En camino</div><div class="ab"><svg viewBox="0 0 200 120" width="100%"><rect width="200" height="120" rx="8" fill="#eef1ec"/><path d="M0 40h200M0 90h200M60 0v120M140 0v120" stroke="#fff" stroke-width="7"/><path d="M60 100 L60 40 L140 40 L140 12" fill="none" stroke="#2563eb" stroke-width="4"/><circle cx="60" cy="100" r="7" fill="#ea580c"/><circle cx="140" cy="12" r="7" fill="#b91c1c"/></svg>
+        <div class="chips" style="gap:4px"><span class="chip on">En camino</span><span class="chip">En el lugar</span><span class="chip">Con paciente</span><span class="chip">Entregada 🖐</span></div><div class="mini">GPS del celular → la central y el hospital ven la llegada estimada: 6 min</div></div></div>
+      <div>
+        <div class="card"><div class="lbl">¿App o teléfono? — los dos</div>
+          <div style="font-size:13.5px;line-height:1.6">📱 <b>App</b>: los centros y hospitales piden desde el SIVEC (botón Derivar → “necesita ambulancia”).<br>☎️ <b>Central telefónica</b> sigue: llamadas del público y emergencias, y <b>plan B</b> si cae internet. El operador <b>carga la llamada en el SIVEC</b> y despacha por la misma app.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Por qué un celular de la ambulancia (no del chofer)</div>
+          <div style="font-size:13.5px;line-height:1.6">El GPS sigue a la <b>ambulancia</b> aunque cambie el turno · los datos de pacientes no quedan en teléfonos personales · la tripulación entra con su huella al empezar el turno.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Si nadie acepta en 60 s</div><div style="font-size:13.5px">pasa a la siguiente ambulancia disponible y la central recibe alerta.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  const NOTES = {
+    h1: '<b>Recorrido:</b> onde a paciente está agora e por onde passou. Cada passo é um formulário do SIVEC e vai para a linha do tempo. O procedimento decide o piso (cesárea → gineco-obstetrícia/puerpério; risco → ARO; etc.).',
+    h2: '<b>Monitorização fetal:</b> pedida no catálogo de exames da emergência GO; traçado, parâmetros e classificação (NST reativo) assinados com digital.',
+    h3: '<b>Solicitação de quirófano:</b> diagnóstico, procedimento, prioridade, anestesia, sangue e requisitos (o sistema marca o que já existe). Mostra a agenda dos quirófanos do dia.',
+    h4: '<b>Anestesia:</b> avaliação pré-anestésica, receita da anestesiologia (vai para a farmácia do quirófano) e protocolo com os sinais vitais intraoperatórios.',
+    h5: '<b>Enfermagem do quirófano e saída:</b> checklist OMS, contagem de gazes/compressas, destino, pendentes e entrega/recebimento com digital.',
+    h6: '<b>Recuperação pós-anestésica:</b> sinais vitais a cada 15 min, dor, sangramento, útero e escala de Aldrete; com ≥ 9 pode sair, e o sistema sugere o piso.',
+    h7: '<b>Piso e camas:</b> mapa de camas por tipo (puerpério, ARO, ginecologia), horas na cama, nota de ingresso e pendentes da paciente.',
+    h8: '<b>Chefe de piso:</b> ocupação, estância média, altas e ingressos, interconsultas entre pisos, alertas e pessoal de turno.',
+    h9: '<b>Alta:</b> epicrise automática, indicações, receita e contrarreferência ao centro (retirada de pontos no dia 7, controles). Cada item vira tarefa com data e SMS.',
+    h10: '<b>Pediatria:</b> calculadora de doses pelo peso (com dose máxima), busca de medicamento por indicação e controles do niño sano com curva OMS.',
+    h11: '<b>App da ambulância:</b> celular da ambulância toca como um “Uber”, a tripulação aceita, vê a ficha da paciente e o destino já confirmado; GPS em tempo real. A central telefônica continua e usa o mesmo sistema.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 'h1');
+</script>
+
+</body>
+</html>
