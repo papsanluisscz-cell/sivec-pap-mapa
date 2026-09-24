@@ -523,7 +523,7 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - **Coberturas y ESAVI:** cobertura acumulada contra lo esperado, deserción Penta 1→3, ESAVI con lote, e informe mensual PAI automático (SNIS y gestor).
 - Imágenes: docs/vacunas-01..08.png · esboco-vacunas.html
 
-### Carnet de vacunas del niño/a (impreso) — dibujado, para aprobar
+### Carnet de salud infantil (vacunas + crecimiento + desarrollo, impreso) — dibujado, para aprobar
 - 1 hoja A4 horizontal, impresa en los 2 lados y doblada al medio (A5). Sale de la impresora del centro; en blanco y negro también sirve.
 - **8 especificaciones:**
   1. identificación con QR (niño/a, mamá/tutor, centro);
@@ -536,3 +536,15 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
   8. lenguaje simple, letra ≥ 9 pt, el mismo carnet para niña y niño.
 - **Uso:** Pediatría lo imprime al nacer (BCG y HepB ya anotadas) y se reimprime después de cada vacuna. El QR siempre muestra la verdad del SIVEC.
 - Imágenes: docs/carnet-vacunas-01..03.png · esboco-carnet-vacunas.html
+- **Agregado (pedido del usuario):** el carnet pasa a ser un **cuadernillo A5 de 8 caras** (2 hojas A4).
+  - **Curvas de crecimiento OMS** (peso y talla para la edad, niña o niño; zona verde, −2, −3 y +2). El SIVEC dibuja la línea del niño con las medidas reales. También hay páginas de 2–5 años, peso/talla y perímetro cefálico.
+  - **Hitos del desarrollo por edad** (AIEPI-OPS), de 1 mes a 5 años: ✓ lo evaluado por el personal y ☐ para que la mamá marque en casa. Incluye señales de alerta y consejos de estimulación.
+- **Control del niño sano en el SIVEC:**
+  - Las medidas dan los puntajes Z automáticos (OMS), con alerta si la curva se aplana.
+  - Los hitos dan la clasificación AIEPI (adecuado / con factores de riesgo / posible retraso → referir); se puede aplicar una escala completa.
+  - Vacunas y suplementos se registran en el mismo control.
+- **Todo queda en la base de datos:** cada medida y cada hito, con fecha y responsable.
+  - Salen listas de búsqueda activa (desnutrición, talla baja, retraso, sin control).
+  - Los indicadores van al SNIS y al gestor.
+  - Al cerrar el control se reimprime el carnet.
+- Imágenes: docs/carnet-vacunas-01..06.png
