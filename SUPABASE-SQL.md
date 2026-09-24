@@ -36,6 +36,20 @@ Sin esta columna el campo aparece deshabilitado y todo lo demás funciona igual.
 
 ---
 
+## Paso 4 — Seguimiento por etapas y envíos al laboratorio (recomendado, sin riesgo)
+
+- `seg_etapa` / `seg_fechas`: en PAP+ y VPH+, cada etapa del seguimiento (notificada, colposcopia, tratamiento, alta) se registra con un toque y su fecha.
+- `fecha_envio` / `lote_envio`: en Balance, qué muestras se enviaron al laboratorio y cuándo (sirve para medir cuánto tarda el resultado).
+
+```sql
+alter table pacientes add column if not exists seg_etapa text;
+alter table pacientes add column if not exists seg_fechas jsonb;
+alter table pacientes add column if not exists fecha_envio date;
+alter table pacientes add column if not exists lote_envio text;
+```
+
+---
+
 ## Paso 3 — Proteger los datos de las pacientes (IMPORTANTE)
 
 Hoy cualquiera que tenga la URL y la clave *anon* de Supabase puede leer todos los datos.

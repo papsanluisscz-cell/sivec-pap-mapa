@@ -270,6 +270,8 @@
   .panelCard canvas { flex: 1; max-height: 240px; }
   #trashView { padding: 24px 32px; overflow-y: auto; }
   #metodosView { padding: 24px 32px; overflow-y: auto; }
+  #segpapView, #segvphView, #balanceView { padding: 24px 32px; overflow-y: auto; }
+  @media (max-width: 700px) { #segpapView, #segvphView, #balanceView, #metodosView, #panelView, #trashView { padding: 16px 12px; } }
   #filterDoctora, #filterTomas, #filterPaso { padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 13.5px; background: var(--surface); color: var(--ink); }
   #listView #listToolbar { margin: 12px 22px 12px; }
   #listView #overdueBanner, #listView #vencimientoBanner, #listView #birthdayBanner { margin-left: 22px; margin-right: 22px; }
@@ -473,6 +475,45 @@
   .regBorr button, .regExist button { border: 1px solid currentColor; background: transparent; color: inherit; border-radius: 7px; padding: 4px 10px; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
   .regOk { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .regOk button { border: none; background: var(--teal-700); color: #fff; border-radius: 8px; padding: 7px 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  /* ===== Balance: envíos ===== */
+  .balTiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin: 4px 0 12px; }
+  .balTile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+  .balTile .v { font-size: 26px; font-weight: 800; } .balTile .l { font-size: 12px; color: var(--ink-soft); font-weight: 600; } .balDocs { font-size: 12.5px; line-height: 1.7; }
+  .balLote { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; font-size: 13px; }
+  .balLote input { border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; background: var(--surface); color: var(--ink); }
+  .balBtn { background: var(--teal-700); color: #fff; border: none; border-radius: 8px; padding: 7px 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .balBtn2 { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; cursor: pointer; font-family: inherit; }
+  .balPill { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+  .balPill.ok { background: #dcf5e9; color: #0d6b47; } .balPill.no { background: #fff4d6; color: #8a5300; }
+  tr.balSent td { background: color-mix(in srgb, #16a34a 5%, transparent); }
+  @media print { .noPrint { display: none !important; } }
+  /* ===== Seguimiento por etapas ===== */
+  .segPipe { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin: 8px 0 12px; }
+  .segStage { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; }
+  .segStage .v { font-size: 22px; font-weight: 800; } .segStage .l { font-size: 11.5px; color: var(--ink-soft); font-weight: 600; }
+  .segStage .bar { height: 4px; border-radius: 2px; background: var(--teal-700); margin-top: 6px; transform-origin: left; animation: pnGrowX 1s ease both; }
+  @keyframes pnGrowX { from { transform: scaleX(0); } }
+  .segNote { font-size: 12.5px; background: #fff7e6; border: 1px solid #f3d9a4; color: #6b4a00; border-radius: 10px; padding: 8px 12px; margin-bottom: 10px; }
+  body.dark .segNote { background: #3a2a0c; color: #fcd34d; border-color: #5a4212; }
+  .segList { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 4px 14px; }
+  .segRow { display: grid; grid-template-columns: 240px 1fr 110px; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .segRow:last-child { border-bottom: none; }
+  .segName { border: none; background: none; padding: 0; font-size: 14px; font-weight: 700; color: var(--ink); cursor: pointer; text-align: left; font-family: inherit; text-decoration: underline dotted; text-underline-offset: 3px; }
+  .segNm small { display: block; color: var(--ink-soft); font-size: 12px; margin-top: 2px; }
+  .segTag { font-size: 10.5px; font-weight: 700; border-radius: 999px; padding: 1px 7px; background: #fff4d6; color: #8a5300; margin-left: 3px; }
+  .segTag.hi { background: #fee2e2; color: #991b1b; }
+  .segSteps { display: grid; grid-template-columns: repeat(6, 1fr); position: relative; }
+  .segSteps::before { content: ""; position: absolute; top: 11px; left: 8%; right: 8%; height: 3px; background: var(--line); border-radius: 2px; }
+  .segSteps::after { content: ""; position: absolute; top: 11px; left: 8%; width: var(--fill); height: 3px; background: var(--teal-700); border-radius: 2px; transform-origin: left; animation: pnGrowX 1s ease both; }
+  .segSt { border: none; background: none; text-align: center; position: relative; z-index: 1; font-size: 10.5px; color: var(--ink-soft); cursor: pointer; padding: 0; font-family: inherit; }
+  .segSt:disabled { cursor: default; }
+  .segSt i { width: 24px; height: 24px; border-radius: 50%; background: var(--surface); border: 3px solid var(--line); display: block; margin: 0 auto 4px; font-style: normal; font-size: 11px; line-height: 18px; color: #fff; font-weight: 800; transition: transform .15s; }
+  .segSt:not(:disabled):hover i { transform: scale(1.15); border-color: var(--teal-500); }
+  .segSt.done { color: var(--ink); font-weight: 600; } .segSt.done i { background: var(--teal-700); border-color: var(--teal-700); }
+  .segSt.now { color: var(--ink); font-weight: 700; } .segSt.now i { border-color: var(--teal-700); box-shadow: 0 0 0 4px color-mix(in srgb, var(--teal-700) 18%, transparent); }
+  .segSt.stuck i { border-color: #dc2626; box-shadow: 0 0 0 4px rgba(220,38,38,.18); }
+  .segDays { text-align: right; font-size: 12px; color: var(--ink-soft); } .segDays b { display: block; font-size: 18px; color: var(--ink); } .segDays b.r { color: #dc2626; }
+  @media (max-width: 900px) { .segRow { grid-template-columns: 1fr; } .segPipe { grid-template-columns: repeat(3, 1fr); } .segDays { text-align: left; } }
   /* ===== Métodos: calendario ===== */
   .metTiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 6px 0 14px; }
   .metTile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; cursor: pointer; }
@@ -835,6 +876,8 @@
     <div id="segpapView" class="view">
       <h2>Seguimiento de Casos Positivos (PAP)</h2>
       <p class="hint">Pacientes con Estado del PAP = Positivo. Registra acá el seguimiento y la fecha de cada gestión.</p>
+      <div id="segPapFlow" class="segFlow"></div>
+      <h3 style="margin:18px 0 8px;font-size:14px">Tabla detallada</h3>
       <div id="tableWrapSegPap">
         <table>
           <thead><tr>
@@ -850,6 +893,8 @@
     <div id="segvphView" class="view">
       <h2>Seguimiento de Pacientes VPH Positivo</h2>
       <p class="hint">Pacientes con Resultado VPH = Positiva. Registra acá el seguimiento y la fecha de cada gestión.</p>
+      <div id="segVphFlow" class="segFlow"></div>
+      <h3 style="margin:18px 0 8px;font-size:14px">Tabla detallada</h3>
       <div id="tableWrapSegVph">
         <table>
           <thead><tr>
@@ -1003,6 +1048,7 @@
     <span>Edad objetivo PAP: hasta</span><input id="cfgPapMax" type="number" min="0" max="120">
     <span>Edad objetivo VPH: desde</span><input id="cfgVphMin" type="number" min="0" max="120">
     <span>Edad objetivo VPH: hasta</span><input id="cfgVphMax" type="number" min="0" max="120">
+    <span>Seguimiento: días máximos por etapa</span><input id="cfgSegDias" type="number" min="1" max="365">
   </div>
   <button class="primary" onclick="saveClinCfg()">Guardar criterios</button>
 
@@ -1397,7 +1443,7 @@ async function init() {
   document.getElementById('keyInput').value = key;
   document.getElementById('driveFolderInput').value = localStorage.getItem('sivecDriveFolderId') || '';
   document.getElementById('gmapsKeyInput').value = localStorage.getItem('sivec_gmaps_key') || '';
-  [['cfgPapAnios', 'papNegAnios'], ['cfgVphAnios', 'vphNegAnios'], ['cfgPapMin', 'papEdadMin'], ['cfgPapMax', 'papEdadMax'], ['cfgVphMin', 'vphEdadMin'], ['cfgVphMax', 'vphEdadMax']]
+  [['cfgSegDias', 'segDias'], ['cfgPapAnios', 'papNegAnios'], ['cfgVphAnios', 'vphNegAnios'], ['cfgPapMin', 'papEdadMin'], ['cfgPapMax', 'papEdadMax'], ['cfgVphMin', 'vphEdadMin'], ['cfgVphMax', 'vphEdadMax']]
     .forEach(([id, k]) => { document.getElementById(id).value = clinCfg[k]; });
   const reqChk = document.getElementById('requireLoginChk');
   reqChk.checked = localStorage.getItem('sivec_require_login') === '1';
@@ -1597,8 +1643,21 @@ async function loadBalance() {
   }
   lastBalanceData = data;
   lastBalanceRange = { inicio, fin };
+  const envioOk = await columnOk('fecha_envio');
+  const enviadas = data.filter(p => p.fecha_envio).length;
+  const porDoc = {}; data.forEach(p => { const d = p.doctora || 'Sin doctora'; porDoc[d] = (porDoc[d] || 0) + 1; });
+  const resumen = `<div class="balTiles">
+      <div class="balTile"><div class="v">${data.length}</div><div class="l">Tomas en el período</div></div>
+      ${envioOk ? `<div class="balTile"><div class="v" style="color:#16a34a">${enviadas}</div><div class="l">Enviadas al laboratorio</div></div>
+      <div class="balTile"><div class="v" style="color:${data.length - enviadas ? '#d97706' : '#16a34a'}">${data.length - enviadas}</div><div class="l">Falta enviar</div></div>` : ''}
+      <div class="balTile"><div class="l" style="margin-bottom:4px">Por doctora</div><div class="balDocs">${Object.entries(porDoc).sort((a, b) => b[1] - a[1]).map(([d, n]) => `${esc(d)} <b>${n}</b>`).join(' · ')}</div></div>
+    </div>
+    ${envioOk ? `<div class="balLote"><b id="balSel">0 marcadas</b> → <span>Fecha de envío</span> <input type="date" id="balFechaEnvio" value="${hoyISO()}"> <span>Lote</span> <input id="balLote" value="L-${hoyISO().slice(0, 4)}-${String(Math.ceil((new Date() - new Date(new Date().getFullYear(), 0, 1)) / 604800000)).padStart(2, '0')}" style="width:110px">
+      <button type="button" class="balBtn" id="balMarcar">Marcar como enviadas</button> <button type="button" class="balBtn2" id="balSinEnviar">Marcar todas las que faltan</button></div>`
+      : '<div class="segNote">Para registrar qué muestras se enviaron al laboratorio (y medir cuánto tarda el resultado), ejecutá el <b>Paso 4</b> de SUPABASE-SQL.md.</div>'}`;
   const filas = data.map((p, i) => `
-    <tr>
+    <tr class="${p.fecha_envio ? 'balSent' : ''}">
+      ${envioOk ? `<td class="noPrint"><input type="checkbox" class="balChk" value="${esc(p.id)}"${p.fecha_envio ? ' disabled' : ''}></td>` : ''}
       <td>${i + 1}</td>
       <td>${esc(p.nombre)}</td>
       <td>${esc(p.carnet) || '—'}</td>
@@ -1610,21 +1669,40 @@ async function loadBalance() {
       <td>${esc(p.doctora) || '—'}</td>
       <td>${esc(p.estado_pap) || 'Pendiente'}</td>
       <td>${esc(p.resultado_pap) || '—'}</td>
+      ${envioOk ? `<td>${p.fecha_envio ? `<span class="balPill ok">✓ ${fmtFecha(p.fecha_envio)}${p.lote_envio ? ' · ' + esc(p.lote_envio) : ''}</span>` : '<span class="balPill no">Falta enviar</span>'}</td>` : ''}
     </tr>`).join('');
-  cont.innerHTML = `
+  cont.innerHTML = resumen + `
     <div id="balancePrintArea">
       <h3 style="margin-bottom:2px">Balance Semanal — ${fmtFecha(inicio)} a ${fmtFecha(fin)}</h3>
       <p class="hint" style="margin-top:0">Total: ${data.length} pacientes</p>
       <table>
         <thead><tr>
-          <th>#</th><th>Nombre</th><th>Carnet</th><th>Fecha nac.</th><th>Edad</th><th>Celular</th>
-          <th>Dirección</th><th>Fecha toma</th><th>Doctora</th><th>Estado</th><th>Resultado</th>
+          ${envioOk ? '<th class="noPrint"><input type="checkbox" id="balChkAll" title="Marcar todas"></th>' : ''}<th>#</th><th>Nombre</th><th>Carnet</th><th>Fecha nac.</th><th>Edad</th><th>Celular</th>
+          <th>Dirección</th><th>Fecha toma</th><th>Doctora</th><th>Estado</th><th>Resultado</th>${envioOk ? '<th>Envío</th>' : ''}
         </tr></thead>
         <tbody>${filas}</tbody>
       </table>
     </div>`;
   document.getElementById('balanceImprimirBtn').style.display = 'inline-block';
   document.getElementById('balancePdfBtn').style.display = 'inline-block';
+  if (envioOk) {
+    const chks = () => [...cont.querySelectorAll('.balChk:not(:disabled)')];
+    const upd = () => { cont.querySelector('#balSel').textContent = chks().filter(c => c.checked).length + ' marcadas'; };
+    cont.onchange = e => { if (e.target.id === 'balChkAll') chks().forEach(c => c.checked = e.target.checked); if (cont.querySelector('#balSel')) upd(); };
+    cont.querySelector('#balSinEnviar').onclick = () => { chks().forEach(c => c.checked = true); upd(); };
+    cont.querySelector('#balMarcar').onclick = async () => {
+      const ids = chks().filter(c => c.checked).map(c => c.value);
+      const fecha = cont.querySelector('#balFechaEnvio').value, lote = cont.querySelector('#balLote').value.trim();
+      if (!ids.length) { alert('Marcá al menos una toma.'); return; }
+      if (!fecha) { alert('Elegí la fecha de envío.'); return; }
+      if (!confirm(`¿Registrar ${ids.length} muestra${ids.length > 1 ? 's' : ''} como enviada${ids.length > 1 ? 's' : ''} el ${fmtFecha(fecha)}${lote ? ' (lote ' + lote + ')' : ''}?`)) return;
+      const idVals = data.filter(p => ids.includes(String(p.id))).map(p => p.id);
+      const { error } = await sb.from('pacientes').update({ fecha_envio: fecha, lote_envio: lote || null }).in('id', idVals);
+      if (error) { alert('Error al guardar: ' + error.message); return; }
+      showToast(`${ids.length} muestra${ids.length > 1 ? 's' : ''} marcada${ids.length > 1 ? 's' : ''} como enviada${ids.length > 1 ? 's' : ''} ✔`, 'ok');
+      loadBalance();
+    };
+  }
 }
 document.getElementById('balanceBuscarBtn').addEventListener('click', loadBalance);
 document.getElementById('balanceImprimirBtn').addEventListener('click', () => {
@@ -1715,11 +1793,69 @@ async function generateBalancePdf() {
   setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
+// ================= Seguimiento de positivas por etapas =================
+// Con las columnas seg_etapa / seg_fechas (SUPABASE-SQL.md, Paso 4) cada etapa se registra con un toque.
+// Sin ellas, la etapa se deduce de los datos que ya existen (solo lectura).
+const SEG_ETAPAS = [['resultado', 'Resultado recibido'], ['notificada', 'Notificada'], ['colpo_agendada', 'Colposcopia agendada'], ['colpo_realizada', 'Colposcopia realizada'], ['tratamiento', 'En tratamiento'], ['alta', 'Alta / control']];
+const SEG_CORTO = { resultado: 'Resultado', notificada: 'Notificada', colpo_agendada: 'Colpo agendada', colpo_realizada: 'Colpo realizada', tratamiento: 'Tratamiento', alta: 'Alta' };
+function segEtapaDe(p) {
+  if (p.seg_etapa && SEG_CORTO[p.seg_etapa]) return p.seg_etapa;
+  if (p.recibio_tratamiento_vph || p.derivacion_pap) return 'tratamiento';
+  if (p.recibio_resultado) return 'notificada';
+  return 'resultado';
+}
+function segFechaEtapa(p, et) {
+  const f = (p.seg_fechas && typeof p.seg_fechas === 'object') ? p.seg_fechas : {};
+  return f[et] || (et === 'notificada' && p.fecha_recibio_resultado) || p.fecha_seguimiento_pap || p.fecha_seguimiento_vph || p.fecha_toma || null;
+}
+async function renderSegFlow(contId, data, recargar) {
+  const cont = document.getElementById(contId);
+  const editable = await columnOk('seg_etapa');
+  const hoy = hoyISO(), lim = Number(clinCfg.segDias) || 30;
+  const filas = data.map(p => {
+    const et = segEtapaDe(p), idx = SEG_ETAPAS.findIndex(e => e[0] === et);
+    const desde = segFechaEtapa(p, et), dias = desde ? Math.max(0, Math.round((new Date(hoy) - new Date(desde)) / 86400000)) : null;
+    return { p, et, idx, dias, trabada: et !== 'alta' && dias != null && dias > lim };
+  }).sort((a, b) => (b.trabada - a.trabada) || ((b.dias || 0) - (a.dias || 0)));
+  const cuenta = SEG_ETAPAS.map(([k]) => filas.filter(f => f.et === k).length);
+  const mx = Math.max(1, ...cuenta);
+  cont.innerHTML = `
+    <div class="segPipe">${SEG_ETAPAS.map(([k, n], i) => `<div class="segStage"><div class="v">${cuenta[i]}</div><div class="l">${n}</div><div class="bar" style="width:${Math.max(4, cuenta[i] / mx * 100)}%;${k === 'alta' ? 'background:#16a34a' : ''}"></div></div>`).join('')}</div>
+    ${editable ? '' : '<div class="segNote">Para registrar cada etapa con un toque, ejecutá el <b>Paso 4</b> de SUPABASE-SQL.md. Mientras tanto, la etapa se deduce de los datos (entregado, derivación, tratamiento).</div>'}
+    <div class="segList">${filas.length ? filas.map(({ p, et, idx, dias, trabada }) => {
+      const bet = bethesdaDe(p);
+      const tags = [bet && bet !== 'NILM' ? bet : '', p.resultado_vph === 'Positiva' ? 'VPH' + (p.vph_genotipo ? ' ' + p.vph_genotipo : '+') : ''].filter(Boolean);
+      return `<div class="segRow${trabada ? ' stuck' : ''}">
+        <div class="segNm"><button type="button" class="segName" data-ficha="${esc(p.id)}">${esc(p.nombre)}</button> ${tags.map(t => `<span class="segTag ${/HSIL|ASC-H|AGC|AIS|Carcinoma|VPH/.test(t) ? 'hi' : ''}">${esc(t)}</span>`).join('')}
+          <small>${esc(p.carnet || 'Sin carnet')}${edadDe(p.fecha_nacimiento) != null ? ' · ' + edadDe(p.fecha_nacimiento) + ' años' : ''} · ${esc(p.doctora || '—')} · toma ${fmtFecha(p.fecha_toma) || '—'}</small></div>
+        <div class="segSteps" style="--fill:${idx / (SEG_ETAPAS.length - 1) * 84}%">${SEG_ETAPAS.map(([k], i) => `<button type="button" class="segSt ${i < idx ? 'done' : i === idx ? 'now' : ''}${i === idx && trabada ? ' stuck' : ''}" data-id="${esc(p.id)}" data-et="${k}" ${editable ? '' : 'disabled'} title="${editable ? 'Registrar: ' + SEG_CORTO[k] : SEG_CORTO[k]}"><i>${i < idx ? '✓' : ''}</i>${SEG_CORTO[k]}</button>`).join('')}</div>
+        <div class="segDays">${dias == null ? '—' : `<b${trabada ? ' class="r"' : ''}>${dias} día${dias === 1 ? '' : 's'}</b>${trabada ? 'sin avanzar ⚠' : 'en esta etapa'}`}</div>
+      </div>`;
+    }).join('') : '<p class="hint">No hay pacientes en esta lista.</p>'}</div>`;
+  cont.onclick = async e => {
+    const nm = e.target.closest('[data-ficha]');
+    if (nm) { const p = data.find(x => String(x.id) === nm.dataset.ficha); if (p) { if (!tomasIndex.size) { tomasIndex = buildTomasIndex(allPatientsData.length ? allPatientsData : data); } openFicha(p); } return; }
+    const b = e.target.closest('.segSt[data-et]'); if (!b || b.disabled) return;
+    const p = data.find(x => String(x.id) === b.dataset.id); if (!p) return;
+    const et = b.dataset.et, fecha = prompt(`Registrar "${SEG_CORTO[et]}" para ${p.nombre}.\nFecha (AAAA-MM-DD):`, hoyISO());
+    if (!fecha) return;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) { alert('Fecha inválida. Usá el formato AAAA-MM-DD.'); return; }
+    const fechas = Object.assign({}, (p.seg_fechas && typeof p.seg_fechas === 'object') ? p.seg_fechas : {}, { [et]: fecha });
+    const upd = { seg_etapa: et, seg_fechas: fechas };
+    if (et !== 'resultado' && !p.recibio_resultado) { upd.recibio_resultado = true; upd.fecha_recibio_resultado = fecha; } // notificada = resultado informado
+    const { error } = await sb.from('pacientes').update(upd).eq('id', p.id);
+    if (error) { alert('Error al guardar: ' + error.message); return; }
+    showToast(`${p.nombre}: ${SEG_CORTO[et]} (${fmtFecha(fecha)}) ✔`, 'ok');
+    recargar();
+  };
+}
+
 async function loadSegPap() {
   const tbody = document.getElementById('segPapBody');
   tbody.innerHTML = '<tr><td colspan="9">Cargando...</td></tr>';
   const { data, error } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null).eq('estado_pap', 'Positivo').order('fecha_toma', { ascending: true }));
   if (error) { tbody.innerHTML = `<tr><td colspan="9">Error: ${esc(error.message)}</td></tr>`; return; }
+  renderSegFlow('segPapFlow', data, loadSegPap);
   if (!data.length) { tbody.innerHTML = '<tr><td colspan="9">No hay casos positivos registrados.</td></tr>'; return; }
   tbody.innerHTML = data.map(p => {
     const fechaEst = p.fecha_estimada || addDays(p.fecha_toma, 90);
@@ -1745,6 +1881,7 @@ async function loadSegVph() {
   tbody.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
   const { data, error } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null).eq('resultado_vph', 'Positiva').order('fecha_toma', { ascending: true }));
   if (error) { tbody.innerHTML = `<tr><td colspan="7">Error: ${esc(error.message)}</td></tr>`; return; }
+  renderSegFlow('segVphFlow', data, loadSegVph);
   if (!data.length) { tbody.innerHTML = '<tr><td colspan="7">No hay pacientes VPH positivo registradas.</td></tr>'; return; }
   tbody.innerHTML = data.map(p => `<tr>
       <td>${esc(p.nombre)}</td><td>${esc(p.carnet)}</td><td>${fmtFecha(p.fecha_toma)}</td>
@@ -1922,7 +2059,7 @@ function renderBanners(data) {
 
 // ================= Lógica clínica: Bethesda, próximo paso, próximo control, edad objetivo =================
 // Los intervalos y rangos de edad son configurables (⚙ Configuración) para ajustarlos a la norma nacional vigente.
-const CLIN_DEFAULT = { papNegAnios: 3, vphNegAnios: 5, papEdadMin: 25, papEdadMax: 64, vphEdadMin: 30, vphEdadMax: 64 };
+const CLIN_DEFAULT = { segDias: 30, papNegAnios: 3, vphNegAnios: 5, papEdadMin: 25, papEdadMax: 64, vphEdadMin: 30, vphEdadMax: 64 };
 let clinCfg = Object.assign({}, CLIN_DEFAULT);
 try { clinCfg = Object.assign(clinCfg, JSON.parse(localStorage.getItem('sivec_clin_cfg') || '{}')); } catch (e) {}
 
@@ -2034,7 +2171,7 @@ function columnOk(col) {
 
 function saveClinCfg() {
   const v = id => Number(document.getElementById(id).value);
-  const cfg = { papNegAnios: v('cfgPapAnios'), vphNegAnios: v('cfgVphAnios'), papEdadMin: v('cfgPapMin'), papEdadMax: v('cfgPapMax'), vphEdadMin: v('cfgVphMin'), vphEdadMax: v('cfgVphMax') };
+  const cfg = { segDias: v('cfgSegDias'), papNegAnios: v('cfgPapAnios'), vphNegAnios: v('cfgVphAnios'), papEdadMin: v('cfgPapMin'), papEdadMax: v('cfgPapMax'), vphEdadMin: v('cfgVphMin'), vphEdadMax: v('cfgVphMax') };
   if (Object.values(cfg).some(x => !isFinite(x) || x < 0)) { alert('Revisá los números.'); return; }
   clinCfg = cfg;
   try { localStorage.setItem('sivec_clin_cfg', JSON.stringify(cfg)); } catch (e) {}
