@@ -326,6 +326,14 @@
   #mapPlacingHint { display: none; position: absolute; top: 56px; left: 50%; transform: translateX(-50%); z-index: 1000; background: #fff7ed; color: #7c2d12; border: 1px solid #fdba74; padding: 8px 14px; border-radius: 8px; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); max-width: calc(100% - 24px); }
   #mapUnlocatedPanel { display: none; position: absolute; top: 60px; right: 12px; bottom: 80px; width: 320px; max-width: calc(100% - 24px); z-index: 1001; background: #fff; color: #40323a; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); overflow-y: auto; padding: 10px 12px; font-size: 12.5px; }
   #mapUnlocatedPanel.open { display: block; }
+  #mapBarrioPanel { display: none; position: absolute; top: 60px; right: 12px; bottom: 80px; width: 300px; max-width: calc(100% - 24px); z-index: 1001; background: #fff; color: #40323a; border: 1px solid #ecdde3; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); overflow-y: auto; padding: 10px 12px; font-size: 12.5px; color-scheme: light; }
+  #mapBarrioPanel.open { display: block; }
+  .barrioRow { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 4px; border-bottom: 1px solid #ecdde3; cursor: pointer; border-radius: 6px; }
+  .barrioRow:hover { background: #fbf3f6; }
+  .barrioRow small { display: block; color: #8a7078; font-size: 11.5px; }
+  .barrioRow .cnt { font-weight: 800; font-size: 15px; }
+  .rutaBtn { background: #7d2a4c; color: #fff; border: none; border-radius: 8px; padding: 8px 12px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+  #mapFilter .chip.cobOn { opacity: 1; background: #fee2e2; border-color: #dc2626; font-weight: 700; }
   #mapUnlocatedPanel .unlocItem { display: flex; justify-content: space-between; gap: 8px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line); }
   #mapUnlocatedPanel .unlocItem .addr { color: var(--ink-soft); }
   #mapUnlocatedPanel .unlocItem button { flex-shrink: 0; background: var(--teal-700); color: #fff; border: none; border-radius: 6px; padding: 5px 9px; font-size: 12px; cursor: pointer; }
@@ -847,9 +855,25 @@
           <select id="mapFiltDoctora" class="fSel"><option value="">Todas las doctoras</option></select>
           <select id="mapFiltAnio" class="fSel"><option value="">Todos los años</option></select>
         </div>
+        <div class="fGroup"><span>Buscar</span>
+          <select id="mapFiltAccion" class="fSel" title="Búsqueda activa: mostrar solo las pacientes con una tarea pendiente">
+            <option value="">Todas las pacientes</option>
+            <option value="buscar">⏰ Resultado atrasado</option>
+            <option value="positivas">🩺 Positivas sin seguimiento</option>
+            <option value="entregar">📬 Entregar resultado</option>
+            <option value="control_vencido">📅 Control vencido</option>
+          </select>
+          <button type="button" id="mapCoberturaBtn" class="chip" style="--c:#dc2626" title="Muestra dónde se concentran las tomas">🔥 Cobertura</button>
+        </div>
       </div>
       <div id="mapPlacingHint"></div>
       <div id="mapStatsBar"><span id="mapStats"></span><button id="mapUnlocatedBtn" type="button" style="display:none">Ver no ubicadas</button><button id="mapRelocateBtn" type="button" title="Volver a buscar las direcciones (conserva las que marcaste a mano)">↻ Volver a localizar</button></div>
+      <div id="mapBarrioPanel">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b id="mapBarrioTitle">Búsqueda activa</b><button type="button" onclick="document.getElementById('mapBarrioPanel').classList.remove('open')" style="border:none;background:none;cursor:pointer;font-size:15px">✕</button></div>
+        <p id="mapBarrioSub" style="margin:4px 0 8px;color:var(--ink-soft)"></p>
+        <div id="mapBarrioList"></div>
+        <div style="display:flex;gap:8px;margin-top:10px"><button type="button" id="mapRutaBtn" class="rutaBtn">🖨 Imprimir ruta del día</button></div>
+      </div>
       <div id="mapUnlocatedPanel">
         <div style="display:flex;justify-content:space-between;align-items:center"><b>Pacientes no ubicadas</b><button type="button" onclick="document.getElementById('mapUnlocatedPanel').classList.remove('open')" style="border:none;background:none;cursor:pointer;font-size:15px">✕</button></div>
         <p style="margin:4px 0 6px;color:var(--ink-soft)">No se encontró la dirección automáticamente. Tocá “📍 Ubicar” y hacé clic en el mapa donde vive la paciente.</p>
@@ -2571,16 +2595,22 @@ let mapFilterOn;
 try { mapFilterOn = new Set(JSON.parse(localStorage.getItem('sivec_map_filter') || 'null') || MAP_FILTERS.map(f => f.key)); }
 catch (e) { mapFilterOn = new Set(MAP_FILTERS.map(f => f.key)); }
 function mapFilterAll() { return MAP_FILTERS.every(f => mapFilterOn.has(f.key)); }
-let mapExtra = { doctora: '', anio: '' };
+let mapExtra = { doctora: '', anio: '', accion: '' };
 try { mapExtra = Object.assign(mapExtra, JSON.parse(localStorage.getItem('sivec_map_extra') || '{}')); } catch (e) {}
 function mapPassesExtra(p) {
   if (mapExtra.doctora && p.doctora !== mapExtra.doctora) return false;
   if (mapExtra.anio && String(p.fecha_toma || '').slice(0, 4) !== mapExtra.anio) return false;
+  if (mapExtra.accion) {
+    const k = proximoPaso(p).key;
+    const ok = { buscar: ['buscar'], entregar: ['entregar', 'repetir'], positivas: ['derivar', 'definir'], control_vencido: ['control_vencido'] }[mapExtra.accion] || [];
+    if (!ok.includes(k)) return false;
+  }
   return true;
 }
-function mapHayFiltro() { return !mapFilterAll() || !!mapExtra.doctora || !!mapExtra.anio; }
-['mapFiltDoctora', 'mapFiltAnio'].forEach(id => document.getElementById(id).addEventListener('change', () => {
-  mapExtra = { doctora: document.getElementById('mapFiltDoctora').value, anio: document.getElementById('mapFiltAnio').value };
+function mapHayFiltro() { return !mapFilterAll() || !!mapExtra.doctora || !!mapExtra.anio || !!mapExtra.accion; }
+['mapFiltDoctora', 'mapFiltAnio', 'mapFiltAccion'].forEach(id => document.getElementById(id).addEventListener('change', () => {
+  mapExtra = { doctora: document.getElementById('mapFiltDoctora').value, anio: document.getElementById('mapFiltAnio').value, accion: document.getElementById('mapFiltAccion').value };
+  if (id === 'mapFiltAccion') { document.getElementById('mapBarrioPanel').classList.toggle('open', !!mapExtra.accion); document.getElementById('mapUnlocatedPanel').classList.remove('open'); }
   try { localStorage.setItem('sivec_map_extra', JSON.stringify(mapExtra)); } catch (_) {}
   if (mapState) mapState.applyFilter();
 }));
@@ -2595,13 +2625,13 @@ function pinIcon(color) {
   return L.divIcon({ className: '', html: `<div class="pin" style="background:${color}"></div>`, iconSize: [16, 16], iconAnchor: [8, 8] });
 }
 function renderMapFilterChips(counts) {
-  document.querySelectorAll('#mapFilter .chip').forEach(ch => {
+  document.querySelectorAll('#mapFilter .chip[data-f]').forEach(ch => {
     ch.classList.toggle('on', mapFilterOn.has(ch.dataset.f));
     if (counts) ch.querySelector('small').textContent = counts[ch.dataset.f] || 0;
   });
 }
 document.getElementById('mapFilter').addEventListener('click', e => {
-  const chip = e.target.closest('.chip'), all = e.target.closest('[data-fall]');
+  const chip = e.target.closest('.chip[data-f]'), all = e.target.closest('[data-fall]');
   if (chip) { const k = chip.dataset.f; mapFilterOn.has(k) ? mapFilterOn.delete(k) : mapFilterOn.add(k); }
   else if (all) mapFilterOn = new Set(all.dataset.fall === '1' ? MAP_FILTERS.map(f => f.key) : []);
   else return;
@@ -2610,6 +2640,70 @@ document.getElementById('mapFilter').addEventListener('click', e => {
   if (mapState) mapState.applyFilter();
 });
 renderMapFilterChips();
+
+// ---- Búsqueda activa: pacientes visibles agrupadas por barrio ----
+function barrioDe(addr) {
+  const a = parseAddress(addr || '');
+  if (a.barrios.length) return a.barrios[0].replace(/^barrio\s+/i, 'B. ');
+  if (a.uv) return 'UV-' + a.uv;
+  if (a.localidad) return a.localidad.nombre;
+  if (a.comunidad) return 'Com. ' + a.comunidad;
+  return 'Sin barrio identificado';
+}
+const ACCION_LABEL = { buscar: 'Resultado atrasado', positivas: 'Positivas sin seguimiento', entregar: 'Entregar resultado', control_vencido: 'Control vencido' };
+function renderBarrios() {
+  const panel = document.getElementById('mapBarrioPanel');
+  if (!mapCluster || !mapExtra.accion) return;
+  const grupos = {};
+  mapCluster.getLayers().forEach(m => { const p = m._sivecPaciente; const b = barrioDe(p.direccion); (grupos[b] = grupos[b] || []).push(m); });
+  const arr = Object.entries(grupos).sort((a, b) => b[1].length - a[1].length);
+  const total = arr.reduce((s, x) => s + x[1].length, 0);
+  document.getElementById('mapBarrioTitle').textContent = '🔎 ' + (ACCION_LABEL[mapExtra.accion] || 'Búsqueda activa');
+  document.getElementById('mapBarrioSub').innerHTML = total ? `<b style="color:#40323a">${total} paciente${total > 1 ? 's' : ''}</b> en ${arr.length} barrio${arr.length > 1 ? 's' : ''} · tocá un barrio para acercar el mapa` : 'No hay pacientes ubicadas con esta tarea.';
+  document.getElementById('mapBarrioList').innerHTML = arr.map(([b, ms], i) => {
+    const calles = [...new Set(ms.map(m => (parseAddress(m._sivecPaciente.direccion || '').streets[0] || '').replace(/^calle\s+/i, 'C. ')).filter(Boolean))].slice(0, 3).join(', ');
+    return `<div class="barrioRow" data-i="${i}"><span><b>${esc(b)}</b><small>${esc(calles)}</small></span><span class="cnt">${ms.length}</span></div>`;
+  }).join('');
+  panel._grupos = arr;
+}
+document.getElementById('mapBarrioList').addEventListener('click', e => {
+  const r = e.target.closest('.barrioRow'); if (!r) return;
+  const ms = document.getElementById('mapBarrioPanel')._grupos[+r.dataset.i][1];
+  const b = L.latLngBounds(ms.map(m => m.getLatLng()));
+  mapInstance.fitBounds(b.pad(0.3), { maxZoom: 17 });
+});
+document.getElementById('mapRutaBtn').addEventListener('click', () => {
+  const arr = document.getElementById('mapBarrioPanel')._grupos || [];
+  if (!arr.length) { alert('No hay pacientes en la lista.'); return; }
+  const hoyTxt = new Date().toLocaleDateString('es');
+  const filas = arr.map(([b, ms]) => `<h3>${esc(b)} <small>(${ms.length})</small></h3><table><thead><tr><th>☐</th><th>Paciente</th><th>CI</th><th>Celular</th><th>Dirección</th><th>Qué hacer</th></tr></thead><tbody>` +
+    ms.map(m => { const p = m._sivecPaciente; return `<tr><td>☐</td><td>${esc(p.nombre)}</td><td>${esc(p.carnet || '')}</td><td>${esc(p.celular || '')}</td><td>${esc(p.direccion || '')}</td><td>${esc(proximoPaso(p).txt)}</td></tr>`; }).join('') + '</tbody></table>').join('');
+  const w = window.open('', '_blank');
+  if (!w) { alert('El navegador bloqueó la ventana. Permití las ventanas emergentes para imprimir.'); return; }
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Ruta del día</title><style>
+    @page { size: A4; margin: 12mm; } body { font-family: Arial, sans-serif; color: #222; font-size: 11px; }
+    h1 { font-size: 16px; margin: 0 0 2px; color: #7d2a4c; } .s { color: #666; margin-bottom: 10px; }
+    h3 { font-size: 12.5px; margin: 14px 0 4px; border-bottom: 2px solid #7d2a4c; padding-bottom: 2px; } h3 small { color: #666; font-weight: normal; }
+    table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #bbb; padding: 4px 5px; text-align: left; vertical-align: top; } th { background: #f4ecef; font-size: 10px; }
+    tr { page-break-inside: avoid; } thead { display: table-header-group; } .f { margin-top: 12px; font-size: 9.5px; color: #888; }
+  </style></head><body><h1>SIVEC PAP/VPH · Ruta del día — ${esc(ACCION_LABEL[mapExtra.accion] || '')}</h1><div class="s">${hoyTxt} · ${arr.reduce((s, x) => s + x[1].length, 0)} pacientes en ${arr.length} barrios</div>${filas}
+    <div class="f">Documento con datos personales: uso exclusivo del personal de salud.</div><script>window.onload = () => window.print();<\/script></body></html>`);
+  w.document.close();
+});
+// Capa de cobertura: círculos transparentes que se suman donde hay muchas tomas
+let mapCobLayer = null;
+document.getElementById('mapCoberturaBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  const btn = e.currentTarget;
+  if (mapCobLayer) { mapInstance.removeLayer(mapCobLayer); mapCobLayer = null; btn.classList.remove('cobOn'); return; }
+  if (!mapCluster) return;
+  // Se agrupan las pacientes en celdas de ~100 m; más pacientes = círculo más intenso (con tope).
+  const celdas = {};
+  mapCluster.getLayers().forEach(m => { const ll = m.getLatLng(), k = ll.lat.toFixed(3) + ',' + ll.lng.toFixed(3); (celdas[k] = celdas[k] || { ll, n: 0 }).n++; });
+  const max = Math.max(1, ...Object.values(celdas).map(c => c.n));
+  mapCobLayer = L.layerGroup(Object.values(celdas).map(c => L.circle(c.ll, { radius: 120 + 180 * Math.sqrt(c.n / max), stroke: false, fillColor: '#dc2626', fillOpacity: 0.12 + 0.33 * (c.n / max), interactive: false }))).addTo(mapInstance);
+  btn.classList.add('cobOn');
+});
 
 async function loadMap() {
   const runId = ++mapRunId; // si se vuelve a abrir el mapa, la búsqueda anterior se detiene (evita búsquedas duplicadas y bloqueos)
@@ -2620,6 +2714,10 @@ async function loadMap() {
 
   if (!mapInstance) initMapInstance();
   mapCluster.clearLayers();
+  tomasIndex = buildTomasIndex(data); // para "próximo paso" (búsqueda activa)
+  document.getElementById('mapFiltAccion').value = mapExtra.accion || '';
+  document.getElementById('mapBarrioPanel').classList.toggle('open', !!mapExtra.accion);
+  if (mapCobLayer) { mapInstance.removeLayer(mapCobLayer); mapCobLayer = null; document.getElementById('mapCoberturaBtn').classList.remove('cobOn'); }
   setPlacingMode(null);
   setTimeout(() => mapInstance.invalidateSize(), 50);
 
@@ -2680,6 +2778,7 @@ async function loadMap() {
   const pendingSet = new Set();
   function refresh(done) {
     lastDone = done;
+    renderBarrios();
     let enMapa = 0;
     const noUbicadas = [];
     Object.keys(byAddr).forEach(addr => {
