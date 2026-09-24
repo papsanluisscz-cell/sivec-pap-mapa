@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Formularios propios SIVEC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --wine: #7d2a4c; --wine-d: #5a1c36; --ink: #1f1a1c; --soft: #6b5f64; --line: #2b2326; --hair: #cfc3c8; --tint: #f7eef2; --bg: #e9e4e6; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); font-family: "Source Sans 3", "Segoe UI", Arial, sans-serif; color: var(--ink); }
+  .topbar { position: sticky; top: 0; z-index: 5; background: #2a1720; color: #fff; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px 16px; }
+  .topbar b { margin-right: 6px; font-size: 15px; }
+  .tab { font: inherit; font-size: 14px; font-weight: 600; border: 1px solid #6b4a58; background: transparent; color: #fff; border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+  .tab.on { background: #fff; color: var(--wine-d); border-color: #fff; }
+  .warn { max-width: 900px; margin: 14px auto 0; background: #fff7e0; border: 1px solid #ecd9a0; border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #5b4712; }
+  .note { max-width: 794px; margin: 14px auto 30px; background: #fff; border-radius: 10px; padding: 12px 16px; font-size: 14px; line-height: 1.5; color: #3b3035; border-left: 4px solid var(--wine); }
+  .note b { color: var(--wine-d); }
+  .sheet { width: 794px; min-height: 1123px; margin: 16px auto 0; background: #fff; box-shadow: 0 4px 24px rgba(0,0,0,.14); padding: 40px 44px 36px; display: none; position: relative; font-size: 12.5px; }
+  .sheet.on { display: block; }
+  @media (max-width: 830px) { .sheet { transform-origin: top left; } }
+  /* encabezado común */
+  .hd { display: grid; grid-template-columns: 90px 1fr 150px; gap: 12px; align-items: center; border-bottom: 2.5px solid var(--wine); padding-bottom: 10px; }
+  .logo { height: 62px; border: 1.5px dashed var(--hair); border-radius: 8px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; color: var(--soft); line-height: 1.2; padding: 4px; }
+  .hd h1 { margin: 0; font-size: 19px; font-weight: 800; letter-spacing: .01em; text-align: center; line-height: 1.15; }
+  .hd h1 small { display: block; font-size: 12.5px; font-weight: 600; color: var(--soft); letter-spacing: 0; margin-top: 3px; }
+  .hdR { text-align: right; }
+  .code { display: inline-block; background: var(--wine); color: #fff; font-weight: 800; border-radius: 6px; padding: 3px 10px; font-size: 15px; }
+  .folio { margin-top: 6px; font-size: 12px; color: var(--soft); }
+  .folio b { color: var(--ink); font-size: 15px; letter-spacing: .03em; }
+  .ctx { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 11.5px; color: var(--soft); margin: 7px 0 12px; }
+  .ctx b { color: var(--ink); font-weight: 700; }
+  /* bloques */
+  .sec { margin-top: 12px; }
+  .secT { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--wine-d); border-bottom: 1px solid var(--hair); padding-bottom: 3px; margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .secT span { font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--soft); }
+  .grid { display: grid; gap: 0; border: 1.2px solid var(--line); border-radius: 4px; overflow: hidden; }
+  .cell { padding: 5px 8px 6px; border-right: 1px solid var(--hair); border-bottom: 1px solid var(--hair); min-height: 38px; }
+  .cell .k { display: block; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--soft); }
+  .cell .v { display: block; font-size: 14px; font-weight: 700; margin-top: 1px; }
+  .cell .v.n { font-weight: 400; }
+  .chk { display: inline-flex; align-items: center; vertical-align: top; gap: 5px; margin-right: 12px; white-space: nowrap; font-size: 12.5px; }
+  .bx { flex: none; overflow: hidden; width: 13px; height: 13px; border: 1.3px solid var(--line); border-radius: 2px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; line-height: 1; }
+  .bx.x::after { content: "✕"; }
+  table.t { width: 100%; border-collapse: collapse; border: 1.2px solid var(--line); }
+  table.t th { background: var(--tint); font-size: 10px; text-transform: uppercase; letter-spacing: .05em; text-align: left; padding: 5px 7px; border: 1px solid var(--hair); color: var(--wine-d); }
+  table.t td { border: 1px solid var(--hair); padding: 6px 7px; font-size: 12.5px; height: 26px; vertical-align: middle; }
+  table.t td.num { text-align: center; font-weight: 700; font-size: 14px; }
+  table.t td.med { font-weight: 700; }
+  .ico { font-size: 14px; margin-right: 5px; }
+  .firmas { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 26px; margin-top: 34px; text-align: center; font-size: 11.5px; color: var(--soft); }
+  .firmas div { border-top: 1.2px solid var(--line); padding-top: 5px; }
+  .firmas b { display: block; color: var(--ink); font-size: 12.5px; }
+  .foot { position: absolute; left: 44px; right: 44px; bottom: 18px; display: flex; justify-content: space-between; font-size: 10px; color: var(--soft); border-top: 1px solid var(--hair); padding-top: 5px; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 700; background: var(--tint); color: var(--wine-d); border-radius: 999px; padding: 1px 9px; }
+  .muted { color: var(--soft); }
+  /* HC SOAP */
+  .soapT { width: 100%; border-collapse: collapse; border: 1.4px solid var(--line); }
+  .soapT td { border: 1px solid var(--hair); vertical-align: top; padding: 8px 10px; }
+  .soapT .l { width: 38px; text-align: center; font-size: 22px; font-weight: 800; color: #fff; background: var(--wine); border-color: var(--wine); vertical-align: middle; }
+  .soapT .l small { display: block; font-size: 8.5px; font-weight: 700; letter-spacing: .04em; }
+  .soapT .tx { font-size: 13.5px; line-height: 1.5; }
+  .soapT .tx b { color: var(--wine-d); }
+  .vit { display: grid; grid-template-columns: repeat(8, 1fr); border: 1.2px solid var(--line); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+  .vit div { padding: 4px 6px; border-right: 1px solid var(--hair); }
+  .vit div:last-child { border-right: none; }
+  .vit .k { display: block; font-size: 9px; font-weight: 700; color: var(--soft); text-transform: uppercase; letter-spacing: .05em; }
+  .vit .v { font-size: 14px; font-weight: 700; }
+  .fig { float: right; width: 190px; margin: -2px 0 6px 14px; border: 1px solid var(--hair); border-radius: 8px; padding: 6px 6px 4px; text-align: center; background: #fff; }
+  .fig .cap { font-size: 10px; color: var(--soft); margin-top: 2px; line-height: 1.3; text-align: left; }
+  .leg { display: flex; flex-wrap: wrap; gap: 3px 9px; font-size: 10px; margin-top: 3px; text-align: left; }
+  .leg i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 3px; vertical-align: -1px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .tag { font-size: 11px; border: 1px solid var(--hair); border-radius: 999px; padding: 0 8px; }
+  /* consentimiento */
+  .q { display: grid; grid-template-columns: 26px 1fr 200px; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--hair); font-size: 13.2px; line-height: 1.4; }
+  .q .n { width: 22px; height: 22px; border-radius: 50%; background: var(--wine); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .q .ans { display: flex; gap: 12px; justify-content: flex-end; }
+  .intro { font-size: 13px; line-height: 1.5; background: var(--tint); border-radius: 8px; padding: 9px 12px; }
+  .huella { border: 1.2px solid var(--line); border-radius: 6px; height: 88px; display: flex; align-items: flex-end; justify-content: center; font-size: 11px; color: var(--soft); padding-bottom: 5px; }
+  .map { height: 210px; border: 1.2px solid var(--line); border-radius: 6px; overflow: hidden; position: relative; }
+  .copias { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .copias td { padding: 3px 6px; border-bottom: 1px solid var(--hair); }
+  .cols3 { columns: 3; column-gap: 16px; font-size: 11.5px; }
+  .cols3 .chk { display: flex; margin: 0 0 4px; white-space: normal; }
+  .hl { background: #fff3c4; border-radius: 3px; padding: 0 3px; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — Formularios propios del SIVEC:</b>
+  <button class="tab on" data-t="d1">1. D-1 Recetario</button>
+  <button class="tab" data-t="d8">2. D-8 Solicitud</button>
+  <button class="tab" data-t="pap">3. Registro de toma PAP</button>
+  <button class="tab" data-t="ci">4. Consentimiento</button>
+  <button class="tab" data-t="hc">5. Historia clínica (SOAP)</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Mismos campos que los formularios que usamos hoy, pero armados por el SIVEC: letra más grande y clara, solo lo que corresponde, y lugar para las figuras. Los cuadros punteados son para los <b>escudos/logos oficiales</b>.</div>
+
+<!-- ============ D1 ============ -->
+<section class="sheet on" id="d1">
+  <div class="hd"><div class="logo">Escudo<br>Ministerio de Salud</div>
+    <h1>RECETARIO / RECIBO<small>Atención ambulatoria · Sistema Único de Salud</small></h1>
+    <div class="hdR"><span class="code">D-1</span><div class="folio">Nº receta <b>0004821</b></div></div></div>
+  <div class="ctx"><span>SEDES: <b>Santa Cruz</b></span><span>Red: <b>Centro</b></span><span>Municipio: <b>Santa Cruz</b></span><span>Establecimiento: <b>C.S. San Luis</b></span><span>SUS <span class="bx x"></span></span></div>
+  <div class="grid" style="grid-template-columns: 2.2fr 1fr 1fr 1fr">
+    <div class="cell"><span class="k">Nombre del paciente</span><span class="v">MARÍA QUISPE MAMANI</span></div>
+    <div class="cell"><span class="k">Cédula de identidad</span><span class="v">7654321 SC</span></div>
+    <div class="cell"><span class="k">Fecha de nacimiento</span><span class="v">14 / 03 / 1988</span></div>
+    <div class="cell" style="border-right:none"><span class="k">Fecha</span><span class="v">24 / 09 / 2026</span></div>
+    <div class="cell" style="grid-column: 1 / 3; border-bottom:none"><span class="k">Domicilio</span><span class="v n">B. San Luis, C. Muchiri #45, UV 10 — Santa Cruz</span></div>
+    <div class="cell" style="border-bottom:none"><span class="k">Sexo</span><span class="v"><span class="chk"><span class="bx"></span>M</span><span class="chk"><span class="bx x"></span>F</span></span></div>
+    <div class="cell" style="border-bottom:none;border-right:none"><span class="k">Tipo de atención</span><span class="v n" style="font-size:12.5px"><span class="chk"><span class="bx x"></span>Consultorio</span></span></div>
+  </div>
+  <div class="sec"><div class="secT">Diagnóstico <span>solo se imprime lo marcado (la lista completa queda en el sistema)</span></div>
+    <div class="grid" style="grid-template-columns: 1fr 1fr">
+      <div class="cell"><span class="k">Diagnósticos de la consulta</span><span class="v">Cervicitis · Candidiasis vaginal <span class="pill">N</span></span></div>
+      <div class="cell" style="border-right:none"><span class="k">Otro diagnóstico / código de especialidad</span><span class="v">T - 17576012 <span class="pill">Ginecología</span></span></div>
+    </div></div>
+  <div class="sec"><div class="secT">Otros servicios y productos</div>
+    <span class="chk"><span class="bx x"></span>Toma de PAP / IVAA</span><span class="chk"><span class="bx"></span>Consulta médica (sin medicamentos)</span><span class="chk"><span class="bx"></span>Curación pequeña</span><span class="chk"><span class="bx"></span>Control prenatal</span></div>
+  <div class="sec"><div class="secT">Medicamentos e insumos <span>de la consulta con figuras</span></div>
+    <table class="t"><thead><tr><th style="width:36%">Medicamento / insumo (nombre genérico, forma, concentración)</th><th>Indicaciones para el paciente</th><th style="width:62px">Recetada</th><th style="width:66px">Dispensada</th><th style="width:58px">Unitario</th><th style="width:52px">Total</th></tr></thead>
+    <tbody>
+      <tr><td>Porta objeto</td><td class="muted">Insumo toma de PAP</td><td class="num">01</td><td></td><td></td><td></td></tr>
+      <tr><td>Cepillo</td><td class="muted">Insumo toma de PAP</td><td class="num">01</td><td></td><td></td><td></td></tr>
+      <tr><td>Espátula</td><td class="muted">Insumo toma de PAP</td><td class="num">01</td><td></td><td></td><td></td></tr>
+      <tr><td>Guantes (par)</td><td class="muted">Insumo toma de PAP</td><td class="num">01</td><td></td><td></td><td></td></tr>
+      <tr><td class="med"><span class="ico">🥚</span>Clotrimazol 500 mg óvulo</td><td>1 óvulo vaginal cada noche x 10 noches</td><td class="num">10</td><td></td><td></td><td></td></tr>
+      <tr><td class="med"><span class="ico">💊</span>Fluconazol 150 mg cápsula</td><td>1 cápsula VO, dosis única</td><td class="num">01</td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    </tbody></table>
+    <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:6px;font-size:11.5px;font-weight:700">Costo total: ________ &nbsp; Costo total al usuario: ________</div></div>
+  <div class="firmas"><div><b>Dra. Aguilera</b>Recetado por · Ginecología · 17576012</div><div><b>&nbsp;</b>Dispensado por</div><div><b>&nbsp;</b>Firma paciente / acompañante · C.I.</div></div>
+  <p class="muted" style="font-size:10px;margin-top:14px">El prescriptor y dispensador certifican la veracidad de la información declarada en este documento médico legal. El usuario certifica haber recibido los medicamentos señalados.</p>
+  <div class="foot"><span>SIVEC PAP/VPH · C.S. San Luis</span><span>Generado 24/09/2026 · Hoja 1 de 1</span></div>
+</section>
+
+<!-- ============ D8 ============ -->
+<section class="sheet" id="d8">
+  <div class="hd"><div class="logo">Escudo<br>Ministerio de Salud</div>
+    <h1>SOLICITUD DE EXÁMENES<small>Laboratorio · Imagenología / Gabinete · Servicios de sangre</small></h1>
+    <div class="hdR"><span class="code">D-8</span><div class="folio">Nº registro <b>0003377</b></div></div></div>
+  <div class="ctx"><span>Red: <b>Centro</b></span><span>Municipio: <b>Santa Cruz de la Sierra</b></span><span>Establecimiento: <b>C.S. San Luis</b></span></div>
+  <div class="grid" style="grid-template-columns: 2.2fr 1.2fr .6fr .6fr">
+    <div class="cell"><span class="k">Nombres</span><span class="v">MARÍA QUISPE MAMANI</span></div>
+    <div class="cell"><span class="k">Cédula de identidad</span><span class="v">7654321 SC</span></div>
+    <div class="cell"><span class="k">Edad</span><span class="v">38</span></div>
+    <div class="cell" style="border-right:none"><span class="k">Sexo</span><span class="v">F</span></div>
+    <div class="cell"><span class="k">Fecha de solicitud</span><span class="v">24 / 09 / 2026</span></div>
+    <div class="cell" style="grid-column: 2 / 5; border-right:none"><span class="k">Diagnóstico clínico principal</span><span class="v">Prevención de cáncer de cérvix</span></div>
+  </div>
+  <div class="sec"><div class="secT">Solicitado <span>lo pedido se destaca arriba, fácil de ver en el laboratorio</span></div>
+    <div style="display:flex;gap:10px">
+      <div style="flex:1;border:2px solid var(--wine);border-radius:8px;padding:10px 12px;background:var(--tint)"><span class="chk" style="font-size:15px;font-weight:800"><span class="bx x"></span>Tinción PAP (citología cervical)</span><div class="muted" style="font-size:11.5px;margin-top:3px">Muestra: exocérvix + endocérvix · Lote de envío L-2026-39</div></div>
+      <div style="flex:1;border:2px solid var(--wine);border-radius:8px;padding:10px 12px;background:var(--tint)"><span class="chk" style="font-size:15px;font-weight:800"><span class="bx x"></span>Prueba de VPH (ADN alto riesgo)</span><div class="muted" style="font-size:11.5px;margin-top:3px">Toma convencional · genotipificación 16/18</div></div>
+    </div></div>
+  <div class="sec"><div class="secT">Laboratorio — otros</div>
+    <div class="cols3">
+      <span class="chk"><span class="bx"></span>Baciloscopía seriada</span><span class="chk"><span class="bx"></span>Bilirrubinas totales y fracciones</span><span class="chk"><span class="bx"></span>Coproparasitológico simple</span><span class="chk"><span class="bx"></span>Coproparasitológico seriado</span><span class="chk"><span class="bx"></span>Creatinina en orina</span><span class="chk"><span class="bx"></span>Creatinina sérica</span><span class="chk"><span class="bx"></span>Cultivo y antibiograma</span><span class="chk"><span class="bx"></span>Examen general de orina</span><span class="chk"><span class="bx"></span>Factor reumatoide</span><span class="chk"><span class="bx"></span>Fosfatasa alcalina y ácida</span><span class="chk"><span class="bx"></span>Frotis tinción Gram</span><span class="chk"><span class="bx"></span>Grupo sanguíneo y factor Rh</span><span class="chk"><span class="bx"></span>Glicemia</span><span class="chk"><span class="bx"></span>Gota gruesa + frotis</span><span class="chk"><span class="bx"></span>Hemoglobina y hematocrito</span><span class="chk"><span class="bx"></span>Hemograma completo</span><span class="chk"><span class="bx"></span>Inmunoglobulinas IgG, IgM, IgA</span><span class="chk"><span class="bx"></span>Moco fecal</span><span class="chk"><span class="bx"></span>Nitrógeno ureico y urea</span><span class="chk"><span class="bx"></span>Proteína C reactiva (PCR)</span><span class="chk"><span class="bx"></span>Proteinuria de 24 horas</span><span class="chk"><span class="bx"></span>Coombs directa/indirecta</span><span class="chk"><span class="bx"></span>Prueba rápida sífilis</span><span class="chk"><span class="bx"></span>Tiempo de coagulación y sangría</span><span class="chk"><span class="bx"></span>Tiempo de protrombina/TPP</span><span class="chk"><span class="bx"></span>Transaminasas TGO-TGP</span><span class="chk"><span class="bx"></span>Test de embarazo (HCG)</span><span class="chk"><span class="bx"></span>Reactantes de fase aguda</span><span class="chk"><span class="bx"></span>Reacción de Widal</span><span class="chk"><span class="bx"></span>RPR para sífilis – VDRL</span>
+    </div></div>
+  <div class="sec"><div class="secT">Imagenología / gabinete</div>
+    <div class="grid" style="grid-template-columns: 1fr 1fr">
+      <div class="cell"><span class="k">Ecografía</span></div><div class="cell" style="border-right:none"><span class="k">Rayos X</span></div>
+      <div class="cell" style="border-bottom:none"><span class="k">TAC</span></div><div class="cell" style="border-bottom:none;border-right:none"><span class="k">Endoscopía</span></div>
+    </div></div>
+  <div class="sec"><div class="secT">Servicio de transfusión / banco de sangre <span>se imprime vacío si no se usa</span></div>
+    <div class="grid" style="grid-template-columns: 2fr 1fr 1fr"><div class="cell" style="border-bottom:none"><span class="k">Unidad / servicio</span></div><div class="cell" style="border-bottom:none"><span class="k">Urgencia</span><span class="chk"><span class="bx"></span>Urgente</span><span class="chk"><span class="bx"></span>Programada</span></div><div class="cell" style="border-bottom:none;border-right:none"><span class="k">Grupo sanguíneo y Rh</span></div></div></div>
+  <div class="firmas" style="grid-template-columns: 1fr 1fr"><div><b>Dra. Aguilera</b>Firma y sello del solicitante · Ginecología 17576012</div><div><b>&nbsp;</b>Sello del establecimiento</div></div>
+  <div class="foot"><span>SIVEC PAP/VPH · C.S. San Luis</span><span>Generado 24/09/2026 · Hoja 1 de 1</span></div>
+</section>
+
+<!-- ============ PAP ============ -->
+<section class="sheet" id="pap">
+  <div class="hd"><div class="logo">Escudo<br>Gobernación<br>Santa Cruz</div>
+    <h1>REGISTRO DE TOMA DE PAP<small>Servicio Departamental de Salud (SEDES) — Santa Cruz</small></h1>
+    <div class="hdR"><div class="logo" style="height:44px;margin-bottom:4px">Logo municipio</div><div class="folio">Nº <b>0012094</b></div></div></div>
+  <div class="ctx"><span>Red: <b>Centro</b></span><span>Establecimiento: <b>San Luis</b></span><span>Nivel: <b>1ro</b></span><span>Municipio: <b>Santa Cruz de la Sierra</b></span><span>Historia clínica: <b>HC-2026-0418</b></span></div>
+  <div class="grid" style="grid-template-columns: 1.4fr 1fr 1fr .5fr">
+    <div class="cell"><span class="k">Nombres</span><span class="v">MARÍA</span></div>
+    <div class="cell"><span class="k">Apellido paterno</span><span class="v">QUISPE</span></div>
+    <div class="cell"><span class="k">Apellido materno</span><span class="v">MAMANI</span></div>
+    <div class="cell" style="border-right:none"><span class="k">Edad</span><span class="v">38</span></div>
+    <div class="cell"><span class="k">C.I. · Fecha de nacimiento</span><span class="v">7654321 SC · 14/03/1988</span></div>
+    <div class="cell"><span class="k">Teléfono celular</span><span class="v">7 123 4567</span></div>
+    <div class="cell"><span class="k">Estado civil</span><span class="v">CASADA</span></div>
+    <div class="cell" style="border-right:none"><span class="k">Fecha</span><span class="v">24/09/26</span></div>
+    <div class="cell" style="grid-column: 1 / 5; border-right:none; border-bottom:none"><span class="k">Dirección (barrio · calle · Nº · UV · Mz · lote)</span><span class="v n">B. San Luis · C. Muchiri #45 · UV 10 · Mz 12 · Lote 7</span></div>
+  </div>
+  <div class="sec"><div class="secT">Datos de la toma</div>
+    <div class="grid" style="grid-template-columns: 1fr 1fr 1fr">
+      <div class="cell"><span class="k">Embarazo actual</span><span class="chk"><span class="bx"></span>Sí</span><span class="chk"><span class="bx x"></span>No</span></div>
+      <div class="cell"><span class="k">Muestra de</span><span class="chk"><span class="bx x"></span>Exocérvix</span><span class="chk"><span class="bx x"></span>Endocérvix</span><span class="chk"><span class="bx"></span>Vaginal</span></div>
+      <div class="cell" style="border-right:none"><span class="k">Toma de muestra test VPH</span><span class="chk"><span class="bx x"></span>Sí</span><span class="chk"><span class="bx x"></span>Convencional</span><span class="chk"><span class="bx"></span>Autotoma</span></div>
+      <div class="cell"><span class="k">PAP previo</span><span class="chk"><span class="bx x"></span>Sí, hace 3 años</span><span class="chk"><span class="bx"></span>No</span></div>
+      <div class="cell"><span class="k">Cuello</span><span class="chk"><span class="bx"></span>Sano</span><span class="chk"><span class="bx x"></span>Lesión sospechosa</span></div>
+      <div class="cell" style="border-right:none"><span class="k">Antecedente de PAP positivo</span><span class="chk"><span class="bx"></span>Sí</span><span class="chk"><span class="bx x"></span>No</span></div>
+      <div class="cell" style="grid-column: 1 / 4; border-right:none; border-bottom:none"><span class="k">Tratamiento realizado</span><span class="chk"><span class="bx"></span>Cauterización</span><span class="chk"><span class="bx"></span>Crioterapia</span><span class="chk"><span class="bx"></span>LEEP</span><span class="chk"><span class="bx"></span>Cono frío</span><span class="chk"><span class="bx"></span>Histerectomía</span><span class="chk"><span class="bx"></span>Radioterapia</span><span class="chk"><span class="bx"></span>Otros</span></div>
+    </div></div>
+  <div class="sec"><div class="secT">Resultado <span>lo llena el laboratorio</span></div>
+    <div class="grid" style="grid-template-columns: 1.3fr 1fr">
+      <div class="cell"><span class="k">Diagnóstico de patología (Bethesda)</span></div><div class="cell" style="border-right:none"><span class="k">Diagnóstico test VPH</span></div>
+      <div class="cell"><span class="k">Fecha de recepción · Citotecnólogo</span></div><div class="cell" style="border-right:none"><span class="k">Fecha de entrega · Patólogo</span></div>
+      <div class="cell" style="grid-column:1/3;border-right:none;border-bottom:none;background:var(--tint)"><span class="k">Fecha del próximo PAP (la calcula el SIVEC según resultado y edad)</span><span class="v">Septiembre 2029 · si el resultado es negativo</span></div>
+    </div></div>
+  <div class="sec"><div class="secT">Croquis de ubicación del domicilio <span>sale del mapa del SIVEC (ubicación marcada al registrar)</span></div>
+    <div style="display:grid;grid-template-columns: 1fr 190px;gap:12px">
+      <div class="map"><svg viewBox="0 0 470 210" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+        <rect width="470" height="210" fill="#f3efe9"/>
+        <g stroke="#fff" stroke-width="14"><path d="M-10 60 L480 45"/><path d="M-10 150 L480 165"/><path d="M120 -10 L100 220"/><path d="M320 -10 L340 220"/></g>
+        <g stroke="#fff" stroke-width="7"><path d="M-10 105 L480 105"/><path d="M215 -10 L225 220"/><path d="M420 -10 L430 220"/></g>
+        <rect x="140" y="118" width="60" height="24" fill="#d9ead0"/><text x="170" y="134" font-size="10" text-anchor="middle" fill="#5d7a4f">Plaza</text>
+        <text x="30" y="40" font-size="11" fill="#6b5f64" font-family="Source Sans 3, sans-serif">Av. Principal</text>
+        <text x="240" y="100" font-size="10" fill="#6b5f64" font-family="Source Sans 3, sans-serif">C. Muchiri</text>
+        <rect x="236" y="60" width="70" height="20" rx="4" fill="#7d2a4c"/><text x="271" y="74" font-size="10" fill="#fff" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-weight="700">C.S. San Luis</text>
+        <circle cx="275" cy="130" r="16" fill="#7d2a4c" opacity=".15"/><path d="M275 108c-7 0-12 5-12 12 0 9 12 20 12 20s12-11 12-20c0-7-5-12-12-12z" fill="#dc2626"/><circle cx="275" cy="120" r="4.5" fill="#fff"/>
+        <text x="296" y="136" font-size="11" font-weight="700" fill="#1f1a1c" font-family="Source Sans 3, sans-serif">Casa · #45</text>
+        <g transform="translate(440,30)"><circle r="15" fill="#fff" stroke="#6b5f64"/><path d="M0 -12 L4 0 L0 -3 L-4 0Z" fill="#1f1a1c"/><text y="-17" font-size="9" text-anchor="middle" fill="#1f1a1c">N</text></g>
+      </svg></div>
+      <div style="font-size:11.5px;line-height:1.45"><b>Referencia:</b> a 2 cuadras del centro de salud, frente a la plaza, portón verde.<br><br><b>Coordenadas:</b> -17.7930, -63.1840<div class="muted" style="margin-top:8px;font-size:10.5px">Si no hay ubicación marcada, este cuadro sale en blanco para dibujar a mano.</div></div>
+    </div></div>
+  <div class="sec" style="display:grid;grid-template-columns: 1fr 1.2fr;gap:16px;align-items:end">
+    <div class="firmas" style="grid-template-columns:1fr;margin-top:26px"><div><b>Dra. Aguilera</b>Nombre, cargo, firma y sello del responsable</div></div>
+    <table class="copias"><tr><td><b>Original</b> (blanca)</td><td>Establecimiento — expediente de Patología / Oncológico</td></tr><tr><td><b>1ra copia</b> (amarilla)</td><td>Establecimiento I-II nivel — búsqueda de positivas</td></tr><tr><td><b>2da copia</b> (rosada)</td><td>Establecimiento de salud — GAD</td></tr><tr><td><b>3ra copia</b> (verde)</td><td>Establecimiento que realiza la referencia</td></tr></table>
+  </div>
+  <div class="foot"><span>SIVEC PAP/VPH · C.S. San Luis · Todos los datos deben llenarse obligatoriamente</span><span>Hoja 1 de 1</span></div>
+</section>
+
+<!-- ============ CI ============ -->
+<section class="sheet" id="ci">
+  <div class="hd"><div class="logo">Escudo<br>Ministerio de Salud</div>
+    <h1>CONSENTIMIENTO INFORMADO<small>Ficha específica de información · Servicio de Telesalud</small></h1>
+    <div class="hdR"><div class="logo" style="height:52px">Logo Programa<br>Telesalud</div></div></div>
+  <div class="grid" style="grid-template-columns: 1.6fr 1fr 1fr; margin-top:12px">
+    <div class="cell"><span class="k">Paciente</span><span class="v">MARÍA QUISPE MAMANI</span></div>
+    <div class="cell"><span class="k">C.I.</span><span class="v">7654321 SC</span></div>
+    <div class="cell" style="border-right:none"><span class="k">Fecha de nacimiento</span><span class="v">14 / 03 / 1988</span></div>
+    <div class="cell" style="border-bottom:none"><span class="k">Dirección</span><span class="v n">B. San Luis, C. Muchiri #45</span></div>
+    <div class="cell" style="border-bottom:none"><span class="k">Nº de celular</span><span class="v n">7 123 4567</span></div>
+    <div class="cell" style="border-bottom:none;border-right:none"><span class="k">Ocupación</span><span class="v n">Comerciante</span></div>
+  </div>
+  <p class="intro" style="margin-top:12px">Estimada paciente: el/la médico responsable del área de Telesalud <b>(nombre, matrícula y C.I. configurados en el sistema)</b> le solicita leer con detenimiento este documento. <b>El consentimiento informado</b> es su derecho a aceptar de forma libre, informada, voluntaria y sin presiones que se realice algún procedimiento clínico, imagenológico (videoconferencia y/o fotografías) y/o la discusión diagnóstica de su caso. Marque su aceptación o rechazo.</p>
+  <div class="q"><span class="n">1</span><span>¿Acepta de forma libre, voluntaria e informada la atención por el área de <b>Telemedicina</b> y los procesos que implica?</span><span class="ans"><span class="chk"><span class="bx x"></span>Acepto</span><span class="chk"><span class="bx"></span>Rechazo</span></span></div>
+  <div class="q"><span class="n">2</span><span>¿Da su consentimiento para el interrogatorio y examen físico, el seguimiento y el registro de sus datos y exámenes en una <b>Historia Clínica Digital</b>?</span><span class="ans"><span class="chk"><span class="bx x"></span>Acepto</span><span class="chk"><span class="bx"></span>Rechazo</span></span></div>
+  <div class="q"><span class="n">3</span><span>¿Desea ser <b>informada</b> de todo lo que acontezca con su enfermedad?</span><span class="ans"><span class="chk"><span class="bx x"></span>Sí</span><span class="chk"><span class="bx"></span>No</span></span></div>
+  <div class="q" style="grid-template-columns: 26px 1fr 250px"><span class="n">4</span><span>¿Autoriza el <b>uso de dispositivos médicos</b> de Telesalud, previa explicación detallada?</span><span class="ans"><span class="chk"><span class="bx"></span>Sí</span><span class="chk"><span class="bx"></span>No</span><span class="chk"><span class="bx x"></span>Solo a algunos</span></span></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;padding:6px 0 8px 34px;font-size:12.5px;border-bottom:1px solid var(--hair)">
+    <span class="chk"><span class="bx"></span>Monitor de signos vitales</span><span class="chk"><span class="bx"></span>Electrocardiógrafo</span><span class="chk"><span class="bx"></span>Ultrasonido</span><span class="chk"><span class="bx"></span>Espirómetro</span><span class="chk"><span class="bx x"></span>Cámara de examen general</span><span class="chk"><span class="bx"></span>Otoscopio</span><span class="chk"><span class="bx"></span>Oftalmoscopio</span><span class="chk"><span class="bx x"></span>Videocolposcopio</span></div>
+  <div class="q"><span class="n">5</span><span>¿La lectura de esta ficha fue acompañada de una <b>explicación clara y detallada</b>?</span><span class="ans"><span class="chk"><span class="bx x"></span>Sí</span><span class="chk"><span class="bx"></span>No</span></span></div>
+  <div class="grid" style="grid-template-columns: 1.6fr 1fr 1.2fr; margin-top:14px">
+    <div class="cell" style="border-bottom:none"><span class="k">Nombre completo (paciente) o tutor legal</span><span class="v">MARÍA QUISPE MAMANI</span></div>
+    <div class="cell" style="border-bottom:none"><span class="k">C.I.</span><span class="v">7654321 SC</span></div>
+    <div class="cell" style="border-bottom:none;border-right:none"><span class="k">Lugar y fecha</span><span class="v n">Santa Cruz de la Sierra, 24/09/2026</span></div>
+  </div>
+  <div style="display:grid;grid-template-columns: 1fr 1fr 150px;gap:22px;margin-top:40px;align-items:end">
+    <div class="firmas" style="grid-template-columns:1fr;margin:0"><div><b>&nbsp;</b>Firma paciente, tutor legal o familiar</div></div>
+    <div class="firmas" style="grid-template-columns:1fr;margin:0"><div><b>&nbsp;</b>Firma y sello · Médico Telesalud</div></div>
+    <div class="huella">Huella digital</div>
+  </div>
+  <div class="foot"><span>SIVEC PAP/VPH · C.S. San Luis</span><span>Hoja 1 de 1</span></div>
+</section>
+
+<!-- ============ HC ============ -->
+<section class="sheet" id="hc">
+  <div class="hd"><div class="logo">Escudo<br>Ministerio de Salud</div>
+    <h1>HISTORIA CLÍNICA — EVOLUCIÓN<small>Nota S-O-A-P · Código R.A. SALUD INE 101/2010</small></h1>
+    <div class="hdR"><div class="folio">Nº H.C. <b>0418</b></div><div class="folio" style="margin-top:2px">Hoja 2 de 2</div></div></div>
+  <div class="ctx"><span>Paciente: <b>MARÍA QUISPE MAMANI</b></span><span>C.I.: <b>7654321 SC</b></span><span>Edad: <b>38 años</b></span><span>Establecimiento: <b>C.S. San Luis</b></span></div>
+  <div class="vit">
+    <div><span class="k">Fecha</span><span class="v">24/09/26</span></div><div><span class="k">Edad</span><span class="v">38</span></div><div><span class="k">Talla</span><span class="v">1,56</span></div><div><span class="k">Peso</span><span class="v">62 kg</span></div><div><span class="k">Temp.</span><span class="v">36,5°</span></div><div><span class="k">FC</span><span class="v">78</span></div><div><span class="k">PA</span><span class="v">110/70</span></div><div><span class="k">FR</span><span class="v">18</span></div>
+  </div>
+  <table class="soapT">
+    <tr><td class="l">S<small>SUBJ.</small></td><td class="tx">Refiere <b>flujo vaginal y prurito</b> de 1–4 semanas de evolución. FUM: 02/09/2026. G3 P2 C1 A0. IRS: 17 años. Parejas sexuales: 2. Último PAP: 2023 (NILM).</td></tr>
+    <tr><td class="l">O<small>OBJ.</small></td><td class="tx">
+      <div class="fig">
+        <svg viewBox="0 0 240 240" width="170" height="170"><circle cx="120" cy="120" r="106" fill="#fbe9ee" stroke="#e7b9c7" stroke-width="2"/><g id="hcClock"></g><circle cx="120" cy="120" r="55" fill="none" stroke="#c98ea2" stroke-dasharray="3 4"/><ellipse cx="120" cy="120" rx="12" ry="5" fill="#7d2a4c"/></svg>
+        <div class="leg"><span><i style="background:#e98a8f"></i>Acetoblanco</span><span><i style="background:#b98be6"></i>Mosaico</span><span><i style="background:#6f95c9;border-radius:50%"></i>Biopsia</span></div>
+        <div class="cap">Colposcopia 24/09/2026 · Schiller + · ZT tipo 1</div>
+      </div>
+      <b>Especuloscopía:</b> cuello eritematoso, leucorrea moderada, secreción blanquecina. Se realiza toma de PAP y VPH.
+      <div class="tags"><span class="tag">💧💧 Moderada</span><span class="tag">⚪ Blanquecina</span><span class="tag">Cuello eritematoso</span></div>
+      <p style="margin:8px 0 0"><b>Colposcopia:</b> Schiller positiva. ZT tipo 1. Epitelio acetoblanco en 11 y 1 h; mosaico en 5, 6 y 7 h; biopsia en 12 h. Impresión: cambios mayores (alto grado).</p>
+      <div style="clear:both"></div></td></tr>
+    <tr><td class="l">A<small>ANÁL.</small></td><td class="tx">Cervicitis. Candidiasis vaginal. Colposcopia con cambios mayores — pendiente resultado de biopsia, PAP y VPH.</td></tr>
+    <tr><td class="l">P<small>PLAN</small></td><td class="tx">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 16px">
+        <span>🥚 <b>Clotrimazol 500 mg óvulo</b> — 1 cada noche x 10 noches</span><span>💊 <b>Fluconazol 150 mg</b> — 1 cápsula VO, dosis única</span>
+        <span>🧼 Aseo vulvoperineal</span><span>🗣️ Orientación sexual</span></div>
+      <p style="margin:6px 0 0"><b>Derivación:</b> Oncología (con resultado de biopsia). <b>Próximo control:</b> al resultado del PAP.</p></td></tr>
+  </table>
+  <div class="firmas" style="grid-template-columns: 1fr 1fr;margin-top:40px"><div><b>Dra. Aguilera</b>Nombre y firma · Ginecología · 17576012</div><div><b>&nbsp;</b>Sello del establecimiento</div></div>
+  <p class="muted" style="font-size:11px;margin-top:16px"><b>Hoja 1</b> (datos administrativos, identificación, antecedentes gineco-obstétricos) sale completa con los datos del Registrar, con la misma letra.</p>
+  <div class="foot"><span>SIVEC PAP/VPH · C.S. San Luis</span><span>Generado 24/09/2026</span></div>
+</section>
+
+<div class="note" id="note"></div>
+
+<script>
+  const NOTES = {
+    d1: '<b>D-1:</b> en vez de la lista enorme de diagnósticos (casi nunca usada en el PAP), sale <b>solo lo marcado</b> y el <b>código de la especialidad</b>. Los medicamentos de la consulta llenan la tabla con letra grande. Si el SUS exige el formato oficial, se mantiene el oficial (como hoy) y este queda como opción.',
+    d8: '<b>D-8:</b> lo pedido (PAP / VPH) se ve arriba, destacado, para que el laboratorio no se equivoque; el resto de la lista queda completa pero chica.',
+    pap: '<b>Registro de toma de PAP:</b> el <b>croquis</b> sale solo, del mapa del SIVEC con la casa marcada. La fecha del próximo PAP la calcula el sistema.',
+    ci: '<b>Consentimiento:</b> preguntas numeradas, casillas grandes y lugar claro para las firmas y la huella. El nombre del médico de Telesalud se configura una vez.',
+    hc: '<b>Historia clínica:</b> S-O-A-P con letra legible (13–14 pt), signos vitales en una fila, y la <b>figura del cuello</b> al lado de la colposcopia. Los tratamientos salen con su ícono.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.sheet').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 'd1');
+  // reloj del cuello en la HC
+  (function () {
+    const g = document.getElementById('hcClock'), cx = 120, cy = 120, R = 100, r0 = 16;
+    const marcas = { 11: '#e98a8f', 1: '#e98a8f', 5: '#b98be6', 6: '#b98be6', 7: '#b98be6' };
+    const pt = (a, r) => [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+    let s = '';
+    for (let h = 1; h <= 12; h++) {
+      const a0 = (h * 30 - 105) * Math.PI / 180, a1 = (h * 30 - 75) * Math.PI / 180;
+      const [x0, y0] = pt(a0, R), [x1, y1] = pt(a1, R), [x2, y2] = pt(a1, r0), [x3, y3] = pt(a0, r0);
+      s += `<path d="M${x3},${y3} L${x0},${y0} A${R},${R} 0 0 1 ${x1},${y1} L${x2},${y2} A${r0},${r0} 0 0 0 ${x3},${y3} Z" fill="${marcas[h] || '#f6d5de'}" stroke="#fff" stroke-width="1.5"/>`;
+      const [lx, ly] = pt((h * 30 - 90) * Math.PI / 180, R + 12);
+      s += `<text x="${lx}" y="${ly + 4}" text-anchor="middle" font-size="12" fill="#6b5f64" font-family="Source Sans 3, sans-serif" font-weight="700">${h}</text>`;
+    }
+    const [bx, by] = pt(-Math.PI / 2, R * 0.8);
+    s += `<circle cx="${bx}" cy="${by}" r="7" fill="#6f95c9" stroke="#fff" stroke-width="2"/>`;
+    g.innerHTML = s;
+  })();
+</script>
+</body>
+</html>
