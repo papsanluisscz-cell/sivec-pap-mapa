@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIVEC Enfermería</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
+    --n1:#2f6fb0; --n2:#0e7490; --n3:#7c3aed; --n4:#b4235a; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .topbar { position:sticky; top:0; z-index:5; background:#2a1720; color:#fff; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; }
+  .topbar b { margin-right:6px; font-size:15px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; border:1px solid #6b4a58; background:transparent; color:#fff; border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tab.on { background:#fff; color:var(--wine-d); border-color:#fff; }
+  .warn { max-width:1100px; margin:14px auto 0; background:#fff7e0; border:1px solid #ecd9a0; border-radius:10px; padding:10px 14px; font-size:14px; color:#5b4712; }
+  .scr { display:none; max-width:1100px; margin:14px auto 30px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,.14); }
+  .scr.on { display:block; }
+  .app { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; }
+  .app .brand { font-weight:800; font-size:20px; letter-spacing:.04em; } .app .brand span { font-size:11px; background:#fff; color:var(--wine-d); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:3px; letter-spacing:.08em; }
+  .app .who { font-size:14px; opacity:.95; }
+  .body { padding:18px 22px 22px; }
+  h2 { margin:0 0 4px; font-size:20px; } .sub { color:var(--soft); font-size:14px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cols { display:grid; gap:14px; } .c2 { grid-template-columns:1fr 1fr; } .c3 { grid-template-columns:1fr 1fr 1fr; } .c21 { grid-template-columns:1.6fr 1fr; }
+  .lbl { font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); margin:10px 0 5px; }
+  .lbl:first-child { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:13px; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .chip.on { background:var(--tint); border-color:var(--wine); color:var(--wine-d); font-weight:700; }
+  .inp { border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13.5px; background:#fff; min-height:36px; }
+  .inp.tall { min-height:62px; line-height:1.45; }
+  .pri { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pri div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; }
+  .pri div b { display:block; font-size:14px; } .pri div.on { border:2px solid var(--wine); background:var(--tint); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .auto { background:#f3f7fb; border:1px dashed #b9cde3; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.55; }
+  .auto b { color:#1e4f8a; }
+  .att { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; } .att span { font-size:12.5px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13.5px; font-weight:700; border-radius:9px; padding:8px 14px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .btn.p { background:var(--wine); border-color:var(--wine); color:#fff; } .btn.g { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fp { width:26px; height:30px; vertical-align:middle; }
+  table.l { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; border-radius:12px; overflow:hidden; }
+  table.l th { text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); padding:9px 10px; border-bottom:1px solid var(--line); background:#fff; }
+  table.l td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .st { font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .st.bad { background:var(--badbg); color:var(--bad); } .st.warn { background:var(--warnbg); color:var(--warn); } .st.ok { background:var(--okbg); color:var(--ok); } .st.info { background:#e0ecfa; color:#1e4f8a; } .st.mut { background:#eee; color:#555; }
+  .lvl { font-size:11px; font-weight:800; color:#fff; border-radius:6px; padding:2px 7px; }
+  .mini { font-size:12px; color:var(--soft); }
+  .note { max-width:1100px; margin:-16px auto 30px; background:#fff; border-radius:10px; padding:12px 16px; font-size:14px; line-height:1.5; color:#3b3035; border-left:4px solid var(--wine); }
+  /* flujo */
+  .levels { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin:6px 0 4px; }
+  .lv { text-align:center; padding:0 8px; }
+  .lv .ic { width:74px; height:74px; border-radius:18px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; }
+  .lv b { display:block; font-size:15px; } .lv span { font-size:12.5px; color:var(--soft); }
+  .arrows { position:relative; height:74px; margin-top:-120px; margin-bottom:60px; pointer-events:none; }
+  .loop { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+  .loop div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12.3px; text-align:center; position:relative; }
+  .loop div b { display:block; font-size:13px; } .loop i { font-style:normal; display:block; font-size:18px; }
+  .loop div:not(:last-child)::after { content:"›"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--soft); font-size:18px; }
+  .world { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .world div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:12.3px; line-height:1.4; }
+  .world b { display:block; font-size:13px; color:var(--wine-d); }
+  /* seguimiento */
+  .steps { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin:8px 0 4px; }
+  .steps div { text-align:center; font-size:12px; position:relative; padding-top:30px; }
+  .steps div::before { content:""; position:absolute; top:9px; left:0; right:0; height:4px; background:#e3d6dc; }
+  .steps div:first-child::before { left:50%; } .steps div:last-child::before { right:50%; }
+  .steps div.done::before { background:var(--ok); } .steps div.cur::before { background:linear-gradient(90deg,var(--ok) 50%,#e3d6dc 50%); }
+  .steps i { position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:50%; background:#e3d6dc; color:#fff; font-style:normal; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:3px solid var(--paper); }
+  .steps .done i { background:var(--ok); } .steps .cur i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .steps b { display:block; font-size:12.5px; } .steps small { color:var(--soft); }
+  .tl { border-left:3px solid var(--line); margin-left:8px; padding-left:14px; }
+  .tl div { position:relative; font-size:13px; margin-bottom:10px; line-height:1.4; }
+  .tl div::before { content:""; position:absolute; left:-21px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--c,#999); border:2px solid #fff; }
+  .kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:600; } .kpi b { font-size:28px; letter-spacing:-.01em; } .kpi span { font-size:12px; color:var(--soft); }
+  .bars div.r { display:grid; grid-template-columns:170px 1fr 54px; align-items:center; gap:10px; font-size:13px; margin:7px 0; }
+  .bars .trk { height:14px; border-radius:0 4px 4px 0; background:transparent; position:relative; }
+  .bars .fill { height:14px; border-radius:0 4px 4px 0; background:var(--wine); }
+  .bars .ref { position:absolute; top:-3px; bottom:-3px; width:2px; background:#2d2429; }
+  .bars .v { font-weight:700; text-align:right; }
+  .alertc { border-left:4px solid var(--bad); }
+
+  .role .rh { display:flex; gap:10px; align-items:center; margin-bottom:8px; } .role .rh b { display:block; font-size:15px; } .role .rh small { color:var(--soft); font-size:12px; }
+  .ri { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .todo { display:flex; align-items:center; gap:10px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .todo:last-child { border-bottom:none; }
+  .todo .st { min-width:30px; text-align:center; font-size:13px; }
+  .mini2 { font-size:13px; line-height:1.5; } .mini2 b { display:block; margin-bottom:2px; }
+  .flowbar { display:flex; gap:6px; margin-bottom:12px; } .flowbar span { flex:1; text-align:center; font-size:13px; font-weight:700; padding:7px; border-radius:9px; background:#fff; border:1px solid var(--line); color:var(--soft); }
+  .flowbar span.on { background:var(--okbg); color:var(--ok); border-color:#b8e3c7; } .flowbar span.cur { background:var(--wine); color:#fff; border-color:var(--wine); }
+  .found { display:flex; gap:12px; align-items:center; margin-top:10px; padding:10px; border-radius:10px; background:#f3f9f5; border:1px solid #cfe9d8; }
+  .photo2 { width:64px; height:72px; border-radius:10px; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:24px; flex:none; }
+  .k2 { display:block; font-size:10.5px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.04em; }
+  .scanner { width:150px; height:160px; margin:6px auto 0; border-radius:18px; background:radial-gradient(circle at 50% 45%, #fff 0, #f7e9ef 70%); border:3px solid #d9b9c6; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -6px 12px rgba(125,42,76,.12); }
+  .ticket { margin-top:12px; text-align:center; }
+  .tk { border:2px dashed var(--wine); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:2px; font-size:13.5px; } .tk b { font-size:40px; color:var(--wine-d); letter-spacing:.04em; line-height:1.1; } .tk small { color:var(--soft); font-size:11.5px; }
+  .q2 { padding:8px 10px; border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:13.5px; background:#fff; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; } .q2 .mini { width:100%; }
+  .q2.cur { border:2px solid var(--wine); background:var(--tint); } .q2 .st { margin-left:auto; }
+  .vit2 { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .vit2 div { background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 8px; font-size:16px; font-weight:800; } .vit2 small { display:block; font-size:10.5px; color:var(--soft); font-weight:700; text-transform:uppercase; }
+  .tv { background:#120810; border-radius:16px; padding:14px; color:#fff; border:8px solid #2a2a2a; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
+  .tvh { display:flex; justify-content:space-between; font-size:13px; color:#cfb7c2; font-weight:700; letter-spacing:.08em; }
+  .tvnow { background:linear-gradient(135deg,#7d2a4c,#b4235a); border-radius:12px; padding:16px; text-align:center; } .tvnow small { display:block; font-size:13px; letter-spacing:.2em; font-weight:800; color:#ffe4ee; }
+  .tvnow b { display:block; font-size:64px; line-height:1.05; letter-spacing:.04em; } .tvnow span { display:block; font-size:24px; font-weight:700; } .tvnow em { display:block; font-style:normal; font-size:20px; margin-top:4px; color:#ffe4ee; }
+  .tvlist div { display:flex; gap:12px; align-items:baseline; font-size:18px; padding:6px 4px; border-bottom:1px solid #3a2530; } .tvlist b { color:#f1a7c3; min-width:70px; } .tvlist span { margin-left:auto; color:#cfb7c2; font-size:15px; }
+  .tvf { font-size:13px; color:#cfb7c2; }
+  .doc { display:grid; grid-template-columns:34px 1fr auto auto; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--line); font-size:13.5px; } .di { font-size:22px; text-align:center; } .dest { font-size:12.5px; color:var(--soft); font-weight:600; }
+  .st.warn { margin:0; max-width:none; padding:2px 9px; border:none; font-size:11.5px; }
+  .todo .st.warn { font-size:13px; }
+
+  .svc { display:flex; flex-wrap:wrap; gap:8px; } .svc span { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 12px; font-size:13.5px; font-weight:600; }
+  .prob { display:flex; align-items:center; gap:8px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .prob .mini { margin-left:auto; }
+  .dotc { width:10px; height:10px; border-radius:50%; flex:none; }
+  .tpl { border:1px solid; border-left-width:5px; border-radius:10px; padding:9px 11px; font-size:13px; line-height:1.45; background:#fff; } .tpl b { display:block; font-size:14px; margin-bottom:2px; }
+  .opt { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; } .opt span { border:1px solid var(--line); border-radius:12px; padding:10px; font-size:22px; background:#fff; text-align:center; } .opt b { display:block; font-size:14px; margin-top:4px; } .opt small { display:block; font-size:12px; color:var(--soft); }
+  .opt .sel { border:2px solid var(--wine); background:var(--tint); }
+  .side { border-left:4px solid var(--line); padding:5px 10px; margin-bottom:8px; font-size:13.5px; line-height:1.45; } .side b { display:block; }
+  .stk { display:grid; grid-template-columns:150px 1fr auto; gap:8px; align-items:center; font-size:13px; margin:6px 0; } .stk div { height:10px; background:#eee4e8; border-radius:5px; overflow:hidden; } .stk i { display:block; height:100%; background:#15803d; border-radius:5px; } .stk b { font-size:12.5px; }
+  .phn { background:#e5ddd5; border:9px solid #1f1f1f; border-radius:26px; padding:10px; display:flex; flex-direction:column; gap:8px; min-height:430px; }
+  .phh { background:#075e54; color:#fff; font-size:13px; font-weight:700; margin:-10px -10px 4px; padding:10px 12px; border-radius:16px 16px 0 0; }
+  .msg { font-size:13px; line-height:1.4; border-radius:10px; padding:7px 9px; max-width:88%; box-shadow:0 1px 1px rgba(0,0,0,.12); } .msg.in { background:#fff; align-self:flex-start; } .msg.out { background:#dcf8c6; align-self:flex-end; font-weight:800; }
+  .ck { font-size:13.5px; line-height:1.45; } .ck b { display:block; font-size:15px; margin-bottom:3px; }
+
+  .kv2 { display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:4px 0; border-bottom:1px dashed var(--line); } .kv2 span { color:var(--soft); }
+  .req { display:flex; flex-wrap:wrap; gap:6px; } .req span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .req .ok { background:var(--okbg); color:var(--ok); } .req .no { background:var(--warnbg); color:var(--warn); }
+  .qx { position:relative; height:30px; background:#f3eef0; border-radius:8px; margin:6px 0; padding-left:34px; } .qx b { position:absolute; left:8px; top:6px; font-size:13px; }
+  .qx span { position:absolute; top:3px; bottom:3px; margin-left:34px; border-radius:6px; color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; padding:0 6px; white-space:nowrap; overflow:hidden; }
+  .who2 { display:grid; gap:6px; } .who2 div { border:1px solid var(--line); border-radius:8px; padding:6px 9px; background:#f7fbf8; font-size:12.5px; } .who2 b { display:block; color:var(--wine-d); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; } .who2 span { color:#166534; }
+  .beds { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .bed { border-radius:10px; padding:8px; font-size:13px; font-weight:700; border:1px solid var(--line); min-height:76px; } .bed b { display:block; font-size:18px; } .bed small { display:block; font-weight:500; font-size:11.5px; color:var(--soft); }
+  .bed.p { background:#fbe4ee; } .bed.a { background:#fde2e2; } .bed.g { background:#ede4fb; } .bed.free { background:#ecf8f1; color:#15803d; } .bed.clean { background:#fdf0d5; color:#8a5a00; } .bed.sel { outline:3px solid var(--wine); }
+  .leg2 { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-left:6px; border:1px solid var(--line); }
+  .dose { border:1px solid var(--line); border-radius:10px; padding:7px 9px; margin-bottom:6px; font-size:13px; display:flex; flex-direction:column; } .dose span { color:var(--soft); font-size:12px; } .dose em { font-style:normal; margin-top:2px; }
+  .srch { border-left:4px solid #c2410c; background:#fff7f0; border-radius:6px; padding:6px 9px; margin-bottom:6px; font-size:13px; } .srch b { display:block; font-size:12px; color:#c2410c; text-transform:uppercase; letter-spacing:.04em; }
+  .amb { border:9px solid #1f1f1f; border-radius:26px; background:#fff; overflow:hidden; min-height:420px; display:flex; flex-direction:column; }
+  .ah { background:#ea580c; color:#fff; font-weight:800; font-size:14px; padding:10px 12px; } .ab { padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .big2 { font-size:40px; font-weight:900; text-align:center; color:#ea580c; margin-top:6px; }
+
+  .tree div { padding:6px 8px; border-radius:8px; font-size:13.5px; } .tree small { color:var(--soft); margin-left:4px; }
+  .tree .t0 { font-weight:800; } .tree .t1 { padding-left:18px; font-weight:700; } .tree .t2 { padding-left:32px; font-weight:700; } .tree .t3 { padding-left:50px; } .tree .mut { color:var(--soft); }
+  .tree .on { background:#f3eef0; } .tree .sel { background:var(--tint); outline:2px solid var(--wine); }
+  .fing { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:8px; } .fing span { font-size:12px; font-weight:700; border-radius:999px; padding:3px 9px; background:#f3eef0; } .fing .done { background:var(--okbg); color:var(--ok); } .fing .cur { background:var(--wine); color:#fff; }
+  table.mx td, table.mx th { text-align:center; font-size:12.5px; padding:8px 6px; } table.mx td:first-child, table.mx th:first-child { text-align:left; }
+  table.mx2 td, table.mx2 th { text-align:center; font-size:12.5px; } table.mx2 td:first-child, table.mx2 th:first-child { text-align:left; }
+  table.mx2 td.on { color:#15803d; font-size:18px; } table.mx2 td.pi { color:#c2410c; font-size:18px; } table.mx2 td { color:#c9bcc2; font-size:18px; } table.mx2 td:first-child { font-size:13.5px; color:var(--ink); }
+  .catl { padding:8px 10px; border-radius:9px; font-size:13.5px; margin-bottom:4px; display:flex; justify-content:space-between; } .catl small { color:var(--soft); } .catl.on { background:var(--tint); font-weight:700; }
+  table.mx2 { table-layout:fixed; } table.mx2 th { font-size:10px; padding:6px 3px; letter-spacing:.02em; white-space:normal; text-align:center; } table.mx2 th:first-child { width:170px; } table.mx2 td { padding:8px 3px; }
+  .tk2 { display:grid; grid-template-columns:52px 150px 1fr auto; gap:8px; align-items:center; padding:9px 4px; border-bottom:1px dashed var(--line); font-size:13.5px; } .tk2 .h { font-weight:800; color:var(--soft); } .tk2.late { background:#fff5f5; border-radius:8px; }
+  .pt { display:flex; gap:10px; align-items:center; padding:7px 0; border-bottom:1px dashed var(--line); font-size:13.5px; } .pt > b { width:34px; height:34px; border-radius:9px; background:#f3eef0; display:flex; align-items:center; justify-content:center; flex:none; } .pt.red > b { background:#fde2e2; color:#991b1b; }
+  table.kx td, table.kx th { text-align:center; font-size:12.5px; padding:8px 5px; } table.kx td:first-child, table.kx td:nth-child(2), table.kx th:first-child, table.kx th:nth-child(2) { text-align:left; }
+  table.kx td.d { background:#ecf8f1; color:#15803d; font-weight:800; } table.kx td.n { background:#7d2a4c; color:#fff; font-weight:800; } table.kx td.p { background:#f7f2f4; color:#9c8b92; }
+  .scanbox { border:2px dashed #b9cde3; border-radius:12px; padding:18px; text-align:center; font-weight:700; color:#1e4f8a; background:#f3f7fb; margin-top:6px; }
+  .five { display:grid; grid-template-columns:26px 1fr; gap:2px 8px; padding:6px 0; border-bottom:1px dashed var(--line); font-size:12.5px; color:var(--soft); } .five span { grid-row:span 2; width:22px; height:22px; border-radius:50%; background:#dcf3e5; color:#15803d; font-weight:800; display:flex; align-items:center; justify-content:center; } .five b { color:var(--ink); font-size:14px; }
+  .dh { position:relative; height:170px; display:flex; align-items:flex-end; gap:10px; padding:0 4px 18px; border-bottom:1px solid var(--line); } .dh div { flex:1; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; position:relative; } .dh i { width:70%; background:#0e7490; border-radius:4px 4px 0 0; } .dh span { position:absolute; bottom:-18px; font-size:11px; color:var(--soft); }
+  .dh em { position:absolute; left:0; right:0; border-top:2px dashed #991b1b; font-style:normal; font-size:11px; color:#991b1b; text-align:right; }
+  .dv { font-size:13px; padding:6px 0; border-bottom:1px dashed var(--line); } .ck2 { font-size:13.5px; padding:5px 0; }
+  .sbar { font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .sbar b { display:block; color:var(--wine-d); font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — 4 · Enfermería de piso:</b>
+  <button class="tab on" data-t="e1">1. Mi turno</button>
+  <button class="tab" data-t="e2">2. Kárdex de medicamentos</button>
+  <button class="tab" data-t="e3">3. Administrar (5 correctos)</button>
+  <button class="tab" data-t="e4">4. Signos vitales y alerta</button>
+  <button class="tab" data-t="e5">5. Balance hídrico</button>
+  <button class="tab" data-t="e6">6. Escalas y cuidados</button>
+  <button class="tab" data-t="e7">7. Nota y entrega de turno</button>
+  <button class="tab" data-t="e8">8. Indicadores</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Funciona igual en el piso de un hospital y en las pocas camas de un centro de 1er nivel.</div>
+
+<!-- ============ E1 ============ -->
+<section class="scr on" id="e1">
+  <div class="app"><div class="brand">SIVEC <span>ENFERMERÍA</span></div><div class="who">🩺 Lic. Rojas · Piso GO · turno mañana 07:00–13:00 · 5 pacientes</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Tareas de la próxima hora · 08:00–09:00</div>
+        <div class="tk2 late"><span class="h">07:45</span><b>Cama 13 · Juana M.</b><span>💉 Sulfato de magnesio — mantenimiento</span><span class="st bad">atrasada 15 min</span></div>
+        <div class="tk2"><span class="h">08:00</span><b>Cama 12 · Lucía F.</b><span>💊 Paracetamol 1 g IV</span><span class="st info">ahora</span></div>
+        <div class="tk2"><span class="h">08:00</span><b>Cama 12 · Lucía F.</b><span>❤️ Signos vitales + sangrado + útero</span><span class="st info">ahora</span></div>
+        <div class="tk2"><span class="h">08:00</span><b>Cama 13 · Juana M.</b><span>❤️ PA c/1 h · reflejos · diuresis</span><span class="st info">ahora</span></div>
+        <div class="tk2"><span class="h">08:30</span><b>Cama 14 · Carla T.</b><span>💉 Nifedipino 10 mg VO</span><span class="st mut">pendiente</span></div>
+        <div class="tk2"><span class="h">09:00</span><b>Cama 9 · Ana R.</b><span>🩹 Curación de herida · retirar sonda</span><span class="st mut">pendiente</span></div></div>
+      <div>
+        <div class="card"><div class="lbl">Mis pacientes</div>
+          <div class="pt"><b>12</b><div><b>Lucía F.</b> · post-cesárea día 1<div class="mini">🟢 estable · riesgo de caída bajo</div></div></div>
+          <div class="pt red"><b>13</b><div><b>Juana M.</b> · preeclampsia<div class="mini">🔴 alerta temprana 5 · PA c/1 h</div></div></div>
+          <div class="pt"><b>14</b><div><b>Carla T.</b> · amenaza de parto pretérmino</div></div>
+          <div class="pt"><b>9</b><div><b>Ana R.</b> · puerperio · alta hoy</div></div>
+          <div class="pt"><b>10</b><div><b>Rosa V.</b> · puerperio</div></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Avisos del médico</div><div style="font-size:13px">📝 Nueva indicación cama 13: “control de diuresis horaria” (Dr. Paz 07:50) — <b>confirmar lectura</b></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ E2 ============ -->
+<section class="scr" id="e2">
+  <div class="app"><div class="brand">SIVEC <span>ENFERMERÍA</span></div><div class="who">💊 Kárdex · Cama 12 · Lucía Flores · ⚠ sin alergias · 72 kg</div></div>
+  <div class="body">
+    <div class="card">
+      <div class="lbl">Indicaciones médicas → horarios (se arman solos desde la receta del médico)</div>
+      <table class="l kx"><thead><tr><th>Medicamento</th><th>Dosis · vía · frecuencia</th><th>00</th><th>04</th><th>06</th><th>08</th><th>12</th><th>14</th><th>16</th><th>20</th><th>22</th></tr></thead><tbody>
+        <tr><td><b>Paracetamol</b></td><td>1 g IV c/8 h</td><td class="d">✓</td><td></td><td></td><td class="n">●</td><td></td><td></td><td class="p">○</td><td></td><td></td></tr>
+        <tr><td><b>Oxitocina</b></td><td>20 UI en 1000 mL · 125 mL/h</td><td class="d" colspan="4">✓ en goteo · cambio de frasco 06:10</td><td class="p" colspan="5">○ suspender a las 12 h</td></tr>
+        <tr><td><b>Ketorolaco</b></td><td>30 mg IV c/8 h · 48 h</td><td></td><td></td><td class="d">✓</td><td></td><td></td><td class="p">○</td><td></td><td></td><td class="p">○</td></tr>
+        <tr><td><b>Sulfato ferroso</b></td><td>1 comp VO c/24 h</td><td></td><td></td><td></td><td></td><td class="p">○</td><td></td><td></td><td></td><td></td></tr>
+        <tr style="opacity:.55"><td><s>Cefazolina</s></td><td>2 g IV dosis única</td><td colspan="9" class="mini">suspendido — dosis única en quirófano</td></tr>
+      </tbody></table>
+      <div class="mini" style="margin-top:8px">✓ administrada · ● toca ahora · ○ pendiente · ✗ no administrada (con motivo). El kárdex se actualiza solo cuando el médico cambia una indicación, y enfermería debe confirmar la lectura.</div>
+    </div>
+    <div class="cols c3" style="margin-top:12px;gap:12px">
+      <div class="card mini2"><b>Doble control</b>medicamentos de alto riesgo (insulina, heparina, sulfato de magnesio, potasio) piden huella de una segunda enfermera.</div>
+      <div class="card mini2"><b>Farmacia</b>cada dosis sale del stock del piso; farmacia repone según el kárdex del día.</div>
+      <div class="card mini2"><b>Sin papel</b>el kárdex en tarjeta y la hoja de medicación desaparecen; todo queda firmado.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ E3 ============ -->
+<section class="scr" id="e3">
+  <div class="app"><div class="brand">SIVEC <span>ENFERMERÍA</span></div><div class="who">✅ Administrar medicamento · Cama 12 · 08:02</div></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:260px 1fr 1fr;gap:14px">
+      <div class="phn" style="background:#fff;min-height:420px"><div class="phh" style="background:#0e7490">Tablet de enfermería</div>
+        <div class="scanbox">📷 Escanear pulsera</div><div class="st ok" style="text-align:center">✓ Lucía Flores · cama 12</div>
+        <div class="scanbox">📷 Escanear medicamento</div><div class="st ok" style="text-align:center">✓ Paracetamol 1 g IV</div>
+        <div class="btn g" style="justify-content:center;margin-top:6px">🖐 Registrar administración</div></div>
+      <div class="card"><div class="lbl">Los 5 correctos — el sistema los comprueba</div>
+        <div class="five"><span>✓</span><b>Paciente correcto</b>pulsera = kárdex</div>
+        <div class="five"><span>✓</span><b>Medicamento correcto</b>código del frasco = indicación</div>
+        <div class="five"><span>✓</span><b>Dosis correcta</b>1 g · peso 72 kg</div>
+        <div class="five"><span>✓</span><b>Vía correcta</b>IV</div>
+        <div class="five"><span>✓</span><b>Hora correcta</b>08:00 (± 30 min)</div>
+        <div class="five"><span>✓</span><b>+ alergias</b>ninguna registrada</div></div>
+      <div>
+        <div class="card alertc"><div class="lbl">Si algo no coincide</div><div style="font-size:13.5px;line-height:1.6">🚫 “Este frasco es <b>Ketorolaco</b>, la indicación de las 08:00 es <b>Paracetamol</b>.” — no deja registrar.<br>⚠️ “La paciente es alérgica a penicilina” — bloqueo y aviso al médico.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Si no se administra</div><div class="chips"><span class="chip">Paciente en ayunas</span><span class="chip">Rechazó</span><span class="chip">No hay en stock</span><span class="chip">Vía no permeable</span><span class="chip">Otro</span></div><div class="mini" style="margin-top:6px">El médico recibe aviso.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ E4 ============ -->
+<section class="scr" id="e4">
+  <div class="app"><div class="brand">SIVEC <span>ENFERMERÍA</span></div><div class="who">❤️ Signos vitales · Cama 13 · Juana M. · preeclampsia</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Presión arterial sistólica — últimas 12 h</div>
+        <svg viewBox="0 0 560 170" width="100%" role="img" aria-label="Presión sistólica en 12 horas"><rect x="40" y="10" width="510" height="130" fill="#fff"/><rect x="40" y="10" width="510" height="43" fill="#fde2e2" opacity=".6"/><g font-family="Source Sans 3" font-size="11" fill="#7a6a71"><text x="34" y="14" text-anchor="end">180</text><text x="34" y="56" text-anchor="end">160</text><text x="34" y="98" text-anchor="end">140</text><text x="34" y="140" text-anchor="end">120</text><text x="40" y="158">20:00</text><text x="550" y="158" text-anchor="end">08:00</text></g>
+          <polyline points="40,98 90,91 140,86 190,93 240,84 290,77 340,72 390,64 440,58 490,50 540,42" fill="none" stroke="#7d2a4c" stroke-width="2"/><circle cx="540" cy="42" r="4.5" fill="#7d2a4c"/><text x="534" y="34" text-anchor="end" font-family="Source Sans 3" font-size="12" font-weight="700" fill="#2d2429">164</text><text x="46" y="26" font-family="Source Sans 3" font-size="11" fill="#991b1b">zona de alarma ≥ 160</text></svg>
+        <div class="lbl">Carga de hoy 08:00</div>
+        <div class="vit2" style="grid-template-columns:repeat(7,1fr)"><div><small>PA</small>164/108</div><div><small>FC</small>96</div><div><small>FR</small>20</div><div><small>T°</small>36,8</div><div><small>SatO₂</small>96%</div><div><small>Diuresis</small>25 mL/h</div><div><small>Conciencia</small>alerta</div></div></div>
+      <div>
+        <div class="card alertc"><div class="lbl">Puntaje de alerta temprana</div><div style="font-size:40px;font-weight:900;color:#991b1b;line-height:1">5 <span style="font-size:15px">alto</span></div><div style="font-size:13.5px;line-height:1.6;margin-top:6px">🔔 Aviso automático al médico de turno y al jefe de piso<br>⏱ control de signos cada 30 min<br>📋 protocolo de preeclampsia severa sugerido</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">También desde el monitor</div><div style="font-size:13px">Si la cama tiene monitor conectado, los signos entran solos; la enfermera solo confirma.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Escala usada</div><div style="font-size:13px">Obstétrica (MEOWS) en GO · NEWS2 en adultos · PEWS en niños — configurable por piso.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ E5 ============ -->
+<section class="scr" id="e5">
+  <div class="app"><div class="brand">SIVEC <span>ENFERMERÍA</span></div><div class="who">💧 Balance hídrico · Cama 13 · Juana M. · 24 h (07:00 → 07:00)</div></div>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card"><div class="lbl">Ingresos</div>
+        <div class="kv2"><span>Suero (Ringer lactato)</span><b>1.500 mL</b></div><div class="kv2"><span>Sulfato de Mg en solución</span><b>600 mL</b></div><div class="kv2"><span>Vía oral</span><b>400 mL</b></div><div class="kv2" style="font-size:15px"><span><b>Total ingresos</b></span><b>2.500 mL</b></div>
+        <div class="lbl">Egresos</div>
+        <div class="kv2"><span>Diuresis (sonda)</span><b>1.450 mL</b></div><div class="kv2"><span>Vómito</span><b>100 mL</b></div><div class="kv2"><span>Pérdidas insensibles (calculadas)</span><b>700 mL</b></div><div class="kv2" style="font-size:15px"><span><b>Total egresos</b></span><b>2.250 mL</b></div>
+        <div style="margin-top:10px;font-size:22px;font-weight:900">Balance: <span style="color:#c2410c">+250 mL</span></div></div>
+      <div class="card"><div class="lbl">Diuresis por hora (mL)</div>
+        <div class="dh">
+          <div><i style="height:62%"></i><span>02</span></div><div><i style="height:58%"></i><span>03</span></div><div><i style="height:55%"></i><span>04</span></div><div><i style="height:48%"></i><span>05</span></div><div><i style="height:40%"></i><span>06</span></div><div><i style="height:32%;background:#c2410c"></i><span>07</span></div><div><i style="height:25%;background:#991b1b"></i><span>08</span></div>
+          <em style="bottom:30%">mínimo 30 mL/h</em></div>
+        <div class="mini" style="margin-top:8px">⚠ Bajo 30 mL/h dos horas seguidas → aviso al médico (riesgo con sulfato de magnesio).</div>
+        <div class="mini">Los sueros e infusiones registrados en el kárdex suman solos al ingreso.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ E6 ============ -->
+<section class="scr" id="e6">
+  <div class="app"><div class="brand">SIVEC <span>ENFERMERÍA</span></div><div class="who">📋 Escalas y cuidados · Cama 12 · Lucía F.</div></div>
+  <div class="body">
+    <div class="cols c3" style="gap:12px">
+      <div class="card"><div class="lbl">Escalas de riesgo (al ingreso y cada turno)</div>
+        <div class="kv2"><span>Caídas (Morse)</span><b>25 · bajo</b></div><div class="kv2"><span>Úlceras por presión (Braden)</span><b>18 · bajo</b></div><div class="kv2"><span>Dolor (0–10)</span><b>3</b></div><div class="kv2"><span>Riesgo de TVP</span><b>moderado → medias</b></div>
+        <div class="mini" style="margin-top:6px">Riesgo alto → aparecen los cuidados que corresponden (barandas, cambios de posición cada 2 h).</div></div>
+      <div class="card"><div class="lbl">Dispositivos</div>
+        <div class="dv"><b>🩸 Vía periférica</b> brazo izq. · colocada 24/09 07:40 · <span class="st ok">día 1 de 3</span></div>
+        <div class="dv"><b>🚽 Sonda vesical</b> · 24/09 08:45 · <span class="st warn">retirar hoy 20:00</span></div>
+        <div class="dv"><b>🩹 Herida quirúrgica</b> · limpia, seca · <span class="st ok">curación mañana</span></div>
+        <div class="mini" style="margin-top:6px">Aviso cuando toca cambiar o retirar.</div></div>
+      <div class="card"><div class="lbl">Cuidados del turno</div>
+        <div class="ck2"><span class="st ok">✓</span> Deambulación asistida</div><div class="ck2"><span class="st ok">✓</span> Apoyo a la lactancia</div><div class="ck2"><span class="st ok">✓</span> Control de loquios</div><div class="ck2"><span class="st mut">○</span> Baño asistido</div><div class="ck2"><span class="st mut">○</span> Educación al alta</div></div>
+    </div>
+    <div class="card" style="margin-top:12px"><div class="lbl">Procedimientos de enfermería</div><div class="chips"><span class="chip">Curación</span><span class="chip">Colocar/retirar sonda</span><span class="chip">Canalizar vía</span><span class="chip">Nebulización</span><span class="chip">Glicemia capilar</span><span class="chip">Toma de muestra</span><span class="chip">Transfusión (doble firma)</span><span class="chip">Cuidado del RN</span></div><div class="mini" style="margin-top:6px">Cada procedimiento registra insumos usados → descuento del stock del piso.</div></div>
+  </div>
+</section>
+
+<!-- ============ E7 ============ -->
+<section class="scr" id="e7">
+  <div class="app"><div class="brand">SIVEC <span>ENFERMERÍA</span></div><div class="who">📝 Nota de enfermería y entrega de turno · 12:50</div></div>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card"><div class="lbl">Nota de enfermería · Cama 13 · Juana M.</div>
+        <div class="inp tall" style="min-height:120px">08:00 PA 164/108, alerta temprana 5, se avisa al Dr. Paz (08:03). 08:20 se administra labetalol según indicación. 10:00 PA 148/96. Diuresis 25→35 mL/h. Reflejos conservados. Paciente refiere cefalea leve. Se mantiene sulfato de Mg.</div>
+        <div class="mini" style="margin-top:6px">Frases rápidas y lo ya registrado (signos, medicación) se insertan con un toque. 🖐 firma de la enfermera.</div></div>
+      <div class="card"><div class="lbl">Entrega de turno (SBAR) — se arma sola</div>
+        <div class="sbar"><b>S · Situación</b>Juana M., cama 13, preeclampsia severa.</div>
+        <div class="sbar"><b>B · Antecedentes</b>28 años, 36 sem; sulfato de Mg desde 22:00.</div>
+        <div class="sbar"><b>A · Evaluación</b>PA mejoró 164→148; diuresis en recuperación; alerta temprana 5→3.</div>
+        <div class="sbar"><b>R · Recomendación</b>PA c/30 min, diuresis horaria, reflejos; laboratorio de control 14:00.</div>
+        <div class="row" style="margin-top:8px;font-size:13px"><span class="st ok">🖐 entrega Lic. Rojas</span><span class="st ok">🖐 recibe Lic. Vargas</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ E8 ============ -->
+<section class="scr" id="e8">
+  <div class="app"><div class="brand">SIVEC <span>ENFERMERÍA</span></div><div class="who">📊 Indicadores de enfermería · Piso GO · septiembre</div></div>
+  <div class="body">
+    <div class="kpi"><div><small>Dosis a tiempo (± 30 min)</small><b>94%</b></div><div><small>Errores evitados por escaneo</small><b>11</b></div><div><small>Caídas</small><b>0</b></div><div><small>Úlceras por presión</small><b>0</b></div></div>
+    <div class="cols c2" style="margin-top:12px">
+      <div class="card bars"><div class="lbl">Dosis a tiempo por turno</div>
+        <div class="r"><span>Mañana</span><div class="trk"><div class="fill" style="width:96%"></div></div><span class="v">96%</span></div>
+        <div class="r"><span>Tarde</span><div class="trk"><div class="fill" style="width:95%"></div></div><span class="v">95%</span></div>
+        <div class="r"><span>Noche</span><div class="trk"><div class="fill" style="width:89%"></div></div><span class="v">89%</span></div>
+        <div class="mini">Escala 0–100%.</div></div>
+      <div class="card bars"><div class="lbl">Pacientes por enfermera</div>
+        <div class="r"><span>Mañana</span><div class="trk"><div class="fill" style="width:50%"></div></div><span class="v">5</span></div>
+        <div class="r"><span>Tarde</span><div class="trk"><div class="fill" style="width:60%"></div></div><span class="v">6</span></div>
+        <div class="r"><span>Noche</span><div class="trk"><div class="fill" style="width:100%;background:#c2410c"></div></div><span class="v">10</span></div>
+        <div class="mini">Escala 0–10 · la noche está sobrecargada.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  const NOTES = {
+    e1: '<b>Meu turno:</b> a enfermeira vê suas pacientes e as tarefas da próxima hora (medicação, sinais vitais, curativos), com as atrasadas em vermelho e as novas indicações do médico para confirmar.',
+    e2: '<b>Kárdex:</b> as indicações do médico viram horários sozinhas; cada dose marcada como dada, pendente ou não dada com motivo. Medicamentos de alto risco pedem dupla checagem.',
+    e3: '<b>Administrar (5 certos):</b> escaneia a pulseira e o medicamento; o sistema confere paciente, remédio, dose, via, hora e alergias. Se não bate, não deixa registrar.',
+    e4: '<b>Sinais vitais e alerta precoce:</b> gráfico de tendência, carga rápida ou do monitor, e escore de alerta (MEOWS/NEWS2/PEWS) que avisa o médico sozinho.',
+    e5: '<b>Balanço hídrico:</b> entradas e saídas das 24 h, diurese por hora com linha mínima e aviso; os soros do kárdex somam sozinhos.',
+    e6: '<b>Escalas e cuidados:</b> quedas, úlceras, dor e TVP; dispositivos (via, sonda, ferida) com aviso de troca; cuidados do turno e procedimentos que descontam insumos.',
+    e7: '<b>Nota e passagem de plantão:</b> nota com frases rápidas e dados já registrados; a passagem SBAR se monta sozinha e é assinada por quem entrega e quem recebe.',
+    e8: '<b>Indicadores:</b> doses no horário, erros evitados pelo escaneamento, quedas, úlceras e pacientes por enfermeira por turno.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 'e1');
+</script>
+
+</body>
+</html>
