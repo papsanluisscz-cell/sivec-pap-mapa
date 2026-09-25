@@ -653,3 +653,26 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
   - turnos cubiertos, ausentismo, horas extra, certificados por vencer;
   - personal por 10.000 habitantes y carga real por centro, para pedir ítems con datos.
 - Imágenes: docs/personal-01..08.png · esboco-personal.html
+
+**Módulo 12 · Personal y guardias: APROVADO.**
+
+### Módulo 13 · Epidemiología — dibujado, para aprobar
+- **Notificar desde la consulta:** el médico escribe el diagnóstico como siempre. Si es de notificación obligatoria, el SIVEC avisa (inmediata o semanal) y la ficha ya viene llena.
+  - También disparan la notificación: un resultado de laboratorio, un informe de imagen, un síndrome sin diagnóstico y la muerte materna o infantil.
+- **Ficha epidemiológica:** faltan solo 3 preguntas por toques. La clasificación (sospechoso → confirmado) cambia sola con el laboratorio.
+  - Al notificar llega al instante al epidemiólogo y al SEDES, entra al mapa y al canal endémico, y crea contactos.
+- **Mapa de casos:** cada caso en su domicilio, sin nombres. El sistema detecta solo el conglomerado y sugiere bloqueo de foco; el mapa público muestra solo manchas por zona.
+- **Canal endémico automático:** 5 años de referencia con zonas de éxito, seguridad, alerta y epidemia. La alerta de brote llega al epidemiólogo, al director y al SEDES; hay otras vigilancias en vivo.
+- **Respuesta al brote:** plan con responsable, fecha y avance:
+  - bloqueo de foco y búsqueda casa por casa sin internet;
+  - eliminación de criaderos, alerta a consultorios, SMS de zona y camas reservadas;
+  - cierre con informe final.
+- **Contactos y seguimiento:**
+  - TB: contactos desde la ficha familiar;
+  - sarampión: vigilancia de 21 días y vacunación de bloqueo;
+  - mordedura: observación del perro y esquema antirrábico con búsqueda activa si falta a una dosis.
+- **Notificación semanal:** el formulario se arma solo desde el SOAP por grupos de edad; el responsable firma con huella. Se envía también en cero y se ve el estado de los envíos.
+- **Tablero:**
+  - oportunidad de notificación en menos de 24 h, centros al día, brotes activos y casos por evento;
+  - enlazado con laboratorio, imagen, vacunas, almacén, camas y gestor.
+- Imágenes: docs/epidemiologia-01..08.png · esboco-epidemiologia.html
