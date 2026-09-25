@@ -760,3 +760,4 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
   1. El interno escribe o dicta la evolución de la mañana en la estación de enfermería; el residente revisa y firma con huella.
   2. Retiro de sonda vesical: la indicación aparece como tarea; el registro se hace en 30 s en el celular (hora, balón, orina, aspecto, molestia) y queda la alarma de 1ª micción en 6 h.
   3. Pase de visita con el carro: tablet visible para todo el equipo; la planta corrobora con la paciente y el residente firma en el carro.
+- **Estilo “más realista” (prueba):** ilustración vectorial detallada con perspectiva, luz, sombras, proporciones reales y la pantalla real del SIVEC en el tablet (docs/escena-realista-pase-visita.png). Un estilo fotorrealista necesita fotos reales en el hospital (con consentimiento) o un ilustrador/generador de imágenes externo.
