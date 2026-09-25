@@ -123,6 +123,20 @@ notify pgrst, 'reload schema';
 
 ---
 
+### Paso 7b — Si al guardar sale "violates foreign key constraint consultas_paciente_id_fkey"
+
+En el Supabase del piloto, la tabla `consultas` venía de una versión vieja que la ataba a `pacientes_generales`.
+Las consultas del SIVEC PAP son de las pacientes de la tabla `pacientes`: esto cambia la regla (las consultas viejas no se tocan).
+
+```sql
+alter table consultas drop constraint if exists consultas_paciente_id_fkey;
+alter table consultas add constraint consultas_paciente_id_fkey
+  foreign key (paciente_id) references pacientes(id) on delete cascade not valid;
+notify pgrst, 'reload schema';
+```
+
+---
+
 ## Paso 8 — Redes, centros y usuarios con rol (SIVEC PAP para toda la red)
 
 Usa las tablas que ya existen en el Supabase del piloto (**`centros_salud`**, **`perfiles_usuario`**, todo con `uuid`) y crea **`redes`**.
