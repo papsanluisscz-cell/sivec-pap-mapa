@@ -617,3 +617,22 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
   - Solo “perdido por caries” cuenta como P en el CPO-D (regla OMS). La extracción indicada (todavía en boca) cuenta como C.
   - Si la extracción se hizo en el SIVEC, la causa y la fecha vienen solas de esa sesión.
   - Imagen: docs/odonto-02.png (las demás pantallas pasan a odonto-03..08).
+
+**Módulo 10 · Odonto: APROVADO** (incluye diente ausente con causa).
+
+### Módulo 11 · Almacén y logística — dibujado, para aprobar
+- **Almacén del centro:** stock de todo (LINAME, insumos, reactivos, vacunas, odonto), con consumo por mes, cuántos días alcanza, el lote que vence primero y semáforo.
+  - El consumo se descuenta solo cuando farmacia, laboratorio, odonto, vacunas o enfermería usan algo (adiós kárdex de papel).
+- **Recibir mercadería:** se escanea cada caja y se compara con el pedido (lote, vencimiento). Las diferencias generan un reclamo automático; firman con huella el chofer y la responsable (reemplaza la nota de remisión).
+- **Pedido automático:** consumo promedio × meses + seguridad − stock − lo que está en camino, ajustado por temporada y campañas.
+  - Aprueban la responsable y el director (con huella).
+  - Salen solos los formularios oficiales (SNUS/CEASS).
+- **Entre centros de la red:**
+  - sugerencias de transferencia (lo que sobra o está por vencer hacia donde falta);
+  - buscador “¿quién tiene…?”;
+  - préstamo urgente que viaja en la próxima ambulancia o entrega.
+- **Vencimientos y bajas:** se entrega primero lo que vence primero (farmacia recibe el lote sugerido); baja con acta, foto y huella; las pérdidas del año bajan.
+- **Equipos y mantenimiento:** QR en cada equipo; reportar una falla en 1 minuto (QR + foto) crea una orden de trabajo para el técnico. Si el equipo está parado, los pedidos se derivan.
+- **Entregas en camino:** ruta del camión con firma de cada entrega en el celular del chofer. El mismo viaje lleva muestras de laboratorio y vacunas en caja térmica.
+- **Tablero de abastecimiento:** disponibilidad de medicamentos trazadores por centro (meta ≥ 95%), quiebres, pedidos completos y pérdidas. Los quiebres de emergencia obstétrica avisan al instante.
+- Imágenes: docs/almacen-01..08.png · esboco-almacen.html
