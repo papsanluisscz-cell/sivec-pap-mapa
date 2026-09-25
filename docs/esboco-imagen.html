@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIVEC Imagen</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
+    --n1:#2f6fb0; --n2:#0e7490; --n3:#7c3aed; --n4:#b4235a; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .topbar { position:sticky; top:0; z-index:5; background:#2a1720; color:#fff; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; }
+  .topbar b { margin-right:6px; font-size:15px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; border:1px solid #6b4a58; background:transparent; color:#fff; border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tab.on { background:#fff; color:var(--wine-d); border-color:#fff; }
+  .warn { max-width:1100px; margin:14px auto 0; background:#fff7e0; border:1px solid #ecd9a0; border-radius:10px; padding:10px 14px; font-size:14px; color:#5b4712; }
+  .scr { display:none; max-width:1100px; margin:14px auto 30px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,.14); }
+  .scr.on { display:block; }
+  .app { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; }
+  .app .brand { font-weight:800; font-size:20px; letter-spacing:.04em; } .app .brand span { font-size:11px; background:#fff; color:var(--wine-d); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:3px; letter-spacing:.08em; }
+  .app .who { font-size:14px; opacity:.95; }
+  .body { padding:18px 22px 22px; }
+  h2 { margin:0 0 4px; font-size:20px; } .sub { color:var(--soft); font-size:14px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cols { display:grid; gap:14px; } .c2 { grid-template-columns:1fr 1fr; } .c3 { grid-template-columns:1fr 1fr 1fr; } .c21 { grid-template-columns:1.6fr 1fr; }
+  .lbl { font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); margin:10px 0 5px; }
+  .lbl:first-child { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:13px; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .chip.on { background:var(--tint); border-color:var(--wine); color:var(--wine-d); font-weight:700; }
+  .inp { border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13.5px; background:#fff; min-height:36px; }
+  .inp.tall { min-height:62px; line-height:1.45; }
+  .pri { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pri div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; }
+  .pri div b { display:block; font-size:14px; } .pri div.on { border:2px solid var(--wine); background:var(--tint); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .auto { background:#f3f7fb; border:1px dashed #b9cde3; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.55; }
+  .auto b { color:#1e4f8a; }
+  .att { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; } .att span { font-size:12.5px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13.5px; font-weight:700; border-radius:9px; padding:8px 14px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .btn.p { background:var(--wine); border-color:var(--wine); color:#fff; } .btn.g { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fp { width:26px; height:30px; vertical-align:middle; }
+  table.l { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; border-radius:12px; overflow:hidden; }
+  table.l th { text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); padding:9px 10px; border-bottom:1px solid var(--line); background:#fff; }
+  table.l td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .st { font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .st.bad { background:var(--badbg); color:var(--bad); } .st.warn { background:var(--warnbg); color:var(--warn); } .st.ok { background:var(--okbg); color:var(--ok); } .st.info { background:#e0ecfa; color:#1e4f8a; } .st.mut { background:#eee; color:#555; }
+  .lvl { font-size:11px; font-weight:800; color:#fff; border-radius:6px; padding:2px 7px; }
+  .mini { font-size:12px; color:var(--soft); }
+  .note { max-width:1100px; margin:-16px auto 30px; background:#fff; border-radius:10px; padding:12px 16px; font-size:14px; line-height:1.5; color:#3b3035; border-left:4px solid var(--wine); }
+  /* flujo */
+  .levels { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin:6px 0 4px; }
+  .lv { text-align:center; padding:0 8px; }
+  .lv .ic { width:74px; height:74px; border-radius:18px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; }
+  .lv b { display:block; font-size:15px; } .lv span { font-size:12.5px; color:var(--soft); }
+  .arrows { position:relative; height:74px; margin-top:-120px; margin-bottom:60px; pointer-events:none; }
+  .loop { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+  .loop div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12.3px; text-align:center; position:relative; }
+  .loop div b { display:block; font-size:13px; } .loop i { font-style:normal; display:block; font-size:18px; }
+  .loop div:not(:last-child)::after { content:"›"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--soft); font-size:18px; }
+  .world { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .world div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:12.3px; line-height:1.4; }
+  .world b { display:block; font-size:13px; color:var(--wine-d); }
+  /* seguimiento */
+  .steps { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin:8px 0 4px; }
+  .steps div { text-align:center; font-size:12px; position:relative; padding-top:30px; }
+  .steps div::before { content:""; position:absolute; top:9px; left:0; right:0; height:4px; background:#e3d6dc; }
+  .steps div:first-child::before { left:50%; } .steps div:last-child::before { right:50%; }
+  .steps div.done::before { background:var(--ok); } .steps div.cur::before { background:linear-gradient(90deg,var(--ok) 50%,#e3d6dc 50%); }
+  .steps i { position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:50%; background:#e3d6dc; color:#fff; font-style:normal; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:3px solid var(--paper); }
+  .steps .done i { background:var(--ok); } .steps .cur i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .steps b { display:block; font-size:12.5px; } .steps small { color:var(--soft); }
+  .tl { border-left:3px solid var(--line); margin-left:8px; padding-left:14px; }
+  .tl div { position:relative; font-size:13px; margin-bottom:10px; line-height:1.4; }
+  .tl div::before { content:""; position:absolute; left:-21px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--c,#999); border:2px solid #fff; }
+  .kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:600; } .kpi b { font-size:28px; letter-spacing:-.01em; } .kpi span { font-size:12px; color:var(--soft); }
+  .bars div.r { display:grid; grid-template-columns:170px 1fr 54px; align-items:center; gap:10px; font-size:13px; margin:7px 0; }
+  .bars .trk { height:14px; border-radius:0 4px 4px 0; background:transparent; position:relative; }
+  .bars .fill { height:14px; border-radius:0 4px 4px 0; background:var(--wine); }
+  .bars .ref { position:absolute; top:-3px; bottom:-3px; width:2px; background:#2d2429; }
+  .bars .v { font-weight:700; text-align:right; }
+  .alertc { border-left:4px solid var(--bad); }
+
+  .role .rh { display:flex; gap:10px; align-items:center; margin-bottom:8px; } .role .rh b { display:block; font-size:15px; } .role .rh small { color:var(--soft); font-size:12px; }
+  .ri { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .todo { display:flex; align-items:center; gap:10px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .todo:last-child { border-bottom:none; }
+  .todo .st { min-width:30px; text-align:center; font-size:13px; }
+  .mini2 { font-size:13px; line-height:1.5; } .mini2 b { display:block; margin-bottom:2px; }
+  .flowbar { display:flex; gap:6px; margin-bottom:12px; } .flowbar span { flex:1; text-align:center; font-size:13px; font-weight:700; padding:7px; border-radius:9px; background:#fff; border:1px solid var(--line); color:var(--soft); }
+  .flowbar span.on { background:var(--okbg); color:var(--ok); border-color:#b8e3c7; } .flowbar span.cur { background:var(--wine); color:#fff; border-color:var(--wine); }
+  .found { display:flex; gap:12px; align-items:center; margin-top:10px; padding:10px; border-radius:10px; background:#f3f9f5; border:1px solid #cfe9d8; }
+  .photo2 { width:64px; height:72px; border-radius:10px; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:24px; flex:none; }
+  .k2 { display:block; font-size:10.5px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.04em; }
+  .scanner { width:150px; height:160px; margin:6px auto 0; border-radius:18px; background:radial-gradient(circle at 50% 45%, #fff 0, #f7e9ef 70%); border:3px solid #d9b9c6; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -6px 12px rgba(125,42,76,.12); }
+  .ticket { margin-top:12px; text-align:center; }
+  .tk { border:2px dashed var(--wine); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:2px; font-size:13.5px; } .tk b { font-size:40px; color:var(--wine-d); letter-spacing:.04em; line-height:1.1; } .tk small { color:var(--soft); font-size:11.5px; }
+  .q2 { padding:8px 10px; border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:13.5px; background:#fff; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; } .q2 .mini { width:100%; }
+  .q2.cur { border:2px solid var(--wine); background:var(--tint); } .q2 .st { margin-left:auto; }
+  .vit2 { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .vit2 div { background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 8px; font-size:16px; font-weight:800; } .vit2 small { display:block; font-size:10.5px; color:var(--soft); font-weight:700; text-transform:uppercase; }
+  .tv { background:#120810; border-radius:16px; padding:14px; color:#fff; border:8px solid #2a2a2a; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
+  .tvh { display:flex; justify-content:space-between; font-size:13px; color:#cfb7c2; font-weight:700; letter-spacing:.08em; }
+  .tvnow { background:linear-gradient(135deg,#7d2a4c,#b4235a); border-radius:12px; padding:16px; text-align:center; } .tvnow small { display:block; font-size:13px; letter-spacing:.2em; font-weight:800; color:#ffe4ee; }
+  .tvnow b { display:block; font-size:64px; line-height:1.05; letter-spacing:.04em; } .tvnow span { display:block; font-size:24px; font-weight:700; } .tvnow em { display:block; font-style:normal; font-size:20px; margin-top:4px; color:#ffe4ee; }
+  .tvlist div { display:flex; gap:12px; align-items:baseline; font-size:18px; padding:6px 4px; border-bottom:1px solid #3a2530; } .tvlist b { color:#f1a7c3; min-width:70px; } .tvlist span { margin-left:auto; color:#cfb7c2; font-size:15px; }
+  .tvf { font-size:13px; color:#cfb7c2; }
+  .doc { display:grid; grid-template-columns:34px 1fr auto auto; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--line); font-size:13.5px; } .di { font-size:22px; text-align:center; } .dest { font-size:12.5px; color:var(--soft); font-weight:600; }
+  .st.warn { margin:0; max-width:none; padding:2px 9px; border:none; font-size:11.5px; }
+  .todo .st.warn { font-size:13px; }
+
+  .svc { display:flex; flex-wrap:wrap; gap:8px; } .svc span { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 12px; font-size:13.5px; font-weight:600; }
+  .prob { display:flex; align-items:center; gap:8px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .prob .mini { margin-left:auto; }
+  .dotc { width:10px; height:10px; border-radius:50%; flex:none; }
+  .tpl { border:1px solid; border-left-width:5px; border-radius:10px; padding:9px 11px; font-size:13px; line-height:1.45; background:#fff; } .tpl b { display:block; font-size:14px; margin-bottom:2px; }
+  .opt { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; } .opt span { border:1px solid var(--line); border-radius:12px; padding:10px; font-size:22px; background:#fff; text-align:center; } .opt b { display:block; font-size:14px; margin-top:4px; } .opt small { display:block; font-size:12px; color:var(--soft); }
+  .opt .sel { border:2px solid var(--wine); background:var(--tint); }
+  .side { border-left:4px solid var(--line); padding:5px 10px; margin-bottom:8px; font-size:13.5px; line-height:1.45; } .side b { display:block; }
+  .stk { display:grid; grid-template-columns:150px 1fr auto; gap:8px; align-items:center; font-size:13px; margin:6px 0; } .stk div { height:10px; background:#eee4e8; border-radius:5px; overflow:hidden; } .stk i { display:block; height:100%; background:#15803d; border-radius:5px; } .stk b { font-size:12.5px; }
+  .phn { background:#e5ddd5; border:9px solid #1f1f1f; border-radius:26px; padding:10px; display:flex; flex-direction:column; gap:8px; min-height:430px; }
+  .phh { background:#075e54; color:#fff; font-size:13px; font-weight:700; margin:-10px -10px 4px; padding:10px 12px; border-radius:16px 16px 0 0; }
+  .msg { font-size:13px; line-height:1.4; border-radius:10px; padding:7px 9px; max-width:88%; box-shadow:0 1px 1px rgba(0,0,0,.12); } .msg.in { background:#fff; align-self:flex-start; } .msg.out { background:#dcf8c6; align-self:flex-end; font-weight:800; }
+  .ck { font-size:13.5px; line-height:1.45; } .ck b { display:block; font-size:15px; margin-bottom:3px; }
+
+  .kv2 { display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:4px 0; border-bottom:1px dashed var(--line); } .kv2 span { color:var(--soft); }
+  .req { display:flex; flex-wrap:wrap; gap:6px; } .req span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .req .ok { background:var(--okbg); color:var(--ok); } .req .no { background:var(--warnbg); color:var(--warn); }
+  .qx { position:relative; height:30px; background:#f3eef0; border-radius:8px; margin:6px 0; padding-left:34px; } .qx b { position:absolute; left:8px; top:6px; font-size:13px; }
+  .qx span { position:absolute; top:3px; bottom:3px; margin-left:34px; border-radius:6px; color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; padding:0 6px; white-space:nowrap; overflow:hidden; }
+  .who2 { display:grid; gap:6px; } .who2 div { border:1px solid var(--line); border-radius:8px; padding:6px 9px; background:#f7fbf8; font-size:12.5px; } .who2 b { display:block; color:var(--wine-d); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; } .who2 span { color:#166534; }
+  .beds { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .bed { border-radius:10px; padding:8px; font-size:13px; font-weight:700; border:1px solid var(--line); min-height:76px; } .bed b { display:block; font-size:18px; } .bed small { display:block; font-weight:500; font-size:11.5px; color:var(--soft); }
+  .bed.p { background:#fbe4ee; } .bed.a { background:#fde2e2; } .bed.g { background:#ede4fb; } .bed.free { background:#ecf8f1; color:#15803d; } .bed.clean { background:#fdf0d5; color:#8a5a00; } .bed.sel { outline:3px solid var(--wine); }
+  .leg2 { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-left:6px; border:1px solid var(--line); }
+  .dose { border:1px solid var(--line); border-radius:10px; padding:7px 9px; margin-bottom:6px; font-size:13px; display:flex; flex-direction:column; } .dose span { color:var(--soft); font-size:12px; } .dose em { font-style:normal; margin-top:2px; }
+  .srch { border-left:4px solid #c2410c; background:#fff7f0; border-radius:6px; padding:6px 9px; margin-bottom:6px; font-size:13px; } .srch b { display:block; font-size:12px; color:#c2410c; text-transform:uppercase; letter-spacing:.04em; }
+  .amb { border:9px solid #1f1f1f; border-radius:26px; background:#fff; overflow:hidden; min-height:420px; display:flex; flex-direction:column; }
+  .ah { background:#ea580c; color:#fff; font-weight:800; font-size:14px; padding:10px 12px; } .ab { padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .big2 { font-size:40px; font-weight:900; text-align:center; color:#ea580c; margin-top:6px; }
+
+  .tree div { padding:6px 8px; border-radius:8px; font-size:13.5px; } .tree small { color:var(--soft); margin-left:4px; }
+  .tree .t0 { font-weight:800; } .tree .t1 { padding-left:18px; font-weight:700; } .tree .t2 { padding-left:32px; font-weight:700; } .tree .t3 { padding-left:50px; } .tree .mut { color:var(--soft); }
+  .tree .on { background:#f3eef0; } .tree .sel { background:var(--tint); outline:2px solid var(--wine); }
+  .fing { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:8px; } .fing span { font-size:12px; font-weight:700; border-radius:999px; padding:3px 9px; background:#f3eef0; } .fing .done { background:var(--okbg); color:var(--ok); } .fing .cur { background:var(--wine); color:#fff; }
+  table.mx td, table.mx th { text-align:center; font-size:12.5px; padding:8px 6px; } table.mx td:first-child, table.mx th:first-child { text-align:left; }
+  table.mx2 td, table.mx2 th { text-align:center; font-size:12.5px; } table.mx2 td:first-child, table.mx2 th:first-child { text-align:left; }
+  table.mx2 td.on { color:#15803d; font-size:18px; } table.mx2 td.pi { color:#c2410c; font-size:18px; } table.mx2 td { color:#c9bcc2; font-size:18px; } table.mx2 td:first-child { font-size:13.5px; color:var(--ink); }
+  .catl { padding:8px 10px; border-radius:9px; font-size:13.5px; margin-bottom:4px; display:flex; justify-content:space-between; } .catl small { color:var(--soft); } .catl.on { background:var(--tint); font-weight:700; }
+  table.mx2 { table-layout:fixed; } table.mx2 th { font-size:10px; padding:6px 3px; letter-spacing:.02em; white-space:normal; text-align:center; } table.mx2 th:first-child { width:170px; } table.mx2 td { padding:8px 3px; }
+  .ring2 { width:150px; height:150px; border-radius:50%; margin:6px auto 0; background:conic-gradient(#7d2a4c 0 71%, #eadde3 71% 100%); display:flex; align-items:center; justify-content:center; } .ring2 > div { width:118px; height:118px; border-radius:50%; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; color:var(--soft); } .ring2 b { font-size:40px; color:var(--ink); line-height:1; }
+  .ctl { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; } .ctl span { text-align:center; border-radius:10px; padding:8px 4px; font-weight:800; font-size:14px; background:#f3eef0; color:#9c8b92; } .ctl small { display:block; font-weight:600; font-size:11px; } .ctl .d { background:#dcf3e5; color:#15803d; } .ctl .n { background:var(--wine); color:#fff; }
+  .chk3 { display:flex; flex-direction:column; gap:4px; } .chk3 span { font-size:12.8px; font-weight:600; border-radius:7px; padding:3px 8px; } .chk3 .ok { background:#ecf8f1; color:#15803d; } .chk3 .no { background:#fdf0d5; color:#8a5a00; }
+  .rk { display:flex; gap:10px; align-items:center; font-size:14px; padding:7px 0; border-bottom:1px dashed var(--line); } .rk .st { min-width:44px; text-align:center; }
+  .vg { width:100%; border-collapse:separate; border-spacing:4px; font-size:12.5px; } .vg th { font-size:10.5px; text-transform:uppercase; color:var(--soft); font-weight:800; text-align:center; } .vg th:first-child { text-align:left; }
+  .vg td { text-align:center; border-radius:8px; padding:5px 2px; font-weight:700; } .vg td:first-child { text-align:left; font-weight:700; background:none; padding-left:0; }
+  .vg .d { background:#dcf3e5; color:#15803d; } .vg .h { background:var(--wine); color:#fff; } .vg .a { background:#fde2e2; color:#991b1b; } .vg .f { background:#f3eef0; color:#9c8b92; } .vg .x { background:none; }
+  .fr { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:13.5px; } .fr:last-child { border:none; }
+  .tbig { font-size:30px; font-weight:900; line-height:1; }
+  .zn { display:grid; grid-template-columns:150px 1fr 60px; gap:8px; align-items:center; font-size:13px; padding:4px 0; }
+  .bar2 { height:12px; border-radius:6px; background:#eee; position:relative; overflow:hidden; } .bar2 i { position:absolute; left:0; top:0; bottom:0; border-radius:6px; } .bar2 .m { position:absolute; top:-2px; bottom:-2px; width:2px; background:#2d2429; }
+  .flow3 { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; } .flow3 span { text-align:center; font-size:12.5px; font-weight:700; border-radius:10px; padding:8px 4px; background:#f3eef0; color:#8a7a81; } .flow3 span small { display:block; font-weight:600; font-size:11px; } .flow3 .d { background:#dcf3e5; color:#15803d; } .flow3 .n { background:var(--wine); color:#fff; }
+  .al { display:flex; flex-wrap:wrap; gap:6px; } .al span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .al .r { background:#fde2e2; color:#991b1b; } .al .y { background:#fdf0d5; color:#8a5a00; } .al .g { background:#ecf8f1; color:#15803d; }
+  table.lab { width:100%; border-collapse:collapse; font-size:12.8px; } table.lab th { font-size:11px; text-transform:uppercase; color:var(--soft); text-align:left; padding:4px 6px; border-bottom:1px solid var(--line); } table.lab td { padding:5px 6px; border-bottom:1px dashed var(--line); }
+  .dt { display:inline-block; min-width:22px; text-align:center; border-radius:6px; padding:1px 6px; font-weight:800; font-size:12px; } .dt.ok { background:#dcf3e5; color:#15803d; } .dt.w { background:#fdf0d5; color:#8a5a00; } .dt.b { background:#fde2e2; color:#991b1b; } .dt.p { background:#eee; color:#888; }
+  .phs { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .dev { width:280px; height:560px; margin:0 auto; border-radius:36px; border:9px solid #17121a; background:#fff; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 14px 30px rgba(60,20,40,.2); }
+  .dev .sb { height:24px; display:flex; justify-content:space-between; align-items:center; padding:0 16px; font-size:10.5px; font-weight:700; color:#fff; background:var(--wine-d); flex:none; }
+  .dev .hd { background:linear-gradient(145deg,#8a3056,#5a1c36); color:#fff; padding:8px 14px 12px; flex:none; font-size:12px; } .dev .hd strong { display:block; font-size:16px; }
+  .dev .ct { flex:1; overflow:hidden; padding:10px; display:flex; flex-direction:column; gap:8px; background:#faf6f8; }
+  .dev .c { background:#fff; border:1px solid var(--line); border-radius:14px; padding:9px 11px; font-size:12.3px; line-height:1.4; }
+  .dev .c .t { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--soft); font-weight:800; margin-bottom:3px; }
+  .dev .nv { flex:none; display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); background:#fff; padding:5px 0 8px; text-align:center; font-size:10px; font-weight:700; color:#8a7a81; } .dev .nv .o { color:var(--wine); }
+  .dev .li { display:flex; justify-content:space-between; gap:6px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .dev .bt2 { display:block; text-align:center; font-weight:800; font-size:12.5px; border-radius:10px; padding:8px; background:var(--wine); color:#fff; margin-top:6px; } .dev .bt2.o2 { background:#fff; color:var(--wine); border:1.5px solid var(--wine); }
+  .cap2 { text-align:center; font-size:13.5px; margin-top:10px; color:#43363d; line-height:1.4; }
+  .bar { height:9px; border-radius:6px; background:#eee; overflow:hidden; } .bar i { display:block; height:100%; background:var(--ok,#15803d); }
+  .tl2 { display:grid; grid-template-columns:1fr 70px 1fr; gap:0; }
+  .tlc { border-radius:14px; padding:12px 14px; } .tlc h4 { margin:0 0 10px; font-size:15px; }
+  .ev { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 10px; font-size:12.8px; margin-bottom:7px; line-height:1.35; } .ev small { color:var(--soft); display:block; font-size:11.5px; }
+  .ev.lk { border:2px solid var(--wine); }
+  .ring2 { width:150px; height:150px; border-radius:50%; margin:6px auto 0; background:conic-gradient(#7d2a4c 0 71%, #eadde3 71% 100%); display:flex; align-items:center; justify-content:center; } .ring2 > div { width:118px; height:118px; border-radius:50%; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; color:var(--soft); } .ring2 b { font-size:40px; color:var(--ink); line-height:1; }
+  .ctl { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; } .ctl span { text-align:center; border-radius:10px; padding:8px 4px; font-weight:800; font-size:14px; background:#f3eef0; color:#9c8b92; } .ctl small { display:block; font-weight:600; font-size:11px; } .ctl .d { background:#dcf3e5; color:#15803d; } .ctl .n { background:var(--wine); color:#fff; }
+  .chk3 { display:flex; flex-direction:column; gap:4px; } .chk3 span { font-size:12.8px; font-weight:600; border-radius:7px; padding:3px 8px; } .chk3 .ok { background:#ecf8f1; color:#15803d; } .chk3 .no { background:#fdf0d5; color:#8a5a00; }
+  .rk { display:flex; gap:10px; align-items:center; font-size:14px; padding:7px 0; border-bottom:1px dashed var(--line); } .rk .st { min-width:44px; text-align:center; }
+  .flow3 { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; } .flow3 span { text-align:center; font-size:12.5px; font-weight:700; border-radius:10px; padding:8px 4px; background:#f3eef0; color:#8a7a81; } .flow3 span small { display:block; font-weight:600; font-size:11px; } .flow3 .d { background:#dcf3e5; color:#15803d; } .flow3 .n { background:var(--wine); color:#fff; }
+  .al { display:flex; flex-wrap:wrap; gap:6px; } .al span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .al .r { background:#fde2e2; color:#991b1b; } .al .y { background:#fdf0d5; color:#8a5a00; } .al .g { background:#ecf8f1; color:#15803d; }
+  table.lab { width:100%; border-collapse:collapse; font-size:12.8px; } table.lab th { font-size:11px; text-transform:uppercase; color:var(--soft); text-align:left; padding:4px 6px; border-bottom:1px solid var(--line); } table.lab td { padding:5px 6px; border-bottom:1px dashed var(--line); }
+  .dt { display:inline-block; min-width:22px; text-align:center; border-radius:6px; padding:1px 6px; font-weight:800; font-size:12px; } .dt.ok { background:#dcf3e5; color:#15803d; } .dt.w { background:#fdf0d5; color:#8a5a00; } .dt.b { background:#fde2e2; color:#991b1b; } .dt.p { background:#eee; color:#888; }
+  .phs { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .dev { width:280px; height:560px; margin:0 auto; border-radius:36px; border:9px solid #17121a; background:#fff; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 14px 30px rgba(60,20,40,.2); }
+  .dev .sb { height:24px; display:flex; justify-content:space-between; align-items:center; padding:0 16px; font-size:10.5px; font-weight:700; color:#fff; background:var(--wine-d); flex:none; }
+  .dev .hd { background:linear-gradient(145deg,#8a3056,#5a1c36); color:#fff; padding:8px 14px 12px; flex:none; font-size:12px; } .dev .hd strong { display:block; font-size:16px; }
+  .dev .ct { flex:1; overflow:hidden; padding:10px; display:flex; flex-direction:column; gap:8px; background:#faf6f8; }
+  .dev .c { background:#fff; border:1px solid var(--line); border-radius:14px; padding:9px 11px; font-size:12.3px; line-height:1.4; }
+  .dev .c .t { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--soft); font-weight:800; margin-bottom:3px; }
+  .dev .nv { flex:none; display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); background:#fff; padding:5px 0 8px; text-align:center; font-size:10px; font-weight:700; color:#8a7a81; } .dev .nv .o { color:var(--wine); }
+  .dev .li { display:flex; justify-content:space-between; gap:6px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .dev .bt2 { display:block; text-align:center; font-weight:800; font-size:12.5px; border-radius:10px; padding:8px; background:var(--wine); color:#fff; margin-top:6px; } .dev .bt2.o2 { background:#fff; color:var(--wine); border:1.5px solid var(--wine); }
+  .cap2 { text-align:center; font-size:13.5px; margin-top:10px; color:#43363d; line-height:1.4; }
+  .bar { height:9px; border-radius:6px; background:#eee; overflow:hidden; } .bar i { display:block; height:100%; background:var(--ok,#15803d); }
+  .tl2 { display:grid; grid-template-columns:1fr 70px 1fr; gap:0; }
+  .tlc { border-radius:14px; padding:12px 14px; } .tlc h4 { margin:0 0 10px; font-size:15px; }
+  .ev { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 10px; font-size:12.8px; margin-bottom:7px; line-height:1.35; } .ev small { color:var(--soft); display:block; font-size:11.5px; }
+  .ev.lk { border:2px solid var(--wine); }
+  .paper { background:#fff; max-width:1000px; margin:0 auto; border:1px solid #ddd; box-shadow:0 4px 16px rgba(0,0,0,.10); padding:26px 30px; font-size:12px; color:#222; line-height:1.35; }
+  .ph1 { display:flex; align-items:center; gap:12px; border-bottom:3px solid var(--wine); padding-bottom:8px; }
+  .ph1 .lg { width:40px; height:40px; border-radius:24%; background:linear-gradient(145deg,#9c3a5f,#5a1c36); color:#fff; font-weight:900; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .ph1 h3 { margin:0; font-size:18px; letter-spacing:.02em; } .ph1 .sm { font-size:11px; color:#666; }
+  .sec { margin-top:10px; border:1px solid #d8cdd2; border-radius:6px; overflow:hidden; }
+  .sec > h5 { margin:0; background:#f3e7ec; color:var(--wine-d); font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; padding:4px 8px; }
+  .sec .in2 { padding:6px 8px; }
+  .fg { display:grid; gap:4px 10px; } .fg div { border-bottom:1px solid #eee; padding:2px 0; } .fg small { display:block; font-size:9.5px; color:#8a7a81; text-transform:uppercase; letter-spacing:.03em; } .fg b { font-size:12.5px; }
+  .pt { width:100%; border-collapse:collapse; font-size:11.3px; } .pt th { background:#faf5f7; font-size:9.8px; text-transform:uppercase; color:#6f6168; border:1px solid #e6dce0; padding:3px 4px; text-align:left; } .pt td { border:1px solid #eee4e8; padding:3px 4px; }
+  .ya { color:#991b1b; font-weight:800; } .no2 { color:#15803d; }
+  .alx { background:#fff4f4; border:1px solid #f3c4c4; border-radius:6px; padding:5px 8px; }
+  .sig { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:12px; } .sig div { border-top:1px solid #999; padding-top:3px; font-size:10.5px; color:#555; text-align:center; }
+  .cn { display:grid; grid-template-columns:1fr 1fr; gap:0; max-width:1000px; margin:0 auto; background:#fff; border:1px solid #ddd; box-shadow:0 4px 16px rgba(0,0,0,.10); }
+  .cn > div { padding:16px 18px; font-size:12px; line-height:1.4; } .cn > div + div { border-left:2px dashed #ccc; }
+  .cn h6 { margin:10px 0 4px; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--wine-d); }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — 9 · Imagen:</b>
+  <button class="tab on" data-t="i1">1. Pedir un estudio</button>
+  <button class="tab" data-t="i2">2. Sala de imagen del día</button>
+  <button class="tab" data-t="i3">3. Técnico: tomar y enviar</button>
+  <button class="tab" data-t="i4">4. Visor</button>
+  <button class="tab" data-t="i5">5. Informe estructurado</button>
+  <button class="tab" data-t="i6">6. Resultado y hallazgo crítico</button>
+  <button class="tab" data-t="i7">7. Informe a distancia (red)</button>
+  <button class="tab" data-t="i8">8. Indicadores y equipos</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos e imágenes inventados. Rayos X, ecografía y mamografía en 1er y 2º nivel; tomografía donde exista. Funciona con equipo digital o analógico.</div>
+
+<!-- ============ I1 ============ -->
+<section class="scr on" id="i1">
+  <div class="app"><div class="brand">SIVEC <span>CONSULTORIO</span></div><div class="who">🩻 Pedir imagen · Juan Pérez Soliz · 58 a · Dra. Méndez</div></div>
+  <div class="body">
+    <div class="chips"><span class="chip on">🩻 Rayos X</span><span class="chip">🔊 Ecografía</span><span class="chip">🎀 Mamografía</span><span class="chip">🌀 Tomografía</span></div>
+    <div class="cols c21" style="margin-top:12px">
+      <div class="card"><div class="lbl">Rayos X · elegir por toques</div>
+        <div class="chips"><span class="chip on">Tórax PA</span><span class="chip on">Tórax lateral</span><span class="chip">Abdomen de pie</span><span class="chip">Columna lumbar</span><span class="chip">Mano / muñeca</span><span class="chip">Rodilla</span><span class="chip">Pelvis</span><span class="chip">Cráneo</span><span class="chip">Senos paranasales</span><span class="chip">+ más</span></div>
+        <div class="lbl" style="margin-top:12px">Motivo clínico (obligatorio, lo lee el radiólogo)</div>
+        <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13.5px">Tos con expectoración 3 semanas, fiebre, baja de peso · <b>descartar TB / neumonía</b></div>
+        <div class="chips" style="margin-top:8px"><span class="chip on">Prioridad normal</span><span class="chip">Urgente (hoy)</span></div>
+        <div class="mini" style="margin-top:6px">Se llena solo con el diagnóstico del SOAP (A); la doctora solo corrige.</div></div>
+      <div>
+        <div class="card"><div class="lbl">Seguridad</div>
+          <div class="chk3"><span class="ok">✓ Hombre · sin riesgo de embarazo</span><span class="ok">✓ Sin contraste</span><span class="no">ℹ Rx de tórax previo: 03/2025 → se mostrará para comparar</span></div>
+          <div class="mini" style="margin-top:6px">Mujer 10–50 años: pregunta FUM/embarazo. Con contraste: pide creatinina y alergias.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Qué pasa al enviar</div>
+          <div class="tl"><div style="--c:#15803d">La orden va a la <b>sala de imagen</b> (misma red, sin papel)</div><div style="--c:#7d2a4c">Si el centro no tiene Rx → se deriva al que tiene, con turno</div><div style="--c:#2f6fb0">Orden impresa con QR si el paciente va a otro lugar</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ I2 ============ -->
+<section class="scr" id="i2">
+  <div class="app"><div class="brand">SIVEC <span>IMAGEN</span></div><div class="who">🏥 Hospital de 2º nivel · jueves 25/09 · lista de trabajo</div></div>
+  <div class="body">
+    <div class="kpi"><div><small>Pedidos de hoy</small><b>46</b></div><div><small>Esperando</small><b>9</b></div><div><small>Por informar</small><b style="color:#b45309">14</b></div><div><small>Urgentes pendientes</small><b style="color:#991b1b">2</b></div></div>
+    <div class="card" style="margin-top:12px"><div class="lbl">Por equipo · orden de llegada, urgentes primero</div>
+      <table class="l"><thead><tr><th>Hora</th><th>Paciente</th><th>Estudio</th><th>Equipo</th><th>Viene de</th><th>Estado</th></tr></thead><tbody>
+        <tr><td>09:40</td><td><b>Pedro V.</b> · 34 a</td><td>Rx tórax <span class="st bad">urgente</span></td><td>Rx sala 1</td><td>Emergencias · box 3</td><td><span class="st info">en estudio</span></td></tr>
+        <tr><td>09:10</td><td><b>Juan Pérez S.</b> · 58 a</td><td>Rx tórax PA + lateral</td><td>Rx sala 1</td><td>C.S. San Luis</td><td><span class="st warn">esperando</span></td></tr>
+        <tr><td>09:15</td><td><b>Carla Torres</b> · 28 sem</td><td>Eco obstétrica</td><td>Eco 2</td><td>Materno · control</td><td><span class="st warn">esperando</span></td></tr>
+        <tr><td>08:30</td><td><b>Marta L.</b> · 51 a</td><td>Mamografía bilateral</td><td>Mamógrafo</td><td>Tamizaje · PAP/VPH</td><td><span class="st mut">por informar</span></td></tr>
+        <tr><td>08:05</td><td><b>Luis A.</b> · 45 a</td><td>Eco abdominal</td><td>Eco 1</td><td>Consulta externa</td><td><span class="st ok">informado</span></td></tr></tbody></table>
+      <div class="mini" style="margin-top:6px">En la TV de la sala de espera: “Juan P. → Rx sala 1” (mismo sistema de turnos de recepción).</div></div>
+  </div>
+</section>
+
+<!-- ============ I3 ============ -->
+<section class="scr" id="i3">
+  <div class="app"><div class="brand">SIVEC <span>IMAGEN</span></div><div class="who">🧑‍🔬 Técnico · Lic. Salvatierra · Rx sala 1 · Juan Pérez S.</div></div>
+  <div class="body">
+    <div class="cols c3">
+      <div class="card"><div class="lbl">① Confirmar paciente</div>
+        <div style="font-size:13.5px;line-height:1.6">Huella 🖐 o QR de la orden ✓<br><b>Juan Pérez Soliz</b> · 58 a · CI 4.221.908<br>Tórax PA + lateral · motivo: tos 3 sem</div></div>
+      <div class="card"><div class="lbl">② Registro técnico</div>
+        <div class="kv2"><span>Proyecciones</span><b>PA ✓ · lateral ✓</b></div><div class="kv2"><span>kV · mAs</span><b>110 · 3,2</b></div><div class="kv2"><span>Repeticiones</span><b>0</b></div><div class="kv2"><span>Calidad</span><b>buena</b></div></div>
+      <div class="card"><div class="lbl">③ Enviar la imagen</div>
+        <div style="font-size:13px;line-height:1.6"><b>Equipo digital</b> → llega sola al SIVEC (estándar DICOM)<br><b>Equipo con placa</b> → foto con la cámara del centro sobre el negativoscopio, guiada en pantalla</div>
+        <span class="btn p" style="display:inline-block;margin-top:8px">Enviar a informar 🖐</span></div>
+    </div>
+    <div class="card" style="margin-top:12px;display:flex;gap:14px;align-items:center"><div style="font-size:26px">🗄️</div><div style="font-size:13.5px;line-height:1.55">Las imágenes se guardan en un <b>archivo de imágenes de la red</b> (PACS pequeño, software libre) y quedan unidas a la ficha del paciente. Ya no hay “la placa se la llevó el paciente”.</div></div>
+  </div>
+</section>
+
+<!-- ============ I4 ============ -->
+<section class="scr" id="i4">
+  <div class="app"><div class="brand">SIVEC <span>VISOR</span></div><div class="who">🖥️ Juan Pérez S. · Rx tórax PA · 25/09/2026 · comparar con 03/2025</div></div>
+  <div class="body" style="background:#1b1618">
+    <div style="display:flex;gap:8px;margin-bottom:10px"><span class="btn" style="background:#2b2327;color:#fff;border-color:#4a3c42">🔍 Zoom</span><span class="btn" style="background:#2b2327;color:#fff;border-color:#4a3c42">◐ Contraste</span><span class="btn" style="background:#2b2327;color:#fff;border-color:#4a3c42">📏 Medir</span><span class="btn" style="background:#2b2327;color:#fff;border-color:#4a3c42">✏️ Marcar</span><span class="btn" style="background:#7d2a4c;color:#fff;border-color:#7d2a4c">⇆ Comparar con anterior</span></div>
+    <div class="cols c2">
+      <div style="text-align:center;color:#cfc3c8;font-size:12px"><svg viewBox="0 0 300 300" width="100%" style="background:#000;border-radius:8px">
+        <defs><radialGradient id="lg" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#3a3a3a"/><stop offset="1" stop-color="#121212"/></radialGradient></defs>
+        <rect width="300" height="300" fill="#050505"/><path d="M40 40 Q150 10 260 40 L280 290 L20 290Z" fill="#6a6a6a" opacity=".5"/>
+        <path d="M70 70 Q60 180 85 250 Q115 262 138 245 L140 80 Q105 55 70 70Z" fill="url(#lg)"/><path d="M230 70 Q240 180 215 250 Q185 262 162 245 L160 80 Q195 55 230 70Z" fill="url(#lg)"/>
+        <rect x="143" y="40" width="14" height="240" fill="#9a9a9a" opacity=".8"/><path d="M150 150 Q125 200 150 245 Q190 235 200 190 Q185 155 150 150Z" fill="#8a8a8a" opacity=".8"/>
+        <g stroke="#8d8d8d" stroke-width="3" fill="none" opacity=".55"><path d="M70 90 Q105 75 140 95"/><path d="M68 115 Q105 100 140 120"/><path d="M68 140 Q105 125 140 145"/><path d="M70 165 Q105 150 140 170"/><path d="M160 95 Q195 75 230 90"/><path d="M160 120 Q195 100 232 115"/><path d="M160 145 Q195 125 232 140"/><path d="M160 170 Q195 150 230 165"/></g>
+        <ellipse cx="102" cy="98" rx="22" ry="17" fill="#bdbdbd" opacity=".55"/><circle cx="102" cy="98" r="27" fill="none" stroke="#f5c542" stroke-width="2" stroke-dasharray="5 3"/><text x="30" y="64" font-size="11" fill="#f5c542" font-family="Source Sans 3">4,1 cm</text>
+        <text x="12" y="22" font-size="11" fill="#ddd" font-family="Source Sans 3">R</text></svg><div style="margin-top:4px">HOY · 25/09/2026</div></div>
+      <div style="text-align:center;color:#cfc3c8;font-size:12px"><svg viewBox="0 0 300 300" width="100%" style="background:#000;border-radius:8px">
+        <rect width="300" height="300" fill="#050505"/><path d="M40 40 Q150 10 260 40 L280 290 L20 290Z" fill="#6a6a6a" opacity=".5"/>
+        <path d="M70 70 Q60 180 85 250 Q115 262 138 245 L140 80 Q105 55 70 70Z" fill="url(#lg)"/><path d="M230 70 Q240 180 215 250 Q185 262 162 245 L160 80 Q195 55 230 70Z" fill="url(#lg)"/>
+        <rect x="143" y="40" width="14" height="240" fill="#9a9a9a" opacity=".8"/><path d="M150 150 Q125 200 150 245 Q190 235 200 190 Q185 155 150 150Z" fill="#8a8a8a" opacity=".8"/>
+        <g stroke="#8d8d8d" stroke-width="3" fill="none" opacity=".55"><path d="M70 90 Q105 75 140 95"/><path d="M68 115 Q105 100 140 120"/><path d="M68 140 Q105 125 140 145"/><path d="M70 165 Q105 150 140 170"/><path d="M160 95 Q195 75 230 90"/><path d="M160 120 Q195 100 232 115"/><path d="M160 145 Q195 125 232 140"/><path d="M160 170 Q195 150 230 165"/></g>
+        <text x="12" y="22" font-size="11" fill="#ddd" font-family="Source Sans 3">R</text></svg><div style="margin-top:4px">ANTERIOR · 03/2025 · normal</div></div>
+    </div>
+    <div class="mini" style="color:#cfc3c8;margin-top:8px;text-align:center">Se abre en cualquier computadora de la red, sin instalar nada. El médico que pidió el estudio lo ve desde la ficha del paciente.</div>
+  </div>
+</section>
+
+<!-- ============ I5 ============ -->
+<section class="scr" id="i5">
+  <div class="app"><div class="brand">SIVEC <span>INFORME</span></div><div class="who">📝 Dr. Aguilera (radiólogo) · plantillas por estudio · frases por toques</div></div>
+  <div class="body">
+    <div class="chips"><span class="chip on">Rx tórax</span><span class="chip">Eco obstétrica</span><span class="chip">Eco abdominal</span><span class="chip">Mamografía (BI-RADS)</span><span class="chip">Eco tiroides (TI-RADS)</span></div>
+    <div class="cols c2" style="margin-top:12px">
+      <div class="card"><div class="lbl">Rx tórax · Juan Pérez S.</div>
+        <div class="kv2"><span>Técnica</span><b>adecuada ✓</b></div>
+        <div class="kv2"><span>Campos pulmonares</span><b class="ya">opacidad LSD con cavitación</b></div>
+        <div class="kv2"><span>Hilios</span><b>normales</b></div><div class="kv2"><span>Silueta cardíaca</span><b>normal</b></div><div class="kv2"><span>Senos costofrénicos</span><b>libres</b></div><div class="kv2"><span>Partes óseas</span><b>sin alteraciones</b></div>
+        <div class="lbl" style="margin-top:10px">Conclusión</div>
+        <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13.5px"><b>Lesión cavitada en lóbulo superior derecho (4,1 cm), nueva respecto a 03/2025. Sugestiva de TB pulmonar.</b> Sugiero baciloscopía / GeneXpert.</div>
+        <div class="chips" style="margin-top:8px"><span class="chip">Normal</span><span class="chip">No urgente</span><span class="chip on" style="border-color:#b91c1c;color:#991b1b;background:#fde2e2">⚠ Hallazgo importante</span></div></div>
+      <div>
+        <div class="card"><div class="lbl">Eco obstétrica · la plantilla calcula sola</div>
+          <div class="vit2" style="grid-template-columns:repeat(4,1fr)"><div><small>DBP</small>72 mm</div><div><small>CC</small>264 mm</div><div><small>CA</small>238 mm</div><div><small>LF</small>54 mm</div></div>
+          <div style="font-size:13px;margin-top:6px"><b>EG por eco 28+6 · peso fetal 1.180 g (p45)</b> · placenta anterior grado I · líquido normal · FCF 144</div>
+          <div class="mini">Pasa solo a la historia perinatal (Materno) y a la curva de crecimiento fetal.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Dictar en vez de escribir</div><div style="font-size:13px">🎤 El radiólogo puede dictar; el texto aparece en los campos y él revisa y firma 🖐.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ I6 ============ -->
+<section class="scr" id="i6">
+  <div class="app"><div class="brand">SIVEC <span>RESULTADOS</span></div><div class="who">🔔 El informe llega a quien pidió · y el hallazgo importante no se pierde</div></div>
+  <div class="body">
+    <div class="cols c3">
+      <div class="card" style="border:2px solid #fecaca"><div class="lbl" style="color:#991b1b">⚠ Hallazgo importante</div>
+        <div style="font-size:13px;line-height:1.55"><b>Juan Pérez S.</b> · posible TB pulmonar<br>Aviso a <b>Dra. Méndez</b> (C.S. San Luis) 10:52<br>Debe marcar <b>“visto”</b>: si en 24 h nadie lo ve, sube al jefe médico.</div>
+        <div class="chk3" style="margin-top:6px"><span class="ok">✓ Visto 11:05 · Dra. Méndez</span><span class="ok">✓ Paciente citado mañana · baciloscopía pedida</span><span class="ok">✓ Aviso al programa de TB</span></div></div>
+      <div class="card"><div class="lbl">En la ficha del paciente</div>
+        <div class="tl"><div style="--c:#2f6fb0"><b>25/09</b> · Rx tórax · informe + imagen (abrir visor)</div><div style="--c:#b91c1c"><b>25/09</b> · Hallazgo: lesión cavitada LSD</div><div style="--c:#15803d"><b>26/09</b> · Baciloscopía pedida</div></div>
+        <div class="mini">El médico abre la imagen y el informe desde la línea de tiempo.</div></div>
+      <div class="card"><div class="lbl">Para el paciente</div>
+        <div style="font-size:13px;line-height:1.6">🖨️ Informe impreso con QR (sin placa, sin CD)<br>🔒 Otro médico escanea el QR y ve la imagen en el visor</div>
+        <div class="mini" style="margin-top:6px">Emergencia: el informe “urgente” vuelve al box en minutos.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ I7 ============ -->
+<section class="scr" id="i7">
+  <div class="app"><div class="brand">SIVEC <span>IMAGEN · RED</span></div><div class="who">🌐 Centros sin radiólogo → informe desde el hospital (telerradiología)</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Bandeja del radiólogo de la red · por prioridad</div>
+        <table class="l"><thead><tr><th>Centro</th><th>Estudio</th><th>Prioridad</th><th>Espera</th><th></th></tr></thead><tbody>
+          <tr><td>C.S. Los Lotes</td><td>Rx tórax · niño 4 a</td><td><span class="st bad">urgente</span></td><td>12 min</td><td><span class="btn p">Informar</span></td></tr>
+          <tr><td>C.S. Plan 3000</td><td>Rx mano · trauma</td><td><span class="st warn">hoy</span></td><td>1 h 10</td><td><span class="btn">Informar</span></td></tr>
+          <tr><td>C.S. El Bajío</td><td>Eco obstétrica (fotos + medidas)</td><td><span class="st warn">hoy</span></td><td>2 h</td><td><span class="btn">Revisar</span></td></tr>
+          <tr><td>C.S. Villa 1º de Mayo</td><td>Rx columna</td><td><span class="st mut">normal</span></td><td>1 día</td><td><span class="btn">Informar</span></td></tr></tbody></table></div>
+      <div>
+        <div class="card"><div class="lbl">Así se aprovecha a pocos radiólogos</div><div style="font-size:13px;line-height:1.6">El centro toma la imagen → el radiólogo del hospital (o de turno en otra ciudad) la informa desde el SIVEC → el informe vuelve a la ficha.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Segunda opinión</div><div style="font-size:13px">Botón “pedir opinión” a otro especialista de la red, con la imagen y la pregunta; queda registrado.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ I8 ============ -->
+<section class="scr" id="i8">
+  <div class="app"><div class="brand">SIVEC <span>IMAGEN</span></div><div class="who">📊 Indicadores y equipos · Red Centro · septiembre</div></div>
+  <div class="body">
+    <div class="kpi"><div><small>Estudios del mes</small><b>3.184</b></div><div><small>Pedido → informe (mediana)</small><b>26 h</b><span> urgente 38 min</span></div><div><small>Repeticiones</small><b>3,1%</b><span> meta &lt; 5%</span></div><div><small>Hallazgos importantes vistos &lt; 24 h</small><b style="color:#15803d">97%</b></div></div>
+    <div class="cols c2" style="margin-top:12px">
+      <div class="card"><div class="lbl">Equipos de la red</div>
+        <table class="lab"><tr><th>Equipo</th><th>Lugar</th><th>Estado</th><th>Mantenimiento</th></tr>
+          <tr><td>Rx digital</td><td>Hosp. 2º nivel</td><td><span class="dt ok">funciona</span></td><td>12/2026</td></tr>
+          <tr><td>Rx con placa</td><td>C.S. Plan 3000</td><td><span class="dt ok">funciona</span></td><td>11/2026</td></tr>
+          <tr><td>Ecógrafo 1</td><td>Hosp. 2º nivel</td><td><span class="dt ok">funciona</span></td><td>01/2027</td></tr>
+          <tr><td>Ecógrafo portátil</td><td>C.S. San Luis</td><td><span class="dt b">parado · sonda</span></td><td>pedido 20/09</td></tr>
+          <tr><td>Mamógrafo</td><td>Hosp. 2º nivel</td><td><span class="dt w">vence calibración</span></td><td>10/2026</td></tr></table>
+        <div class="mini" style="margin-top:6px">Equipo parado → los pedidos se derivan solos al centro más cercano que funciona.</div></div>
+      <div class="card"><div class="lbl">Estudios por tipo</div>
+        <div class="zn"><span>Rx</span><div class="bar2"><i style="width:62%;background:#7d2a4c"></i></div><b>1.970</b></div>
+        <div class="zn"><span>Ecografía</span><div class="bar2"><i style="width:31%;background:#2f6fb0"></i></div><b>985</b></div>
+        <div class="zn"><span>Mamografía</span><div class="bar2"><i style="width:5%;background:#b45309"></i></div><b>162</b></div>
+        <div class="zn"><span>Tomografía</span><div class="bar2"><i style="width:2%;background:#15803d"></i></div><b>67</b></div>
+        <div class="mini" style="margin-top:6px">Mamografías del tamizaje se cruzan con el programa PAP/VPH (mujeres 50–69 sin mamografía).</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  const NOTES = {
+    i1: '<b>Pedir um estudo:</b> no consultório, abas Rx / Eco / Mamografia / Tomografia, região por toques, motivo clínico obrigatório (vem do SOAP), prioridade e segurança (gravidez, contraste, creatinina). O estudo anterior aparece para comparar. A ordem vai para a sala de imagem sem papel; se o centro não tem o equipamento, deriva com turno.',
+    i2: '<b>Sala de imagem do dia:</b> lista de trabalho por equipamento, urgentes primeiro, de onde vem cada paciente e estado (esperando, em estudo, por informar, informado). Chamada na TV da sala de espera.',
+    i3: '<b>Técnico:</b> confirma o paciente com huella ou QR, registra projeções, dose e repetições, e envia a imagem — equipamento digital manda sozinho (DICOM); equipamento com placa, foto guiada pelo negatoscópio. Tudo fica num arquivo de imagens da rede ligado à ficha.',
+    i4: '<b>Visor:</b> abre em qualquer computador da rede, com zoom, contraste, medir e marcar, e comparação lado a lado com o estudo anterior.',
+    i5: '<b>Informe estruturado:</b> modelos por estudo com frases por toques (Rx tórax, eco obstétrica, abdominal, BI-RADS, TI-RADS). A eco obstétrica calcula idade gestacional e peso fetal e passa sozinha para a história perinatal. Pode ditar por voz e assina com huella.',
+    i6: '<b>Resultado e achado importante:</b> o informe chega a quem pediu; o achado importante exige “visto” e sobe ao chefe se ninguém vê em 24 h. Fica na linha do tempo; o paciente recebe informe impresso com QR, sem placa nem CD.',
+    i7: '<b>Informe à distância:</b> centros sem radiologista mandam a imagem e o radiologista do hospital informa pela bandeja de prioridades; também segunda opinião entre especialistas.',
+    i8: '<b>Indicadores e equipamentos:</b> estudos do mês, tempo pedido→informe, repetições, achados vistos em 24 h; estado e manutenção de cada equipamento (parado → deriva sozinho); mamografias cruzadas com o programa PAP/VPH.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 'i1');
+</script>
+
+</body>
+</html>

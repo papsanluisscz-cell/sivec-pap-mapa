@@ -548,3 +548,30 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
   - Los indicadores van al SNIS y al gestor.
   - Al cerrar el control se reimprime el carnet.
 - Imágenes: docs/carnet-vacunas-01..06.png
+
+**Módulo 8 · Vacunas + Carnet de salud infantil: APROVADO.**
+
+### Módulo 9 · Imagen — dibujado, para aprobar
+- **Pedir un estudio desde la consulta:**
+  - pestañas Rx / Eco / Mamografía / Tomografía; la región se elige por toques;
+  - el motivo clínico es obligatorio y viene del SOAP;
+  - prioridad y seguridad: embarazo, contraste, creatinina;
+  - se muestra el estudio previo para comparar;
+  - si el centro no tiene el equipo, se deriva con turno.
+- **Sala de imagen del día:** lista de trabajo por equipo, urgentes primero, con origen y estado; el llamado sale en la TV.
+- **Técnico:** confirma al paciente (huella o QR) y registra proyecciones, dosis y repeticiones.
+  - Equipo digital: la imagen llega sola (DICOM).
+  - Equipo con placa: foto guiada sobre el negativoscopio.
+  - Las imágenes se guardan en un archivo de imágenes de la red (PACS pequeño, software libre).
+- **Visor web** sin instalar nada: zoom, contraste, medir, marcar y comparar lado a lado con el estudio anterior.
+- **Informe estructurado:** plantillas con frases por toques (Rx tórax, eco obstétrica, abdominal, BI-RADS, TI-RADS).
+  - La eco obstétrica calcula la EG y el peso fetal y pasa sola a la historia perinatal.
+  - Se puede dictar por voz; se firma con huella.
+- **Hallazgo importante:** exige “visto”; si nadie lo ve en 24 h sube al jefe médico. Avisa al programa que corresponda (ej. TB).
+- **Resultado:** queda en la línea de tiempo; el paciente recibe el informe impreso con QR (sin placa ni CD).
+- **Informe a distancia (telerradiología) en la red:** bandeja del radiólogo por prioridad, más segunda opinión.
+- **Indicadores y equipos:**
+  - tiempo pedido→informe, repeticiones y hallazgos vistos en menos de 24 h;
+  - estado y mantenimiento de cada equipo; si uno está parado, los pedidos se derivan solos;
+  - las mamografías se cruzan con el programa PAP/VPH.
+- Imágenes: docs/imagen-01..08.png · esboco-imagen.html
