@@ -636,3 +636,20 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - **Entregas en camino:** ruta del camión con firma de cada entrega en el celular del chofer. El mismo viaje lleva muestras de laboratorio y vacunas en caja térmica.
 - **Tablero de abastecimiento:** disponibilidad de medicamentos trazadores por centro (meta ≥ 95%), quiebres, pedidos completos y pérdidas. Los quiebres de emergencia obstétrica avisan al instante.
 - Imágenes: docs/almacen-01..08.png · esboco-almacen.html
+
+**Módulo 11 · Almacén y logística: APROVADO.**
+
+### Módulo 12 · Personal y guardias — dibujado, para aprobar
+- **Rol de turnos mensual** por persona (M, T, N, guardia 24 h, vacación) con horas sumadas. El SIVEC avisa si un turno queda sin cubrir, si falta el descanso post-guardia o si se pasa el máximo de horas. Se publica por SMS, en la app del profesional y en el mural.
+- **Quién está de guardia ahora:** por especialidad en el hospital (presencial o llamada, con tiempo de llegada) y centros de 1er nivel abiertos. Se usa al derivar o referir, y sale en la TV de emergencias.
+- **Asistencia con huella** en el mismo lector de recepción: atrasos y faltas. A fin de mes, el resumen (horas, extras, faltas) se exporta al sistema de RRHH para la planilla; el SIVEC no paga sueldos.
+- **Cambios y reemplazos:**
+  - cambio entre colegas: los dos firman con huella y el jefe aprueba, con verificación de descanso y horas;
+  - reemplazo urgente: el SIVEC sugiere quién puede venir y avisa por SMS; el primero que acepta queda en el rol.
+- **Vacaciones, permisos y licencias:** saldo de días, certificado por foto, licencia de maternidad con reemplazo. El jefe ve la cobertura antes de aprobar.
+- **Ficha del personal:** cargo, títulos y matrícula con aviso de vencimiento (RCP), vacunas del trabajador, accidente con aguja, y su producción en el SIVEC (solo ella y su jefe la ven).
+- **Internos y residentes:** rotaciones con tutor, notas por validar, procedimientos para la evaluación, y guardias y descanso de los residentes.
+- **Indicadores:**
+  - turnos cubiertos, ausentismo, horas extra, certificados por vencer;
+  - personal por 10.000 habitantes y carga real por centro, para pedir ítems con datos.
+- Imágenes: docs/personal-01..08.png · esboco-personal.html

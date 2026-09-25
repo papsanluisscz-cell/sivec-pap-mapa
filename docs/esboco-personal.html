@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIVEC Personal</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
+    --n1:#2f6fb0; --n2:#0e7490; --n3:#7c3aed; --n4:#b4235a; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .topbar { position:sticky; top:0; z-index:5; background:#2a1720; color:#fff; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; }
+  .topbar b { margin-right:6px; font-size:15px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; border:1px solid #6b4a58; background:transparent; color:#fff; border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tab.on { background:#fff; color:var(--wine-d); border-color:#fff; }
+  .warn { max-width:1100px; margin:14px auto 0; background:#fff7e0; border:1px solid #ecd9a0; border-radius:10px; padding:10px 14px; font-size:14px; color:#5b4712; }
+  .scr { display:none; max-width:1100px; margin:14px auto 30px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,.14); }
+  .scr.on { display:block; }
+  .app { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; }
+  .app .brand { font-weight:800; font-size:20px; letter-spacing:.04em; } .app .brand span { font-size:11px; background:#fff; color:var(--wine-d); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:3px; letter-spacing:.08em; }
+  .app .who { font-size:14px; opacity:.95; }
+  .body { padding:18px 22px 22px; }
+  h2 { margin:0 0 4px; font-size:20px; } .sub { color:var(--soft); font-size:14px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cols { display:grid; gap:14px; } .c2 { grid-template-columns:1fr 1fr; } .c3 { grid-template-columns:1fr 1fr 1fr; } .c21 { grid-template-columns:1.6fr 1fr; }
+  .lbl { font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); margin:10px 0 5px; }
+  .lbl:first-child { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:13px; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .chip.on { background:var(--tint); border-color:var(--wine); color:var(--wine-d); font-weight:700; }
+  .inp { border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13.5px; background:#fff; min-height:36px; }
+  .inp.tall { min-height:62px; line-height:1.45; }
+  .pri { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pri div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; }
+  .pri div b { display:block; font-size:14px; } .pri div.on { border:2px solid var(--wine); background:var(--tint); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .auto { background:#f3f7fb; border:1px dashed #b9cde3; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.55; }
+  .auto b { color:#1e4f8a; }
+  .att { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; } .att span { font-size:12.5px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13.5px; font-weight:700; border-radius:9px; padding:8px 14px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .btn.p { background:var(--wine); border-color:var(--wine); color:#fff; } .btn.g { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fp { width:26px; height:30px; vertical-align:middle; }
+  table.l { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; border-radius:12px; overflow:hidden; }
+  table.l th { text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); padding:9px 10px; border-bottom:1px solid var(--line); background:#fff; }
+  table.l td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .st { font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .st.bad { background:var(--badbg); color:var(--bad); } .st.warn { background:var(--warnbg); color:var(--warn); } .st.ok { background:var(--okbg); color:var(--ok); } .st.info { background:#e0ecfa; color:#1e4f8a; } .st.mut { background:#eee; color:#555; }
+  .lvl { font-size:11px; font-weight:800; color:#fff; border-radius:6px; padding:2px 7px; }
+  .mini { font-size:12px; color:var(--soft); }
+  .note { max-width:1100px; margin:-16px auto 30px; background:#fff; border-radius:10px; padding:12px 16px; font-size:14px; line-height:1.5; color:#3b3035; border-left:4px solid var(--wine); }
+  /* flujo */
+  .levels { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin:6px 0 4px; }
+  .lv { text-align:center; padding:0 8px; }
+  .lv .ic { width:74px; height:74px; border-radius:18px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; }
+  .lv b { display:block; font-size:15px; } .lv span { font-size:12.5px; color:var(--soft); }
+  .arrows { position:relative; height:74px; margin-top:-120px; margin-bottom:60px; pointer-events:none; }
+  .loop { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+  .loop div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12.3px; text-align:center; position:relative; }
+  .loop div b { display:block; font-size:13px; } .loop i { font-style:normal; display:block; font-size:18px; }
+  .loop div:not(:last-child)::after { content:"›"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--soft); font-size:18px; }
+  .world { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .world div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:12.3px; line-height:1.4; }
+  .world b { display:block; font-size:13px; color:var(--wine-d); }
+  /* seguimiento */
+  .steps { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin:8px 0 4px; }
+  .steps div { text-align:center; font-size:12px; position:relative; padding-top:30px; }
+  .steps div::before { content:""; position:absolute; top:9px; left:0; right:0; height:4px; background:#e3d6dc; }
+  .steps div:first-child::before { left:50%; } .steps div:last-child::before { right:50%; }
+  .steps div.done::before { background:var(--ok); } .steps div.cur::before { background:linear-gradient(90deg,var(--ok) 50%,#e3d6dc 50%); }
+  .steps i { position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:50%; background:#e3d6dc; color:#fff; font-style:normal; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:3px solid var(--paper); }
+  .steps .done i { background:var(--ok); } .steps .cur i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .steps b { display:block; font-size:12.5px; } .steps small { color:var(--soft); }
+  .tl { border-left:3px solid var(--line); margin-left:8px; padding-left:14px; }
+  .tl div { position:relative; font-size:13px; margin-bottom:10px; line-height:1.4; }
+  .tl div::before { content:""; position:absolute; left:-21px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--c,#999); border:2px solid #fff; }
+  .kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:600; } .kpi b { font-size:28px; letter-spacing:-.01em; } .kpi span { font-size:12px; color:var(--soft); }
+  .bars div.r { display:grid; grid-template-columns:170px 1fr 54px; align-items:center; gap:10px; font-size:13px; margin:7px 0; }
+  .bars .trk { height:14px; border-radius:0 4px 4px 0; background:transparent; position:relative; }
+  .bars .fill { height:14px; border-radius:0 4px 4px 0; background:var(--wine); }
+  .bars .ref { position:absolute; top:-3px; bottom:-3px; width:2px; background:#2d2429; }
+  .bars .v { font-weight:700; text-align:right; }
+  .alertc { border-left:4px solid var(--bad); }
+
+  .role .rh { display:flex; gap:10px; align-items:center; margin-bottom:8px; } .role .rh b { display:block; font-size:15px; } .role .rh small { color:var(--soft); font-size:12px; }
+  .ri { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .todo { display:flex; align-items:center; gap:10px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .todo:last-child { border-bottom:none; }
+  .todo .st { min-width:30px; text-align:center; font-size:13px; }
+  .mini2 { font-size:13px; line-height:1.5; } .mini2 b { display:block; margin-bottom:2px; }
+  .flowbar { display:flex; gap:6px; margin-bottom:12px; } .flowbar span { flex:1; text-align:center; font-size:13px; font-weight:700; padding:7px; border-radius:9px; background:#fff; border:1px solid var(--line); color:var(--soft); }
+  .flowbar span.on { background:var(--okbg); color:var(--ok); border-color:#b8e3c7; } .flowbar span.cur { background:var(--wine); color:#fff; border-color:var(--wine); }
+  .found { display:flex; gap:12px; align-items:center; margin-top:10px; padding:10px; border-radius:10px; background:#f3f9f5; border:1px solid #cfe9d8; }
+  .photo2 { width:64px; height:72px; border-radius:10px; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:24px; flex:none; }
+  .k2 { display:block; font-size:10.5px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.04em; }
+  .scanner { width:150px; height:160px; margin:6px auto 0; border-radius:18px; background:radial-gradient(circle at 50% 45%, #fff 0, #f7e9ef 70%); border:3px solid #d9b9c6; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -6px 12px rgba(125,42,76,.12); }
+  .ticket { margin-top:12px; text-align:center; }
+  .tk { border:2px dashed var(--wine); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:2px; font-size:13.5px; } .tk b { font-size:40px; color:var(--wine-d); letter-spacing:.04em; line-height:1.1; } .tk small { color:var(--soft); font-size:11.5px; }
+  .q2 { padding:8px 10px; border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:13.5px; background:#fff; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; } .q2 .mini { width:100%; }
+  .q2.cur { border:2px solid var(--wine); background:var(--tint); } .q2 .st { margin-left:auto; }
+  .vit2 { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .vit2 div { background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 8px; font-size:16px; font-weight:800; } .vit2 small { display:block; font-size:10.5px; color:var(--soft); font-weight:700; text-transform:uppercase; }
+  .tv { background:#120810; border-radius:16px; padding:14px; color:#fff; border:8px solid #2a2a2a; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
+  .tvh { display:flex; justify-content:space-between; font-size:13px; color:#cfb7c2; font-weight:700; letter-spacing:.08em; }
+  .tvnow { background:linear-gradient(135deg,#7d2a4c,#b4235a); border-radius:12px; padding:16px; text-align:center; } .tvnow small { display:block; font-size:13px; letter-spacing:.2em; font-weight:800; color:#ffe4ee; }
+  .tvnow b { display:block; font-size:64px; line-height:1.05; letter-spacing:.04em; } .tvnow span { display:block; font-size:24px; font-weight:700; } .tvnow em { display:block; font-style:normal; font-size:20px; margin-top:4px; color:#ffe4ee; }
+  .tvlist div { display:flex; gap:12px; align-items:baseline; font-size:18px; padding:6px 4px; border-bottom:1px solid #3a2530; } .tvlist b { color:#f1a7c3; min-width:70px; } .tvlist span { margin-left:auto; color:#cfb7c2; font-size:15px; }
+  .tvf { font-size:13px; color:#cfb7c2; }
+  .doc { display:grid; grid-template-columns:34px 1fr auto auto; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--line); font-size:13.5px; } .di { font-size:22px; text-align:center; } .dest { font-size:12.5px; color:var(--soft); font-weight:600; }
+  .st.warn { margin:0; max-width:none; padding:2px 9px; border:none; font-size:11.5px; }
+  .todo .st.warn { font-size:13px; }
+
+  .svc { display:flex; flex-wrap:wrap; gap:8px; } .svc span { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 12px; font-size:13.5px; font-weight:600; }
+  .prob { display:flex; align-items:center; gap:8px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .prob .mini { margin-left:auto; }
+  .dotc { width:10px; height:10px; border-radius:50%; flex:none; }
+  .tpl { border:1px solid; border-left-width:5px; border-radius:10px; padding:9px 11px; font-size:13px; line-height:1.45; background:#fff; } .tpl b { display:block; font-size:14px; margin-bottom:2px; }
+  .opt { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; } .opt span { border:1px solid var(--line); border-radius:12px; padding:10px; font-size:22px; background:#fff; text-align:center; } .opt b { display:block; font-size:14px; margin-top:4px; } .opt small { display:block; font-size:12px; color:var(--soft); }
+  .opt .sel { border:2px solid var(--wine); background:var(--tint); }
+  .side { border-left:4px solid var(--line); padding:5px 10px; margin-bottom:8px; font-size:13.5px; line-height:1.45; } .side b { display:block; }
+  .stk { display:grid; grid-template-columns:150px 1fr auto; gap:8px; align-items:center; font-size:13px; margin:6px 0; } .stk div { height:10px; background:#eee4e8; border-radius:5px; overflow:hidden; } .stk i { display:block; height:100%; background:#15803d; border-radius:5px; } .stk b { font-size:12.5px; }
+  .phn { background:#e5ddd5; border:9px solid #1f1f1f; border-radius:26px; padding:10px; display:flex; flex-direction:column; gap:8px; min-height:430px; }
+  .phh { background:#075e54; color:#fff; font-size:13px; font-weight:700; margin:-10px -10px 4px; padding:10px 12px; border-radius:16px 16px 0 0; }
+  .msg { font-size:13px; line-height:1.4; border-radius:10px; padding:7px 9px; max-width:88%; box-shadow:0 1px 1px rgba(0,0,0,.12); } .msg.in { background:#fff; align-self:flex-start; } .msg.out { background:#dcf8c6; align-self:flex-end; font-weight:800; }
+  .ck { font-size:13.5px; line-height:1.45; } .ck b { display:block; font-size:15px; margin-bottom:3px; }
+
+  .kv2 { display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:4px 0; border-bottom:1px dashed var(--line); } .kv2 span { color:var(--soft); }
+  .req { display:flex; flex-wrap:wrap; gap:6px; } .req span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .req .ok { background:var(--okbg); color:var(--ok); } .req .no { background:var(--warnbg); color:var(--warn); }
+  .qx { position:relative; height:30px; background:#f3eef0; border-radius:8px; margin:6px 0; padding-left:34px; } .qx b { position:absolute; left:8px; top:6px; font-size:13px; }
+  .qx span { position:absolute; top:3px; bottom:3px; margin-left:34px; border-radius:6px; color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; padding:0 6px; white-space:nowrap; overflow:hidden; }
+  .who2 { display:grid; gap:6px; } .who2 div { border:1px solid var(--line); border-radius:8px; padding:6px 9px; background:#f7fbf8; font-size:12.5px; } .who2 b { display:block; color:var(--wine-d); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; } .who2 span { color:#166534; }
+  .beds { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .bed { border-radius:10px; padding:8px; font-size:13px; font-weight:700; border:1px solid var(--line); min-height:76px; } .bed b { display:block; font-size:18px; } .bed small { display:block; font-weight:500; font-size:11.5px; color:var(--soft); }
+  .bed.p { background:#fbe4ee; } .bed.a { background:#fde2e2; } .bed.g { background:#ede4fb; } .bed.free { background:#ecf8f1; color:#15803d; } .bed.clean { background:#fdf0d5; color:#8a5a00; } .bed.sel { outline:3px solid var(--wine); }
+  .leg2 { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-left:6px; border:1px solid var(--line); }
+  .dose { border:1px solid var(--line); border-radius:10px; padding:7px 9px; margin-bottom:6px; font-size:13px; display:flex; flex-direction:column; } .dose span { color:var(--soft); font-size:12px; } .dose em { font-style:normal; margin-top:2px; }
+  .srch { border-left:4px solid #c2410c; background:#fff7f0; border-radius:6px; padding:6px 9px; margin-bottom:6px; font-size:13px; } .srch b { display:block; font-size:12px; color:#c2410c; text-transform:uppercase; letter-spacing:.04em; }
+  .amb { border:9px solid #1f1f1f; border-radius:26px; background:#fff; overflow:hidden; min-height:420px; display:flex; flex-direction:column; }
+  .ah { background:#ea580c; color:#fff; font-weight:800; font-size:14px; padding:10px 12px; } .ab { padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .big2 { font-size:40px; font-weight:900; text-align:center; color:#ea580c; margin-top:6px; }
+
+  .tree div { padding:6px 8px; border-radius:8px; font-size:13.5px; } .tree small { color:var(--soft); margin-left:4px; }
+  .tree .t0 { font-weight:800; } .tree .t1 { padding-left:18px; font-weight:700; } .tree .t2 { padding-left:32px; font-weight:700; } .tree .t3 { padding-left:50px; } .tree .mut { color:var(--soft); }
+  .tree .on { background:#f3eef0; } .tree .sel { background:var(--tint); outline:2px solid var(--wine); }
+  .fing { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:8px; } .fing span { font-size:12px; font-weight:700; border-radius:999px; padding:3px 9px; background:#f3eef0; } .fing .done { background:var(--okbg); color:var(--ok); } .fing .cur { background:var(--wine); color:#fff; }
+  table.mx td, table.mx th { text-align:center; font-size:12.5px; padding:8px 6px; } table.mx td:first-child, table.mx th:first-child { text-align:left; }
+  table.mx2 td, table.mx2 th { text-align:center; font-size:12.5px; } table.mx2 td:first-child, table.mx2 th:first-child { text-align:left; }
+  table.mx2 td.on { color:#15803d; font-size:18px; } table.mx2 td.pi { color:#c2410c; font-size:18px; } table.mx2 td { color:#c9bcc2; font-size:18px; } table.mx2 td:first-child { font-size:13.5px; color:var(--ink); }
+  .catl { padding:8px 10px; border-radius:9px; font-size:13.5px; margin-bottom:4px; display:flex; justify-content:space-between; } .catl small { color:var(--soft); } .catl.on { background:var(--tint); font-weight:700; }
+  table.mx2 { table-layout:fixed; } table.mx2 th { font-size:10px; padding:6px 3px; letter-spacing:.02em; white-space:normal; text-align:center; } table.mx2 th:first-child { width:170px; } table.mx2 td { padding:8px 3px; }
+  .ring2 { width:150px; height:150px; border-radius:50%; margin:6px auto 0; background:conic-gradient(#7d2a4c 0 71%, #eadde3 71% 100%); display:flex; align-items:center; justify-content:center; } .ring2 > div { width:118px; height:118px; border-radius:50%; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; color:var(--soft); } .ring2 b { font-size:40px; color:var(--ink); line-height:1; }
+  .ctl { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; } .ctl span { text-align:center; border-radius:10px; padding:8px 4px; font-weight:800; font-size:14px; background:#f3eef0; color:#9c8b92; } .ctl small { display:block; font-weight:600; font-size:11px; } .ctl .d { background:#dcf3e5; color:#15803d; } .ctl .n { background:var(--wine); color:#fff; }
+  .chk3 { display:flex; flex-direction:column; gap:4px; } .chk3 span { font-size:12.8px; font-weight:600; border-radius:7px; padding:3px 8px; } .chk3 .ok { background:#ecf8f1; color:#15803d; } .chk3 .no { background:#fdf0d5; color:#8a5a00; }
+  .rk { display:flex; gap:10px; align-items:center; font-size:14px; padding:7px 0; border-bottom:1px dashed var(--line); } .rk .st { min-width:44px; text-align:center; }
+  .vg { width:100%; border-collapse:separate; border-spacing:4px; font-size:12.5px; } .vg th { font-size:10.5px; text-transform:uppercase; color:var(--soft); font-weight:800; text-align:center; } .vg th:first-child { text-align:left; }
+  .vg td { text-align:center; border-radius:8px; padding:5px 2px; font-weight:700; } .vg td:first-child { text-align:left; font-weight:700; background:none; padding-left:0; }
+  .vg .d { background:#dcf3e5; color:#15803d; } .vg .h { background:var(--wine); color:#fff; } .vg .a { background:#fde2e2; color:#991b1b; } .vg .f { background:#f3eef0; color:#9c8b92; } .vg .x { background:none; }
+  .fr { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:13.5px; } .fr:last-child { border:none; }
+  .tbig { font-size:30px; font-weight:900; line-height:1; }
+  .zn { display:grid; grid-template-columns:150px 1fr 60px; gap:8px; align-items:center; font-size:13px; padding:4px 0; }
+  .bar2 { height:12px; border-radius:6px; background:#eee; position:relative; overflow:hidden; } .bar2 i { position:absolute; left:0; top:0; bottom:0; border-radius:6px; } .bar2 .m { position:absolute; top:-2px; bottom:-2px; width:2px; background:#2d2429; }
+  .flow3 { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; } .flow3 span { text-align:center; font-size:12.5px; font-weight:700; border-radius:10px; padding:8px 4px; background:#f3eef0; color:#8a7a81; } .flow3 span small { display:block; font-weight:600; font-size:11px; } .flow3 .d { background:#dcf3e5; color:#15803d; } .flow3 .n { background:var(--wine); color:#fff; }
+  .al { display:flex; flex-wrap:wrap; gap:6px; } .al span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .al .r { background:#fde2e2; color:#991b1b; } .al .y { background:#fdf0d5; color:#8a5a00; } .al .g { background:#ecf8f1; color:#15803d; }
+  table.lab { width:100%; border-collapse:collapse; font-size:12.8px; } table.lab th { font-size:11px; text-transform:uppercase; color:var(--soft); text-align:left; padding:4px 6px; border-bottom:1px solid var(--line); } table.lab td { padding:5px 6px; border-bottom:1px dashed var(--line); }
+  .dt { display:inline-block; min-width:22px; text-align:center; border-radius:6px; padding:1px 6px; font-weight:800; font-size:12px; } .dt.ok { background:#dcf3e5; color:#15803d; } .dt.w { background:#fdf0d5; color:#8a5a00; } .dt.b { background:#fde2e2; color:#991b1b; } .dt.p { background:#eee; color:#888; }
+  .phs { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .dev { width:280px; height:560px; margin:0 auto; border-radius:36px; border:9px solid #17121a; background:#fff; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 14px 30px rgba(60,20,40,.2); }
+  .dev .sb { height:24px; display:flex; justify-content:space-between; align-items:center; padding:0 16px; font-size:10.5px; font-weight:700; color:#fff; background:var(--wine-d); flex:none; }
+  .dev .hd { background:linear-gradient(145deg,#8a3056,#5a1c36); color:#fff; padding:8px 14px 12px; flex:none; font-size:12px; } .dev .hd strong { display:block; font-size:16px; }
+  .dev .ct { flex:1; overflow:hidden; padding:10px; display:flex; flex-direction:column; gap:8px; background:#faf6f8; }
+  .dev .c { background:#fff; border:1px solid var(--line); border-radius:14px; padding:9px 11px; font-size:12.3px; line-height:1.4; }
+  .dev .c .t { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--soft); font-weight:800; margin-bottom:3px; }
+  .dev .nv { flex:none; display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); background:#fff; padding:5px 0 8px; text-align:center; font-size:10px; font-weight:700; color:#8a7a81; } .dev .nv .o { color:var(--wine); }
+  .dev .li { display:flex; justify-content:space-between; gap:6px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .dev .bt2 { display:block; text-align:center; font-weight:800; font-size:12.5px; border-radius:10px; padding:8px; background:var(--wine); color:#fff; margin-top:6px; } .dev .bt2.o2 { background:#fff; color:var(--wine); border:1.5px solid var(--wine); }
+  .cap2 { text-align:center; font-size:13.5px; margin-top:10px; color:#43363d; line-height:1.4; }
+  .bar { height:9px; border-radius:6px; background:#eee; overflow:hidden; } .bar i { display:block; height:100%; background:var(--ok,#15803d); }
+  .tl2 { display:grid; grid-template-columns:1fr 70px 1fr; gap:0; }
+  .tlc { border-radius:14px; padding:12px 14px; } .tlc h4 { margin:0 0 10px; font-size:15px; }
+  .ev { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 10px; font-size:12.8px; margin-bottom:7px; line-height:1.35; } .ev small { color:var(--soft); display:block; font-size:11.5px; }
+  .ev.lk { border:2px solid var(--wine); }
+  .ring2 { width:150px; height:150px; border-radius:50%; margin:6px auto 0; background:conic-gradient(#7d2a4c 0 71%, #eadde3 71% 100%); display:flex; align-items:center; justify-content:center; } .ring2 > div { width:118px; height:118px; border-radius:50%; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; color:var(--soft); } .ring2 b { font-size:40px; color:var(--ink); line-height:1; }
+  .ctl { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; } .ctl span { text-align:center; border-radius:10px; padding:8px 4px; font-weight:800; font-size:14px; background:#f3eef0; color:#9c8b92; } .ctl small { display:block; font-weight:600; font-size:11px; } .ctl .d { background:#dcf3e5; color:#15803d; } .ctl .n { background:var(--wine); color:#fff; }
+  .chk3 { display:flex; flex-direction:column; gap:4px; } .chk3 span { font-size:12.8px; font-weight:600; border-radius:7px; padding:3px 8px; } .chk3 .ok { background:#ecf8f1; color:#15803d; } .chk3 .no { background:#fdf0d5; color:#8a5a00; }
+  .rk { display:flex; gap:10px; align-items:center; font-size:14px; padding:7px 0; border-bottom:1px dashed var(--line); } .rk .st { min-width:44px; text-align:center; }
+  .flow3 { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; } .flow3 span { text-align:center; font-size:12.5px; font-weight:700; border-radius:10px; padding:8px 4px; background:#f3eef0; color:#8a7a81; } .flow3 span small { display:block; font-weight:600; font-size:11px; } .flow3 .d { background:#dcf3e5; color:#15803d; } .flow3 .n { background:var(--wine); color:#fff; }
+  .al { display:flex; flex-wrap:wrap; gap:6px; } .al span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .al .r { background:#fde2e2; color:#991b1b; } .al .y { background:#fdf0d5; color:#8a5a00; } .al .g { background:#ecf8f1; color:#15803d; }
+  table.lab { width:100%; border-collapse:collapse; font-size:12.8px; } table.lab th { font-size:11px; text-transform:uppercase; color:var(--soft); text-align:left; padding:4px 6px; border-bottom:1px solid var(--line); } table.lab td { padding:5px 6px; border-bottom:1px dashed var(--line); }
+  .dt { display:inline-block; min-width:22px; text-align:center; border-radius:6px; padding:1px 6px; font-weight:800; font-size:12px; } .dt.ok { background:#dcf3e5; color:#15803d; } .dt.w { background:#fdf0d5; color:#8a5a00; } .dt.b { background:#fde2e2; color:#991b1b; } .dt.p { background:#eee; color:#888; }
+  .phs { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .dev { width:280px; height:560px; margin:0 auto; border-radius:36px; border:9px solid #17121a; background:#fff; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 14px 30px rgba(60,20,40,.2); }
+  .dev .sb { height:24px; display:flex; justify-content:space-between; align-items:center; padding:0 16px; font-size:10.5px; font-weight:700; color:#fff; background:var(--wine-d); flex:none; }
+  .dev .hd { background:linear-gradient(145deg,#8a3056,#5a1c36); color:#fff; padding:8px 14px 12px; flex:none; font-size:12px; } .dev .hd strong { display:block; font-size:16px; }
+  .dev .ct { flex:1; overflow:hidden; padding:10px; display:flex; flex-direction:column; gap:8px; background:#faf6f8; }
+  .dev .c { background:#fff; border:1px solid var(--line); border-radius:14px; padding:9px 11px; font-size:12.3px; line-height:1.4; }
+  .dev .c .t { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--soft); font-weight:800; margin-bottom:3px; }
+  .dev .nv { flex:none; display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); background:#fff; padding:5px 0 8px; text-align:center; font-size:10px; font-weight:700; color:#8a7a81; } .dev .nv .o { color:var(--wine); }
+  .dev .li { display:flex; justify-content:space-between; gap:6px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .dev .bt2 { display:block; text-align:center; font-weight:800; font-size:12.5px; border-radius:10px; padding:8px; background:var(--wine); color:#fff; margin-top:6px; } .dev .bt2.o2 { background:#fff; color:var(--wine); border:1.5px solid var(--wine); }
+  .cap2 { text-align:center; font-size:13.5px; margin-top:10px; color:#43363d; line-height:1.4; }
+  .bar { height:9px; border-radius:6px; background:#eee; overflow:hidden; } .bar i { display:block; height:100%; background:var(--ok,#15803d); }
+  .tl2 { display:grid; grid-template-columns:1fr 70px 1fr; gap:0; }
+  .tlc { border-radius:14px; padding:12px 14px; } .tlc h4 { margin:0 0 10px; font-size:15px; }
+  .ev { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 10px; font-size:12.8px; margin-bottom:7px; line-height:1.35; } .ev small { color:var(--soft); display:block; font-size:11.5px; }
+  .ev.lk { border:2px solid var(--wine); }
+  .paper { background:#fff; max-width:1000px; margin:0 auto; border:1px solid #ddd; box-shadow:0 4px 16px rgba(0,0,0,.10); padding:26px 30px; font-size:12px; color:#222; line-height:1.35; }
+  .ph1 { display:flex; align-items:center; gap:12px; border-bottom:3px solid var(--wine); padding-bottom:8px; }
+  .ph1 .lg { width:40px; height:40px; border-radius:24%; background:linear-gradient(145deg,#9c3a5f,#5a1c36); color:#fff; font-weight:900; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .ph1 h3 { margin:0; font-size:18px; letter-spacing:.02em; } .ph1 .sm { font-size:11px; color:#666; }
+  .sec { margin-top:10px; border:1px solid #d8cdd2; border-radius:6px; overflow:hidden; }
+  .sec > h5 { margin:0; background:#f3e7ec; color:var(--wine-d); font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; padding:4px 8px; }
+  .sec .in2 { padding:6px 8px; }
+  .fg { display:grid; gap:4px 10px; } .fg div { border-bottom:1px solid #eee; padding:2px 0; } .fg small { display:block; font-size:9.5px; color:#8a7a81; text-transform:uppercase; letter-spacing:.03em; } .fg b { font-size:12.5px; }
+  .pt { width:100%; border-collapse:collapse; font-size:11.3px; } .pt th { background:#faf5f7; font-size:9.8px; text-transform:uppercase; color:#6f6168; border:1px solid #e6dce0; padding:3px 4px; text-align:left; } .pt td { border:1px solid #eee4e8; padding:3px 4px; }
+  .ya { color:#991b1b; font-weight:800; } .no2 { color:#15803d; }
+  .alx { background:#fff4f4; border:1px solid #f3c4c4; border-radius:6px; padding:5px 8px; }
+  .sig { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:12px; } .sig div { border-top:1px solid #999; padding-top:3px; font-size:10.5px; color:#555; text-align:center; }
+  .cn { display:grid; grid-template-columns:1fr 1fr; gap:0; max-width:1000px; margin:0 auto; background:#fff; border:1px solid #ddd; box-shadow:0 4px 16px rgba(0,0,0,.10); }
+  .cn > div { padding:16px 18px; font-size:12px; line-height:1.4; } .cn > div + div { border-left:2px dashed #ccc; }
+  .cn h6 { margin:10px 0 4px; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--wine-d); }
+  table.rol { width:100%; border-collapse:separate; border-spacing:2px; font-size:10.5px; } table.rol th { font-size:9.5px; color:var(--soft); font-weight:700; text-align:center; line-height:1.1; } table.rol th.we { color:#b91c1c; }
+  table.rol td { text-align:center; border-radius:4px; padding:4px 0; font-weight:800; font-size:10.5px; } table.rol td:first-child { background:none; padding-right:6px; font-size:12px; font-weight:600; }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — 12 · Personal y guardias:</b>
+  <button class="tab on" data-t="g1">1. Rol de turnos</button>
+  <button class="tab" data-t="g2">2. Quién está de guardia</button>
+  <button class="tab" data-t="g3">3. Asistencia con huella</button>
+  <button class="tab" data-t="g4">4. Cambios y reemplazos</button>
+  <button class="tab" data-t="g5">5. Vacaciones y permisos</button>
+  <button class="tab" data-t="g6">6. Ficha del personal</button>
+  <button class="tab" data-t="g7">7. Internos y residentes</button>
+  <button class="tab" data-t="g8">8. Indicadores</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos inventados. El SIVEC organiza turnos, asistencia y permisos; el sueldo lo sigue pagando el sistema de RRHH del Ministerio/Gobernación, que recibe los datos listos (horas extra, faltas).</div>
+
+<!-- ============ G1 ============ -->
+<section class="scr on" id="g1">
+  <div class="app"><div class="brand">SIVEC <span>PERSONAL</span></div><div class="who">🗓️ Rol de turnos · C.S. San Luis · octubre 2026 · Dir. Dra. Méndez</div></div>
+  <div class="body">
+    <div class="card"><div class="lbl">Arrastrar para asignar · el sistema avisa si falta cobertura o si alguien no descansa</div>
+      <table class="rol"><thead><tr><th style="text-align:left">Personal</th><th class="">J<br>1</th><th class="">V<br>2</th><th class="we">S<br>3</th><th class="we">D<br>4</th><th class="">L<br>5</th><th class="">M<br>6</th><th class="">M<br>7</th><th class="">J<br>8</th><th class="">V<br>9</th><th class="we">S<br>10</th><th class="we">D<br>11</th><th class="">L<br>12</th><th class="">M<br>13</th><th class="">M<br>14</th><th class="">J<br>15</th><th class="">V<br>16</th><th class="we">S<br>17</th><th class="we">D<br>18</th><th class="">L<br>19</th><th class="">M<br>20</th><th class="">M<br>21</th><th class="">J<br>22</th><th class="">V<br>23</th><th class="we">S<br>24</th><th class="we">D<br>25</th><th class="">L<br>26</th><th class="">M<br>27</th><th class="">M<br>28</th><th class="">J<br>29</th><th class="">V<br>30</th><th class="we">S<br>31</th><th>Horas</th></tr></thead><tbody><tr><td style="text-align:left;white-space:nowrap"><b>Dra. Méndez</b> <span class="mini">MG</span></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#7d2a4c;color:#fff">G</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#dcf3e5;color:#15803d">V</td><td style="background:#dcf3e5;color:#15803d">V</td><td style="background:#dcf3e5;color:#15803d">V</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#dcf3e5;color:#15803d">V</td><td style="background:#dcf3e5;color:#15803d">V</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td><b>126</b></td></tr><tr><td style="text-align:left;white-space:nowrap"><b>Dr. Flores</b> <span class="mini">MG</span></td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#7d2a4c;color:#fff">G</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#7d2a4c;color:#fff">G</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#7d2a4c;color:#fff">G</td><td><b>192</b></td></tr><tr><td style="text-align:left;white-space:nowrap"><b>Dra. Rocha</b> <span class="mini">Odont.</span></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td><b>132</b></td></tr><tr><td style="text-align:left;white-space:nowrap"><b>Lic. Cuéllar</b> <span class="mini">Enf.</span></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#3b2f5c;color:#fff">N</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#3b2f5c;color:#fff">N</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td><b>150</b></td></tr><tr><td style="text-align:left;white-space:nowrap"><b>Lic. Rivero</b> <span class="mini">Enf.</span></td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#3b2f5c;color:#fff">N</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#7d2a4c;color:#fff">G</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fde2e2;color:#991b1b">!</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#f3eef0;color:#b9a9b0"></td><td><b>162</b></td></tr><tr><td style="text-align:left;white-space:nowrap"><b>Lic. Arteaga</b> <span class="mini">Farm.</span></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#e0ecfa;color:#1e4f8a">M</td><td style="background:#f3eef0;color:#b9a9b0"></td><td><b>132</b></td></tr><tr><td style="text-align:left;white-space:nowrap"><b>Aux. Paz</b> <span class="mini">Aux.</span></td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#7d2a4c;color:#fff">G</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#f3eef0;color:#b9a9b0"></td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#fdf0d5;color:#8a5a00">T</td><td style="background:#f3eef0;color:#b9a9b0"></td><td><b>150</b></td></tr></tbody></table>
+      <div class="chips" style="margin-top:8px;font-size:12px"><span class="chip" style="background:#e0ecfa">M mañana 6 h</span><span class="chip" style="background:#fdf0d5">T tarde 6 h</span><span class="chip" style="background:#3b2f5c;color:#fff">N noche 12 h</span><span class="chip" style="background:#7d2a4c;color:#fff">G guardia 24 h</span><span class="chip" style="background:#dcf3e5">V vacación</span><span class="chip" style="background:#fde2e2">! falta sin cubrir</span></div></div>
+    <div class="cols c3" style="margin-top:12px">
+      <div class="card" style="border:2px solid #fecaca"><div class="lbl" style="color:#991b1b">Alertas del rol</div><div style="font-size:13px;line-height:1.6">• Jue 29 tarde: Lic. Rivero con permiso → <b>enfermería sin cubrir</b><br>• Dra. Méndez de vacación 21–27: consultorio 1 solo con Dr. Flores en la tarde</div></div>
+      <div class="card"><div class="lbl">Reglas que revisa solo</div><div style="font-size:13px;line-height:1.6">Descanso después de guardia · máximo de horas · mínimo por servicio (ej. 1 enfermera por turno) · feriados</div></div>
+      <div class="card"><div class="lbl">Publicar</div><div style="font-size:13px;line-height:1.6">Al aprobar el rol, cada uno lo recibe por SMS y lo ve en la app del profesional. Impreso para el mural.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ G2 ============ -->
+<section class="scr" id="g2">
+  <div class="app"><div class="brand">SIVEC <span>RED</span></div><div class="who">📟 Quién está de guardia ahora · jueves 25/09 · 22:10</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Hospital de 2º nivel · guardia de hoy</div>
+        <table class="l"><thead><tr><th>Especialidad</th><th>De guardia</th><th>Modo</th><th>Contacto</th></tr></thead><tbody>
+          <tr><td><b>Emergencias</b></td><td>Dr. Quiroga · Dra. Lima</td><td><span class="st ok">en el hospital</span></td><td>interno 101</td></tr>
+          <tr><td><b>Ginecología-obstetricia</b></td><td>Dra. Suárez</td><td><span class="st ok">en el hospital</span></td><td>interno 204</td></tr>
+          <tr><td><b>Pediatría / neonatología</b></td><td>Dr. Vargas</td><td><span class="st ok">en el hospital</span></td><td>interno 310</td></tr>
+          <tr><td><b>Cirugía</b></td><td>Dr. Paz</td><td><span class="st ok">en el hospital</span></td><td>interno 220</td></tr>
+          <tr><td><b>Anestesiología</b></td><td>Dr. Céspedes</td><td><span class="st warn">llamada · 20 min</span></td><td>📞 celular de guardia</td></tr>
+          <tr><td><b>Traumatología</b></td><td>Dr. Ortiz</td><td><span class="st warn">llamada · 30 min</span></td><td>📞 celular de guardia</td></tr>
+          <tr><td><b>Imagen</b></td><td>Lic. Salvatierra · informe: Dr. Aguilera (a distancia)</td><td><span class="st ok">en el hospital</span></td><td>interno 150</td></tr></tbody></table>
+        <div class="mini" style="margin-top:6px">Se llena solo con el rol aprobado y la huella de entrada. Si alguien no marcó entrada, aparece en rojo.</div></div>
+      <div>
+        <div class="card"><div class="lbl">Centros de 1er nivel abiertos ahora</div>
+          <div class="kv2"><span>C.S. San Luis (24 h)</span><b>Dr. Flores · Lic. Mercado (reemplazo)</b></div><div class="kv2"><span>C.S. Plan 3000 (24 h)</span><b>Dra. Aliaga</b></div><div class="kv2"><span>C.S. Los Lotes</span><b style="color:#7a6a71">cerrado · abre 07:00</b></div></div>
+        <div class="card" style="margin-top:12px;font-size:13px"><div class="lbl">Para qué sirve</div>Al <b>derivar</b> o <b>referir una emergencia</b>, el SIVEC ya sabe a quién avisar. En la TV de emergencias: “Pediatra de guardia: Dr. Vargas”.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ G3 ============ -->
+<section class="scr" id="g3">
+  <div class="app"><div class="brand">SIVEC <span>ASISTENCIA</span></div><div class="who">🖐 Marcación con huella · C.S. San Luis · jueves 25/09</div></div>
+  <div class="body">
+    <div class="kpi"><div><small>Programados hoy</small><b>14</b></div><div><small>Marcaron entrada</small><b style="color:#15803d">12</b></div><div><small>Atrasos</small><b style="color:#b45309">2</b></div><div><small>Falta sin aviso</small><b style="color:#991b1b">0</b></div></div>
+    <div class="cols c21" style="margin-top:12px">
+      <div class="card"><div class="lbl">Entradas y salidas · mismo lector de huella de recepción</div>
+        <table class="l"><thead><tr><th>Personal</th><th>Turno</th><th>Entrada</th><th>Salida</th><th></th></tr></thead><tbody>
+          <tr><td><b>Dra. Méndez</b></td><td>M 07:00–13:00</td><td>06:52</td><td>—</td><td><span class="st ok">a tiempo</span></td></tr>
+          <tr><td><b>Lic. Cuéllar</b></td><td>M 07:00–13:00</td><td>07:18</td><td>—</td><td><span class="st warn">18 min tarde</span></td></tr>
+          <tr><td><b>Dra. Rocha</b></td><td>M 08:00–14:00</td><td>07:55</td><td>—</td><td><span class="st ok">a tiempo</span></td></tr>
+          <tr><td><b>Lic. Arteaga</b></td><td>M 07:00–13:00</td><td>07:09</td><td>—</td><td><span class="st warn">9 min tarde</span></td></tr>
+          <tr><td><b>Dr. Flores</b></td><td>T 13:00–19:00</td><td>—</td><td>—</td><td><span class="st mut">aún no</span></td></tr></tbody></table></div>
+      <div>
+        <div class="card"><div class="lbl">Sin trampas</div><div style="font-size:13px;line-height:1.6">La huella no se presta. La foto del lector queda si hay dudas. Si el lector falla, marca el jefe con su huella y queda anotado.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Fin de mes</div><div style="font-size:13px;line-height:1.6">Resumen por persona: horas trabajadas, atrasos, faltas, horas extra → se exporta al sistema de RRHH para la planilla.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ G4 ============ -->
+<section class="scr" id="g4">
+  <div class="app"><div class="brand">SIVEC <span>PERSONAL</span></div><div class="who">🔁 Cambios de turno y reemplazos</div></div>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card"><div class="lbl">Cambio entre colegas</div>
+        <div style="font-size:13.5px;line-height:1.6"><b>Lic. Rivero</b> (tarde del <b>jue 29</b>) ↔ <b>Lic. Mercado</b> (tarde del <b>sáb 31</b>)</div>
+        <div class="tl" style="margin-top:8px"><div style="--c:#15803d">Lic. Rivero pide · 🖐</div><div style="--c:#15803d">Lic. Mercado acepta · 🖐</div><div style="--c:#b45309">Jefa de enfermería aprueba · pendiente</div></div>
+        <div class="chk3" style="margin-top:6px"><span class="ok">✓ Nadie queda sin descanso</span><span class="ok">✓ No pasa el máximo de horas</span></div></div>
+      <div class="card"><div class="lbl">Reemplazo urgente · alguien avisó que no viene</div>
+        <div style="font-size:13.5px"><b>Hoy 13:00 · Enfermería tarde</b> · Lic. Rivero enferma (certificado 📷)</div>
+        <div class="lbl" style="margin-top:10px">El SIVEC sugiere quién puede venir</div>
+        <table class="lab"><tr><th>Personal</th><th>Por qué</th><th></th></tr><tr><td>Lic. Mercado</td><td>libre hoy · descansó · 12 h esta semana</td><td><span class="btn p">Avisar</span></td></tr><tr><td>Lic. Cuéllar</td><td>termina 13:00 · haría doble turno</td><td><span class="dt w">no ideal</span></td></tr><tr><td>Lic. Soria (Plan 3000)</td><td>libre · otro centro de la red</td><td><span class="btn">Avisar</span></td></tr></table>
+        <div class="mini" style="margin-top:6px">SMS a los sugeridos · el primero que acepta queda en el rol.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ G5 ============ -->
+<section class="scr" id="g5">
+  <div class="app"><div class="brand">SIVEC <span>PERSONAL</span></div><div class="who">🌴 Vacaciones, permisos y licencias</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Solicitudes</div>
+        <table class="l"><thead><tr><th>Personal</th><th>Tipo</th><th>Fechas</th><th>Saldo</th><th>Estado</th></tr></thead><tbody>
+          <tr><td><b>Dra. Méndez</b></td><td>Vacación</td><td>21–27/10</td><td>15 → 10 días</td><td><span class="st ok">aprobada</span></td></tr>
+          <tr><td><b>Lic. Rivero</b></td><td>Baja médica</td><td>25–26/09</td><td>—</td><td><span class="st info">certificado 📷</span></td></tr>
+          <tr><td><b>Aux. Paz</b></td><td>Permiso personal</td><td>03/10 · 2 h</td><td>—</td><td><span class="st warn">pendiente</span></td></tr>
+          <tr><td><b>Lic. Arteaga</b></td><td>Capacitación</td><td>14–15/10</td><td>—</td><td><span class="st ok">aprobada</span></td></tr>
+          <tr><td><b>Dra. Aliaga</b></td><td>Licencia de maternidad</td><td>desde 01/11</td><td>—</td><td><span class="st ok">aprobada · reemplazo asignado</span></td></tr></tbody></table></div>
+      <div>
+        <div class="card"><div class="lbl">Antes de aprobar, el jefe ve</div><div style="font-size:13px;line-height:1.6">Quiénes más faltan esos días · si el servicio queda cubierto · el saldo de días. Todo en una pantalla.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Calendario del equipo</div><div style="font-size:13px">Vista mensual de quién está de vacación o capacitación, para no dejar el centro vacío en diciembre.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ G6 ============ -->
+<section class="scr" id="g6">
+  <div class="app"><div class="brand">SIVEC <span>PERSONAL</span></div><div class="who">🪪 Ficha del personal · Lic. Rosa Cuéllar · enfermera</div></div>
+  <div class="body">
+    <div class="cols c3">
+      <div class="card"><div class="lbl">Datos y cargo</div>
+        <div class="kv2"><span>CI</span><b>6.332.140</b></div><div class="kv2"><span>Cargo</span><b>Lic. en enfermería · ítem</b></div><div class="kv2"><span>Centro</span><b>C.S. San Luis</b></div><div class="kv2"><span>Carga horaria</span><b>6 h/día</b></div><div class="kv2"><span>Desde</span><b>03/2019</b></div></div>
+      <div class="card"><div class="lbl">Títulos y matrícula</div>
+        <div class="chk3"><span class="ok">✓ Título · UAGRM 2017</span><span class="ok">✓ Matrícula profesional vigente</span><span class="no">⏳ RCP / soporte vital · vence 11/2026</span><span class="ok">✓ Curso cadena de frío 2025</span></div>
+        <div class="mini" style="margin-top:6px">Avisa antes de que venza un certificado obligatorio.</div></div>
+      <div class="card"><div class="lbl">Salud del trabajador</div>
+        <div class="chk3"><span class="ok">✓ Hepatitis B · 3 dosis</span><span class="ok">✓ Influenza 2026</span><span class="ok">✓ dT vigente</span></div>
+        <div class="mini" style="margin-top:6px">Accidente con aguja → registro y protocolo (con el módulo de vacunas y laboratorio).</div></div>
+    </div>
+    <div class="card" style="margin-top:12px"><div class="lbl">Lo que hizo en el SIVEC este mes · automático</div>
+      <div class="kv2"><span>Vacunas aplicadas</span><b>412</b></div><div class="kv2"><span>Controles de signos vitales / triaje</span><b>286</b></div><div class="kv2"><span>Horas trabajadas · extra</span><b>132 · 6</b></div>
+      <div class="mini">Solo lo ve ella y su jefe. Sirve para su evaluación, no para castigar.</div></div>
+  </div>
+</section>
+
+<!-- ============ G7 ============ -->
+<section class="scr" id="g7">
+  <div class="app"><div class="brand">SIVEC <span>DOCENCIA</span></div><div class="who">🎓 Internos y residentes · Hospital de 2º nivel · gestión 2026</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Rotaciones de internos</div>
+        <table class="l"><thead><tr><th>Interno</th><th>Rotación actual</th><th>Tutor</th><th>Notas por firmar</th></tr></thead><tbody>
+          <tr><td><b>Int. Rojas</b></td><td>Gineco-obstetricia (sep–oct)</td><td>Dra. Suárez</td><td><span class="st warn">3 pendientes</span></td></tr>
+          <tr><td><b>Int. Gómez</b></td><td>Pediatría (sep–oct)</td><td>Dr. Vargas</td><td><span class="st ok">al día</span></td></tr>
+          <tr><td><b>Int. Salazar</b></td><td>Medicina interna</td><td>Dr. Ibáñez</td><td><span class="st bad">7 pendientes</span></td></tr>
+          <tr><td><b>Int. Vaca</b></td><td>Cirugía</td><td>Dr. Paz</td><td><span class="st ok">al día</span></td></tr></tbody></table>
+        <div class="mini" style="margin-top:6px">Las notas que escribe el interno quedan “por validar” hasta que el residente o el tutor corrige y firma (como en la historia de hospitalización).</div></div>
+      <div>
+        <div class="card"><div class="lbl">Evaluación de la rotación</div><div style="font-size:13px;line-height:1.6">Casos vistos, procedimientos hechos (partos, suturas, vías) y correcciones recibidas → base para la nota del tutor.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Residentes</div><div style="font-size:13px">Guardias por año de residencia, descanso post-guardia, rotaciones externas, y los mismos permisos que el resto del personal.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ G8 ============ -->
+<section class="scr" id="g8">
+  <div class="app"><div class="brand">SIVEC <span>PERSONAL</span></div><div class="who">📊 Indicadores de personal · Red Centro · septiembre</div></div>
+  <div class="body">
+    <div class="kpi"><div><small>Turnos cubiertos</small><b style="color:#15803d">98,6%</b></div><div><small>Ausentismo</small><b>3,2%</b></div><div><small>Horas extra del mes</small><b>412 h</b></div><div><small>Certificados por vencer</small><b style="color:#b45309">11</b></div></div>
+    <div class="cols c2" style="margin-top:12px">
+      <div class="card"><div class="lbl">Personal por población (cada 10.000 habitantes)</div>
+        <div class="zn"><span>Médicos</span><div class="bar2"><i style="width:42%;background:#7d2a4c"></i></div><b>4,2</b></div>
+        <div class="zn"><span>Enfermería</span><div class="bar2"><i style="width:61%;background:#2f6fb0"></i></div><b>6,1</b></div>
+        <div class="zn"><span>Odontología</span><div class="bar2"><i style="width:12%;background:#15803d"></i></div><b>1,2</b></div>
+        <div class="mini" style="margin-top:6px">Ayuda a pedir ítems con datos: “San Luis atiende 30% más pacientes con el mismo personal”.</div></div>
+      <div class="card"><div class="lbl">Carga de trabajo por centro</div>
+        <table class="lab"><tr><th>Centro</th><th>Consultas por médico/día</th><th></th></tr><tr><td>C.S. San Luis</td><td>31</td><td><span class="dt w">alta</span></td></tr><tr><td>C.S. Plan 3000</td><td>26</td><td><span class="dt ok">normal</span></td></tr><tr><td>C.S. Los Lotes</td><td>18</td><td><span class="dt ok">normal</span></td></tr></table>
+        <div class="mini" style="margin-top:6px">Sale del SIVEC (consultas reales), no de planillas.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  const NOTES = {
+    g1: '<b>Escala de turnos:</b> o mês inteiro por pessoa (manhã, tarde, noite, plantão 24 h, férias) com horas somadas; o SIVEC avisa turno sem cobertura, falta de descanso e máximo de horas; publicado por SMS e no app do profissional.',
+    g2: '<b>Quem está de plantão agora:</b> por especialidade no hospital (presencial ou chamada, com tempo de chegada) e os centros abertos. Serve para derivar ou referir sabendo a quem avisar, e aparece na TV de emergências.',
+    g3: '<b>Assistência com huella:</b> entrada e saída no mesmo leitor da recepção; atrasos e faltas; no fim do mês o resumo (horas, extras, faltas) vai para o sistema de RRHH da planilha.',
+    g4: '<b>Trocas e substituições:</b> troca entre colegas com aceite e aprovação do chefe verificando descanso e horas; substituição urgente com sugestão de quem pode vir e SMS — o primeiro que aceita entra na escala.',
+    g5: '<b>Férias e permissões:</b> solicitações com saldo de dias, atestado por foto, licença maternidade com substituto; o chefe vê se o serviço fica coberto antes de aprovar.',
+    g6: '<b>Ficha do pessoal:</b> dados e cargo, títulos e matrícula com aviso de vencimento (RCP), vacinas do trabalhador e o que fez no SIVEC no mês (só ela e o chefe veem).',
+    g7: '<b>Internos e residentes:</b> rotações com tutor, notas por validar (o residente corrige e assina), procedimentos para a avaliação, plantões e descanso dos residentes.',
+    g8: '<b>Indicadores:</b> turnos cobertos, absenteísmo, horas extra, certificados por vencer, pessoal por 10.000 habitantes e carga de trabalho real por centro — para pedir itens com dados.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 'g1');
+</script>
+
+</body>
+</html>
