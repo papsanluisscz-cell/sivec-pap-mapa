@@ -807,3 +807,8 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - **Idea pendiente:** gamificación de la satisfacción (“mi ganado / mi estancia” o árbol que crece). Privada por médico, pública solo por centro; crece con calidad + satisfacción; mínimo de 20 respuestas. **Esperando que el usuario elija la metáfora.**
 - **PDF paso a paso (empresa → gobierno):** docs/negocio/SIVEC-passo-a-passo-empresa-governo.pdf (12 páginas). Fuente: docs/negocio/pdf-src/passo-a-passo.html. Usuario aprobó el kiosco con mapa y la encuesta de satisfacción.
 - **SIVEC completo (prototipo navegable):** docs/SIVEC-completo.html. Entrar por función (médico, recepción, enfermería, hospital, farmacia, laboratorio, gestor, admin, ver todo), cada una con su “Para hacer hoy” y su menú de módulos; abre todas las pantallas diseñadas en modo presentación. Publicado como página.
+
+## SIVEC PAP em camadas (para vender primeiro o PAP/VPH)
+- Esboço `docs/esboco-pap-capas.html` (pap-capas-01/02.png): Centro de salud → lote de láminas → Oncológico (informa PAP/VPH/biopsia, firma digital) → resultado digital volta ao centro; derivação digital a colposcopia 2º nivel → biopsia → oncológico → resultado CIN → contrarreferencia ao centro.
+- Capas: 1 Centro (funciona), 2 Oncológico (desenhado no esboço de laboratório, falta programar), 3 Gestor de red (parcial, por centro), 4 Administración (falta programar).
+- Ordem para programar: 1) login+roles+redes/centros, 2) lote de envío, 3) portal oncológico, 4) derivação digital + contrarreferencia, 5) tablero gestor de red.
