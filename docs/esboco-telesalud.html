@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIVEC Telesalud</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
+    --n1:#2f6fb0; --n2:#0e7490; --n3:#7c3aed; --n4:#b4235a; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .topbar { position:sticky; top:0; z-index:5; background:#2a1720; color:#fff; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; }
+  .topbar b { margin-right:6px; font-size:15px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; border:1px solid #6b4a58; background:transparent; color:#fff; border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tab.on { background:#fff; color:var(--wine-d); border-color:#fff; }
+  .warn { max-width:1100px; margin:14px auto 0; background:#fff7e0; border:1px solid #ecd9a0; border-radius:10px; padding:10px 14px; font-size:14px; color:#5b4712; }
+  .scr { display:none; max-width:1100px; margin:14px auto 30px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,.14); }
+  .scr.on { display:block; }
+  .app { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; }
+  .app .brand { font-weight:800; font-size:20px; letter-spacing:.04em; } .app .brand span { font-size:11px; background:#fff; color:var(--wine-d); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:3px; letter-spacing:.08em; }
+  .app .who { font-size:14px; opacity:.95; }
+  .body { padding:18px 22px 22px; }
+  h2 { margin:0 0 4px; font-size:20px; } .sub { color:var(--soft); font-size:14px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cols { display:grid; gap:14px; } .c2 { grid-template-columns:1fr 1fr; } .c3 { grid-template-columns:1fr 1fr 1fr; } .c21 { grid-template-columns:1.6fr 1fr; }
+  .lbl { font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); margin:10px 0 5px; }
+  .lbl:first-child { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:13px; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .chip.on { background:var(--tint); border-color:var(--wine); color:var(--wine-d); font-weight:700; }
+  .inp { border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13.5px; background:#fff; min-height:36px; }
+  .inp.tall { min-height:62px; line-height:1.45; }
+  .pri { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pri div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; }
+  .pri div b { display:block; font-size:14px; } .pri div.on { border:2px solid var(--wine); background:var(--tint); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .auto { background:#f3f7fb; border:1px dashed #b9cde3; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.55; }
+  .auto b { color:#1e4f8a; }
+  .att { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; } .att span { font-size:12.5px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13.5px; font-weight:700; border-radius:9px; padding:8px 14px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .btn.p { background:var(--wine); border-color:var(--wine); color:#fff; } .btn.g { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fp { width:26px; height:30px; vertical-align:middle; }
+  table.l { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; border-radius:12px; overflow:hidden; }
+  table.l th { text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); padding:9px 10px; border-bottom:1px solid var(--line); background:#fff; }
+  table.l td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .st { font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .st.bad { background:var(--badbg); color:var(--bad); } .st.warn { background:var(--warnbg); color:var(--warn); } .st.ok { background:var(--okbg); color:var(--ok); } .st.info { background:#e0ecfa; color:#1e4f8a; } .st.mut { background:#eee; color:#555; }
+  .lvl { font-size:11px; font-weight:800; color:#fff; border-radius:6px; padding:2px 7px; }
+  .mini { font-size:12px; color:var(--soft); }
+  .note { max-width:1100px; margin:-16px auto 30px; background:#fff; border-radius:10px; padding:12px 16px; font-size:14px; line-height:1.5; color:#3b3035; border-left:4px solid var(--wine); }
+  /* flujo */
+  .levels { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin:6px 0 4px; }
+  .lv { text-align:center; padding:0 8px; }
+  .lv .ic { width:74px; height:74px; border-radius:18px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; }
+  .lv b { display:block; font-size:15px; } .lv span { font-size:12.5px; color:var(--soft); }
+  .arrows { position:relative; height:74px; margin-top:-120px; margin-bottom:60px; pointer-events:none; }
+  .loop { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+  .loop div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12.3px; text-align:center; position:relative; }
+  .loop div b { display:block; font-size:13px; } .loop i { font-style:normal; display:block; font-size:18px; }
+  .loop div:not(:last-child)::after { content:"›"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--soft); font-size:18px; }
+  .world { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .world div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:12.3px; line-height:1.4; }
+  .world b { display:block; font-size:13px; color:var(--wine-d); }
+  /* seguimiento */
+  .steps { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin:8px 0 4px; }
+  .steps div { text-align:center; font-size:12px; position:relative; padding-top:30px; }
+  .steps div::before { content:""; position:absolute; top:9px; left:0; right:0; height:4px; background:#e3d6dc; }
+  .steps div:first-child::before { left:50%; } .steps div:last-child::before { right:50%; }
+  .steps div.done::before { background:var(--ok); } .steps div.cur::before { background:linear-gradient(90deg,var(--ok) 50%,#e3d6dc 50%); }
+  .steps i { position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:50%; background:#e3d6dc; color:#fff; font-style:normal; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:3px solid var(--paper); }
+  .steps .done i { background:var(--ok); } .steps .cur i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .steps b { display:block; font-size:12.5px; } .steps small { color:var(--soft); }
+  .tl { border-left:3px solid var(--line); margin-left:8px; padding-left:14px; }
+  .tl div { position:relative; font-size:13px; margin-bottom:10px; line-height:1.4; }
+  .tl div::before { content:""; position:absolute; left:-21px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--c,#999); border:2px solid #fff; }
+  .kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:600; } .kpi b { font-size:28px; letter-spacing:-.01em; } .kpi span { font-size:12px; color:var(--soft); }
+  .bars div.r { display:grid; grid-template-columns:170px 1fr 54px; align-items:center; gap:10px; font-size:13px; margin:7px 0; }
+  .bars .trk { height:14px; border-radius:0 4px 4px 0; background:transparent; position:relative; }
+  .bars .fill { height:14px; border-radius:0 4px 4px 0; background:var(--wine); }
+  .bars .ref { position:absolute; top:-3px; bottom:-3px; width:2px; background:#2d2429; }
+  .bars .v { font-weight:700; text-align:right; }
+  .alertc { border-left:4px solid var(--bad); }
+
+  .role .rh { display:flex; gap:10px; align-items:center; margin-bottom:8px; } .role .rh b { display:block; font-size:15px; } .role .rh small { color:var(--soft); font-size:12px; }
+  .ri { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .todo { display:flex; align-items:center; gap:10px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .todo:last-child { border-bottom:none; }
+  .todo .st { min-width:30px; text-align:center; font-size:13px; }
+  .mini2 { font-size:13px; line-height:1.5; } .mini2 b { display:block; margin-bottom:2px; }
+  .flowbar { display:flex; gap:6px; margin-bottom:12px; } .flowbar span { flex:1; text-align:center; font-size:13px; font-weight:700; padding:7px; border-radius:9px; background:#fff; border:1px solid var(--line); color:var(--soft); }
+  .flowbar span.on { background:var(--okbg); color:var(--ok); border-color:#b8e3c7; } .flowbar span.cur { background:var(--wine); color:#fff; border-color:var(--wine); }
+  .found { display:flex; gap:12px; align-items:center; margin-top:10px; padding:10px; border-radius:10px; background:#f3f9f5; border:1px solid #cfe9d8; }
+  .photo2 { width:64px; height:72px; border-radius:10px; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:24px; flex:none; }
+  .k2 { display:block; font-size:10.5px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.04em; }
+  .scanner { width:150px; height:160px; margin:6px auto 0; border-radius:18px; background:radial-gradient(circle at 50% 45%, #fff 0, #f7e9ef 70%); border:3px solid #d9b9c6; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -6px 12px rgba(125,42,76,.12); }
+  .ticket { margin-top:12px; text-align:center; }
+  .tk { border:2px dashed var(--wine); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:2px; font-size:13.5px; } .tk b { font-size:40px; color:var(--wine-d); letter-spacing:.04em; line-height:1.1; } .tk small { color:var(--soft); font-size:11.5px; }
+  .q2 { padding:8px 10px; border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:13.5px; background:#fff; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; } .q2 .mini { width:100%; }
+  .q2.cur { border:2px solid var(--wine); background:var(--tint); } .q2 .st { margin-left:auto; }
+  .vit2 { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .vit2 div { background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 8px; font-size:16px; font-weight:800; } .vit2 small { display:block; font-size:10.5px; color:var(--soft); font-weight:700; text-transform:uppercase; }
+  .tv { background:#120810; border-radius:16px; padding:14px; color:#fff; border:8px solid #2a2a2a; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
+  .tvh { display:flex; justify-content:space-between; font-size:13px; color:#cfb7c2; font-weight:700; letter-spacing:.08em; }
+  .tvnow { background:linear-gradient(135deg,#7d2a4c,#b4235a); border-radius:12px; padding:16px; text-align:center; } .tvnow small { display:block; font-size:13px; letter-spacing:.2em; font-weight:800; color:#ffe4ee; }
+  .tvnow b { display:block; font-size:64px; line-height:1.05; letter-spacing:.04em; } .tvnow span { display:block; font-size:24px; font-weight:700; } .tvnow em { display:block; font-style:normal; font-size:20px; margin-top:4px; color:#ffe4ee; }
+  .tvlist div { display:flex; gap:12px; align-items:baseline; font-size:18px; padding:6px 4px; border-bottom:1px solid #3a2530; } .tvlist b { color:#f1a7c3; min-width:70px; } .tvlist span { margin-left:auto; color:#cfb7c2; font-size:15px; }
+  .tvf { font-size:13px; color:#cfb7c2; }
+  .doc { display:grid; grid-template-columns:34px 1fr auto auto; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--line); font-size:13.5px; } .di { font-size:22px; text-align:center; } .dest { font-size:12.5px; color:var(--soft); font-weight:600; }
+  .st.warn { margin:0; max-width:none; padding:2px 9px; border:none; font-size:11.5px; }
+  .todo .st.warn { font-size:13px; }
+
+  .svc { display:flex; flex-wrap:wrap; gap:8px; } .svc span { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 12px; font-size:13.5px; font-weight:600; }
+  .prob { display:flex; align-items:center; gap:8px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .prob .mini { margin-left:auto; }
+  .dotc { width:10px; height:10px; border-radius:50%; flex:none; }
+  .tpl { border:1px solid; border-left-width:5px; border-radius:10px; padding:9px 11px; font-size:13px; line-height:1.45; background:#fff; } .tpl b { display:block; font-size:14px; margin-bottom:2px; }
+  .opt { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; } .opt span { border:1px solid var(--line); border-radius:12px; padding:10px; font-size:22px; background:#fff; text-align:center; } .opt b { display:block; font-size:14px; margin-top:4px; } .opt small { display:block; font-size:12px; color:var(--soft); }
+  .opt .sel { border:2px solid var(--wine); background:var(--tint); }
+  .side { border-left:4px solid var(--line); padding:5px 10px; margin-bottom:8px; font-size:13.5px; line-height:1.45; } .side b { display:block; }
+  .stk { display:grid; grid-template-columns:150px 1fr auto; gap:8px; align-items:center; font-size:13px; margin:6px 0; } .stk div { height:10px; background:#eee4e8; border-radius:5px; overflow:hidden; } .stk i { display:block; height:100%; background:#15803d; border-radius:5px; } .stk b { font-size:12.5px; }
+  .phn { background:#e5ddd5; border:9px solid #1f1f1f; border-radius:26px; padding:10px; display:flex; flex-direction:column; gap:8px; min-height:430px; }
+  .phh { background:#075e54; color:#fff; font-size:13px; font-weight:700; margin:-10px -10px 4px; padding:10px 12px; border-radius:16px 16px 0 0; }
+  .msg { font-size:13px; line-height:1.4; border-radius:10px; padding:7px 9px; max-width:88%; box-shadow:0 1px 1px rgba(0,0,0,.12); } .msg.in { background:#fff; align-self:flex-start; } .msg.out { background:#dcf8c6; align-self:flex-end; font-weight:800; }
+  .ck { font-size:13.5px; line-height:1.45; } .ck b { display:block; font-size:15px; margin-bottom:3px; }
+
+  .kv2 { display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:4px 0; border-bottom:1px dashed var(--line); } .kv2 span { color:var(--soft); }
+  .req { display:flex; flex-wrap:wrap; gap:6px; } .req span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .req .ok { background:var(--okbg); color:var(--ok); } .req .no { background:var(--warnbg); color:var(--warn); }
+  .qx { position:relative; height:30px; background:#f3eef0; border-radius:8px; margin:6px 0; padding-left:34px; } .qx b { position:absolute; left:8px; top:6px; font-size:13px; }
+  .qx span { position:absolute; top:3px; bottom:3px; margin-left:34px; border-radius:6px; color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; padding:0 6px; white-space:nowrap; overflow:hidden; }
+  .who2 { display:grid; gap:6px; } .who2 div { border:1px solid var(--line); border-radius:8px; padding:6px 9px; background:#f7fbf8; font-size:12.5px; } .who2 b { display:block; color:var(--wine-d); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; } .who2 span { color:#166534; }
+  .beds { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .bed { border-radius:10px; padding:8px; font-size:13px; font-weight:700; border:1px solid var(--line); min-height:76px; } .bed b { display:block; font-size:18px; } .bed small { display:block; font-weight:500; font-size:11.5px; color:var(--soft); }
+  .bed.p { background:#fbe4ee; } .bed.a { background:#fde2e2; } .bed.g { background:#ede4fb; } .bed.free { background:#ecf8f1; color:#15803d; } .bed.clean { background:#fdf0d5; color:#8a5a00; } .bed.sel { outline:3px solid var(--wine); }
+  .leg2 { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-left:6px; border:1px solid var(--line); }
+  .dose { border:1px solid var(--line); border-radius:10px; padding:7px 9px; margin-bottom:6px; font-size:13px; display:flex; flex-direction:column; } .dose span { color:var(--soft); font-size:12px; } .dose em { font-style:normal; margin-top:2px; }
+  .srch { border-left:4px solid #c2410c; background:#fff7f0; border-radius:6px; padding:6px 9px; margin-bottom:6px; font-size:13px; } .srch b { display:block; font-size:12px; color:#c2410c; text-transform:uppercase; letter-spacing:.04em; }
+  .amb { border:9px solid #1f1f1f; border-radius:26px; background:#fff; overflow:hidden; min-height:420px; display:flex; flex-direction:column; }
+  .ah { background:#ea580c; color:#fff; font-weight:800; font-size:14px; padding:10px 12px; } .ab { padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .big2 { font-size:40px; font-weight:900; text-align:center; color:#ea580c; margin-top:6px; }
+
+  .tree div { padding:6px 8px; border-radius:8px; font-size:13.5px; } .tree small { color:var(--soft); margin-left:4px; }
+  .tree .t0 { font-weight:800; } .tree .t1 { padding-left:18px; font-weight:700; } .tree .t2 { padding-left:32px; font-weight:700; } .tree .t3 { padding-left:50px; } .tree .mut { color:var(--soft); }
+  .tree .on { background:#f3eef0; } .tree .sel { background:var(--tint); outline:2px solid var(--wine); }
+  .fing { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:8px; } .fing span { font-size:12px; font-weight:700; border-radius:999px; padding:3px 9px; background:#f3eef0; } .fing .done { background:var(--okbg); color:var(--ok); } .fing .cur { background:var(--wine); color:#fff; }
+  table.mx td, table.mx th { text-align:center; font-size:12.5px; padding:8px 6px; } table.mx td:first-child, table.mx th:first-child { text-align:left; }
+  table.mx2 td, table.mx2 th { text-align:center; font-size:12.5px; } table.mx2 td:first-child, table.mx2 th:first-child { text-align:left; }
+  table.mx2 td.on { color:#15803d; font-size:18px; } table.mx2 td.pi { color:#c2410c; font-size:18px; } table.mx2 td { color:#c9bcc2; font-size:18px; } table.mx2 td:first-child { font-size:13.5px; color:var(--ink); }
+  .catl { padding:8px 10px; border-radius:9px; font-size:13.5px; margin-bottom:4px; display:flex; justify-content:space-between; } .catl small { color:var(--soft); } .catl.on { background:var(--tint); font-weight:700; }
+  table.mx2 { table-layout:fixed; } table.mx2 th { font-size:10px; padding:6px 3px; letter-spacing:.02em; white-space:normal; text-align:center; } table.mx2 th:first-child { width:170px; } table.mx2 td { padding:8px 3px; }
+  .ring2 { width:150px; height:150px; border-radius:50%; margin:6px auto 0; background:conic-gradient(#7d2a4c 0 71%, #eadde3 71% 100%); display:flex; align-items:center; justify-content:center; } .ring2 > div { width:118px; height:118px; border-radius:50%; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; color:var(--soft); } .ring2 b { font-size:40px; color:var(--ink); line-height:1; }
+  .ctl { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; } .ctl span { text-align:center; border-radius:10px; padding:8px 4px; font-weight:800; font-size:14px; background:#f3eef0; color:#9c8b92; } .ctl small { display:block; font-weight:600; font-size:11px; } .ctl .d { background:#dcf3e5; color:#15803d; } .ctl .n { background:var(--wine); color:#fff; }
+  .chk3 { display:flex; flex-direction:column; gap:4px; } .chk3 span { font-size:12.8px; font-weight:600; border-radius:7px; padding:3px 8px; } .chk3 .ok { background:#ecf8f1; color:#15803d; } .chk3 .no { background:#fdf0d5; color:#8a5a00; }
+  .rk { display:flex; gap:10px; align-items:center; font-size:14px; padding:7px 0; border-bottom:1px dashed var(--line); } .rk .st { min-width:44px; text-align:center; }
+  .vg { width:100%; border-collapse:separate; border-spacing:4px; font-size:12.5px; } .vg th { font-size:10.5px; text-transform:uppercase; color:var(--soft); font-weight:800; text-align:center; } .vg th:first-child { text-align:left; }
+  .vg td { text-align:center; border-radius:8px; padding:5px 2px; font-weight:700; } .vg td:first-child { text-align:left; font-weight:700; background:none; padding-left:0; }
+  .vg .d { background:#dcf3e5; color:#15803d; } .vg .h { background:var(--wine); color:#fff; } .vg .a { background:#fde2e2; color:#991b1b; } .vg .f { background:#f3eef0; color:#9c8b92; } .vg .x { background:none; }
+  .fr { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:13.5px; } .fr:last-child { border:none; }
+  .tbig { font-size:30px; font-weight:900; line-height:1; }
+  .zn { display:grid; grid-template-columns:150px 1fr 60px; gap:8px; align-items:center; font-size:13px; padding:4px 0; }
+  .bar2 { height:12px; border-radius:6px; background:#eee; position:relative; overflow:hidden; } .bar2 i { position:absolute; left:0; top:0; bottom:0; border-radius:6px; } .bar2 .m { position:absolute; top:-2px; bottom:-2px; width:2px; background:#2d2429; }
+  .flow3 { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; } .flow3 span { text-align:center; font-size:12.5px; font-weight:700; border-radius:10px; padding:8px 4px; background:#f3eef0; color:#8a7a81; } .flow3 span small { display:block; font-weight:600; font-size:11px; } .flow3 .d { background:#dcf3e5; color:#15803d; } .flow3 .n { background:var(--wine); color:#fff; }
+  .al { display:flex; flex-wrap:wrap; gap:6px; } .al span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .al .r { background:#fde2e2; color:#991b1b; } .al .y { background:#fdf0d5; color:#8a5a00; } .al .g { background:#ecf8f1; color:#15803d; }
+  table.lab { width:100%; border-collapse:collapse; font-size:12.8px; } table.lab th { font-size:11px; text-transform:uppercase; color:var(--soft); text-align:left; padding:4px 6px; border-bottom:1px solid var(--line); } table.lab td { padding:5px 6px; border-bottom:1px dashed var(--line); }
+  .dt { display:inline-block; min-width:22px; text-align:center; border-radius:6px; padding:1px 6px; font-weight:800; font-size:12px; } .dt.ok { background:#dcf3e5; color:#15803d; } .dt.w { background:#fdf0d5; color:#8a5a00; } .dt.b { background:#fde2e2; color:#991b1b; } .dt.p { background:#eee; color:#888; }
+  .phs { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .dev { width:280px; height:560px; margin:0 auto; border-radius:36px; border:9px solid #17121a; background:#fff; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 14px 30px rgba(60,20,40,.2); }
+  .dev .sb { height:24px; display:flex; justify-content:space-between; align-items:center; padding:0 16px; font-size:10.5px; font-weight:700; color:#fff; background:var(--wine-d); flex:none; }
+  .dev .hd { background:linear-gradient(145deg,#8a3056,#5a1c36); color:#fff; padding:8px 14px 12px; flex:none; font-size:12px; } .dev .hd strong { display:block; font-size:16px; }
+  .dev .ct { flex:1; overflow:hidden; padding:10px; display:flex; flex-direction:column; gap:8px; background:#faf6f8; }
+  .dev .c { background:#fff; border:1px solid var(--line); border-radius:14px; padding:9px 11px; font-size:12.3px; line-height:1.4; }
+  .dev .c .t { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--soft); font-weight:800; margin-bottom:3px; }
+  .dev .nv { flex:none; display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); background:#fff; padding:5px 0 8px; text-align:center; font-size:10px; font-weight:700; color:#8a7a81; } .dev .nv .o { color:var(--wine); }
+  .dev .li { display:flex; justify-content:space-between; gap:6px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .dev .bt2 { display:block; text-align:center; font-weight:800; font-size:12.5px; border-radius:10px; padding:8px; background:var(--wine); color:#fff; margin-top:6px; } .dev .bt2.o2 { background:#fff; color:var(--wine); border:1.5px solid var(--wine); }
+  .cap2 { text-align:center; font-size:13.5px; margin-top:10px; color:#43363d; line-height:1.4; }
+  .bar { height:9px; border-radius:6px; background:#eee; overflow:hidden; } .bar i { display:block; height:100%; background:var(--ok,#15803d); }
+  .tl2 { display:grid; grid-template-columns:1fr 70px 1fr; gap:0; }
+  .tlc { border-radius:14px; padding:12px 14px; } .tlc h4 { margin:0 0 10px; font-size:15px; }
+  .ev { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 10px; font-size:12.8px; margin-bottom:7px; line-height:1.35; } .ev small { color:var(--soft); display:block; font-size:11.5px; }
+  .ev.lk { border:2px solid var(--wine); }
+  .ring2 { width:150px; height:150px; border-radius:50%; margin:6px auto 0; background:conic-gradient(#7d2a4c 0 71%, #eadde3 71% 100%); display:flex; align-items:center; justify-content:center; } .ring2 > div { width:118px; height:118px; border-radius:50%; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; color:var(--soft); } .ring2 b { font-size:40px; color:var(--ink); line-height:1; }
+  .ctl { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; } .ctl span { text-align:center; border-radius:10px; padding:8px 4px; font-weight:800; font-size:14px; background:#f3eef0; color:#9c8b92; } .ctl small { display:block; font-weight:600; font-size:11px; } .ctl .d { background:#dcf3e5; color:#15803d; } .ctl .n { background:var(--wine); color:#fff; }
+  .chk3 { display:flex; flex-direction:column; gap:4px; } .chk3 span { font-size:12.8px; font-weight:600; border-radius:7px; padding:3px 8px; } .chk3 .ok { background:#ecf8f1; color:#15803d; } .chk3 .no { background:#fdf0d5; color:#8a5a00; }
+  .rk { display:flex; gap:10px; align-items:center; font-size:14px; padding:7px 0; border-bottom:1px dashed var(--line); } .rk .st { min-width:44px; text-align:center; }
+  .flow3 { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; } .flow3 span { text-align:center; font-size:12.5px; font-weight:700; border-radius:10px; padding:8px 4px; background:#f3eef0; color:#8a7a81; } .flow3 span small { display:block; font-weight:600; font-size:11px; } .flow3 .d { background:#dcf3e5; color:#15803d; } .flow3 .n { background:var(--wine); color:#fff; }
+  .al { display:flex; flex-wrap:wrap; gap:6px; } .al span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .al .r { background:#fde2e2; color:#991b1b; } .al .y { background:#fdf0d5; color:#8a5a00; } .al .g { background:#ecf8f1; color:#15803d; }
+  table.lab { width:100%; border-collapse:collapse; font-size:12.8px; } table.lab th { font-size:11px; text-transform:uppercase; color:var(--soft); text-align:left; padding:4px 6px; border-bottom:1px solid var(--line); } table.lab td { padding:5px 6px; border-bottom:1px dashed var(--line); }
+  .dt { display:inline-block; min-width:22px; text-align:center; border-radius:6px; padding:1px 6px; font-weight:800; font-size:12px; } .dt.ok { background:#dcf3e5; color:#15803d; } .dt.w { background:#fdf0d5; color:#8a5a00; } .dt.b { background:#fde2e2; color:#991b1b; } .dt.p { background:#eee; color:#888; }
+  .phs { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .dev { width:280px; height:560px; margin:0 auto; border-radius:36px; border:9px solid #17121a; background:#fff; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 14px 30px rgba(60,20,40,.2); }
+  .dev .sb { height:24px; display:flex; justify-content:space-between; align-items:center; padding:0 16px; font-size:10.5px; font-weight:700; color:#fff; background:var(--wine-d); flex:none; }
+  .dev .hd { background:linear-gradient(145deg,#8a3056,#5a1c36); color:#fff; padding:8px 14px 12px; flex:none; font-size:12px; } .dev .hd strong { display:block; font-size:16px; }
+  .dev .ct { flex:1; overflow:hidden; padding:10px; display:flex; flex-direction:column; gap:8px; background:#faf6f8; }
+  .dev .c { background:#fff; border:1px solid var(--line); border-radius:14px; padding:9px 11px; font-size:12.3px; line-height:1.4; }
+  .dev .c .t { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--soft); font-weight:800; margin-bottom:3px; }
+  .dev .nv { flex:none; display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); background:#fff; padding:5px 0 8px; text-align:center; font-size:10px; font-weight:700; color:#8a7a81; } .dev .nv .o { color:var(--wine); }
+  .dev .li { display:flex; justify-content:space-between; gap:6px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .dev .bt2 { display:block; text-align:center; font-weight:800; font-size:12.5px; border-radius:10px; padding:8px; background:var(--wine); color:#fff; margin-top:6px; } .dev .bt2.o2 { background:#fff; color:var(--wine); border:1.5px solid var(--wine); }
+  .cap2 { text-align:center; font-size:13.5px; margin-top:10px; color:#43363d; line-height:1.4; }
+  .bar { height:9px; border-radius:6px; background:#eee; overflow:hidden; } .bar i { display:block; height:100%; background:var(--ok,#15803d); }
+  .tl2 { display:grid; grid-template-columns:1fr 70px 1fr; gap:0; }
+  .tlc { border-radius:14px; padding:12px 14px; } .tlc h4 { margin:0 0 10px; font-size:15px; }
+  .ev { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 10px; font-size:12.8px; margin-bottom:7px; line-height:1.35; } .ev small { color:var(--soft); display:block; font-size:11.5px; }
+  .ev.lk { border:2px solid var(--wine); }
+  .paper { background:#fff; max-width:1000px; margin:0 auto; border:1px solid #ddd; box-shadow:0 4px 16px rgba(0,0,0,.10); padding:26px 30px; font-size:12px; color:#222; line-height:1.35; }
+  .ph1 { display:flex; align-items:center; gap:12px; border-bottom:3px solid var(--wine); padding-bottom:8px; }
+  .ph1 .lg { width:40px; height:40px; border-radius:24%; background:linear-gradient(145deg,#9c3a5f,#5a1c36); color:#fff; font-weight:900; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .ph1 h3 { margin:0; font-size:18px; letter-spacing:.02em; } .ph1 .sm { font-size:11px; color:#666; }
+  .sec { margin-top:10px; border:1px solid #d8cdd2; border-radius:6px; overflow:hidden; }
+  .sec > h5 { margin:0; background:#f3e7ec; color:var(--wine-d); font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; padding:4px 8px; }
+  .sec .in2 { padding:6px 8px; }
+  .fg { display:grid; gap:4px 10px; } .fg div { border-bottom:1px solid #eee; padding:2px 0; } .fg small { display:block; font-size:9.5px; color:#8a7a81; text-transform:uppercase; letter-spacing:.03em; } .fg b { font-size:12.5px; }
+  .pt { width:100%; border-collapse:collapse; font-size:11.3px; } .pt th { background:#faf5f7; font-size:9.8px; text-transform:uppercase; color:#6f6168; border:1px solid #e6dce0; padding:3px 4px; text-align:left; } .pt td { border:1px solid #eee4e8; padding:3px 4px; }
+  .ya { color:#991b1b; font-weight:800; } .no2 { color:#15803d; }
+  .alx { background:#fff4f4; border:1px solid #f3c4c4; border-radius:6px; padding:5px 8px; }
+  .sig { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:12px; } .sig div { border-top:1px solid #999; padding-top:3px; font-size:10.5px; color:#555; text-align:center; }
+  .cn { display:grid; grid-template-columns:1fr 1fr; gap:0; max-width:1000px; margin:0 auto; background:#fff; border:1px solid #ddd; box-shadow:0 4px 16px rgba(0,0,0,.10); }
+  .cn > div { padding:16px 18px; font-size:12px; line-height:1.4; } .cn > div + div { border-left:2px dashed #ccc; }
+  .cn h6 { margin:10px 0 4px; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--wine-d); }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — 14 · Telesalud:</b>
+  <button class="tab on" data-t="t1">1. Pedir opinión al especialista</button>
+  <button class="tab" data-t="t2">2. Bandeja del especialista</button>
+  <button class="tab" data-t="t3">3. Videoconsulta asistida</button>
+  <button class="tab" data-t="t4">4. Paciente desde su casa</button>
+  <button class="tab" data-t="t5">5. Seguimiento a distancia</button>
+  <button class="tab" data-t="t6">6. Capacitación y ateneos</button>
+  <button class="tab" data-t="t7">7. Agenda e indicadores</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Sin app nueva: todo se abre con un enlace en el navegador (computadora o celular). Se puede integrar con el programa nacional de Telesalud.</div>
+
+<!-- ============ T1 ============ -->
+<section class="scr on" id="t1">
+  <div class="app"><div class="brand">SIVEC <span>TELESALUD</span></div><div class="who">📨 Interconsulta a distancia · C.S. Los Lotes → Dermatología · Dra. Aliaga</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">El caso se arma solo con la ficha · el médico agrega la pregunta y fotos</div>
+        <div class="kv2"><span>Paciente</span><b>Doña Elena Rojas · 67 a · diabética</b></div><div class="kv2"><span>Resumen</span><b>lesión en mejilla izq. 6 meses, crece, sangra a veces</b></div><div class="kv2"><span>Medicamentos · alergias</span><b>metformina · sin alergias</b></div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <div style="width:110px;height:84px;border-radius:8px;background:radial-gradient(circle at 55% 50%,#b0625e 0 14px,#d9a48e 15px 22px,#e8c3a8 23px);display:flex;align-items:flex-end;justify-content:center;color:#fff;font-size:10px;padding:3px">📷 cerca</div>
+          <div style="width:110px;height:84px;border-radius:8px;background:radial-gradient(circle at 50% 45%,#c07c68 0 6px,#e8c3a8 7px);display:flex;align-items:flex-end;justify-content:center;color:#5a3a2e;font-size:10px;padding:3px">📷 cara completa</div>
+          <div style="width:110px;height:84px;border-radius:8px;border:2px dashed var(--line);display:flex;align-items:center;justify-content:center;color:var(--soft);font-size:12px">+ foto</div></div>
+        <div class="lbl" style="margin-top:10px">Pregunta</div>
+        <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13.5px">¿Carcinoma basocelular? ¿Se puede biopsiar aquí o derivo?</div></div>
+      <div>
+        <div class="card"><div class="lbl">Especialidad y urgencia</div>
+          <div class="chips"><span class="chip on">Dermatología</span><span class="chip">Cardiología (ECG)</span><span class="chip">Pediatría</span><span class="chip">Gineco-obstetricia</span><span class="chip">Medicina interna</span><span class="chip">Salud mental</span></div>
+          <div class="chips" style="margin-top:8px"><span class="chip on">Respuesta en 48 h</span><span class="chip">Hoy</span></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Por qué primero preguntar</div><div style="font-size:13px;line-height:1.6">Muchas derivaciones se resuelven con una respuesta: la paciente no viaja 2 horas ni pierde el día. Si el especialista dice “derivar”, el botón <b>Derivar</b> ya lleva todo (sin fila).</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ T2 ============ -->
+<section class="scr" id="t2">
+  <div class="app"><div class="brand">SIVEC <span>TELESALUD</span></div><div class="who">🧑‍⚕️ Bandeja del especialista · Dr. Montaño (Dermatología) · Hosp. 3er nivel</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Interconsultas por responder</div>
+        <table class="l"><thead><tr><th>Desde</th><th>Paciente</th><th>Pregunta</th><th>Espera</th><th></th></tr></thead><tbody>
+          <tr><td>C.S. Los Lotes</td><td>Elena R. · 67 a</td><td>¿basocelular?</td><td><span class="st warn">20 h</span></td><td><span class="btn p">Responder</span></td></tr>
+          <tr><td>C.S. Plan 3000</td><td>Niño 4 a</td><td>placas con picazón</td><td>6 h</td><td><span class="btn">Responder</span></td></tr>
+          <tr><td>C.S. El Bajío</td><td>Hombre 38 a</td><td>úlcera en pierna</td><td>2 h</td><td><span class="btn">Responder</span></td></tr></tbody></table></div>
+      <div class="card"><div class="lbl">Respuesta · Elena R.</div>
+        <div style="font-size:13px;line-height:1.6">Imagen compatible con <b>carcinoma basocelular</b>. No urgente.<br><b>Conducta:</b> derivar a cirugía dermatológica · ya le reservé turno 14/10.<br>Proteger del sol; controlar glucemia antes de la cirugía.</div>
+        <div class="chips" style="margin-top:8px"><span class="chip">Resuelto en el centro</span><span class="chip on">Derivar</span><span class="chip">Videoconsulta</span></div>
+        <div class="mini" style="margin-top:6px">Firma 🖐 · vuelve a la ficha de la paciente y a la Dra. Aliaga · cuenta como producción del especialista.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ T3 ============ -->
+<section class="scr" id="t3">
+  <div class="app"><div class="brand">SIVEC <span>VIDEOCONSULTA</span></div><div class="who">🎥 Cardiología · Dr. Ibáñez (hospital) ↔ C.S. Los Lotes · Lic. Soria con el paciente</div></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:1.25fr 1fr">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="position:relative;height:310px;background:linear-gradient(160deg,#3b3438,#1f1a1d)">
+          <div style="position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);text-align:center;color:#eee"><div style="font-size:64px">🧓</div><div style="font-size:13px">Don Julio A. · 71 a · con Lic. Soria</div></div>
+          <div style="position:absolute;right:12px;top:12px;width:120px;height:86px;border-radius:8px;background:#584e53;display:flex;align-items:center;justify-content:center;color:#fff;font-size:30px">👨‍⚕️</div>
+          <div style="position:absolute;left:12px;top:12px;background:#b91c1c;color:#fff;font-size:11px;font-weight:800;border-radius:999px;padding:2px 9px">● EN VIVO 08:12</div>
+          <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px"><span class="btn" style="background:#fff">🎤</span><span class="btn" style="background:#fff">📷</span><span class="btn" style="background:#fff">🖥 compartir ECG</span><span class="btn" style="background:#b91c1c;color:#fff;border-color:#b91c1c">Colgar</span></div></div></div>
+      <div>
+        <div class="card"><div class="lbl">Lo que ve el especialista al lado</div>
+          <div class="kv2"><span>PA (tomada por la Lic.)</span><b class="ya">168/96</b></div><div class="kv2"><span>FC · SatO₂</span><b>88 irregular · 95%</b></div><div class="kv2"><span>ECG (foto)</span><b>fibrilación auricular</b></div><div class="kv2"><span>Remedios</span><b>enalapril 10 mg</b></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">SOAP y receta · como en el consultorio</div><div style="font-size:13px;line-height:1.6">A: FA + HTA no controlada<br>P: enalapril 20 mg · anticoagular (control en hospital) · ECG en 1 mes<br>Receta → farmacia del C.S. Los Lotes · firma 🖐</div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px;font-size:13px;display:flex;gap:14px;align-items:center"><div style="font-size:24px">📶</div><div><b>Internet débil:</b> baja la calidad del video; si se corta, sigue por <b>llamada telefónica</b> y la consulta queda registrada igual.</div></div>
+  </div>
+</section>
+
+<!-- ============ T4 ============ -->
+<section class="scr" id="t4">
+  <div class="app"><div class="brand">SIVEC <span>TELESALUD</span></div><div class="who">🏠 El paciente se conecta desde su casa · sin instalar nada</div></div>
+  <div class="body">
+    <div class="cols c3" style="align-items:start">
+      <div style="text-align:center"><div class="dev" style="height:430px;width:240px"><div class="sb"><span>09:55</span><span>SMS</span></div>
+        <div class="ct" style="background:#f0f0f0"><div class="c" style="border-radius:14px 14px 14px 4px">SIVEC · C.S. San Luis: Su control con la <b>Dra. Méndez</b> es hoy 10:00 por video. Entre aquí: <u>sivec.bo/v/K7P2</u><br>Si no puede, responda 1 y la llamamos por teléfono.</div></div></div>
+        <div class="cap2">① Llega un SMS con el enlace</div></div>
+      <div style="text-align:center"><div class="dev" style="height:430px;width:240px"><div class="sb"><span>09:58</span><span>sivec.bo</span></div>
+        <div class="hd">Sala de espera<strong>Dra. Méndez · 10:00</strong>usted es la siguiente</div>
+        <div class="ct"><div class="c"><div class="t">Antes de entrar</div>✓ Acepto la consulta por video<br>✓ Estoy en un lugar tranquilo<br>Fecha de nacimiento: <b>14/05/2000</b></div><div class="c" style="text-align:center">🎤 ✓ &nbsp; 📷 ✓<span class="bt2">Entrar</span></div></div></div>
+        <div class="cap2">② Sala de espera en el navegador</div></div>
+      <div style="text-align:center"><div class="dev" style="height:430px;width:240px"><div class="sb"><span>10:01</span><span>sivec.bo</span></div>
+        <div style="flex:1;background:linear-gradient(160deg,#3b3438,#1f1a1d);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#eee;gap:6px"><div style="font-size:56px">👩‍⚕️</div><div style="font-size:12px">Dra. Méndez</div></div>
+        <div class="ct" style="flex:none"><div class="c">La receta y la próxima cita le llegan por SMS; los remedios los recoge en farmacia con su CI.</div></div></div>
+        <div class="cap2">③ Consulta · receta por SMS</div></div>
+    </div>
+    <div class="card" style="margin-top:12px;font-size:13px"><div class="lbl">Para quién sirve</div>Controles de crónicos estables, resultados de laboratorio, puerperio, salud mental, adultos mayores que no pueden caminar. <b>No</b> para la primera consulta de algo grave: ahí se cita al centro.</div>
+  </div>
+</section>
+
+<!-- ============ T5 ============ -->
+<section class="scr" id="t5">
+  <div class="app"><div class="brand">SIVEC <span>TELESALUD</span></div><div class="who">📡 Seguimiento a distancia · hipertensos, diabéticos y embarazadas de alto riesgo</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Valores que llegan · la promotora mide en la casa con el celular del centro, o el paciente responde un SMS</div>
+        <table class="l"><thead><tr><th>Paciente</th><th>Qué</th><th>Último</th><th>Tendencia</th><th></th></tr></thead><tbody>
+          <tr><td><b>Don Julio A.</b> · HTA + FA</td><td>PA</td><td class="ya">172/98</td><td>↑ 3 días</td><td><span class="btn p">Videollamada</span></td></tr>
+          <tr><td><b>Juana M.</b> · 32 sem ARO</td><td>PA · movimientos</td><td>128/84 · 10 ✓</td><td>estable</td><td><span class="st ok">bien</span></td></tr>
+          <tr><td><b>Pedro S.</b> · diabético</td><td>glucemia ayunas</td><td class="ya">248</td><td>↑</td><td><span class="btn">Llamar</span></td></tr>
+          <tr><td><b>Rosa V.</b> · puérpera</td><td>Edimburgo (SMS)</td><td class="ya">14 puntos</td><td>—</td><td><span class="btn p">Salud mental</span></td></tr></tbody></table>
+        <div class="mini" style="margin-top:6px">Fuera de rango → alerta al médico de cabecera, que decide: llamada, videoconsulta o cita presencial.</div></div>
+      <div>
+        <div class="card"><div class="lbl">SMS de preguntas simples</div><div style="font-size:13px;line-height:1.6">“Responda con su presión de hoy: 135/85” · “¿Tomó sus pastillas? 1 sí / 2 no”. Funciona con cualquier celular, sin internet.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">En la ficha</div><div style="font-size:13px">Cada valor entra a la curva del paciente (PA, glucosa) con su origen: “domicilio · promotora”.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ T6 ============ -->
+<section class="scr" id="t6">
+  <div class="app"><div class="brand">SIVEC <span>TELEEDUCACIÓN</span></div><div class="who">🎓 Capacitación y ateneos clínicos de la red</div></div>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card"><div class="lbl">Próximas sesiones</div>
+        <table class="l"><thead><tr><th>Fecha</th><th>Tema</th><th>Quién</th><th></th></tr></thead><tbody>
+          <tr><td>jue 02/10 · 14:00</td><td>Dengue: signos de alarma y manejo</td><td>Epidemiólogo de red</td><td><span class="btn p">Inscribirse</span></td></tr>
+          <tr><td>jue 09/10 · 14:00</td><td>Ateneo: caso de TB cavitada</td><td>Dr. Aguilera + Dra. Méndez</td><td><span class="btn">Inscribirse</span></td></tr>
+          <tr><td>jue 16/10 · 14:00</td><td>Reanimación neonatal (práctico)</td><td>Dr. Vargas</td><td><span class="btn">Inscribirse</span></td></tr></tbody></table>
+        <div class="mini" style="margin-top:6px">Mismo enlace del navegador; queda grabada para quien estaba de turno.</div></div>
+      <div>
+        <div class="card"><div class="lbl">Certificado automático</div><div style="font-size:13px;line-height:1.6">Asistencia registrada + preguntas al final → el certificado va a la ficha del personal (módulo Personal), útil para el curso de RCP que vence.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Casos reales, sin nombres</div><div style="font-size:13px">El ateneo usa la ficha del caso anonimizada: imagen, laboratorio y evolución, con permiso.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ T7 ============ -->
+<section class="scr" id="t7">
+  <div class="app"><div class="brand">SIVEC <span>TELESALUD</span></div><div class="who">📊 Agenda e indicadores · Red Centro · septiembre</div></div>
+  <div class="body">
+    <div class="kpi"><div><small>Interconsultas a distancia</small><b>214</b></div><div><small>Respondidas en &lt; 48 h</small><b style="color:#15803d">91%</b></div><div><small>Resueltas sin viajar</small><b style="color:#15803d">58%</b><span> 124 pacientes</span></div><div><small>Videoconsultas</small><b>96</b><span> 12 pasaron a teléfono</span></div></div>
+    <div class="cols c2" style="margin-top:12px">
+      <div class="card"><div class="lbl">Por especialidad</div>
+        <div class="zn"><span>Dermatología</span><div class="bar2"><i style="width:64%;background:#7d2a4c"></i></div><b>64</b></div>
+        <div class="zn"><span>Cardiología (ECG)</span><div class="bar2"><i style="width:48%;background:#2f6fb0"></i></div><b>48</b></div>
+        <div class="zn"><span>Gineco-obstetricia</span><div class="bar2"><i style="width:37%;background:#b45309"></i></div><b>37</b></div>
+        <div class="zn"><span>Pediatría</span><div class="bar2"><i style="width:33%;background:#15803d"></i></div><b>33</b></div>
+        <div class="zn"><span>Salud mental</span><div class="bar2"><i style="width:32%;background:#6d28d9"></i></div><b>32</b></div></div>
+      <div class="card"><div class="lbl">Lo que se ahorró la gente</div>
+        <div class="kv2"><span>Viajes evitados</span><b>124</b></div><div class="kv2"><span>Kilómetros no recorridos</span><b>≈ 9.300 km</b></div><div class="kv2"><span>Días de trabajo no perdidos</span><b>≈ 124</b></div>
+        <div class="mini" style="margin-top:6px">Argumento fuerte para el Ministerio y para vender el sistema.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  const NOTES = {
+    t1: '<b>Pedir opinião ao especialista:</b> o caso se monta sozinho com a ficha; o médico acrescenta pergunta e fotos (pele, ECG) e escolhe especialidade e urgência. Muitas derivações se resolvem só com a resposta; se precisar, o botão Derivar leva tudo.',
+    t2: '<b>Bandeja do especialista:</b> interconsultas por responder com tempo de espera; resposta com conduta (resolver no centro, derivar com turno já reservado, ou videoconsulta), assinada com huella, volta à ficha e conta como produção.',
+    t3: '<b>Videoconsulta assistida:</b> o paciente está no centro rural com a enfermeira, o especialista no hospital; ao lado do vídeo, os sinais e o ECG; SOAP e receita como no consultório. Se a internet cair, continua por telefone e fica registrado.',
+    t4: '<b>Paciente desde casa:</b> SMS com link → sala de espera no navegador (aceite e confirmação) → consulta; receita e próxima cita por SMS. Sem app. Para controles de crônicos, resultados, puerpério, saúde mental; não para primeira consulta grave.',
+    t5: '<b>Seguimento à distância:</b> hipertensos, diabéticos e gestantes de alto risco; a promotora mede na casa ou o paciente responde SMS; fora do intervalo alerta o médico. Cada valor entra na curva da ficha.',
+    t6: '<b>Capacitação e ateneus:</b> sessões da rede pelo mesmo link, gravadas; certificado automático na ficha do pessoal; casos reais anonimizados.',
+    t7: '<b>Agenda e indicadores:</b> interconsultas, respondidas em 48 h, resolvidas sem viajar, videoconsultas, por especialidade e o que a população economizou (viagens, km, dias de trabalho).',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 't1');
+</script>
+
+</body>
+</html>

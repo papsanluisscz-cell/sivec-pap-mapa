@@ -676,3 +676,20 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
   - oportunidad de notificación en menos de 24 h, centros al día, brotes activos y casos por evento;
   - enlazado con laboratorio, imagen, vacunas, almacén, camas y gestor.
 - Imágenes: docs/epidemiologia-01..08.png · esboco-epidemiologia.html
+
+**Módulo 13 · Epidemiología: APROVADO.**
+
+### Módulo 14 · Telesalud — dibujado, para aprobar (sin app nueva: enlace en el navegador)
+- **Interconsulta a distancia (asíncrona):** el caso se arma solo con la ficha; el médico agrega la pregunta y fotos (piel, ECG) y elige especialidad y urgencia. Muchas derivaciones se resuelven con la respuesta; si no, Derivar lleva todo.
+- **Bandeja del especialista:** responde con la conducta (resolver en el centro, derivar con turno ya reservado o videoconsulta). Firma con huella, la respuesta vuelve a la ficha y cuenta como producción.
+- **Videoconsulta asistida:** el paciente está en el centro rural con la enfermera y el especialista en el hospital.
+  - Junto al video se ven los signos y el ECG; SOAP y receta como en el consultorio.
+  - Si el internet cae, sigue por teléfono y queda registrado.
+- **Desde la casa:** SMS con enlace → sala de espera en el navegador (acepto + fecha de nacimiento) → consulta. La receta y la cita llegan por SMS.
+  - Sirve para crónicos estables, resultados, puerperio, salud mental y adultos mayores; no para la primera consulta de algo grave.
+- **Seguimiento a distancia:** hipertensos, diabéticos y embarazadas ARO.
+  - La promotora mide en la casa o el paciente responde un SMS.
+  - Si sale de rango, avisa al médico; cada valor entra a la curva de la ficha.
+- **Capacitación y ateneos** de la red por el mismo enlace, grabados, con certificado automático en la ficha del personal.
+- **Indicadores:** interconsultas, respondidas en menos de 48 h, resueltas sin viajar, videoconsultas; viajes, km y días de trabajo ahorrados (argumento de venta).
+- Imágenes: docs/telesalud-01..07.png · esboco-telesalud.html
