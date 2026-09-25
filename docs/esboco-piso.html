@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIVEC Piso</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
+    --n1:#2f6fb0; --n2:#0e7490; --n3:#7c3aed; --n4:#b4235a; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .topbar { position:sticky; top:0; z-index:5; background:#2a1720; color:#fff; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; }
+  .topbar b { margin-right:6px; font-size:15px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; border:1px solid #6b4a58; background:transparent; color:#fff; border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tab.on { background:#fff; color:var(--wine-d); border-color:#fff; }
+  .warn { max-width:1100px; margin:14px auto 0; background:#fff7e0; border:1px solid #ecd9a0; border-radius:10px; padding:10px 14px; font-size:14px; color:#5b4712; }
+  .scr { display:none; max-width:1100px; margin:14px auto 30px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,.14); }
+  .scr.on { display:block; }
+  .app { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; }
+  .app .brand { font-weight:800; font-size:20px; letter-spacing:.04em; } .app .brand span { font-size:11px; background:#fff; color:var(--wine-d); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:3px; letter-spacing:.08em; }
+  .app .who { font-size:14px; opacity:.95; }
+  .body { padding:18px 22px 22px; }
+  h2 { margin:0 0 4px; font-size:20px; } .sub { color:var(--soft); font-size:14px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cols { display:grid; gap:14px; } .c2 { grid-template-columns:1fr 1fr; } .c3 { grid-template-columns:1fr 1fr 1fr; } .c21 { grid-template-columns:1.6fr 1fr; }
+  .lbl { font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); margin:10px 0 5px; }
+  .lbl:first-child { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:13px; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .chip.on { background:var(--tint); border-color:var(--wine); color:var(--wine-d); font-weight:700; }
+  .inp { border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13.5px; background:#fff; min-height:36px; }
+  .inp.tall { min-height:62px; line-height:1.45; }
+  .pri { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pri div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; }
+  .pri div b { display:block; font-size:14px; } .pri div.on { border:2px solid var(--wine); background:var(--tint); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .auto { background:#f3f7fb; border:1px dashed #b9cde3; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.55; }
+  .auto b { color:#1e4f8a; }
+  .att { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; } .att span { font-size:12.5px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13.5px; font-weight:700; border-radius:9px; padding:8px 14px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .btn.p { background:var(--wine); border-color:var(--wine); color:#fff; } .btn.g { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fp { width:26px; height:30px; vertical-align:middle; }
+  table.l { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; border-radius:12px; overflow:hidden; }
+  table.l th { text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); padding:9px 10px; border-bottom:1px solid var(--line); background:#fff; }
+  table.l td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .st { font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .st.bad { background:var(--badbg); color:var(--bad); } .st.warn { background:var(--warnbg); color:var(--warn); } .st.ok { background:var(--okbg); color:var(--ok); } .st.info { background:#e0ecfa; color:#1e4f8a; } .st.mut { background:#eee; color:#555; }
+  .lvl { font-size:11px; font-weight:800; color:#fff; border-radius:6px; padding:2px 7px; }
+  .mini { font-size:12px; color:var(--soft); }
+  .note { max-width:1100px; margin:-16px auto 30px; background:#fff; border-radius:10px; padding:12px 16px; font-size:14px; line-height:1.5; color:#3b3035; border-left:4px solid var(--wine); }
+  /* flujo */
+  .levels { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin:6px 0 4px; }
+  .lv { text-align:center; padding:0 8px; }
+  .lv .ic { width:74px; height:74px; border-radius:18px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; }
+  .lv b { display:block; font-size:15px; } .lv span { font-size:12.5px; color:var(--soft); }
+  .arrows { position:relative; height:74px; margin-top:-120px; margin-bottom:60px; pointer-events:none; }
+  .loop { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+  .loop div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12.3px; text-align:center; position:relative; }
+  .loop div b { display:block; font-size:13px; } .loop i { font-style:normal; display:block; font-size:18px; }
+  .loop div:not(:last-child)::after { content:"›"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--soft); font-size:18px; }
+  .world { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .world div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:12.3px; line-height:1.4; }
+  .world b { display:block; font-size:13px; color:var(--wine-d); }
+  /* seguimiento */
+  .steps { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin:8px 0 4px; }
+  .steps div { text-align:center; font-size:12px; position:relative; padding-top:30px; }
+  .steps div::before { content:""; position:absolute; top:9px; left:0; right:0; height:4px; background:#e3d6dc; }
+  .steps div:first-child::before { left:50%; } .steps div:last-child::before { right:50%; }
+  .steps div.done::before { background:var(--ok); } .steps div.cur::before { background:linear-gradient(90deg,var(--ok) 50%,#e3d6dc 50%); }
+  .steps i { position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:50%; background:#e3d6dc; color:#fff; font-style:normal; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:3px solid var(--paper); }
+  .steps .done i { background:var(--ok); } .steps .cur i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .steps b { display:block; font-size:12.5px; } .steps small { color:var(--soft); }
+  .tl { border-left:3px solid var(--line); margin-left:8px; padding-left:14px; }
+  .tl div { position:relative; font-size:13px; margin-bottom:10px; line-height:1.4; }
+  .tl div::before { content:""; position:absolute; left:-21px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--c,#999); border:2px solid #fff; }
+  .kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:600; } .kpi b { font-size:28px; letter-spacing:-.01em; } .kpi span { font-size:12px; color:var(--soft); }
+  .bars div.r { display:grid; grid-template-columns:170px 1fr 54px; align-items:center; gap:10px; font-size:13px; margin:7px 0; }
+  .bars .trk { height:14px; border-radius:0 4px 4px 0; background:transparent; position:relative; }
+  .bars .fill { height:14px; border-radius:0 4px 4px 0; background:var(--wine); }
+  .bars .ref { position:absolute; top:-3px; bottom:-3px; width:2px; background:#2d2429; }
+  .bars .v { font-weight:700; text-align:right; }
+  .alertc { border-left:4px solid var(--bad); }
+
+  .role .rh { display:flex; gap:10px; align-items:center; margin-bottom:8px; } .role .rh b { display:block; font-size:15px; } .role .rh small { color:var(--soft); font-size:12px; }
+  .ri { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .todo { display:flex; align-items:center; gap:10px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .todo:last-child { border-bottom:none; }
+  .todo .st { min-width:30px; text-align:center; font-size:13px; }
+  .mini2 { font-size:13px; line-height:1.5; } .mini2 b { display:block; margin-bottom:2px; }
+  .flowbar { display:flex; gap:6px; margin-bottom:12px; } .flowbar span { flex:1; text-align:center; font-size:13px; font-weight:700; padding:7px; border-radius:9px; background:#fff; border:1px solid var(--line); color:var(--soft); }
+  .flowbar span.on { background:var(--okbg); color:var(--ok); border-color:#b8e3c7; } .flowbar span.cur { background:var(--wine); color:#fff; border-color:var(--wine); }
+  .found { display:flex; gap:12px; align-items:center; margin-top:10px; padding:10px; border-radius:10px; background:#f3f9f5; border:1px solid #cfe9d8; }
+  .photo2 { width:64px; height:72px; border-radius:10px; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:24px; flex:none; }
+  .k2 { display:block; font-size:10.5px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.04em; }
+  .scanner { width:150px; height:160px; margin:6px auto 0; border-radius:18px; background:radial-gradient(circle at 50% 45%, #fff 0, #f7e9ef 70%); border:3px solid #d9b9c6; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -6px 12px rgba(125,42,76,.12); }
+  .ticket { margin-top:12px; text-align:center; }
+  .tk { border:2px dashed var(--wine); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:2px; font-size:13.5px; } .tk b { font-size:40px; color:var(--wine-d); letter-spacing:.04em; line-height:1.1; } .tk small { color:var(--soft); font-size:11.5px; }
+  .q2 { padding:8px 10px; border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:13.5px; background:#fff; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; } .q2 .mini { width:100%; }
+  .q2.cur { border:2px solid var(--wine); background:var(--tint); } .q2 .st { margin-left:auto; }
+  .vit2 { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .vit2 div { background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 8px; font-size:16px; font-weight:800; } .vit2 small { display:block; font-size:10.5px; color:var(--soft); font-weight:700; text-transform:uppercase; }
+  .tv { background:#120810; border-radius:16px; padding:14px; color:#fff; border:8px solid #2a2a2a; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
+  .tvh { display:flex; justify-content:space-between; font-size:13px; color:#cfb7c2; font-weight:700; letter-spacing:.08em; }
+  .tvnow { background:linear-gradient(135deg,#7d2a4c,#b4235a); border-radius:12px; padding:16px; text-align:center; } .tvnow small { display:block; font-size:13px; letter-spacing:.2em; font-weight:800; color:#ffe4ee; }
+  .tvnow b { display:block; font-size:64px; line-height:1.05; letter-spacing:.04em; } .tvnow span { display:block; font-size:24px; font-weight:700; } .tvnow em { display:block; font-style:normal; font-size:20px; margin-top:4px; color:#ffe4ee; }
+  .tvlist div { display:flex; gap:12px; align-items:baseline; font-size:18px; padding:6px 4px; border-bottom:1px solid #3a2530; } .tvlist b { color:#f1a7c3; min-width:70px; } .tvlist span { margin-left:auto; color:#cfb7c2; font-size:15px; }
+  .tvf { font-size:13px; color:#cfb7c2; }
+  .doc { display:grid; grid-template-columns:34px 1fr auto auto; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--line); font-size:13.5px; } .di { font-size:22px; text-align:center; } .dest { font-size:12.5px; color:var(--soft); font-weight:600; }
+  .st.warn { margin:0; max-width:none; padding:2px 9px; border:none; font-size:11.5px; }
+  .todo .st.warn { font-size:13px; }
+
+  .svc { display:flex; flex-wrap:wrap; gap:8px; } .svc span { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 12px; font-size:13.5px; font-weight:600; }
+  .prob { display:flex; align-items:center; gap:8px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .prob .mini { margin-left:auto; }
+  .dotc { width:10px; height:10px; border-radius:50%; flex:none; }
+  .tpl { border:1px solid; border-left-width:5px; border-radius:10px; padding:9px 11px; font-size:13px; line-height:1.45; background:#fff; } .tpl b { display:block; font-size:14px; margin-bottom:2px; }
+  .opt { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; } .opt span { border:1px solid var(--line); border-radius:12px; padding:10px; font-size:22px; background:#fff; text-align:center; } .opt b { display:block; font-size:14px; margin-top:4px; } .opt small { display:block; font-size:12px; color:var(--soft); }
+  .opt .sel { border:2px solid var(--wine); background:var(--tint); }
+  .side { border-left:4px solid var(--line); padding:5px 10px; margin-bottom:8px; font-size:13.5px; line-height:1.45; } .side b { display:block; }
+  .stk { display:grid; grid-template-columns:150px 1fr auto; gap:8px; align-items:center; font-size:13px; margin:6px 0; } .stk div { height:10px; background:#eee4e8; border-radius:5px; overflow:hidden; } .stk i { display:block; height:100%; background:#15803d; border-radius:5px; } .stk b { font-size:12.5px; }
+  .phn { background:#e5ddd5; border:9px solid #1f1f1f; border-radius:26px; padding:10px; display:flex; flex-direction:column; gap:8px; min-height:430px; }
+  .phh { background:#075e54; color:#fff; font-size:13px; font-weight:700; margin:-10px -10px 4px; padding:10px 12px; border-radius:16px 16px 0 0; }
+  .msg { font-size:13px; line-height:1.4; border-radius:10px; padding:7px 9px; max-width:88%; box-shadow:0 1px 1px rgba(0,0,0,.12); } .msg.in { background:#fff; align-self:flex-start; } .msg.out { background:#dcf8c6; align-self:flex-end; font-weight:800; }
+  .ck { font-size:13.5px; line-height:1.45; } .ck b { display:block; font-size:15px; margin-bottom:3px; }
+
+  .kv2 { display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:4px 0; border-bottom:1px dashed var(--line); } .kv2 span { color:var(--soft); }
+  .req { display:flex; flex-wrap:wrap; gap:6px; } .req span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .req .ok { background:var(--okbg); color:var(--ok); } .req .no { background:var(--warnbg); color:var(--warn); }
+  .qx { position:relative; height:30px; background:#f3eef0; border-radius:8px; margin:6px 0; padding-left:34px; } .qx b { position:absolute; left:8px; top:6px; font-size:13px; }
+  .qx span { position:absolute; top:3px; bottom:3px; margin-left:34px; border-radius:6px; color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; padding:0 6px; white-space:nowrap; overflow:hidden; }
+  .who2 { display:grid; gap:6px; } .who2 div { border:1px solid var(--line); border-radius:8px; padding:6px 9px; background:#f7fbf8; font-size:12.5px; } .who2 b { display:block; color:var(--wine-d); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; } .who2 span { color:#166534; }
+  .beds { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .bed { border-radius:10px; padding:8px; font-size:13px; font-weight:700; border:1px solid var(--line); min-height:76px; } .bed b { display:block; font-size:18px; } .bed small { display:block; font-weight:500; font-size:11.5px; color:var(--soft); }
+  .bed.p { background:#fbe4ee; } .bed.a { background:#fde2e2; } .bed.g { background:#ede4fb; } .bed.free { background:#ecf8f1; color:#15803d; } .bed.clean { background:#fdf0d5; color:#8a5a00; } .bed.sel { outline:3px solid var(--wine); }
+  .leg2 { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-left:6px; border:1px solid var(--line); }
+  .dose { border:1px solid var(--line); border-radius:10px; padding:7px 9px; margin-bottom:6px; font-size:13px; display:flex; flex-direction:column; } .dose span { color:var(--soft); font-size:12px; } .dose em { font-style:normal; margin-top:2px; }
+  .srch { border-left:4px solid #c2410c; background:#fff7f0; border-radius:6px; padding:6px 9px; margin-bottom:6px; font-size:13px; } .srch b { display:block; font-size:12px; color:#c2410c; text-transform:uppercase; letter-spacing:.04em; }
+  .amb { border:9px solid #1f1f1f; border-radius:26px; background:#fff; overflow:hidden; min-height:420px; display:flex; flex-direction:column; }
+  .ah { background:#ea580c; color:#fff; font-weight:800; font-size:14px; padding:10px 12px; } .ab { padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .big2 { font-size:40px; font-weight:900; text-align:center; color:#ea580c; margin-top:6px; }
+
+  .tree div { padding:6px 8px; border-radius:8px; font-size:13.5px; } .tree small { color:var(--soft); margin-left:4px; }
+  .tree .t0 { font-weight:800; } .tree .t1 { padding-left:18px; font-weight:700; } .tree .t2 { padding-left:32px; font-weight:700; } .tree .t3 { padding-left:50px; } .tree .mut { color:var(--soft); }
+  .tree .on { background:#f3eef0; } .tree .sel { background:var(--tint); outline:2px solid var(--wine); }
+  .fing { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:8px; } .fing span { font-size:12px; font-weight:700; border-radius:999px; padding:3px 9px; background:#f3eef0; } .fing .done { background:var(--okbg); color:var(--ok); } .fing .cur { background:var(--wine); color:#fff; }
+  table.mx td, table.mx th { text-align:center; font-size:12.5px; padding:8px 6px; } table.mx td:first-child, table.mx th:first-child { text-align:left; }
+  table.mx2 td, table.mx2 th { text-align:center; font-size:12.5px; } table.mx2 td:first-child, table.mx2 th:first-child { text-align:left; }
+  table.mx2 td.on { color:#15803d; font-size:18px; } table.mx2 td.pi { color:#c2410c; font-size:18px; } table.mx2 td { color:#c9bcc2; font-size:18px; } table.mx2 td:first-child { font-size:13.5px; color:var(--ink); }
+  .catl { padding:8px 10px; border-radius:9px; font-size:13.5px; margin-bottom:4px; display:flex; justify-content:space-between; } .catl small { color:var(--soft); } .catl.on { background:var(--tint); font-weight:700; }
+  table.mx2 { table-layout:fixed; } table.mx2 th { font-size:10px; padding:6px 3px; letter-spacing:.02em; white-space:normal; text-align:center; } table.mx2 th:first-child { width:170px; } table.mx2 td { padding:8px 3px; }
+  .ring2 { width:150px; height:150px; border-radius:50%; margin:6px auto 0; background:conic-gradient(#7d2a4c 0 71%, #eadde3 71% 100%); display:flex; align-items:center; justify-content:center; } .ring2 > div { width:118px; height:118px; border-radius:50%; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; color:var(--soft); } .ring2 b { font-size:40px; color:var(--ink); line-height:1; }
+  .ctl { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; } .ctl span { text-align:center; border-radius:10px; padding:8px 4px; font-weight:800; font-size:14px; background:#f3eef0; color:#9c8b92; } .ctl small { display:block; font-weight:600; font-size:11px; } .ctl .d { background:#dcf3e5; color:#15803d; } .ctl .n { background:var(--wine); color:#fff; }
+  .chk3 { display:flex; flex-direction:column; gap:4px; } .chk3 span { font-size:12.8px; font-weight:600; border-radius:7px; padding:3px 8px; } .chk3 .ok { background:#ecf8f1; color:#15803d; } .chk3 .no { background:#fdf0d5; color:#8a5a00; }
+  .rk { display:flex; gap:10px; align-items:center; font-size:14px; padding:7px 0; border-bottom:1px dashed var(--line); } .rk .st { min-width:44px; text-align:center; }
+  .vg { width:100%; border-collapse:separate; border-spacing:4px; font-size:12.5px; } .vg th { font-size:10.5px; text-transform:uppercase; color:var(--soft); font-weight:800; text-align:center; } .vg th:first-child { text-align:left; }
+  .vg td { text-align:center; border-radius:8px; padding:5px 2px; font-weight:700; } .vg td:first-child { text-align:left; font-weight:700; background:none; padding-left:0; }
+  .vg .d { background:#dcf3e5; color:#15803d; } .vg .h { background:var(--wine); color:#fff; } .vg .a { background:#fde2e2; color:#991b1b; } .vg .f { background:#f3eef0; color:#9c8b92; } .vg .x { background:none; }
+  .fr { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:13.5px; } .fr:last-child { border:none; }
+  .tbig { font-size:30px; font-weight:900; line-height:1; }
+  .zn { display:grid; grid-template-columns:150px 1fr 60px; gap:8px; align-items:center; font-size:13px; padding:4px 0; }
+  .bar2 { height:12px; border-radius:6px; background:#eee; position:relative; overflow:hidden; } .bar2 i { position:absolute; left:0; top:0; bottom:0; border-radius:6px; } .bar2 .m { position:absolute; top:-2px; bottom:-2px; width:2px; background:#2d2429; }
+  .flow3 { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; } .flow3 span { text-align:center; font-size:12.5px; font-weight:700; border-radius:10px; padding:8px 4px; background:#f3eef0; color:#8a7a81; } .flow3 span small { display:block; font-weight:600; font-size:11px; } .flow3 .d { background:#dcf3e5; color:#15803d; } .flow3 .n { background:var(--wine); color:#fff; }
+  .al { display:flex; flex-wrap:wrap; gap:6px; } .al span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .al .r { background:#fde2e2; color:#991b1b; } .al .y { background:#fdf0d5; color:#8a5a00; } .al .g { background:#ecf8f1; color:#15803d; }
+  table.lab { width:100%; border-collapse:collapse; font-size:12.8px; } table.lab th { font-size:11px; text-transform:uppercase; color:var(--soft); text-align:left; padding:4px 6px; border-bottom:1px solid var(--line); } table.lab td { padding:5px 6px; border-bottom:1px dashed var(--line); }
+  .dt { display:inline-block; min-width:22px; text-align:center; border-radius:6px; padding:1px 6px; font-weight:800; font-size:12px; } .dt.ok { background:#dcf3e5; color:#15803d; } .dt.w { background:#fdf0d5; color:#8a5a00; } .dt.b { background:#fde2e2; color:#991b1b; } .dt.p { background:#eee; color:#888; }
+  .phs { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .dev { width:280px; height:560px; margin:0 auto; border-radius:36px; border:9px solid #17121a; background:#fff; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 14px 30px rgba(60,20,40,.2); }
+  .dev .sb { height:24px; display:flex; justify-content:space-between; align-items:center; padding:0 16px; font-size:10.5px; font-weight:700; color:#fff; background:var(--wine-d); flex:none; }
+  .dev .hd { background:linear-gradient(145deg,#8a3056,#5a1c36); color:#fff; padding:8px 14px 12px; flex:none; font-size:12px; } .dev .hd strong { display:block; font-size:16px; }
+  .dev .ct { flex:1; overflow:hidden; padding:10px; display:flex; flex-direction:column; gap:8px; background:#faf6f8; }
+  .dev .c { background:#fff; border:1px solid var(--line); border-radius:14px; padding:9px 11px; font-size:12.3px; line-height:1.4; }
+  .dev .c .t { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--soft); font-weight:800; margin-bottom:3px; }
+  .dev .nv { flex:none; display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); background:#fff; padding:5px 0 8px; text-align:center; font-size:10px; font-weight:700; color:#8a7a81; } .dev .nv .o { color:var(--wine); }
+  .dev .li { display:flex; justify-content:space-between; gap:6px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .dev .bt2 { display:block; text-align:center; font-weight:800; font-size:12.5px; border-radius:10px; padding:8px; background:var(--wine); color:#fff; margin-top:6px; } .dev .bt2.o2 { background:#fff; color:var(--wine); border:1.5px solid var(--wine); }
+  .cap2 { text-align:center; font-size:13.5px; margin-top:10px; color:#43363d; line-height:1.4; }
+  .bar { height:9px; border-radius:6px; background:#eee; overflow:hidden; } .bar i { display:block; height:100%; background:var(--ok,#15803d); }
+  .tl2 { display:grid; grid-template-columns:1fr 70px 1fr; gap:0; }
+  .tlc { border-radius:14px; padding:12px 14px; } .tlc h4 { margin:0 0 10px; font-size:15px; }
+  .ev { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 10px; font-size:12.8px; margin-bottom:7px; line-height:1.35; } .ev small { color:var(--soft); display:block; font-size:11.5px; }
+  .ev.lk { border:2px solid var(--wine); }
+  .ring2 { width:150px; height:150px; border-radius:50%; margin:6px auto 0; background:conic-gradient(#7d2a4c 0 71%, #eadde3 71% 100%); display:flex; align-items:center; justify-content:center; } .ring2 > div { width:118px; height:118px; border-radius:50%; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; color:var(--soft); } .ring2 b { font-size:40px; color:var(--ink); line-height:1; }
+  .ctl { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; } .ctl span { text-align:center; border-radius:10px; padding:8px 4px; font-weight:800; font-size:14px; background:#f3eef0; color:#9c8b92; } .ctl small { display:block; font-weight:600; font-size:11px; } .ctl .d { background:#dcf3e5; color:#15803d; } .ctl .n { background:var(--wine); color:#fff; }
+  .chk3 { display:flex; flex-direction:column; gap:4px; } .chk3 span { font-size:12.8px; font-weight:600; border-radius:7px; padding:3px 8px; } .chk3 .ok { background:#ecf8f1; color:#15803d; } .chk3 .no { background:#fdf0d5; color:#8a5a00; }
+  .rk { display:flex; gap:10px; align-items:center; font-size:14px; padding:7px 0; border-bottom:1px dashed var(--line); } .rk .st { min-width:44px; text-align:center; }
+  .flow3 { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; } .flow3 span { text-align:center; font-size:12.5px; font-weight:700; border-radius:10px; padding:8px 4px; background:#f3eef0; color:#8a7a81; } .flow3 span small { display:block; font-weight:600; font-size:11px; } .flow3 .d { background:#dcf3e5; color:#15803d; } .flow3 .n { background:var(--wine); color:#fff; }
+  .al { display:flex; flex-wrap:wrap; gap:6px; } .al span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .al .r { background:#fde2e2; color:#991b1b; } .al .y { background:#fdf0d5; color:#8a5a00; } .al .g { background:#ecf8f1; color:#15803d; }
+  table.lab { width:100%; border-collapse:collapse; font-size:12.8px; } table.lab th { font-size:11px; text-transform:uppercase; color:var(--soft); text-align:left; padding:4px 6px; border-bottom:1px solid var(--line); } table.lab td { padding:5px 6px; border-bottom:1px dashed var(--line); }
+  .dt { display:inline-block; min-width:22px; text-align:center; border-radius:6px; padding:1px 6px; font-weight:800; font-size:12px; } .dt.ok { background:#dcf3e5; color:#15803d; } .dt.w { background:#fdf0d5; color:#8a5a00; } .dt.b { background:#fde2e2; color:#991b1b; } .dt.p { background:#eee; color:#888; }
+  .phs { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .dev { width:280px; height:560px; margin:0 auto; border-radius:36px; border:9px solid #17121a; background:#fff; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 14px 30px rgba(60,20,40,.2); }
+  .dev .sb { height:24px; display:flex; justify-content:space-between; align-items:center; padding:0 16px; font-size:10.5px; font-weight:700; color:#fff; background:var(--wine-d); flex:none; }
+  .dev .hd { background:linear-gradient(145deg,#8a3056,#5a1c36); color:#fff; padding:8px 14px 12px; flex:none; font-size:12px; } .dev .hd strong { display:block; font-size:16px; }
+  .dev .ct { flex:1; overflow:hidden; padding:10px; display:flex; flex-direction:column; gap:8px; background:#faf6f8; }
+  .dev .c { background:#fff; border:1px solid var(--line); border-radius:14px; padding:9px 11px; font-size:12.3px; line-height:1.4; }
+  .dev .c .t { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--soft); font-weight:800; margin-bottom:3px; }
+  .dev .nv { flex:none; display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); background:#fff; padding:5px 0 8px; text-align:center; font-size:10px; font-weight:700; color:#8a7a81; } .dev .nv .o { color:var(--wine); }
+  .dev .li { display:flex; justify-content:space-between; gap:6px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .dev .bt2 { display:block; text-align:center; font-weight:800; font-size:12.5px; border-radius:10px; padding:8px; background:var(--wine); color:#fff; margin-top:6px; } .dev .bt2.o2 { background:#fff; color:var(--wine); border:1.5px solid var(--wine); }
+  .cap2 { text-align:center; font-size:13.5px; margin-top:10px; color:#43363d; line-height:1.4; }
+  .bar { height:9px; border-radius:6px; background:#eee; overflow:hidden; } .bar i { display:block; height:100%; background:var(--ok,#15803d); }
+  .tl2 { display:grid; grid-template-columns:1fr 70px 1fr; gap:0; }
+  .tlc { border-radius:14px; padding:12px 14px; } .tlc h4 { margin:0 0 10px; font-size:15px; }
+  .ev { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 10px; font-size:12.8px; margin-bottom:7px; line-height:1.35; } .ev small { color:var(--soft); display:block; font-size:11.5px; }
+  .ev.lk { border:2px solid var(--wine); }
+  .paper { background:#fff; max-width:1000px; margin:0 auto; border:1px solid #ddd; box-shadow:0 4px 16px rgba(0,0,0,.10); padding:26px 30px; font-size:12px; color:#222; line-height:1.35; }
+  .ph1 { display:flex; align-items:center; gap:12px; border-bottom:3px solid var(--wine); padding-bottom:8px; }
+  .ph1 .lg { width:40px; height:40px; border-radius:24%; background:linear-gradient(145deg,#9c3a5f,#5a1c36); color:#fff; font-weight:900; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .ph1 h3 { margin:0; font-size:18px; letter-spacing:.02em; } .ph1 .sm { font-size:11px; color:#666; }
+  .sec { margin-top:10px; border:1px solid #d8cdd2; border-radius:6px; overflow:hidden; }
+  .sec > h5 { margin:0; background:#f3e7ec; color:var(--wine-d); font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; padding:4px 8px; }
+  .sec .in2 { padding:6px 8px; }
+  .fg { display:grid; gap:4px 10px; } .fg div { border-bottom:1px solid #eee; padding:2px 0; } .fg small { display:block; font-size:9.5px; color:#8a7a81; text-transform:uppercase; letter-spacing:.03em; } .fg b { font-size:12.5px; }
+  .pt { width:100%; border-collapse:collapse; font-size:11.3px; } .pt th { background:#faf5f7; font-size:9.8px; text-transform:uppercase; color:#6f6168; border:1px solid #e6dce0; padding:3px 4px; text-align:left; } .pt td { border:1px solid #eee4e8; padding:3px 4px; }
+  .ya { color:#991b1b; font-weight:800; } .no2 { color:#15803d; }
+  .alx { background:#fff4f4; border:1px solid #f3c4c4; border-radius:6px; padding:5px 8px; }
+  .sig { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:12px; } .sig div { border-top:1px solid #999; padding-top:3px; font-size:10.5px; color:#555; text-align:center; }
+  .cn { display:grid; grid-template-columns:1fr 1fr; gap:0; max-width:1000px; margin:0 auto; background:#fff; border:1px solid #ddd; box-shadow:0 4px 16px rgba(0,0,0,.10); }
+  .cn > div { padding:16px 18px; font-size:12px; line-height:1.4; } .cn > div + div { border-left:2px dashed #ccc; }
+  .cn h6 { margin:10px 0 4px; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--wine-d); }
+  table.mx td.c { text-align:center; font-size:15px; } .ok2 { color:#15803d; } .pd { color:#b45309; } .no3 { color:#991b1b; } .na { color:#c9bcc2; }
+  .ind { display:grid; grid-template-columns:28px 1fr 170px; gap:8px; align-items:center; padding:7px 0; border-bottom:1px dashed var(--line); font-size:13px; } .ind .n { width:24px; height:24px; border-radius:50%; background:var(--tint); color:var(--wine-d); font-weight:800; display:flex; align-items:center; justify-content:center; font-size:12px; }
+  .goes { font-size:11.5px; font-weight:700; border-radius:8px; padding:3px 8px; text-align:center; }
+  .bag { border:2px solid var(--line); border-radius:12px; padding:8px 10px; background:#fff; font-size:12.5px; } .bag b { display:block; font-size:13.5px; }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — PISO (internación):</b>
+  <button class="tab on" data-t="k1">1. Tablero del piso</button>
+  <button class="tab" data-t="k2">2. Indicaciones del día</button>
+  <button class="tab" data-t="k3">3. Evolución mañana y tarde</button>
+  <button class="tab" data-t="k4">4. Farmacia: recetas del piso</button>
+  <button class="tab" data-t="k5">5. Retiro y lo que compra la familia</button>
+  <button class="tab" data-t="k6">6. Ecografía desde el piso</button>
+  <button class="tab" data-t="k7">7. Glicemias y controles</button>
+  <button class="tab" data-t="k8">8. Curaciones</button>
+  <button class="tab" data-t="k9">9. Pase de visita</button>
+  <button class="tab" data-t="k10">10. Carro de visita</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Ejemplo: piso de Gineco-Obstetricia. Es igual para Cirugía, Medicina interna, Pediatría y demás especialidades: cambia solo la plantilla.</div>
+
+<!-- ============ K1 ============ -->
+<section class="scr on" id="k1">
+  <div class="app"><div class="brand">SIVEC <span>PISO</span></div><div class="who">🛏️ Gineco-Obstetricia · 2º piso · jueves 25/09 · 11:40 · R2 Dr. Quispe · Planta Dra. Suárez</div></div>
+  <div class="body">
+    <div class="chips"><span class="chip on">Gineco-Obstetricia</span><span class="chip">Cirugía</span><span class="chip">Medicina interna</span><span class="chip">Pediatría</span><span class="chip">Traumatología</span></div>
+    <div class="card" style="margin-top:10px"><div class="lbl">Qué falta hoy en cada cama · se actualiza solo</div>
+      <table class="l mx"><thead><tr><th>Cama</th><th>Paciente</th><th>Día</th><th>Interno</th><th>Evol. mañana</th><th>Indicaciones</th><th>Farmacia</th><th>Estudios</th><th>Glicemia</th><th>Curación</th><th>Evol. tarde</th></tr></thead><tbody>
+        <tr><td><b>1</b></td><td><b>Juana M.</b> · 32 sem ARO<br><span class="mini">preeclampsia leve · diabetes gestacional</span></td><td>3</td><td>Int. Rojas</td><td class="c ok2">✓ firmada</td><td class="c ok2">✓</td><td class="c pd">⚠ falta 1</td><td class="c ok2">eco 08:30 ✓</td><td class="c ok2">2/2 hoy</td><td class="c na">—</td><td class="c pd">16:00</td></tr>
+        <tr><td><b>2</b></td><td><b>Lucía F.</b> · puérpera vaginal<br><span class="mini">desgarro grado 1</span></td><td>1</td><td>Int. Rojas</td><td class="c pd">⏳ por firmar</td><td class="c ok2">✓</td><td class="c ok2">✓</td><td class="c na">—</td><td class="c na">—</td><td class="c ok2">✓ 09:10</td><td class="c pd">16:00</td></tr>
+        <tr><td><b>3</b></td><td><b>Marta V.</b> · poscesárea<br><span class="mini">día 2 · herida</span></td><td>2</td><td>Int. Rojas</td><td class="c ok2">✓ firmada</td><td class="c ok2">✓</td><td class="c ok2">✓</td><td class="c pd">Hb 14:00</td><td class="c na">—</td><td class="c no3">✕ no hecha</td><td class="c pd">16:00</td></tr>
+        <tr><td><b>4</b></td><td><b>Ana P.</b> · 41 sem<br><span class="mini">inducción</span></td><td>1</td><td>Int. Arce</td><td class="c ok2">✓ firmada</td><td class="c pd">⏳ sin firmar</td><td class="c na">—</td><td class="c pd">monitoreo 12:00</td><td class="c na">—</td><td class="c na">—</td><td class="c pd">16:00</td></tr>
+        <tr><td><b>5</b></td><td><b>Rosa G.</b> · histerectomía<br><span class="mini">POP día 1</span></td><td>2</td><td>Int. Arce</td><td class="c no3">✕ falta</td><td class="c ok2">✓</td><td class="c pd">⚠ falta 1</td><td class="c na">—</td><td class="c na">—</td><td class="c pd">⏳ 12:00</td><td class="c pd">16:00</td></tr>
+        <tr><td><b>6</b></td><td colspan="10" style="color:var(--soft)">libre · limpieza terminal ✓</td></tr></tbody></table>
+      <div class="mini" style="margin-top:6px">Verde = hecho · naranja = pendiente en hora · rojo = atrasado. El residente y la planta ven de un vistazo qué falta antes del pase de visita.</div></div>
+  </div>
+</section>
+
+<!-- ============ K2 ============ -->
+<section class="scr" id="k2">
+  <div class="app"><div class="brand">SIVEC <span>PISO</span></div><div class="who">📋 Indicaciones médicas · 25/09 · Cama 1 · Juana M. · 32 sem · ARO</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Hoja de indicaciones del día · cada línea se reparte sola</div>
+        <div class="ind"><span class="n">1</span><span>Dieta para diabética 1.800 kcal, fraccionada</span><span class="goes" style="background:#f3eef0">🍽 nutrición</span></div>
+        <div class="ind"><span class="n">2</span><span>Solución fisiológica 0,9% 1.000 mL · 21 gotas/min</span><span class="goes" style="background:#e0ecfa">💊 farmacia + enfermería</span></div>
+        <div class="ind"><span class="n">3</span><span>Metildopa 500 mg VO c/8 h (06–14–22)</span><span class="goes" style="background:#e0ecfa">💊 farmacia + enfermería</span></div>
+        <div class="ind"><span class="n">4</span><span>Insulina NPH 10 UI SC 07:00 y 6 UI 21:00</span><span class="goes" style="background:#e0ecfa">💊 farmacia + enfermería</span></div>
+        <div class="ind"><span class="n">5</span><span>Betametasona 12 mg IM c/24 h · 2ª dosis hoy</span><span class="goes" style="background:#e0ecfa">💊 farmacia + enfermería</span></div>
+        <div class="ind"><span class="n">6</span><span>Glicemia capilar c/6 h (06–12–18–24)</span><span class="goes" style="background:#fdf0d5">🩸 enfermería · controles</span></div>
+        <div class="ind"><span class="n">7</span><span>PA c/4 h · FCF c/turno · movimientos fetales</span><span class="goes" style="background:#fdf0d5">🩺 enfermería · controles</span></div>
+        <div class="ind"><span class="n">8</span><span>Ecografía obstétrica + Doppler · hoy</span><span class="goes" style="background:#dcf3e5">🔊 agenda de ecografía</span></div>
+        <div class="ind"><span class="n">9</span><span>Proteinuria de 24 h · hemograma · creatinina</span><span class="goes" style="background:#dcf3e5">🧪 laboratorio (D-8)</span></div>
+        <div class="ind" style="border:none"><span class="n">10</span><span>Avisar si PA ≥ 160/110, cefalea o epigastralgia</span><span class="goes" style="background:#fde2e2">🔔 alerta enfermería</span></div></div>
+      <div>
+        <div class="card"><div class="lbl">Quién escribe y quién firma</div><div style="font-size:13px;line-height:1.6">Interno propone (copia las de ayer y cambia) → <b>residente revisa y firma 🖐</b> → médico de planta confirma en el pase de visita.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Seguridad</div><div class="chk3"><span class="ok">✓ Sin alergias registradas</span><span class="ok">✓ Dosis dentro de rango (embarazo)</span><span class="no">⚠ Metildopa: falta en farmacia · ver descargo</span></div></div>
+        <div class="card" style="margin-top:12px;font-size:13px"><div class="lbl">Al firmar</div>Farmacia recibe la receta del día · enfermería el kárdex · laboratorio y ecografía sus pedidos · y todo queda en la historia.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ K3 ============ -->
+<section class="scr" id="k3">
+  <div class="app"><div class="brand">SIVEC <span>PISO</span></div><div class="who">✍️ Evolución · Cama 1 · Juana M. · Int. Rojas · revisa R2 Dr. Quispe</div></div>
+  <div class="body">
+    <div class="chips"><span class="chip on">☀️ Evolución de la mañana · 07:00</span><span class="chip">🌙 Evolución de la tarde · 16:00</span><span class="chip">Anteriores</span></div>
+    <div class="cols c21" style="margin-top:10px">
+      <div class="card"><div class="lbl">SOAP · lo automático ya viene puesto (gris), el interno escribe lo suyo</div>
+        <div class="kv2"><span>S</span><b>“Durmió bien, sin dolor de cabeza, mueve bien el bebé”</b></div>
+        <div class="kv2"><span>O · signos (enfermería)</span><b style="color:#6f6168">PA 138/88 · 142/90 · 136/86 · FC 84 · T 36,6</b></div>
+        <div class="kv2"><span>O · glicemias (c/6 h)</span><b style="color:#6f6168">ayer 12: 128 · 18: 150 · 24: 101 · hoy 06: 94</b></div>
+        <div class="kv2"><span>O · balance 24 h</span><b style="color:#6f6168">ingresos 2.100 · egresos 1.850 mL</b></div>
+        <div class="kv2"><span>O · FCF · movimientos</span><b style="color:#6f6168">146 · presentes</b></div>
+        <div class="kv2"><span>O · examen</span><b>AU 29 cm · sin edema · reflejos normales</b></div>
+        <div class="kv2"><span>Estudios</span><b style="color:#6f6168">eco 08:30: pendiente · proteinuria 24 h: 420 mg</b></div>
+        <div class="kv2"><span>A</span><b>Preeclampsia leve estable · DG con insulina, glicemia postprandial alta</b></div>
+        <div class="kv2"><span>P</span><b>Subir NPH nocturna a 8 UI · 2ª betametasona · eco Doppler hoy</b></div>
+        <div class="mini" style="margin-top:6px">El interno puede dictar por voz. Lo automático nadie lo copia a mano: no hay errores de transcripción.</div></div>
+      <div>
+        <div class="card" style="border:2px solid #fcd34d"><div class="lbl" style="color:#8a5a00">Revisión del residente · antes de firmar</div>
+          <div style="font-size:13px;line-height:1.6">✏️ “Glicemia de ayer 18 h: <b>150</b> postprandial — anotar si fue 1 h o 2 h después de comer.”<br>✏️ “Agregar: sin síntomas de alarma de preeclampsia.”</div>
+          <div class="chk3" style="margin-top:6px"><span class="ok">✓ Interno corrigió 07:40</span><span class="ok">✓ Firmas: Int. Rojas 🖐 · R2 Quispe 🖐</span></div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Evolución de la tarde</div><div style="font-size:13px;line-height:1.6">A las 16:00 se abre con lo nuevo del día: resultado de la eco, glicemias de 12 y 18 h, PA de la tarde, lo que cambió el médico en el pase.</div></div>
+        <div class="card" style="margin-top:12px;font-size:13px"><div class="lbl">Si no se hizo</div>07:30 sin evolución → aviso al interno · 08:00 → aviso al residente (sale en rojo en el tablero).</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ K4 ============ -->
+<section class="scr" id="k4">
+  <div class="app"><div class="brand">SIVEC <span>FARMACIA</span></div><div class="who">💊 Recetas de piso del día · generadas desde las indicaciones firmadas · 25/09</div></div>
+  <div class="body">
+    <div class="kpi"><div><small>Recetas de piso hoy</small><b>34</b><span> 5 pisos</span></div><div><small>Preparadas</small><b style="color:#15803d">26</b></div><div><small>Con faltantes</small><b style="color:#b45309">6</b></div><div><small>Retiradas</small><b>19</b></div></div>
+    <div class="cols c21" style="margin-top:12px">
+      <div class="card"><div class="lbl">Gineco-Obstetricia · una bolsa por cama · la farmacéutica marca hay / no hay</div>
+        <table class="l"><thead><tr><th>Cama</th><th>Medicamento</th><th>Cant. 24 h</th><th>Farmacia</th></tr></thead><tbody>
+          <tr><td rowspan="5"><b>1</b><br>Juana M.</td><td>Solución fisiológica 1.000 mL</td><td>2</td><td><span class="st ok">hay</span></td></tr>
+          <tr><td>Metildopa 500 mg</td><td>3</td><td><span class="st bad">no hay</span></td></tr>
+          <tr><td>Insulina NPH (frasco)</td><td>1</td><td><span class="st ok">hay</span></td></tr>
+          <tr><td>Betametasona 12 mg</td><td>1</td><td><span class="st ok">hay</span></td></tr>
+          <tr><td>Tiras de glicemia</td><td>4</td><td><span class="st ok">hay</span></td></tr>
+          <tr><td><b>2</b><br>Lucía F.</td><td>Paracetamol 500 · sulfato ferroso</td><td>3 · 1</td><td><span class="st ok">hay</span></td></tr>
+          <tr><td><b>3</b><br>Marta V.</td><td>Ketorolaco amp · cefazolina · gasas</td><td>3 · 3 · 10</td><td><span class="st ok">hay</span></td></tr>
+          <tr><td rowspan="2"><b>5</b><br>Rosa G.</td><td>Tramadol amp · ranitidina</td><td>3 · 2</td><td><span class="st ok">hay</span></td></tr>
+          <tr><td>Enoxaparina 40 mg</td><td>1</td><td><span class="st bad">no hay</span></td></tr></tbody></table>
+        <div class="mini" style="margin-top:6px">Lo que “hay” se descuenta del stock al entregar. Lo que “no hay” va solo a la lista de la familia.</div></div>
+      <div>
+        <div class="card"><div class="lbl">Estante del piso</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div class="bag" style="border-color:#fcd34d"><b>🛍 Cama 1</b>4 de 5 · falta 1</div><div class="bag" style="border-color:#86efac"><b>🛍 Cama 2</b>completa</div>
+            <div class="bag" style="border-color:#86efac"><b>🛍 Cama 3</b>completa</div><div class="bag"><b>🛍 Cama 4</b>sin firmar</div>
+            <div class="bag" style="border-color:#fcd34d"><b>🛍 Cama 5</b>2 de 3</div><div class="bag" style="color:var(--soft)"><b>Cama 6</b>libre</div></div>
+          <div class="mini" style="margin-top:6px">Todas las bolsas del piso juntas en una canasta con etiqueta: “Gineco 2º piso · listo 10:30”.</div></div>
+        <div class="card" style="margin-top:12px;font-size:13px"><div class="lbl">Orden de llegada</div>Las indicaciones firmadas antes de las 09:00 salen a las 10:30. Una indicación nueva del pase de visita llega como “urgente”.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ K5 ============ -->
+<section class="scr" id="k5">
+  <div class="app"><div class="brand">SIVEC <span>FARMACIA</span></div><div class="who">🧺 El interno retira la canasta del piso · y la familia sabe qué comprar</div></div>
+  <div class="body">
+    <div class="cols c3">
+      <div class="card"><div class="lbl">Retiro · una sola pasada</div>
+        <div style="font-size:13px;line-height:1.6">Canasta <b>Gineco 2º piso</b> · 5 bolsas<br>Retira: <b>Int. Rojas 🖐</b> · 10:42<br>Entrega: <b>Farm. Lic. Arteaga 🖐</b></div>
+        <div class="chk3" style="margin-top:6px"><span class="ok">✓ Cada bolsa escaneada al llegar al piso</span><span class="ok">✓ Enfermería ve “recibido” en el kárdex</span></div></div>
+      <div class="card" style="border:2px solid #fcd34d"><div class="lbl" style="color:#8a5a00">La familia debe comprar</div>
+        <div style="font-size:13px;line-height:1.6"><b>Cama 1 · Juana M.</b><br>Metildopa 500 mg · 3 comprimidos (1 día)<br><b>Cama 5 · Rosa G.</b><br>Enoxaparina 40 mg · 1 jeringa</div>
+        <div class="mini" style="margin-top:6px">SMS al familiar registrado + hoja impresa en la cama. Cuando la familia trae el remedio, enfermería lo escanea y queda anotado “traído por familia”.</div></div>
+      <div class="card"><div class="lbl">Hoja para la familia</div>
+        <div style="background:#fff;border:1px solid #ddd;border-radius:8px;padding:10px;font-size:12px;line-height:1.5">
+          <b>HOSPITAL · 2º PISO GINECO · CAMA 1</b><br>Paciente: Juana M.<br>Por favor compre y entregue en enfermería:<br>☐ <b>Metildopa 500 mg</b> · 3 comprimidos<br><span style="color:#777">Receta firmada por R2 Dr. Quispe · 25/09 · válida en cualquier farmacia · QR</span></div>
+        <div class="mini" style="margin-top:6px">Si el SUS cubre y solo falta stock, la farmacia pide reposición a la red (Almacén) en el mismo momento.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ K6 ============ -->
+<section class="scr" id="k6">
+  <div class="app"><div class="brand">SIVEC <span>IMAGEN</span></div><div class="who">🔊 Ecografía pedida desde el piso · la acepta el ecografista y queda agendada</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Agenda del ecografista · Dra. Paredes · jueves 25/09 · 07:05</div>
+        <table class="l"><thead><tr><th>Hora</th><th>Paciente</th><th>Estudio</th><th>Desde</th><th>Estado</th></tr></thead><tbody>
+          <tr><td>08:00</td><td>Ana P. · 41 sem</td><td>Eco + perfil biofísico</td><td>Piso gineco · cama 4</td><td><span class="st ok">aceptada</span></td></tr>
+          <tr><td>08:30</td><td><b>Juana M. · 32 sem ARO</b></td><td>Eco obstétrica + Doppler</td><td>Piso gineco · cama 1</td><td><span class="st bad">ARO · nueva</span> <span class="btn p">Aceptar</span></td></tr>
+          <tr><td>09:00</td><td>Marta V.</td><td>Eco pélvica (colección?)</td><td>Piso gineco · cama 3</td><td><span class="st warn">propuesta</span></td></tr>
+          <tr><td>09:30</td><td>—</td><td colspan="2" style="color:var(--soft)">consulta externa</td><td></td></tr></tbody></table>
+        <div class="mini" style="margin-top:6px">Las pacientes de piso van primero por la mañana; <b>ARO antes que todas</b>.</div></div>
+      <div>
+        <div class="card"><div class="lbl">Qué pasa al aceptar</div>
+          <div class="tl"><div style="--c:#15803d">Aparece en el tablero del piso: “eco 08:30 ✓”</div><div style="--c:#2f6fb0">Enfermería y camillero ven la hora del traslado</div><div style="--c:#7d2a4c">El informe vuelve a la <b>evolución de la tarde</b> y a la historia perinatal</div></div></div>
+        <div class="card" style="margin-top:12px;font-size:13px"><div class="lbl">Si no acepta</div>Propone otra hora o otro ecografista; el médico ve la respuesta en el tablero, sin llamar por teléfono.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ K7 ============ -->
+<section class="scr" id="k7">
+  <div class="app"><div class="brand">SIVEC <span>PISO</span></div><div class="who">🩸 Controles indicados · Cama 1 · Juana M. · glicemia c/6 h + PA c/4 h</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Glicemia capilar · desde ayer · meta en ayunas &lt; 95 · 1 h postprandial &lt; 140</div>
+        <svg viewBox="0 0 560 210" width="100%" font-family="Source Sans 3"><rect x="40" y="95" width="510" height="57" fill="#dcf3e5"/><text x="46" y="109" font-size="10" fill="#15803d">rango meta</text>
+<g font-size="10" fill="#7a6a71"><text x="34" y="48" text-anchor="end">180</text><text x="34" y="99" text-anchor="end">140</text><text x="34" y="156" text-anchor="end">95</text><text x="34" y="200" text-anchor="end">60</text></g>
+<polyline points="60,153 145,110 230,82 315,144 400,153 485,110" fill="none" stroke="#7d2a4c" stroke-width="3"/><g fill="#7d2a4c"><circle cx="60" cy="153" r="4"/><circle cx="145" cy="110" r="4"/><circle cx="230" cy="82" r="5" fill="#b91c1c"/><circle cx="315" cy="144" r="4"/><circle cx="400" cy="153" r="4"/><circle cx="485" cy="110" r="4"/></g>
+<g font-size="10" fill="#7a6a71"><text x="60" y="208" text-anchor="middle">24/09 06</text><text x="145" y="208" text-anchor="middle">12</text><text x="230" y="208" text-anchor="middle">18</text><text x="315" y="208" text-anchor="middle">24</text><text x="400" y="208" text-anchor="middle">25/09 06</text><text x="485" y="208" text-anchor="middle">12</text></g>
+<text x="238" y="74" font-size="11" font-weight="700" fill="#991b1b">150 · postprandial</text></svg>
+        <div class="mini">Cada valor lo carga enfermería (glucómetro del carro); el rojo avisa al interno y al residente.</div></div>
+      <div>
+        <div class="card"><div class="lbl">Controles del día · cumplimiento</div>
+          <div class="kv2"><span>Glicemia c/6 h</span><b>hoy 2 de 2 ✓ · próxima 18:00</b></div><div class="kv2"><span>PA c/4 h</span><b>hoy 3 de 3 ✓ · próxima 14:00</b></div><div class="kv2"><span>FCF c/turno</span><b>1 de 1 ✓</b></div><div class="kv2"><span>Diuresis</span><b>1.850 mL ✓</b></div></div>
+        <div class="card" style="margin-top:12px;font-size:13px"><div class="lbl">Todo va a la evolución</div>Los controles aparecen solos en el “O” de la evolución de la mañana y de la tarde. Si un control no se hizo, también aparece: “glicemia de 18 h no registrada”.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ K8 ============ -->
+<section class="scr" id="k8">
+  <div class="app"><div class="brand">SIVEC <span>PISO</span></div><div class="who">🩹 Curaciones indicadas · Gineco 2º piso · 25/09</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Lista del día · sale de las indicaciones (“curación diaria”)</div>
+        <table class="l"><thead><tr><th>Cama</th><th>Herida</th><th>Frecuencia</th><th>Hecha</th><th>Por</th></tr></thead><tbody>
+          <tr><td><b>2</b> · Lucía F.</td><td>episiorrafia (desgarro gr. 1)</td><td>diaria</td><td><span class="st ok">09:10</span></td><td>Lic. Rivero</td></tr>
+          <tr><td><b>3</b> · Marta V.</td><td>herida de cesárea</td><td>diaria</td><td><span class="st bad">no hecha · atrasada</span></td><td>—</td></tr>
+          <tr><td><b>5</b> · Rosa G.</td><td>herida abdominal · dren</td><td>c/12 h</td><td><span class="st warn">12:00</span></td><td>Int. Arce</td></tr></tbody></table>
+        <div class="mini" style="margin-top:6px">Si a las 11:00 no se hizo, sale en rojo en el tablero y avisa a enfermería.</div></div>
+      <div class="card"><div class="lbl">Registrar curación · cama 2 · por toques</div>
+        <div class="kv2"><span>Aspecto</span><b>limpia · bordes afrontados</b></div><div class="kv2"><span>Secreción</span><b>no</b></div><div class="kv2"><span>Signos de infección</span><b>no (calor, rubor, pus)</b></div><div class="kv2"><span>Dolor</span><b>2/10</b></div><div class="kv2"><span>Material</span><b>gasas 4 · clorhexidina</b></div>
+        <div style="margin-top:6px;font-size:13px">📷 Foto opcional (queda en la historia, solo personal autorizado) · firma 🖐</div>
+        <div class="mini" style="margin-top:6px">Signo de infección → alerta al residente y aparece en la evolución de la tarde. El material se descuenta del stock del piso.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ K9 ============ -->
+<section class="scr" id="k9">
+  <div class="app"><div class="brand">SIVEC <span>PASE DE VISITA</span></div><div class="who">📱 Tablet del carro · Dra. Suárez (planta) + R2 Quispe + internos · 09:00</div></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:230px 1fr">
+      <div class="card"><div class="lbl">Recorrido</div>
+        <div class="chk3"><span class="ok">✓ Cama 4 · Ana P.</span><span class="no">▶ Cama 1 · Juana M.</span><span style="background:#f3eef0">Cama 2 · Lucía F.</span><span style="background:#f3eef0">Cama 3 · Marta V.</span><span style="background:#f3eef0">Cama 5 · Rosa G.</span></div>
+        <div class="mini" style="margin-top:8px">El orden lo pone la planta: primero ARO y graves.</div></div>
+      <div class="card"><div class="lbl">Cama 1 · Juana M. · 32 sem · preeclampsia leve + DG · día 3 · pulsera escaneada ✓</div>
+        <div class="cols c3" style="gap:8px">
+          <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;font-size:12.5px"><b>Lo que dice el interno</b><br>Estable, sin síntomas. Glicemia postprandial alta.</div>
+          <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;font-size:12.5px"><b>Datos del sistema</b><br>PA máx 142/90 · glicemia máx 150 · proteinuria 420 mg</div>
+          <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;font-size:12.5px"><b>Pendientes</b><br>Eco Doppler (en curso 08:30) · 2ª betametasona · metildopa (familia)</div></div>
+        <div class="lbl" style="margin-top:10px">La doctora pregunta y corrobora</div>
+        <div class="chips"><span class="chip on">✓ Síntomas confirmados con la paciente</span><span class="chip on">✓ Examen corroborado</span><span class="chip">✏️ Corrección a la evolución</span></div>
+        <div class="lbl" style="margin-top:10px">Cambios dictados en la visita</div>
+        <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px">🎤 “Subir NPH nocturna a 8 UI. Si Doppler normal, plan de término a las 37 semanas.”</div>
+        <div class="mini" style="margin-top:6px">Se vuelve indicación nueva (urgente a farmacia/enfermería) · firma de la planta con huella en el lector del carro 🖐 · queda en la evolución como “pase de visita 09:12”.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ K10 ============ -->
+<section class="scr" id="k10">
+  <div class="app"><div class="brand">SIVEC <span>PISO</span></div><div class="who">🛒 Carro de visita · lo que lleva y para qué</div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><svg viewBox="0 0 770 470" width="100%" role="img" aria-label="Carro de visita con tablet" font-family="Source Sans 3">
+<rect x="0" y="0" width="770" height="470" fill="#faf6f4"/>
+<!-- pole & arm -->
+<rect x="236" y="70" width="10" height="120" fill="#9ca3af"/>
+<path d="M241 78 L300 60" stroke="#9ca3af" stroke-width="9" stroke-linecap="round"/>
+<!-- tablet -->
+<g transform="translate(262,10) rotate(-6)"><rect x="0" y="0" width="190" height="126" rx="12" fill="#1f1a1d"/><rect x="8" y="8" width="174" height="110" rx="6" fill="#fff"/>
+<rect x="8" y="8" width="174" height="20" fill="#7d2a4c"/><text x="14" y="22" font-size="10" fill="#fff" font-weight="800">SIVEC · PASE DE VISITA</text>
+<text x="14" y="42" font-size="9" fill="#2d2429" font-weight="700">Cama 1 · Juana M. · 32 sem ARO</text>
+<rect x="14" y="48" width="75" height="8" rx="3" fill="#dcf3e5"/><rect x="95" y="48" width="75" height="8" rx="3" fill="#fde2e2"/>
+<rect x="14" y="62" width="156" height="6" rx="3" fill="#eadde3"/><rect x="14" y="72" width="130" height="6" rx="3" fill="#eadde3"/><rect x="14" y="82" width="145" height="6" rx="3" fill="#eadde3"/>
+<rect x="14" y="96" width="70" height="14" rx="5" fill="#7d2a4c"/><text x="21" y="106" font-size="8" fill="#fff" font-weight="700">✓ corroborado</text></g>
+<!-- top surface -->
+<rect x="150" y="190" width="300" height="16" rx="6" fill="#e5e7eb" stroke="#9ca3af"/>
+<!-- fingerprint reader & scanner -->
+<rect x="170" y="176" width="40" height="16" rx="4" fill="#374151"/><ellipse cx="190" cy="180" rx="9" ry="4" fill="#60a5fa"/>
+<rect x="400" y="168" width="18" height="24" rx="4" fill="#374151"/><path d="M404 168 L412 150 L420 150 L416 168Z" fill="#4b5563"/>
+<!-- body drawers -->
+<rect x="160" y="206" width="280" height="190" rx="8" fill="#ffffff" stroke="#9ca3af" stroke-width="2"/>
+<g stroke="#9ca3af" stroke-width="1.5" fill="#f3f4f6"><rect x="172" y="216" width="256" height="40" rx="5"/><rect x="172" y="262" width="256" height="40" rx="5"/><rect x="172" y="308" width="256" height="40" rx="5"/></g>
+<g fill="#7d2a4c"><rect x="280" y="232" width="40" height="6" rx="3"/><rect x="280" y="278" width="40" height="6" rx="3"/><rect x="280" y="324" width="40" height="6" rx="3"/></g>
+<text x="180" y="248" font-size="11" fill="#6f6168">guantes · alcohol · gasas</text>
+<text x="180" y="294" font-size="11" fill="#6f6168">material de curación</text>
+<text x="180" y="340" font-size="11" fill="#6f6168">glucómetro · tiras · termómetro</text>
+<!-- battery -->
+<rect x="172" y="356" width="256" height="30" rx="5" fill="#dcf3e5" stroke="#15803d"/><text x="300" y="376" text-anchor="middle" font-size="11.5" fill="#15803d" font-weight="800">🔋 batería 8 h · carga en la noche</text>
+<!-- side items -->
+<rect x="440" y="230" width="26" height="46" rx="6" fill="#bfdbfe" stroke="#2f6fb0"/><text x="453" y="258" text-anchor="middle" font-size="9" fill="#1e4f8a" font-weight="800">gel</text>
+<path d="M134 300 h26 v70 h-26 z" fill="#fde2e2" stroke="#b91c1c"/><text x="147" y="340" text-anchor="middle" font-size="9" fill="#991b1b" font-weight="800">basura</text>
+<!-- handle -->
+<path d="M160 214 h-20 v40 h20" fill="none" stroke="#9ca3af" stroke-width="6" stroke-linecap="round"/>
+<!-- wheels -->
+<rect x="160" y="396" width="280" height="10" fill="#9ca3af"/>
+<g fill="#374151"><circle cx="180" cy="420" r="14"/><circle cx="420" cy="420" r="14"/><circle cx="300" cy="420" r="10"/></g><g fill="#9ca3af"><circle cx="180" cy="420" r="5"/><circle cx="420" cy="420" r="5"/></g>
+<!-- labels -->
+<g font-size="12.5" fill="#2d2429" font-weight="700">
+<path d="M455 40 L520 40" stroke="#7d2a4c"/><text x="524" y="44">① Tablet con SIVEC</text><text x="524" y="60" font-weight="400" font-size="11" fill="#6f6168">brazo que gira hacia el médico</text>
+<path d="M412 150 L520 110" stroke="#7d2a4c"/><text x="524" y="114">② Lector de códigos</text><text x="524" y="130" font-weight="400" font-size="11" fill="#6f6168">pulsera de la paciente</text>
+<path d="M190 176 L60 130" stroke="#7d2a4c"/><text x="4" y="118">③ Lector de huella</text><text x="4" y="134" font-weight="400" font-size="11" fill="#6f6168">firma residente e interno</text>
+<path d="M172 236 L60 220" stroke="#7d2a4c"/><text x="4" y="216">④ Cajones</text><text x="4" y="232" font-weight="400" font-size="11" fill="#6f6168">guantes, curación, glucómetro</text>
+<path d="M466 250 L520 250" stroke="#7d2a4c"/><text x="524" y="254">⑤ Alcohol en gel</text>
+<path d="M300 386 L520 330" stroke="#7d2a4c"/><text x="524" y="326">⑥ Batería</text><text x="524" y="342" font-weight="400" font-size="11" fill="#6f6168">toda la mañana sin cable</text>
+<path d="M134 340 L60 330" stroke="#7d2a4c"/><text x="4" y="326">⑦ Basura</text><text x="4" y="342" font-weight="400" font-size="11" fill="#6f6168">común / bioinfecciosa</text>
+<path d="M420 420 L520 440" stroke="#7d2a4c"/><text x="524" y="444">⑧ Ruedas con freno</text></g>
+</svg></div>
+      <div>
+        <div class="card"><div class="lbl">Cómo se usa</div><div style="font-size:13px;line-height:1.6">Un carro por piso · se carga de noche · el tablet ya abre en <b>el piso y el orden del recorrido</b>. En cada cama: escanear la pulsera → se abre esa paciente → preguntar, corroborar, firmar.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Por qué un carro y no el celular</div><div style="font-size:13px;line-height:1.6">Pantalla grande para que todo el equipo vea · huella para firmar · manos libres para examinar · material de curación a mano · higiene: superficie lavable y gel.</div></div>
+        <div class="card" style="margin-top:12px"><div class="lbl">Costo aproximado</div><div style="font-size:13px">Carro metálico + tablet de 10" + lector de huella + lector de códigos + batería: equipamiento común, sin nada especial.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  const NOTES = {
+    k1: '<b>Painel do piso:</b> cada cama com o que falta hoje — evolução da manhã, indicações, farmácia, estudos, glicemia, curativo e evolução da tarde — em verde/laranja/vermelho. Filtro por especialidade: igual para gineco, cirurgia, clínica, pediatria.',
+    k2: '<b>Indicações do dia:</b> o interno propõe (copia as de ontem), o residente revisa e assina com huella; cada linha vai sozinha para quem faz: farmácia, enfermagem (kárdex e controles), nutrição, laboratório (D-8) e agenda de ecografia; alertas de segurança.',
+    k3: '<b>Evolução da manhã e da tarde:</b> SOAP em que os sinais, glicemias, balanço e estudos já vêm do sistema (cinza); o interno escreve o dele; o residente marca correções antes de assinar; ambos assinam. Se às 07:30 não há evolução, avisa o interno e depois o residente.',
+    k4: '<b>Farmácia — receitas do piso:</b> geradas das indicações assinadas; uma sacola por cama; a farmacêutica marca “tem / não tem”; todas as sacolas do piso juntas numa cesta “Gineco 2º piso · pronto 10:30”.',
+    k5: '<b>Retirada e o que a família compra:</b> o interno retira a cesta inteira numa só passada (huellas); o que não tem vai por SMS e folha impressa à família; quando trazem, a enfermagem escaneia; a farmácia pede reposição à rede.',
+    k6: '<b>Ecografia desde o piso:</b> a indicação cai na agenda do ecografista, que aceita (ou propõe outra hora); pacientes de piso de manhã, ARO primeiro; o laudo volta à evolução da tarde e à história perinatal.',
+    k7: '<b>Glicemias e controles:</b> curva da glicemia capilar com a faixa-meta, cumprimento de cada controle indicado; tudo entra sozinho no “O” da evolução, e o que não foi feito também aparece.',
+    k8: '<b>Curativos:</b> a lista do dia sai das indicações (“curativo diário”); registro por toques (aspecto, secreção, infecção, dor, material, foto opcional) com assinatura; atrasado fica vermelho no painel; sinal de infecção avisa o residente.',
+    k9: '<b>Passagem de visita:</b> no tablet do carro, por cama: o que diz o interno, os dados do sistema e os pendentes; a médica pergunta à paciente e corrobora; as mudanças ditadas viram indicação nova urgente, assinada com huella no carro.',
+    k10: '<b>Carro de visita:</b> tablet em braço giratório, leitor de código (pulseira), leitor de huella, gavetas com luvas, material de curativo e glicosímetro, álcool gel, lixo, bateria para a manhã inteira e rodas com freio.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1) || 'k1');
+</script>
+
+</body>
+</html>

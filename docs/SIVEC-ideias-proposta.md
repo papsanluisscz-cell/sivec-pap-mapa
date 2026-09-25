@@ -737,3 +737,22 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - Imágenes: docs/programas-01..07.png · esboco-programas.html
 
 **✅ Con este módulo quedan dibujados los 16 módulos pendientes del mapa del proyecto.**
+
+### PISO (internación) de Gineco-Obstetricia y todas las especialidades — dibujado, para aprobar (pedido del usuario)
+- **Tablero del piso:** cada cama con lo que falta hoy (evolución de la mañana, indicaciones, farmacia, estudios, glicemia, curación, evolución de la tarde) en verde, naranja o rojo. Hay filtro por especialidad y el piso es igual para todas; cambia solo la plantilla.
+- **Indicaciones médicas diarias:** el interno propone (copia las de ayer y las cambia), el residente revisa y firma con huella y la planta confirma en el pase de visita. Cada línea va sola a quien la cumple:
+  - farmacia;
+  - enfermería (kárdex y controles);
+  - nutrición;
+  - laboratorio (D-8);
+  - agenda de ecografía;
+  - alertas.
+- **Evolución de la mañana (07:00) y de la tarde (16:00):** SOAP con lo automático ya puesto (signos, glicemias, balance, estudios), sin copiar a mano. El residente marca correcciones antes de firmar y firman los dos. Si a las 07:30 falta, avisa al interno; a las 08:00, al residente.
+- **Farmacia – recetas de piso:** se generan desde las indicaciones firmadas, una bolsa por cama, y la farmacéutica marca hay / no hay. Todas las bolsas del piso van juntas en una canasta (“Gineco 2º piso · listo 10:30”) y el interno la retira en una sola pasada, con huella.
+- **Lo que la familia compra:** lo que no hay va por SMS y en hoja impresa en la cama. Cuando la familia lo trae, enfermería lo escanea (“traído por familia”) y farmacia pide reposición a la red.
+- **Ecografía desde el piso:** la indicación cae en la agenda del ecografista, que acepta o propone otra hora. Los pacientes de piso van por la mañana, primero las ARO; el informe vuelve a la evolución de la tarde y a la historia perinatal.
+- **Controles indicados (glicemia c/6 h, PA, FCF, diuresis):** curva con rango meta y cumplimiento. Todo entra solo al “O” de la evolución; lo no hecho también aparece.
+- **Curaciones indicadas (puérperas, cesáreas, cirugía…):** lista del día desde las indicaciones; registro por toques (aspecto, secreción, infección, dolor, material, foto opcional) con firma. Si está atrasada sale en rojo; un signo de infección avisa al residente.
+- **Pase de visita** con el tablet del carro: por cama se ve lo que dice el interno, los datos del sistema y los pendientes. La doctora pregunta y corrobora; los cambios dictados se vuelven indicación urgente y se firman con huella en el carro.
+- **Carro de visita:** tablet en brazo giratorio, lector de pulsera, lector de huella, cajones (guantes, curación, glucómetro), alcohol en gel, basura, batería para 8 h y ruedas con freno.
+- Imágenes: docs/piso-01..10.png · esboco-piso.html
