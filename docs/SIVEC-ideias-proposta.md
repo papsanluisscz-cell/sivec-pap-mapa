@@ -612,3 +612,8 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - **Agenda de sillones** con lugares para urgencia (ficha del día); **esterilización** con ciclos del autoclave, prueba biológica y paquetes vencidos bloqueados.
 - **Indicadores:** CPO-D a los 12 años (meta OMS < 3), altas, embarazadas con consulta, obturaciones vs extracciones, e insumos que se descuentan solos (Almacén).
 - Imágenes: docs/odonto-01..07.png · esboco-odonto.html
+- **Diente ausente (pregunta del usuario):** al marcar “ausente”, el SIVEC pregunta la causa: perdido por caries, extraído por ortodoncia, trauma, enfermedad de encías, no erupcionado (NE) o agenesia (AG).
+  - Se ve como ✕ azul con la causa debajo; NE y AG en gris.
+  - Solo “perdido por caries” cuenta como P en el CPO-D (regla OMS). La extracción indicada (todavía en boca) cuenta como C.
+  - Si la extracción se hizo en el SIVEC, la causa y la fecha vienen solas de esa sesión.
+  - Imagen: docs/odonto-02.png (las demás pantallas pasan a odonto-03..08).
