@@ -1,0 +1,242 @@
+<title>SIVEC Completo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Domine:wght@600;700&display=swap">
+<style>
+  :root {
+    --wine:#7d2a4c; --wine-d:#5a1c36; --wine-soft:#f3e7ec;
+    --ink:#2a1a22; --soft:#6f6168; --line:#e6dadf;
+    --bg:#f6f1f3; --panel:#fffdfd; --side:#fbf7f9; --hover:#f1e6eb;
+    --ok:#15803d; --warn:#b45309; --bad:#b91c1c; --info:#2f5e8f;
+    --okbg:#e6f5ec; --warnbg:#fdf0d8; --badbg:#fde4e4; --infobg:#e3edf8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --wine:#d7849f; --wine-d:#f0b5c8; --wine-soft:#3a2530;
+      --ink:#f3e9ed; --soft:#b9a8b0; --line:#3d2d35;
+      --bg:#1a1216; --panel:#221820; --side:#1e151a; --hover:#2d2027;
+      --ok:#6ad08f; --warn:#f0b35a; --bad:#f28b8b; --info:#8fb8e6;
+      --okbg:#173022; --warnbg:#35270f; --badbg:#3a1a1a; --infobg:#182536;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --wine:#d7849f; --wine-d:#f0b5c8; --wine-soft:#3a2530;
+    --ink:#f3e9ed; --soft:#b9a8b0; --line:#3d2d35;
+    --bg:#1a1216; --panel:#221820; --side:#1e151a; --hover:#2d2027;
+    --ok:#6ad08f; --warn:#f0b35a; --bad:#f28b8b; --info:#8fb8e6;
+    --okbg:#173022; --warnbg:#35270f; --badbg:#3a1a1a; --infobg:#182536;
+  }
+  * { box-sizing:border-box; }
+  html, body { height:100%; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.45 "Nunito Sans", "Segoe UI", Arial, sans-serif; }
+  button { font:inherit; color:inherit; cursor:pointer; }
+  button:focus-visible, a:focus-visible, select:focus-visible { outline:3px solid var(--wine); outline-offset:2px; }
+
+  .app { height:100%; display:grid; grid-template-rows:auto 1fr; }
+  header.top { display:flex; align-items:center; gap:14px; padding:10px 16px; padding-top:calc(10px + env(safe-area-inset-top, 0px)); background:linear-gradient(135deg,#5a1c36,#8e3459); color:#fff; flex-wrap:wrap; }
+  .brand { display:flex; align-items:center; gap:10px; }
+  .mark { width:36px; height:36px; border-radius:10px; background:#fff; color:#7d2a4c; font:700 20px/36px Domine, Georgia, serif; text-align:center; }
+  .brand b { font-family:Domine, Georgia, serif; font-size:20px; letter-spacing:.04em; }
+  .brand small { display:block; font-size:11px; opacity:.8; letter-spacing:.06em; text-transform:uppercase; }
+  .place { font-size:13px; opacity:.92; }
+  .spacer { flex:1; }
+  .conn { font-size:12px; font-weight:800; border-radius:999px; padding:4px 11px; background:rgba(255,255,255,.16); display:inline-flex; gap:6px; align-items:center; }
+  .conn i { width:8px; height:8px; border-radius:50%; background:#6ad08f; display:inline-block; }
+  .conn.off i { background:#f0b35a; }
+  .roles { display:flex; gap:6px; flex-wrap:wrap; }
+  .role { border:1px solid rgba(255,255,255,.35); background:transparent; color:#fff; border-radius:999px; padding:5px 12px; font-size:13px; font-weight:700; }
+  .role[aria-pressed="true"] { background:#fff; color:#5a1c36; border-color:#fff; }
+  .burger { display:none; background:rgba(255,255,255,.16); border:0; color:#fff; border-radius:8px; padding:6px 10px; font-weight:800; }
+
+  .body { display:grid; grid-template-columns:260px 1fr; min-height:0; }
+  nav.side { background:var(--side); border-right:1px solid var(--line); overflow:auto; padding:12px 10px 24px; }
+  .user { display:flex; gap:10px; align-items:center; padding:8px 8px 12px; border-bottom:1px solid var(--line); margin-bottom:8px; }
+  .avatar { width:38px; height:38px; border-radius:50%; background:var(--wine-soft); color:var(--wine-d); display:flex; align-items:center; justify-content:center; font-weight:800; }
+  .user b { display:block; font-size:14px; } .user span { font-size:12px; color:var(--soft); }
+  .grp { font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--wine); font-weight:800; margin:14px 8px 4px; }
+  .item { display:flex; align-items:center; gap:9px; width:100%; text-align:left; background:none; border:0; border-radius:9px; padding:7px 9px; font-size:14px; font-weight:600; }
+  .item:hover { background:var(--hover); }
+  .item[aria-current="page"] { background:var(--wine-soft); color:var(--wine-d); font-weight:800; }
+  .item .ic { width:22px; text-align:center; }
+  .item .tag { white-space:nowrap; margin-left:auto; font-size:10.5px; font-weight:800; border-radius:999px; padding:1px 7px; }
+  .tag.live { background:var(--okbg); color:var(--ok); }
+  .tag.n { background:var(--badbg); color:var(--bad); }
+
+  main { min-width:0; min-height:0; display:flex; flex-direction:column; }
+  .crumb { display:flex; gap:10px; align-items:center; padding:9px 16px; border-bottom:1px solid var(--line); background:var(--panel); font-size:13px; color:var(--soft); flex-wrap:wrap; }
+  .crumb b { color:var(--ink); }
+  .crumb .pill { margin-left:auto; font-size:11.5px; font-weight:800; background:var(--warnbg); color:var(--warn); border-radius:999px; padding:3px 10px; }
+  iframe { flex:1; width:100%; border:0; background:#fff; }
+
+  .home { flex:1; overflow:auto; padding-block:22px 40px; padding-inline:24px; }
+  .home h1 { font-family:Domine, Georgia, serif; font-size:26px; margin:0 0 4px; text-wrap:balance; }
+  .home .sub { color:var(--soft); margin:0 0 18px; }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-bottom:20px; }
+  .kpi { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:700; }
+  .kpi b { font-size:28px; font-variant-numeric:tabular-nums; }
+  .kpi.w b { color:var(--warn); } .kpi.b b { color:var(--bad); } .kpi.g b { color:var(--ok); }
+  .h2 { font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--wine); font-weight:800; margin:6px 0 10px; }
+  .tasks { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; }
+  .task { display:grid; grid-template-columns:auto 1fr; gap:4px 12px; align-items:start; text-align:left; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:13px 14px; }
+  .task:hover { border-color:var(--wine); }
+  .task .ic { grid-row:span 2; font-size:22px; }
+  .task b { font-size:15px; } .task span { font-size:13px; color:var(--soft); }
+  .task .st { grid-column:2; justify-self:start; font-size:11.5px; font-weight:800; border-radius:999px; padding:2px 9px; margin-top:4px; }
+  .st.b { background:var(--badbg); color:var(--bad); } .st.w { background:var(--warnbg); color:var(--warn); } .st.g { background:var(--okbg); color:var(--ok); } .st.i { background:var(--infobg); color:var(--info); }
+  .note { margin-top:22px; font-size:13px; color:var(--soft); max-width:70ch; }
+
+  @media (max-width: 820px) {
+    .body { grid-template-columns:1fr; }
+    nav.side { display:none; position:fixed; inset:0; top:auto; height:70%; z-index:5; border-top:1px solid var(--line); box-shadow:0 -10px 30px rgba(0,0,0,.25); padding-bottom:calc(24px + env(safe-area-inset-bottom, 0px)); }
+    nav.side.open { display:block; }
+    .burger { display:inline-block; }
+    .place { display:none; }
+    .home { padding-inline:16px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+</style>
+
+<div class="app">
+  <header class="top">
+    <button class="burger" id="burger" aria-controls="side" aria-expanded="false">☰ Menú</button>
+    <div class="brand"><div class="mark" aria-hidden="true">S</div><div><b>SIVEC</b><small>Sistema Integral de Vigilancia y Enlace Clínico</small></div></div>
+    <span class="place" id="place">Red Centro · C.S. San Luis</span>
+    <span class="spacer"></span>
+    <button class="conn" id="conn" title="Simular corte de internet"><i></i><span>En línea</span></button>
+    <div class="roles" id="roles" role="group" aria-label="Entrar como"></div>
+  </header>
+  <div class="body">
+    <nav class="side" id="side" aria-label="Módulos"></nav>
+    <main id="main"></main>
+  </div>
+</div>
+
+<script>
+// Prototipo navegable: cada módulo abre las pantallas diseñadas del SIVEC con datos inventados.
+const M = {
+  hoy:        { l:'Para hacer hoy', ic:'🏠', g:'Inicio' },
+  recepcion:  { l:'Recepción con huella', ic:'🪪', g:'Centro de salud', f:'esboco-recepcion-consultorio.html#p2' },
+  triaje:     { l:'Triaje y TV de turnos', ic:'📺', g:'Centro de salud', f:'esboco-recepcion-consultorio.html#p3' },
+  agenda:     { l:'Agenda y fichas', ic:'📅', g:'Centro de salud', f:'esboco-agenda.html#g1' },
+  consulta:   { l:'Consulta (SOAP)', ic:'🩺', g:'Centro de salud', f:'esboco-recepcion-consultorio.html#p4' },
+  soap:       { l:'Consulta con figuras', ic:'👆', g:'Centro de salud', f:'esboco-soap.html' },
+  historia:   { l:'Historia clínica', ic:'📋', g:'Centro de salud', f:'esboco-historia-clinica.html#b1' },
+  documentos: { l:'Documentos oficiales', ic:'🖨', g:'Centro de salud', f:'esboco-formularios.html#d1' },
+  farmacia:   { l:'Farmacia', ic:'💊', g:'Centro de salud', f:'esboco-plataforma.html#q5' },
+  vacunas:    { l:'Vacunas', ic:'💉', g:'Centro de salud', f:'esboco-vacunas.html#v2' },
+  carnet:     { l:'Carnet de salud infantil', ic:'👶', g:'Centro de salud', f:'esboco-carnet-vacunas.html#c2' },
+  odonto:     { l:'Odontología', ic:'🦷', g:'Centro de salud', f:'esboco-odonto.html#o1' },
+  kiosco:     { l:'Kiosco y mapa', ic:'🧭', g:'Centro de salud', f:'esboco-kiosco.html#k1' },
+  prenatal:   { l:'Historia perinatal', ic:'🤰', g:'Materno-infantil', f:'esboco-carnet-perinatal.html#q2' },
+  control:    { l:'Control prenatal guiado', ic:'✅', g:'Materno-infantil', f:'esboco-carnet-perinatal.html#q3' },
+  partograma: { l:'Partograma', ic:'📈', g:'Materno-infantil', f:'esboco-materno.html#p4' },
+  rn:         { l:'Recién nacido · Pediatría', ic:'🍼', g:'Materno-infantil', f:'esboco-materno.html#p5a' },
+  laboratorio:{ l:'Laboratorio', ic:'🧪', g:'Diagnóstico', f:'esboco-laboratorio.html#l1' },
+  imagen:     { l:'Imagen y visor', ic:'🩻', g:'Diagnóstico', f:'esboco-imagen.html#i1' },
+  emergencias:{ l:'Emergencias', ic:'🚨', g:'Hospital', f:'esboco-emergencias.html#m1' },
+  ambulancias:{ l:'Ambulancias', ic:'🚑', g:'Hospital', f:'esboco-ambulancias.html#b1' },
+  quirofano:  { l:'Hospital y quirófano', ic:'🏥', g:'Hospital', f:'esboco-hospital.html#h1' },
+  piso:       { l:'Piso · internación', ic:'🛏', g:'Hospital', f:'esboco-piso.html#k1' },
+  visita:     { l:'Pase de visita', ic:'🛒', g:'Hospital', f:'esboco-piso.html#k9' },
+  enfermeria: { l:'Enfermería', ic:'🩹', g:'Hospital', f:'esboco-enfermeria.html#e1' },
+  referencias:{ l:'Referencias sin fila', ic:'↪️', g:'Red y programas', f:'esboco-referencias.html#r0' },
+  telesalud:  { l:'Telesalud', ic:'🎥', g:'Red y programas', f:'esboco-telesalud.html#t1' },
+  epidemio:   { l:'Epidemiología', ic:'🦟', g:'Red y programas', f:'esboco-epidemiologia.html#e1' },
+  programas:  { l:'Programas (TB, Chagas…)', ic:'🧩', g:'Red y programas', f:'esboco-programas.html#r1' },
+  almacen:    { l:'Almacén y logística', ic:'📦', g:'Gestión', f:'esboco-almacen.html#a1' },
+  personal:   { l:'Personal y guardias', ic:'🗓', g:'Gestión', f:'esboco-personal.html#g1' },
+  gestor:     { l:'Tablero del gestor', ic:'📊', g:'Gestión', f:'esboco-gestor.html#t1' },
+  informe:    { l:'Informe mensual', ic:'📑', g:'Gestión', f:'esboco-informe.html' },
+  admin:      { l:'Administración', ic:'⚙️', g:'Gestión', f:'esboco-admin.html#a1' },
+  offline:    { l:'Funciona sin internet', ic:'📶', g:'Plataforma', f:'esboco-sin-internet.html#w1' },
+  celular:    { l:'SIVEC en el celular', ic:'📱', g:'Plataforma', f:'esboco-celular.html#m1' },
+  mapa:       { l:'Mapa del proyecto', ic:'🗺', g:'Plataforma', f:'mapa-projeto.html' },
+};
+const ALL = Object.keys(M).filter(k => k !== 'hoy');
+const R = {
+  medico: { l:'Médico', who:'Dra. Méndez', cargo:'Medicina general · C.S. San Luis', place:'Red Centro · C.S. San Luis',
+    mods:['hoy','agenda','consulta','soap','historia','documentos','prenatal','control','laboratorio','imagen','referencias','telesalud','programas','offline'],
+    kpi:[['Pacientes hoy','18',''],['Resultados nuevos','4','w'],['Referencias respondidas','2','g'],['Seguimientos atrasados','3','b']],
+    tasks:[['consulta','🩺','Consulta de Carla Torres · 28 sem','control prenatal · 10:30','ahora','i'],['laboratorio','🧪','Hb 10,8 de Carla','resultado nuevo · anemia leve','revisar','w'],['referencias','↪️','Juana M. aceptada en Gineco','hospital 2º nivel · turno mañana 08:00','respondida','g'],['programas','🧩','PAP alterado sin tratar · 3 mujeres','búsqueda activa del programa','atrasado','b'],['imagen','🩻','Rx tórax de Juan Pérez','hallazgo importante: marcar visto','urgente','b'],['telesalud','🎥','Dermatología respondió','Elena R. · posible basocelular','nuevo','i']] },
+  recepcion: { l:'Recepción', who:'Lic. Rivero', cargo:'Recepción · C.S. San Luis', place:'Red Centro · C.S. San Luis',
+    mods:['hoy','recepcion','triaje','agenda','kiosco','documentos','offline'],
+    kpi:[['Fichas del día','42',''],['En espera','9','w'],['Con cita hoy','23',''],['Impresas en kiosco','11','g']],
+    tasks:[['recepcion','🪪','Registrar paciente con huella','llega Carla Torres · control prenatal','ahora','i'],['agenda','📅','Quedan 6 fichas para la tarde','medicina general','hoy','w'],['triaje','📺','Llamar a la TV: turno 14','consultorio 1','siguiente','i'],['kiosco','🧭','Kiosco: 11 fichas impresas sin fila','pacientes con cita','al día','g']] },
+  enfermeria: { l:'Enfermería', who:'Lic. Cuéllar', cargo:'Enfermería · piso 2 Gineco', place:'Hospital 2º nivel · Piso 2',
+    mods:['hoy','piso','enfermeria','vacunas','carnet','triaje','offline'],
+    kpi:[['Pacientes a cargo','6',''],['Medicación a las 14:00','5','w'],['Curaciones pendientes','2','b'],['Alerta temprana','1','b']],
+    tasks:[['enfermeria','💊','Medicación de las 14:00','5 pacientes · kárdex','14:00','w'],['piso','🩹','Curación de cesárea · cama 3','indicada diaria · atrasada','atrasada','b'],['enfermeria','📈','Cama 7 · alerta temprana 6 puntos','avisar al médico','urgente','b'],['vacunas','💉','Vacunatorio: 4 en espera','Mateo R. atrasado','hoy','i']] },
+  hospital: { l:'Hospital', who:'Dr. Quispe', cargo:'Residente R2 · Gineco-Obstetricia', place:'Hospital 2º nivel',
+    mods:['hoy','emergencias','ambulancias','quirofano','piso','visita','partograma','rn','imagen','laboratorio','referencias','offline'],
+    kpi:[['Camas ocupadas','24/30',''],['Llegan en ambulancia','2','w'],['Evoluciones por firmar','5','w'],['Quirófanos hoy','6','']],
+    tasks:[['ambulancias','🚑','A2 llega en 4 min · ROJO','eclampsia · box 2 listo','4 min','b'],['piso','✍️','5 evoluciones de internos por firmar','piso 2 Gineco','por firmar','w'],['visita','🛒','Pase de visita 09:00','carro 2 · 5 camas','09:00','i'],['partograma','📈','Sala de partos: 2 en trabajo de parto','una cerca de la línea de alerta','vigilar','w'],['referencias','↪️','3 referencias nuevas para aceptar','de centros de la red','nuevo','i']] },
+  farmacia: { l:'Farmacia', who:'Lic. Arteaga', cargo:'Farmacia · Hospital 2º nivel', place:'Hospital 2º nivel',
+    mods:['hoy','farmacia','piso','almacen','offline'],
+    kpi:[['Recetas de piso','34',''],['Preparadas','26','g'],['Con faltantes','6','w'],['Bajo mínimo','9','b']],
+    tasks:[['piso','🛍','Preparar canasta Gineco 2º piso','5 bolsas · listo 10:30','10:30','w'],['farmacia','💊','Recetas de consulta externa','12 esperando','hoy','i'],['almacen','📦','Amoxicilina bajo mínimo','pedido automático sugerido','pedir','b']] },
+  laboratorio: { l:'Laboratorio', who:'Lic. Paredes', cargo:'Laboratorio · Hospital 2º nivel', place:'Hospital 2º nivel',
+    mods:['hoy','laboratorio','imagen','epidemio','offline'],
+    kpi:[['Muestras hoy','86',''],['Por validar','14','w'],['Valores críticos','1','b'],['PAP del mes','212','']],
+    tasks:[['laboratorio','🧪','Validar 14 resultados','hematología y química','por validar','w'],['laboratorio','⚠️','Potasio 6,4 · cama 12','valor crítico: avisado al médico','crítico','b'],['epidemio','🦟','NS1 positivo · notificar','dengue confirmado','notificar','i']] },
+  gestor: { l:'Gestor / director', who:'Dra. Suárez', cargo:'Dirección · Red Centro', place:'Red Centro',
+    mods:['hoy','gestor','informe','epidemio','programas','almacen','personal','ambulancias','referencias','telesalud','admin','mapa'],
+    kpi:[['Consultas del mes','12.480',''],['Referencias sin fila','91%','g'],['Trazadores disponibles','94%','w'],['Brotes activos','1','b']],
+    tasks:[['epidemio','🦟','Brote de dengue · UV 93','plan de respuesta en marcha','activo','b'],['gestor','📊','C.S. Los Lotes bajo la meta','control prenatal 58%','revisar','w'],['almacen','📦','Oxitocina en camino a Los Lotes','transferencia entre centros','en camino','i'],['informe','📑','Informe mensual SNIS listo','sin planillas','listo','g']] },
+  admin: { l:'Administración', who:'Admin de red', cargo:'SIVEC Admin', place:'Red Centro',
+    mods:['hoy','admin','personal','offline','celular','kiosco','mapa'],
+    kpi:[['Usuarios activos','214',''],['Equipos al día','46/48','w'],['Centros conectados','26','g'],['Incidentes','0','g']],
+    tasks:[['admin','👤','3 usuarios nuevos por aprobar','internos de rotación','aprobar','w'],['offline','📶','PC vacunatorio Los Lotes sin enviar 3 días','revisar internet','revisar','b'],['kiosco','🧭','Actualizar mapa: Farmacia se mudó','hospital 2º nivel','pendiente','i']] },
+  todo: { l:'Ver todo', who:'Demostración', cargo:'Todos los módulos', place:'Bolivia · demostración',
+    mods:['hoy'].concat(ALL),
+    kpi:[['Módulos','37',''],['Funcionando (piloto)','PAP/VPH','g'],['Dibujados','36',''],['Centros en el piloto','1','']],
+    tasks:[['recepcion','🪪','Empezar por la recepción','el recorrido de una paciente','empezar','i'],['ambulancias','🚑','Ver la central de ambulancias','como un Uber','ver','i'],['gestor','📊','Ver la red en vivo','para quien decide','ver','i'],['offline','📶','Ver cómo funciona sin internet','pensado para Bolivia','ver','i']] },
+};
+const side = document.getElementById('side'), main = document.getElementById('main');
+let role = 'medico', cur = 'hoy', offline = false;
+try { const s = JSON.parse(localStorage.getItem('sivec_proto') || '{}'); if (R[s.role]) role = s.role; } catch (e) {}
+
+function el(tag, attrs, ...kids) { const e = document.createElement(tag); for (const k in (attrs || {})) { if (k === 'class') e.className = attrs[k]; else if (k.startsWith('on')) e.addEventListener(k.slice(2), attrs[k]); else e.setAttribute(k, attrs[k]); } kids.flat().forEach(c => e.append(c)); return e; }
+
+function renderRoles() {
+  const box = document.getElementById('roles'); box.textContent = '';
+  for (const k in R) box.append(el('button', { class:'role', 'aria-pressed': String(k === role), onclick: () => { role = k; cur = 'hoy'; save(); render(); } }, R[k].l));
+}
+function renderSide() {
+  const r = R[role]; side.textContent = '';
+  side.append(el('div', { class:'user' }, el('div', { class:'avatar' }, r.who.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase()), el('div', {}, el('b', {}, r.who), el('span', {}, r.cargo))));
+  let g = '';
+  r.mods.forEach(k => {
+    const m = M[k];
+    if (m.g !== g) { g = m.g; side.append(el('div', { class:'grp' }, g)); }
+    const b = el('button', { class:'item', onclick: () => { cur = k; render(); side.classList.remove('open'); } }, el('span', { class:'ic', 'aria-hidden':'true' }, m.ic), m.l);
+    if (k === 'soap' || k === 'documentos') b.append(el('span', { class:'tag live' }, 'en uso'));
+    if (cur === k) b.setAttribute('aria-current', 'page');
+    side.append(b);
+  });
+}
+function renderMain() {
+  main.textContent = ''; const r = R[role], m = M[cur];
+  const crumb = el('div', { class:'crumb' }, el('span', {}, r.place), '›', el('b', {}, m.l), el('span', { class:'pill' }, 'Prototipo · datos inventados'));
+  main.append(crumb);
+  if (cur !== 'hoy') {
+    const u = m.f.replace(/(\.html)(#|$)/, '$1?demo$2');
+    main.append(el('iframe', { src:u, title:m.l }));
+    return;
+  }
+  const h = el('div', { class:'home' });
+  h.append(el('h1', {}, 'Buenos días, ' + r.who), el('p', { class:'sub' }, r.cargo + ' · jueves 25 de septiembre'));
+  h.append(el('div', { class:'kpis' }, r.kpi.map(([t, v, c]) => el('div', { class:'kpi ' + c }, el('small', {}, t), el('b', {}, v)))));
+  h.append(el('div', { class:'h2' }, 'Para hacer hoy'));
+  h.append(el('div', { class:'tasks' }, r.tasks.map(([k, ic, t, s, st, c]) => el('button', { class:'task', onclick: () => { cur = k; render(); } }, el('span', { class:'ic', 'aria-hidden':'true' }, ic), el('b', {}, t), el('span', {}, s), el('span', { class:'st ' + c }, st)))));
+  h.append(el('p', { class:'note' }, 'Prototipo navegable del SIVEC completo con datos inventados. Cambie de función arriba (Médico, Recepción, Hospital, Gestor…) para ver lo que cada persona tiene en su pantalla; cada módulo abre sus pantallas reales de diseño. El módulo PAP/VPH ya funciona en el C.S. San Luis desde enero de 2026.'));
+  main.append(h);
+}
+function render() { document.getElementById('place').textContent = R[role].place; renderRoles(); renderSide(); renderMain(); }
+function save() { try { localStorage.setItem('sivec_proto', JSON.stringify({ role })); } catch (e) {} }
+document.getElementById('burger').onclick = () => { const o = side.classList.toggle('open'); document.getElementById('burger').setAttribute('aria-expanded', String(o)); };
+document.getElementById('conn').onclick = () => { offline = !offline; const c = document.getElementById('conn'); c.classList.toggle('off', offline); c.querySelector('span').textContent = offline ? 'Sin internet · 7 guardados' : 'En línea'; };
+render();
+</script>
