@@ -761,3 +761,17 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
   2. Retiro de sonda vesical: la indicación aparece como tarea; el registro se hace en 30 s en el celular (hora, balón, orina, aspecto, molestia) y queda la alarma de 1ª micción en 6 h.
   3. Pase de visita con el carro: tablet visible para todo el equipo; la planta corrobora con la paciente y el residente firma en el carro.
 - **Estilo “más realista” (prueba):** ilustración vectorial detallada con perspectiva, luz, sombras, proporciones reales y la pantalla real del SIVEC en el tablet (docs/escena-realista-pase-visita.png). Un estilo fotorrealista necesita fotos reales en el hospital (con consentimiento) o un ilustrador/generador de imágenes externo.
+
+### Venta del SIVEC completo (pedido del usuario)
+- **Qué falta:** `docs/negocio/SIVEC-que-falta.md`.
+  - Especialidades: medicina interna/crónicos, cirugía/trauma, UTI/UCIN, banco de sangre, oftalmología, otorrino, oncología, nefrología, patología, rehabilitación, etc.
+  - Programas SUS: Bono Juana Azurduy, SAFCI/carpeta familiar, adscripción SUS, VIH/ITS, ENT, cáncer de mama, malaria/leishmaniasis, muerte materna, adolescentes, adulto mayor, discapacidad, lepra, farmacovigilancia.
+  - Transversal: login/roles, integraciones, sin internet, base de DEMO.
+- **Modelo financiero editable:** `docs/negocio/SIVEC-modelo-financiero.xlsx` (supuestos, escenarios, métricas, qué se necesita para operar).
+  - Referencia: 1er nivel US$180/mes, 2º US$1.400, 3er US$3.800.
+  - Bolivia completa ≈ US$14,2 M/año ≈ US$1,16 por habitante por año.
+  - Punto de equilibrio ≈ 108 centros de 1er nivel; el piloto solo no se paga (negociar contrato fijo o junto con la ampliación).
+- **Demo en vivo:** `docs/SIVEC-demo.html` recorre 26 pasos (historia de una paciente por la red) con “qué decir” en cada pantalla. Esconde los avisos de esbozo y las notas (modo presentación `?demo`).
+- **Presentación de venta** (27 diapositivas, en español) con notas del orador: problema → solución → prueba → modelo y precios → confianza → propuesta de piloto.
+  - Arquetipo: Cuidador con voz de Sabio.
+  - Números entre [__] se completan con datos reales.

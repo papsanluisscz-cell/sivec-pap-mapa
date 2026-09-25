@@ -299,5 +299,6 @@ document.querySelectorAll('.demoBar button').forEach(b => b.addEventListener('cl
 }));
 document.querySelectorAll('.mode').forEach(m => m.addEventListener('click', () => { document.querySelectorAll('.mode').forEach(x => x.classList.toggle('on', x === m)); }));
 </script>
+<script>if(/demo/.test(location.search)){document.querySelectorAll(".warn,.note").forEach(function(e){e.style.display="none"});var tb=document.querySelector(".topbar b");if(tb)tb.textContent=tb.textContent.replace(/ESBOZO|ESCENAS/,"SIVEC");}</script>
 </body>
 </html>

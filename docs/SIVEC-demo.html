@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIVEC · Demo en vivo</title>
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Liberation Sans","DejaVu Sans",Arial,sans-serif; color:var(--ink); background:#1f171b; height:100vh; display:grid; grid-template-columns:360px 1fr; }
+  aside { background:var(--paper); display:flex; flex-direction:column; min-height:0; }
+  .top { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; padding:16px 18px; }
+  .top b { font-size:20px; letter-spacing:.04em; } .top div { font-size:13px; opacity:.9; margin-top:4px; }
+  ol { list-style:none; margin:0; padding:8px; overflow:auto; flex:1; }
+  li { border-radius:10px; padding:9px 11px; cursor:pointer; margin-bottom:4px; border:1px solid transparent; }
+  li:hover { background:#f3e7ec; } li.on { background:#fff; border-color:var(--wine); box-shadow:0 2px 8px rgba(0,0,0,.08); }
+  li .n { display:inline-block; width:22px; height:22px; border-radius:50%; background:var(--wine); color:#fff; text-align:center; font-size:12px; line-height:22px; font-weight:700; margin-right:6px; }
+  li .t { font-weight:700; font-size:14px; } li .a { font-size:12px; color:var(--soft); margin:3px 0 0 28px; }
+  li.sec { cursor:default; background:none; border:none; box-shadow:none; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--wine); font-weight:800; padding:10px 8px 2px; }
+  .say { border-top:1px solid var(--line); padding:12px 16px; font-size:13.5px; line-height:1.5; background:#fff; min-height:120px; }
+  .say b { color:var(--wine); display:block; font-size:11px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:4px; }
+  .nav { display:flex; gap:8px; padding:10px 16px 14px; background:#fff; }
+  .nav button { flex:1; font:inherit; font-weight:700; border-radius:10px; padding:9px; border:1px solid var(--wine); background:#fff; color:var(--wine); cursor:pointer; }
+  .nav button.p { background:var(--wine); color:#fff; }
+  main { min-width:0; min-height:0; display:flex; flex-direction:column; }
+  .bar { color:#f6d6e3; font-size:13px; padding:8px 14px; display:flex; justify-content:space-between; }
+  .bar a { color:#fff; }
+  iframe { flex:1; width:100%; border:0; background:#fff; }
+</style>
+</head>
+<body>
+<aside>
+  <div class="top"><b>SIVEC · Demo en vivo</b><div>Un día en la red de salud · teclas ← → para avanzar</div></div>
+  <ol id="steps"></ol>
+  <div class="say" id="say"></div>
+  <div class="nav"><button id="prev">← Anterior</button><button class="p" id="next">Siguiente →</button></div>
+</aside>
+<main>
+  <div class="bar"><span id="where"></span><a id="open" href="#" target="_blank">abrir en pestaña nueva ↗</a></div>
+  <iframe id="view" title="Pantalla del SIVEC"></iframe>
+</main>
+<script>
+// Guion: la historia de Carla (embarazada) y de la red, de la recepción al tablero del gestor.
+const S = [
+  { sec: 'El problema de hoy' },
+  { t: 'Un solo SIVEC para toda la red', f: 'esboco-plataforma.html#q1', a: 'plataforma', s: 'Hoy cada centro trabaja con papel, planillas y sistemas que no se hablan. SIVEC es uno solo: el mismo paciente, la misma historia, en el centro, el hospital y el Ministerio.' },
+  { sec: 'La paciente llega al centro' },
+  { t: 'Para hacer hoy', f: 'esboco-recepcion-consultorio.html#p0', a: 'cada función ve su lista', s: 'Cada persona abre el SIVEC y ve qué tiene que hacer hoy. Nadie busca papeles.' },
+  { t: 'Recepción con huella', f: 'esboco-recepcion-consultorio.html#p2', a: 'SEGIP + huella + foto', s: 'Carla llega. Con la huella se la identifica en segundos, sin historias duplicadas.' },
+  { t: 'Triaje y TV de turnos', f: 'esboco-recepcion-consultorio.html#p3', a: 'orden por prioridad', s: 'Signos vitales y prioridad; la TV la llama por su nombre. Se acaba la fila de madrugada.' },
+  { t: 'Consulta con figuras (SOAP)', f: 'esboco-soap.html', a: 'la consulta por toques', s: 'La doctora marca con toques; el sistema escribe la historia y llena los formularios oficiales.' },
+  { t: 'EN VIVO · SIVEC PAP/VPH funcionando', f: '../SIVEC-PAP-sistema.html', a: 'piloto real · C.S. San Luis', s: 'Esto ya funciona desde enero de 2026 en el C.S. San Luis. (Usar una base de DEMO con pacientes inventadas, nunca datos reales.)' },
+  { t: 'Carnet e historia perinatal', f: 'esboco-carnet-perinatal.html#q2', a: 'OMS + CLAP, llenado solo', s: 'La HCP del CLAP con 450 casillas se llena sola; la mamá lleva un carnet impreso con QR.' },
+  { t: 'Control prenatal guiado', f: 'esboco-carnet-perinatal.html#q3', a: '8 contactos OMS', s: 'Paso a paso como recomienda la OMS; lo que falta se pide con un toque.' },
+  { sec: 'Diagnóstico y red' },
+  { t: 'Laboratorio', f: 'esboco-laboratorio.html#l1', a: 'muestras, validación, resultado', s: 'El pedido llega sin papel y el resultado vuelve solo a la ficha y al médico.' },
+  { t: 'Imagen y visor', f: 'esboco-imagen.html#i4', a: 'Rx/eco en cualquier computadora', s: 'La placa ya no se pierde: se ve en cualquier computadora o por QR.' },
+  { t: 'Referencia “sin fila”', f: 'esboco-referencias.html#r1', a: 'botón Derivar', s: 'Un botón deriva con toda la historia; el hospital la recibe con turno. Se acaba el “vuelva mañana a las 4 de la mañana”.' },
+  { t: 'Agenda y cupos del especialista', f: 'esboco-agenda.html#g12', a: 'hoy vs SIVEC', s: 'Comparación directa: hoy la paciente hace 3 filas; con SIVEC, ninguna.' },
+  { sec: 'El hospital' },
+  { t: 'Emergencias', f: 'esboco-emergencias.html#m1', a: 'triaje por colores', s: 'Tablero en vivo por colores; la ambulancia avisa antes de llegar.' },
+  { t: 'Partograma', f: 'esboco-materno.html#p4', a: 'alerta y acción', s: 'El partograma avisa solo si la curva cruza la línea de alerta.' },
+  { t: 'Recién nacido · Pediatría', f: 'esboco-materno.html#p5a', a: 'atención inmediata', s: 'Pediatría recibe al bebé con hora exacta en cada paso; el bebé nace con su propia ficha.' },
+  { t: 'Piso · tablero de camas', f: 'esboco-piso.html#k1', a: 'qué falta en cada cama', s: 'El residente ve de un vistazo qué falta: evoluciones, farmacia, estudios, curaciones.' },
+  { t: 'Farmacia de piso', f: 'esboco-piso.html#k4', a: 'una bolsa por cama', s: 'La receta sale de las indicaciones; la familia sabe exactamente qué comprar.' },
+  { t: 'Pase de visita con el carro', f: 'escena-realista-pase-visita.html', a: 'tablet + huella', s: 'Todo el equipo ve lo mismo; se corrobora con la paciente y se firma en el carro.' },
+  { sec: 'Programas y salud pública' },
+  { t: 'Vacunas y carnet de salud infantil', f: 'esboco-carnet-vacunas.html#c4', a: 'curvas OMS + desarrollo', s: 'Un carnet con vacunas, crecimiento y desarrollo; los atrasados se buscan solos.' },
+  { t: 'Epidemiología · canal endémico', f: 'esboco-epidemiologia.html#e4', a: 'alerta de brote', s: 'El brote se detecta solo y avisa al SEDES el mismo día.' },
+  { t: 'Programas (TB, Chagas…)', f: 'esboco-programas.html#r1', a: 'una etiqueta en la ficha', s: 'Cada programa del SUS es una etiqueta en la ficha, no otro sistema.' },
+  { t: 'Almacén y medicamentos', f: 'esboco-almacen.html#a4', a: 'entre centros', s: 'Lo que sobra en un centro llega al que le falta antes de que venza.' },
+  { sec: 'Para quien decide' },
+  { t: 'Tablero del gestor', f: 'esboco-gestor.html#t1', a: 'la red en vivo', s: 'El director ve la red en vivo; el informe SNIS sale solo, sin planillas.' },
+  { t: 'Telesalud', f: 'esboco-telesalud.html#t7', a: 'viajes evitados', s: '124 viajes evitados en un mes: menos gasto para la gente, menos saturación del hospital.' },
+  { t: 'SIVEC en el celular', f: 'esboco-celular.html#m4', a: 'sin internet', s: 'Funciona sin internet en el campo y sincroniza al volver: pensado para Bolivia.' },
+  { t: 'Mapa del proyecto', f: 'mapa-projeto.html', a: 'qué funciona y qué sigue', s: 'Lo que ya funciona, lo que está diseñado y las fases de implantación.' },
+];
+const ol = document.getElementById('steps'), view = document.getElementById('view');
+let idx = [], cur = 0;
+S.forEach((x, i) => {
+  const li = document.createElement('li');
+  if (x.sec) { li.className = 'sec'; li.textContent = x.sec; }
+  else { const n = idx.length + 1; idx.push(i); li.innerHTML = '<span class="n">' + n + '</span><span class="t"></span><div class="a"></div>'; li.querySelector('.t').textContent = x.t; li.querySelector('.a').textContent = x.a; li.onclick = () => go(idx.indexOf(i)); }
+  x.el = li; ol.appendChild(li);
+});
+function go(k) {
+  cur = Math.max(0, Math.min(idx.length - 1, k)); const x = S[idx[cur]];
+  S.forEach(y => y.el.classList.toggle('on', y === x));
+  const u = x.f.startsWith('../') ? x.f : x.f.replace(/(\.html)(#|$)/, '$1?demo$2'); view.src = u; document.getElementById('open').href = u;
+  document.getElementById('where').textContent = (cur + 1) + ' / ' + idx.length + ' · ' + x.t;
+  document.getElementById('say').innerHTML = '<b>Qué decir</b>'; document.getElementById('say').appendChild(document.createTextNode(x.s));
+  x.el.scrollIntoView({ block: 'nearest' });
+}
+document.getElementById('prev').onclick = () => go(cur - 1);
+document.getElementById('next').onclick = () => go(cur + 1);
+document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(cur + 1); if (e.key === 'ArrowLeft') go(cur - 1); });
+go(0);
+</script>
+</body>
+</html>

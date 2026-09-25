@@ -324,5 +324,6 @@
   tabs.forEach(b => b.onclick = () => show(b.dataset.t));
   show(location.hash.slice(1) || 'r0');
 </script>
+<script>if(/demo/.test(location.search)){document.querySelectorAll(".warn,.note").forEach(function(e){e.style.display="none"});var tb=document.querySelector(".topbar b");if(tb)tb.textContent=tb.textContent.replace(/ESBOZO|ESCENAS/,"SIVEC");}</script>
 </body>
 </html>
