@@ -693,3 +693,17 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - **Capacitación y ateneos** de la red por el mismo enlace, grabados, con certificado automático en la ficha del personal.
 - **Indicadores:** interconsultas, respondidas en menos de 48 h, resueltas sin viajar, videoconsultas; viajes, km y días de trabajo ahorrados (argumento de venta).
 - Imágenes: docs/telesalud-01..07.png · esboco-telesalud.html
+
+**Módulo 14 · Telesalud: APROVADO.**
+
+### Módulo 15 · SIVEC en el celular (antes “App del profesional”) — dibujado, para aprobar
+- **Decisión:** NO hacer una app de tienda. Es el mismo SIVEC en el navegador del celular, con atajo en la pantalla de inicio (aplicación web progresiva).
+  - No se instala desde la tienda y se actualiza solo para todos.
+  - Funciona sin internet y en celulares baratos, sin depender de Google o Apple.
+  - Una app pequeña solo haría falta para un lector de huella en el celular o el GPS continuo de la ambulancia.
+- **Seguridad:** usuario + PIN, bloqueo a los 5 min, datos sin internet cifrados; si se pierde el celular, se desactiva desde Admin.
+- **En el celular se ve, confirma, firma y registra rápido.** La consulta completa y la historia van en la computadora.
+- **Médico de guardia:** alertas y pacientes; valor crítico con los datos para decidir y “visto”; firmar notas de internos con las marcas del residente y PIN.
+- **Mi trabajo (todo el personal):** turno y semana; aceptar un reemplazo en un toque (con control de horas y descanso); pedir permiso con foto del certificado.
+- **Trabajo de campo sin internet:** la lista de casas se descarga en el centro. En la casa se registran vacunas, fichas de dengue y criaderos sin señal; al volver la señal, un toque sincroniza y el vacunatorio, el epidemiólogo y el mapa ya lo ven.
+- Imágenes: docs/celular-01..04.png · esboco-celular.html
