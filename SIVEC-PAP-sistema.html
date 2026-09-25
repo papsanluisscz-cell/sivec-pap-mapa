@@ -426,6 +426,31 @@
   #loginOverlay { position: fixed; inset: 0; background: var(--paper); z-index: 900; display: flex; align-items: center; justify-content: center; padding: 20px; }
   #loginBox { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 32px; width: 340px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
   #loginBox .field input { width: 100%; }
+  /* Roles: usuario, centro y administración */
+  #rolBox { display: none; align-items: center; gap: 6px; margin-right: 4px; position: relative; z-index: 1; }
+  #rolBadge { font-size: 11.5px; line-height: 1.25; text-align: right; color: #fff; max-width: 220px; }
+  #rolBadge b { display: block; font-size: 12.5px; }
+  #rolBadge span { color: rgba(255,255,255,0.75); }
+  #centroSel { background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.35); color: #fff; border-radius: 7px; padding: 5px 6px; font-size: 12px; max-width: 190px; }
+  #centroSel option { color: #40323a; }
+  @media (max-width: 900px) { #rolBadge { display: none; } }
+  #adminView, #portalView { padding: 24px 32px; overflow-y: auto; }
+  @media (max-width: 700px) { #adminView, #portalView { padding: 16px 12px; } }
+  .admGrid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 900px) { .admGrid { grid-template-columns: 1fr; } }
+  .admCard { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .admCard h3 { margin: 0 0 10px; font-size: 15px; color: var(--teal-900); }
+  .admCard table { font-size: 12.5px; }
+  .admCard td, .admCard th { padding: 6px 8px; }
+  .admCard select, .admCard input { font-size: 12.5px; padding: 5px 7px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); }
+  .admForm { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }
+  .admForm input, .admForm select { flex: 1 1 140px; }
+  .admForm .primary { padding: 7px 14px; }
+  body.soloLectura .editBtn, body.soloLectura .delBtn { display: none !important; }
+  .rolTag { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 8px; background: #f3e5ea; color: #7d2a4c; }
+  body.dark .rolTag { background: #3a2530; color: #f1a7c3; }
+  .sinRolBox { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 32px; width: 380px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+  #sinRolOverlay { position: fixed; inset: 0; background: var(--paper); z-index: 950; display: none; align-items: center; justify-content: center; padding: 20px; }
   #blocker button { background: var(--teal-700); color: #fff; border: none; padding: 9px 18px; border-radius: 7px; cursor: pointer; font-size: 13.5px; }
   /* ===== Ficha de la paciente ===== */
   .patientCard { cursor: pointer; }
@@ -789,6 +814,14 @@
   </div>
 </div>
 
+<div id="sinRolOverlay">
+  <div class="sinRolBox">
+    <h2 style="margin:0 0 8px">Tu usuario todavía no tiene rol</h2>
+    <p class="hint" id="sinRolTexto" style="margin:0 0 16px"></p>
+    <button type="button" class="primary" style="width:100%" onclick="document.getElementById('logoutBtn').click()">Salir</button>
+  </div>
+</div>
+
 <div id="app">
   <header>
     <div>
@@ -813,8 +846,11 @@
       <button data-view="panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="navLabel">Panel</span></button>
       <button data-view="metodos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span class="navLabel">Métodos</span></button>
       <button data-view="trash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span class="navLabel">Papelera</span></button>
+      <button data-view="portal" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/></svg><span class="navLabel">Portal</span></button>
+      <button data-view="admin" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg><span class="navLabel">Admin</span></button>
     </nav>
     <div class="headerActions">
+      <div id="rolBox"><div id="rolBadge"></div><select id="centroSel" title="Centro que se está viendo" aria-label="Centro"></select></div>
       <button id="darkModeBtn" title="Modo oscuro" aria-label="Modo oscuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></button>
       <button id="helpBtn" title="Ayuda" aria-label="Ayuda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></button>
       <button id="settingsBtn" title="Configuración" aria-label="Configuración"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.2 2h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7V4a2 2 0 0 0-2-2Z"/><circle cx="12" cy="12" r="3"/></svg></button>
@@ -1112,6 +1148,53 @@
         </tr></thead>
         <tbody id="metodosBody"></tbody>
       </table>
+    </div>
+
+    <!-- ADMINISTRACIÓN (redes, centros, usuarios) -->
+    <div id="adminView" class="view">
+      <h2>Administración</h2>
+      <p class="hint">Redes, establecimientos y usuarios. Cada persona entra con su propio correo y ve solo lo que le toca: el centro ve sus pacientes, el gestor ve todos los centros de su red (sin editar), el administrador configura pero no ve datos clínicos.</p>
+      <div class="admGrid">
+        <section class="admCard">
+          <h3>Redes de salud</h3>
+          <table><thead><tr><th>Red</th><th>Municipio</th><th>Establecimientos</th></tr></thead><tbody id="admRedes"></tbody></table>
+          <form id="admRedForm" class="admForm">
+            <input name="nombre" placeholder="Nombre de la red (ej: Red Norte)" required>
+            <input name="municipio" placeholder="Municipio">
+            <button class="primary">Agregar red</button>
+          </form>
+        </section>
+        <section class="admCard">
+          <h3>Establecimientos</h3>
+          <table><thead><tr><th>Establecimiento</th><th>Red</th><th>Tipo</th><th>Código</th><th></th></tr></thead><tbody id="admCentros"></tbody></table>
+          <form id="admCentroForm" class="admForm">
+            <input name="nombre" placeholder="Nombre (ej: C.S. Villa 1ro de Mayo)" required>
+            <select name="red_id" required></select>
+            <select name="tipo"></select>
+            <input name="codigo" placeholder="Código (opcional)" style="flex:0 1 120px">
+            <button class="primary">Agregar</button>
+          </form>
+        </section>
+      </div>
+      <section class="admCard">
+        <h3>Usuarios</h3>
+        <table><thead><tr><th>Persona</th><th>Rol</th><th>Establecimiento / red</th><th>Administra</th><th>Activo</th><th></th></tr></thead><tbody id="admUsuarios"></tbody></table>
+        <form id="admUsuarioForm" class="admForm">
+          <input name="correo" type="email" placeholder="Correo" required>
+          <input name="nombre" placeholder="Nombre (ej: Dra. Ortuño)" required>
+          <select name="rol"></select>
+          <select name="lugar"></select>
+          <input name="clave" type="text" placeholder="Contraseña provisoria (si no tiene cuenta)" autocomplete="off">
+          <button class="primary">Agregar usuario</button>
+        </form>
+        <p class="hint" style="margin:8px 0 0">Si la persona ya tiene cuenta en Supabase, basta el correo. Si no, escribí una contraseña provisoria y el sistema le crea la cuenta (si Supabase pide confirmar el correo: Authentication → Users → la cuenta → <i>Confirm</i>). Nunca se borra un usuario: se desactiva.</p>
+      </section>
+    </div>
+
+    <!-- PORTAL (oncológico / colposcopia): pasos 3 y 4 -->
+    <div id="portalView" class="view">
+      <h2 id="portalTitulo">Portal</h2>
+      <p class="hint" id="portalTexto"></p>
     </div>
 
     <!-- TRASH -->
@@ -1586,6 +1669,7 @@ async function init() {
   }
   // El login se activa desde Configuración cuando las cuentas ya estén creadas en Supabase (ver SUPABASE-SQL.md).
   if (localStorage.getItem('sivec_require_login') === '1') await checkAuth();
+  await cargarPerfil();
 }
 
 async function checkAuth() {
@@ -1618,12 +1702,233 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   }
   document.getElementById('loginOverlay').style.display = 'none';
   document.getElementById('logoutBtn').style.display = 'inline-block';
+  await cargarPerfil();
 });
 
 document.getElementById('logoutBtn').addEventListener('click', async () => {
   await sb.auth.signOut();
   document.getElementById('loginOverlay').style.display = 'flex';
   document.getElementById('logoutBtn').style.display = 'none';
+  perfil = null; aplicarRol();
+});
+
+// ===== Redes, centros y roles (Pasos 8 y 9 de SUPABASE-SQL.md) =====
+// Sin esas tablas, o sin sesión, el sistema funciona como siempre (un solo centro).
+const ROLES = { centro: 'Centro de salud', gestor: 'Gestor de red', oncologico: 'Oncológico / laboratorio', colposcopia: 'Colposcopia 2º nivel', admin: 'Administrador' };
+const TIPOS_CENTRO = { primer_nivel: 'Centro de salud (1er nivel)', segundo_nivel: 'Hospital 2º nivel (colposcopia)', oncologico: 'Oncológico / laboratorio' };
+// Pantallas de cada rol (null = todas las del centro). El administrador puro no ve datos clínicos.
+const VISTAS_ROL = { centro: null, gestor: ['list', 'segpap', 'segvph', 'balance', 'map', 'panel', 'metodos'], oncologico: ['portal'], colposcopia: ['portal'], admin: [] };
+const VISTAS_CENTRO = ['form', 'list', 'segpap', 'segvph', 'balance', 'map', 'panel', 'metodos', 'trash'];
+let perfil = null, redes = [], centros = [], centroActivo = '';
+
+function conRoles() { return !!(perfil && !perfil.sinPerfil); }
+function centroNombre(id) { const c = centros.find(x => String(x.id) === String(id)); return c ? c.nombre : ''; }
+function redNombre(id) { const r = redes.find(x => String(x.id) === String(id)); return r ? r.nombre : ''; }
+function centrosVisibles() {
+  if (!conRoles()) return [];
+  if (perfil.rol === 'centro') return centros.filter(c => String(c.id) === String(perfil.centro_id));
+  if (perfil.rol === 'gestor') { const red = perfil.red_id || (centros.find(c => String(c.id) === String(perfil.centro_id)) || {}).red_id; return centros.filter(c => String(c.red_id) === String(red) && c.tipo === 'primer_nivel'); }
+  return [];
+}
+// Consulta de pacientes del centro que se está viendo (la seguridad real la ponen las reglas del Paso 9).
+function pacQ(cols) {
+  let q = sb.from('pacientes').select(cols || '*');
+  if (conRoles() && centroActivo) q = q.eq('centro_id', centroActivo);
+  else if (conRoles() && perfil.rol === 'gestor') q = q.in('centro_id', centrosVisibles().map(c => c.id));
+  return q;
+}
+// Centro de una toma nueva: el propio; false = hay que elegirlo antes.
+function centroParaRegistrar() {
+  if (!conRoles()) return null;
+  if (perfil.rol === 'centro') return perfil.centro_id || null;
+  return centroActivo || false;
+}
+function vistasPermitidas() {
+  if (!conRoles()) return VISTAS_CENTRO.slice();
+  const v = VISTAS_ROL[perfil.rol];
+  const base = v === null || v === undefined ? VISTAS_CENTRO.slice() : v.slice();
+  if (perfil.es_admin || perfil.rol === 'admin') base.push('admin');
+  return base;
+}
+
+async function cargarPerfil() {
+  perfil = null; redes = []; centros = [];
+  if (!sb) return aplicarRol();
+  let session = null;
+  try { ({ data: { session } } = await sb.auth.getSession()); } catch (e) { /* sin sesión */ }
+  if (!session) {
+    // Con el Paso 8 hecho, el inicio de sesión es obligatorio (cada uno ve solo lo suyo).
+    const { error } = await sb.from('perfiles').select('user_id').limit(1);
+    if (!error) { document.getElementById('loginOverlay').style.display = 'flex'; document.getElementById('logoutBtn').style.display = 'none'; }
+    return aplicarRol();
+  }
+  const { data, error } = await sb.from('perfiles').select('*').eq('user_id', session.user.id).maybeSingle();
+  if (error) return aplicarRol(); // tabla perfiles no creada todavía: modo de siempre
+  const [r, c] = await Promise.all([sb.from('redes').select('*').order('nombre'), sb.from('centros').select('*').order('nombre')]);
+  redes = r.data || []; centros = c.data || [];
+  perfil = data && data.activo !== false ? data : { sinPerfil: true, inactivo: !!data, correo: session.user.email };
+  aplicarRol();
+}
+
+function aplicarRol() {
+  const box = document.getElementById('rolBox'), sel = document.getElementById('centroSel');
+  const sinRol = document.getElementById('sinRolOverlay');
+  sinRol.style.display = 'none';
+  if (perfil && perfil.sinPerfil) {
+    document.getElementById('sinRolTexto').textContent = (perfil.inactivo ? 'El usuario ' + perfil.correo + ' está desactivado.' : 'Entraste como ' + perfil.correo + ', pero todavía no te asignaron un rol ni un centro.') + ' Pedile al administrador del SIVEC que lo haga en Admin → Usuarios.';
+    sinRol.style.display = 'flex';
+  }
+  const permitidas = vistasPermitidas();
+  document.querySelectorAll('nav button[data-view]').forEach(b => { b.style.display = permitidas.includes(b.dataset.view) ? '' : 'none'; });
+  document.body.classList.toggle('soloLectura', !!(conRoles() && perfil.rol === 'gestor'));
+  if (!conRoles()) { box.style.display = 'none'; centroActivo = ''; }
+  else {
+    box.style.display = 'flex';
+    const lugar = perfil.rol === 'gestor' ? redNombre(perfil.red_id) || centroNombre(perfil.centro_id) : centroNombre(perfil.centro_id);
+    document.getElementById('rolBadge').innerHTML = `<b>${esc(perfil.nombre || perfil.correo || '')}</b><span>${esc(ROLES[perfil.rol] || perfil.rol)}${lugar ? ' · ' + esc(lugar) : ''}${perfil.es_admin && perfil.rol !== 'admin' ? ' · admin' : ''}</span>`;
+    const vis = centrosVisibles();
+    if (perfil.rol === 'centro') { centroActivo = perfil.centro_id ? String(perfil.centro_id) : ''; sel.style.display = 'none'; }
+    else if (perfil.rol === 'gestor') {
+      let guardado = ''; try { guardado = localStorage.getItem('sivec_centro_sel') || ''; } catch (e) {}
+      centroActivo = vis.some(c => String(c.id) === guardado) ? guardado : '';
+      sel.innerHTML = `<option value="">Todos los centros de la red (${vis.length})</option>` + vis.map(c => `<option value="${c.id}">${esc(c.nombre)}</option>`).join('');
+      sel.value = centroActivo; sel.style.display = '';
+    } else { centroActivo = ''; sel.style.display = 'none'; }
+  }
+  const activa = document.querySelector('nav button.active');
+  const actual = activa && activa.dataset.view;
+  if (!permitidas.includes(actual) && permitidas.length) switchView(permitidas[0]);
+  else if (actual && actual !== 'form') switchView(actual);
+}
+
+document.getElementById('centroSel').addEventListener('change', e => {
+  centroActivo = e.target.value;
+  try { localStorage.setItem('sivec_centro_sel', centroActivo); } catch (_) {}
+  allPatientsData = [];
+  const activa = document.querySelector('nav button.active');
+  if (activa) switchView(activa.dataset.view);
+});
+
+function loadPortal() {
+  const onco = perfil && perfil.rol === 'oncologico';
+  document.getElementById('portalTitulo').textContent = onco ? 'Portal del oncológico' : 'Portal de colposcopia (2º nivel)';
+  document.getElementById('portalTexto').textContent = onco
+    ? 'Acá van a llegar los lotes de láminas que mandan los centros, para confirmar la recepción e informar PAP, VPH y biopsias. El resultado vuelve solo al centro. (En construcción: próximos pasos del SIVEC PAP.)'
+    : 'Acá van a llegar las pacientes derivadas por los centros, para registrar colposcopia, biopsia, tratamiento y la contrarreferencia. (En construcción: próximos pasos del SIVEC PAP.)';
+}
+
+// --- Administración ---
+let admPerfiles = [];
+async function loadAdmin() {
+  const [r, c, p] = await Promise.all([sb.from('redes').select('*').order('nombre'), sb.from('centros').select('*').order('nombre'), sb.from('perfiles').select('*').order('nombre')]);
+  const err = r.error || c.error || p.error;
+  if (err) { document.getElementById('admUsuarios').innerHTML = `<tr><td colspan="6">Error: ${esc(err.message)} — ¿ya ejecutaste el Paso 8 del SQL?</td></tr>`; return; }
+  redes = r.data || []; centros = c.data || []; admPerfiles = p.data || [];
+  const nCentros = id => centros.filter(x => String(x.red_id) === String(id)).length;
+  document.getElementById('admRedes').innerHTML = redes.map(x => `<tr><td><b>${esc(x.nombre)}</b></td><td>${esc(x.municipio) || '—'}</td><td>${nCentros(x.id)}</td></tr>`).join('') || '<tr><td colspan="3">Todavía no hay redes.</td></tr>';
+  document.getElementById('admCentros').innerHTML = centros.map(x => `<tr style="${x.activo === false ? 'opacity:.5' : ''}"><td><b>${esc(x.nombre)}</b></td><td>${esc(redNombre(x.red_id)) || '—'}</td><td>${esc(TIPOS_CENTRO[x.tipo] || x.tipo || '')}</td><td>${esc(x.codigo) || '—'}</td>
+    <td><button class="rowBtn" data-centro-act="${x.id}">${x.activo === false ? 'Activar' : 'Desactivar'}</button></td></tr>`).join('') || '<tr><td colspan="5">Todavía no hay establecimientos.</td></tr>';
+  const optRedes = redes.map(x => `<option value="${x.id}">${esc(x.nombre)}</option>`).join('');
+  const fc = document.getElementById('admCentroForm');
+  fc.red_id.innerHTML = '<option value="">Red…</option>' + optRedes;
+  fc.tipo.innerHTML = Object.entries(TIPOS_CENTRO).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+  const fu = document.getElementById('admUsuarioForm');
+  fu.rol.innerHTML = Object.entries(ROLES).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+  admLugarOpciones(fu.lugar, fu.rol.value, '');
+  const lugarDe = u => u.rol === 'gestor' ? (u.red_id ? 'r' + u.red_id : '') : (u.centro_id ? 'c' + u.centro_id : '');
+  document.getElementById('admUsuarios').innerHTML = admPerfiles.map(u => `<tr data-uid="${u.user_id}" style="${u.activo === false ? 'opacity:.55' : ''}">
+      <td><b>${esc(u.nombre || '—')}</b><br><span style="color:var(--ink-soft);font-size:11.5px">${esc(u.correo || '')}</span></td>
+      <td><select data-f="rol">${Object.entries(ROLES).map(([k, v]) => `<option value="${k}"${u.rol === k ? ' selected' : ''}>${v}</option>`).join('')}</select></td>
+      <td><select data-f="lugar" data-actual="${lugarDe(u)}"></select></td>
+      <td style="text-align:center"><input type="checkbox" data-f="es_admin"${u.es_admin ? ' checked' : ''}></td>
+      <td style="text-align:center"><input type="checkbox" data-f="activo"${u.activo !== false ? ' checked' : ''}></td>
+      <td><button class="rowBtn" data-guardar-usuario>Guardar</button></td></tr>`).join('') || '<tr><td colspan="6">Todavía no hay usuarios con perfil.</td></tr>';
+  document.querySelectorAll('#admUsuarios tr[data-uid]').forEach(tr => {
+    const rol = tr.querySelector('[data-f=rol]'), lugar = tr.querySelector('[data-f=lugar]');
+    admLugarOpciones(lugar, rol.value, lugar.dataset.actual);
+    rol.addEventListener('change', () => admLugarOpciones(lugar, rol.value, ''));
+  });
+}
+// Lugar según el rol: el gestor elige una red; el centro/oncológico/colposcopia, un establecimiento; el admin, nada.
+function admLugarOpciones(sel, rol, actual) {
+  if (rol === 'admin') { sel.innerHTML = '<option value="">— (toda la configuración)</option>'; sel.disabled = true; return; }
+  sel.disabled = false;
+  const tipo = { centro: 'primer_nivel', oncologico: 'oncologico', colposcopia: 'segundo_nivel' }[rol];
+  sel.innerHTML = rol === 'gestor'
+    ? '<option value="">Red…</option>' + redes.map(x => `<option value="r${x.id}">${esc(x.nombre)}</option>`).join('')
+    : '<option value="">Establecimiento…</option>' + centros.filter(x => x.activo !== false && (!tipo || x.tipo === tipo)).map(x => `<option value="c${x.id}">${esc(x.nombre)}</option>`).join('');
+  sel.value = actual || '';
+}
+function admLugarAFila(rol, lugar) {
+  const v = lugar || '';
+  return { centro_id: v[0] === 'c' ? Number(v.slice(1)) : null, red_id: v[0] === 'r' ? Number(v.slice(1)) : null, faltaLugar: rol !== 'admin' && !v };
+}
+
+document.getElementById('admRedForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, row = { nombre: f.nombre.value.trim(), municipio: f.municipio.value.trim() || null };
+  const { error } = await sb.from('redes').insert([row]);
+  if (error) return showToast('No se pudo agregar la red: ' + esc(error.message), 'err');
+  f.reset(); showToast('Red agregada ✔', 'ok'); loadAdmin();
+});
+document.getElementById('admCentroForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, row = { nombre: f.nombre.value.trim(), red_id: Number(f.red_id.value) || null, tipo: f.tipo.value, codigo: f.codigo.value.trim() || null };
+  const { error } = await sb.from('centros').insert([row]);
+  if (error) return showToast('No se pudo agregar: ' + esc(error.message), 'err');
+  f.reset(); showToast('Establecimiento agregado ✔', 'ok'); loadAdmin();
+});
+document.getElementById('admCentros').addEventListener('click', async e => {
+  const b = e.target.closest('[data-centro-act]'); if (!b) return;
+  const c = centros.find(x => String(x.id) === b.dataset.centroAct); if (!c) return;
+  const { error } = await sb.from('centros').update({ activo: c.activo === false }).eq('id', c.id);
+  if (error) return showToast('Error: ' + esc(error.message), 'err');
+  loadAdmin();
+});
+document.getElementById('admUsuarioForm').rol.addEventListener('change', e => admLugarOpciones(e.target.form.lugar, e.target.value, ''));
+document.getElementById('admUsuarios').addEventListener('click', async e => {
+  const b = e.target.closest('[data-guardar-usuario]'); if (!b) return;
+  const tr = b.closest('tr'), g = k => tr.querySelector(`[data-f=${k}]`);
+  const rol = g('rol').value, lugar = admLugarAFila(rol, g('lugar').value);
+  if (lugar.faltaLugar) return showToast('Elegí ' + (rol === 'gestor' ? 'la red' : 'el establecimiento') + ' de este usuario.', 'err');
+  if (tr.dataset.uid === (perfil && perfil.user_id) && !(g('es_admin').checked || rol === 'admin')) {
+    if (!confirm('Te estás sacando el permiso de administrador. ¿Seguro?')) return;
+  }
+  const { error } = await sb.from('perfiles').update({ rol, centro_id: lugar.centro_id, red_id: lugar.red_id, es_admin: g('es_admin').checked, activo: g('activo').checked }).eq('user_id', tr.dataset.uid);
+  if (error) return showToast('Error: ' + esc(error.message), 'err');
+  showToast('Usuario guardado ✔', 'ok');
+  if (tr.dataset.uid === (perfil && perfil.user_id)) await cargarPerfil();
+  loadAdmin();
+});
+document.getElementById('admUsuarioForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, correo = f.correo.value.trim().toLowerCase(), clave = f.clave.value;
+  const rol = f.rol.value, lugar = admLugarAFila(rol, f.lugar.value);
+  if (lugar.faltaLugar) return showToast('Elegí ' + (rol === 'gestor' ? 'la red' : 'el establecimiento') + '.', 'err');
+  const btn = f.querySelector('button'); btn.disabled = true;
+  try {
+    const { data: uidExistente, error: e1 } = await sb.rpc('sivec_uid_por_correo', { p_correo: correo });
+    if (e1) throw e1;
+    let uid = uidExistente, aviso = '';
+    if (!uid) {
+      if (!clave || clave.length < 6) throw new Error('Ese correo no tiene cuenta todavía: escribí una contraseña provisoria (mínimo 6 caracteres).');
+      // Cliente aparte para no cerrar la sesión del administrador.
+      const { url, key } = getConfig();
+      const tmp = window.supabase.createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false, storageKey: 'sivec_alta_tmp' } });
+      const { data, error } = await tmp.auth.signUp({ email: correo, password: clave });
+      if (error) throw error;
+      uid = data.user && data.user.id;
+      if (!uid) throw new Error('Supabase no devolvió la cuenta nueva.');
+      if (!data.session) aviso = ' Supabase pide confirmar el correo: Authentication → Users → la cuenta → Confirm.';
+    }
+    const { error } = await sb.from('perfiles').upsert([{ user_id: uid, correo, nombre: f.nombre.value.trim(), rol, centro_id: lugar.centro_id, red_id: lugar.red_id, activo: true }], { onConflict: 'user_id' });
+    if (error) throw error;
+    f.reset(); admLugarOpciones(f.lugar, f.rol.value, '');
+    showToast('Usuario agregado ✔' + aviso, 'ok');
+    loadAdmin();
+  } catch (err) {
+    showToast('No se pudo agregar: ' + esc(err.message || String(err)), 'err');
+  } finally { btn.disabled = false; }
 });
 
 function switchView(name) {
@@ -1638,6 +1943,8 @@ function switchView(name) {
   if (name === 'panel') loadPanel();
   if (name === 'trash') loadTrash();
   if (name === 'metodos') loadMetodos();
+  if (name === 'admin') loadAdmin();
+  if (name === 'portal') loadPortal();
 }
 
 function addDays(dateStr, days) {
@@ -1744,7 +2051,7 @@ async function loadBalance() {
   const cont = document.getElementById('balanceResultado');
   if (!inicio || !fin) { cont.innerHTML = '<p class="hint">Elegí las dos fechas primero.</p>'; return; }
   cont.innerHTML = '<p class="hint">Buscando...</p>';
-  const { data, error } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null)
+  const { data, error } = await selectAll(() => pacQ().is('deleted_at', null)
     .gte('fecha_toma', inicio).lte('fecha_toma', fin)
     .order('fecha_toma', { ascending: true }));
   if (error) {
@@ -1971,7 +2278,7 @@ async function renderSegFlow(contId, data, recargar) {
 async function loadSegPap() {
   const tbody = document.getElementById('segPapBody');
   tbody.innerHTML = '<tr><td colspan="9">Cargando...</td></tr>';
-  const { data, error } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null).eq('estado_pap', 'Positivo').order('fecha_toma', { ascending: true }));
+  const { data, error } = await selectAll(() => pacQ().is('deleted_at', null).eq('estado_pap', 'Positivo').order('fecha_toma', { ascending: true }));
   if (error) { tbody.innerHTML = `<tr><td colspan="9">Error: ${esc(error.message)}</td></tr>`; return; }
   renderSegFlow('segPapFlow', data, loadSegPap);
   if (!data.length) { tbody.innerHTML = '<tr><td colspan="9">No hay casos positivos registrados.</td></tr>'; return; }
@@ -1997,7 +2304,7 @@ async function loadSegPap() {
 async function loadSegVph() {
   const tbody = document.getElementById('segVphBody');
   tbody.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
-  const { data, error } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null).eq('resultado_vph', 'Positiva').order('fecha_toma', { ascending: true }));
+  const { data, error } = await selectAll(() => pacQ().is('deleted_at', null).eq('resultado_vph', 'Positiva').order('fecha_toma', { ascending: true }));
   if (error) { tbody.innerHTML = `<tr><td colspan="7">Error: ${esc(error.message)}</td></tr>`; return; }
   renderSegFlow('segVphFlow', data, loadSegVph);
   if (!data.length) { tbody.innerHTML = '<tr><td colspan="7">No hay pacientes VPH positivo registradas.</td></tr>'; return; }
@@ -2038,6 +2345,9 @@ async function onSubmit(e) {
   const msg = document.getElementById('formMsg');
   msg.className = ''; msg.style.display = 'none';
 
+  const centroNuevo = centroParaRegistrar();
+  if (centroNuevo === false) { btn.disabled = false; showToast('Elegí arriba el centro donde se registra la toma.', 'err'); return; }
+  if (centroNuevo) data.centro_id = centroNuevo;
   const { data: insertado, error } = await sb.from('pacientes').insert([data]).select();
   btn.disabled = false;
   if (error) {
@@ -2095,7 +2405,7 @@ function tomaResumen(p) {
 // Antes de registrar: avisa si la paciente ya existe. Devuelve true si se puede guardar.
 async function confirmarTomaRepetida(nueva) {
   if (!allPatientsData.length) {
-    const { data } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null));
+    const { data } = await selectAll(() => pacQ().is('deleted_at', null));
     if (data) allPatientsData = data;
   }
   const keys = new Set(pacienteKeys(nueva));
@@ -2114,7 +2424,7 @@ async function confirmarTomaRepetida(nueva) {
 }
 
 async function loadList() {
-  const { data, error } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null).order('fecha_toma', { ascending: true }));
+  const { data, error } = await selectAll(() => pacQ().is('deleted_at', null).order('fecha_toma', { ascending: true }));
   if (error) { alert('Error al cargar: ' + error.message); return; }
   allPatientsData = data;
   tomasIndex = buildTomasIndex(data);
@@ -3012,7 +3322,7 @@ document.getElementById('mapCoberturaBtn').addEventListener('click', e => {
 async function loadMap() {
   const runId = ++mapRunId; // si se vuelve a abrir el mapa, la búsqueda anterior se detiene (evita búsquedas duplicadas y bloqueos)
   const isCancelled = () => runId !== mapRunId;
-  const { data, error } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null));
+  const { data, error } = await selectAll(() => pacQ().is('deleted_at', null));
   if (error) { alert('Error al cargar mapa: ' + error.message); return; }
   if (isCancelled()) return;
 
@@ -3451,7 +3761,7 @@ async function deletePatient(p) {
   async function buscarExistente() {
     const p = { carnet: form.carnet.value, nombre: form.nombre.value, fecha_nacimiento: form.fecha_nacimiento.value };
     const keys = new Set(pacienteKeys(p)); if (!keys.size) { exist.innerHTML = ''; return; }
-    if (!allPatientsData.length) { const { data } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null)); if (data) { allPatientsData = data; tomasIndex = buildTomasIndex(data); } }
+    if (!allPatientsData.length) { const { data } = await selectAll(() => pacQ().is('deleted_at', null)); if (data) { allPatientsData = data; tomasIndex = buildTomasIndex(data); } }
     const prev = allPatientsData.filter(x => pacienteKeys(x).some(k => keys.has(k))).sort((a, b) => String(b.fecha_toma || '').localeCompare(String(a.fecha_toma || '')));
     if (!prev.length) { exist.innerHTML = ''; return; }
     const u = prev[0];
@@ -4110,7 +4420,7 @@ function pnDesde() { if (!pnPeriodo) return null; const d = new Date(); d.setDat
 function sinDoctora(p) { return !p.doctora || !String(p.doctora).trim() || p.doctora === 'Sin asignar'; }
 
 async function loadPanel() {
-  const { data, error } = await selectAll(() => sb.from('pacientes').select('*').is('deleted_at', null));
+  const { data, error } = await selectAll(() => pacQ().is('deleted_at', null));
   if (error) { alert('Error al cargar panel: ' + error.message); return; }
   pnData = data;
   tomasIndex = buildTomasIndex(data); // "Para hacer hoy" usa la toma más reciente de cada paciente
@@ -4375,7 +4685,7 @@ document.getElementById('metodosView').addEventListener('click', e => {
 async function loadMetodos() {
   const tbody = document.getElementById('metodosBody');
   tbody.innerHTML = '<tr><td colspan="8">Cargando...</td></tr>';
-  const { data, error } = await selectAll(() => sb.from('pacientes').select('*')
+  const { data, error } = await selectAll(() => pacQ()
     .is('deleted_at', null)
     .not('anticonceptivo_usa', 'is', null)
     .order('nombre', { ascending: true }));
@@ -4408,7 +4718,7 @@ async function loadTrash() {
   tbody.innerHTML = '<tr><td colspan="5">Cargando...</td></tr>';
   const limite = new Date();
   limite.setDate(limite.getDate() - 30);
-  const { data, error } = await selectAll(() => sb.from('pacientes').select('*')
+  const { data, error } = await selectAll(() => pacQ()
     .not('deleted_at', 'is', null)
     .gte('deleted_at', limite.toISOString())
     .order('deleted_at', { ascending: false }));

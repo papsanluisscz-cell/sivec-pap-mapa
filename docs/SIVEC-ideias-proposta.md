@@ -812,3 +812,10 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - Esboço `docs/esboco-pap-capas.html` (pap-capas-01/02.png): Centro de salud → lote de láminas → Oncológico (informa PAP/VPH/biopsia, firma digital) → resultado digital volta ao centro; derivação digital a colposcopia 2º nivel → biopsia → oncológico → resultado CIN → contrarreferencia ao centro.
 - Capas: 1 Centro (funciona), 2 Oncológico (desenhado no esboço de laboratório, falta programar), 3 Gestor de red (parcial, por centro), 4 Administración (falta programar).
 - Ordem para programar: 1) login+roles+redes/centros, 2) lote de envío, 3) portal oncológico, 4) derivação digital + contrarreferencia, 5) tablero gestor de red.
+
+### [25/09/2026] SIVEC PAP · Passo 1 PROGRAMADO — login com papel + redes e centros
+- Sistema real (`SIVEC-PAP-sistema.html`) + SQL **Paso 8** (redes, centros, perfiles; pacientes atuais → C.S. San Luis; contas atuais → pessoal de San Luis; administrador pelo correio) e **Paso 9** (RLS: cada centro vê o seu; gestor vê a rede sem editar; admin puro não vê dados clínicos).
+- Papéis: Centro de salud · Gestor de red (seletor "Todos / centro X") · Oncológico · Colposcopia 2º nivel (portal "em construção", passos 3 e 4) · Administrador. Casilla "Administra" permite que uma doutora de centro também administre.
+- Tela **Admin**: redes, estabelecimentos (1er nivel / 2º nivel colposcopia / oncológico), usuários (cria a conta com senha provisória ou usa a existente; desativar, nunca apagar).
+- Com o Paso 8 feito, o login passa a ser obrigatório. Testado com Postgres local (permissões por papel) e no navegador com cada papel.
+- Pendente para o passo 5 (painel do gestor): gestor ver números sem nomes, salvo positivos sem tratar.

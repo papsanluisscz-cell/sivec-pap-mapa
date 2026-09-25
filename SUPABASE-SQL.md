@@ -123,6 +123,175 @@ notify pgrst, 'reload schema';
 
 ---
 
+## Paso 8 — Redes, centros y usuarios con rol (SIVEC PAP para toda la red)
+
+Crea las **redes**, los **establecimientos** y el **perfil** de cada usuario (rol + centro o red).
+Todas las pacientes que ya existen quedan en **C.S. San Luis (Red Centro)** y todas las cuentas que ya existen quedan como personal de San Luis.
+
+**Antes:** cada persona que usa el sistema tiene que tener su cuenta (Paso 3.1). Desde este paso **el inicio de sesión es obligatorio**: sin cuenta no se entra.
+**Cambiá `TU_CORREO@gmail.com`** (casi al final) por tu correo: esa cuenta queda como administradora (sigue viendo sus pacientes de San Luis y además ve el botón **Admin**).
+
+Roles:
+- **Centro de salud**: ve y registra solo las pacientes de su centro.
+- **Gestor de red**: ve todos los centros de su red (con selector "Todos / centro X"), no edita.
+- **Oncológico / laboratorio** y **Colposcopia 2º nivel**: su portal (se programa en los próximos pasos).
+- **Administrador**: crea redes, establecimientos y usuarios; **no ve datos clínicos**. Una persona de centro puede además ser administradora (casilla "Administra").
+
+```sql
+-- 1) Redes, establecimientos y perfiles
+create table if not exists redes (
+  id bigint generated always as identity primary key,
+  nombre text not null unique,
+  municipio text,
+  created_at timestamptz not null default now()
+);
+create table if not exists centros (
+  id bigint generated always as identity primary key,
+  nombre text not null unique,
+  red_id bigint references redes(id),
+  tipo text not null default 'primer_nivel',  -- primer_nivel · segundo_nivel · oncologico
+  codigo text,
+  activo boolean not null default true,
+  created_at timestamptz not null default now()
+);
+create table if not exists perfiles (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  correo text,
+  nombre text,
+  rol text not null default 'centro',          -- centro · gestor · oncologico · colposcopia · admin
+  es_admin boolean not null default false,     -- además de su rol, administra redes/centros/usuarios
+  centro_id bigint references centros(id),
+  red_id bigint references redes(id),
+  activo boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+-- 2) Quién soy (las usa el sistema y las reglas de seguridad)
+create or replace function sivec_rol() returns text language sql stable security definer set search_path = public as $$
+  select rol from perfiles where user_id = auth.uid() and activo limit 1 $$;
+create or replace function sivec_es_admin() returns boolean language sql stable security definer set search_path = public as $$
+  select coalesce((select rol = 'admin' or es_admin from perfiles where user_id = auth.uid() and activo limit 1), false) $$;
+create or replace function sivec_centro() returns bigint language sql stable security definer set search_path = public as $$
+  select centro_id from perfiles where user_id = auth.uid() and activo limit 1 $$;
+create or replace function sivec_red() returns bigint language sql stable security definer set search_path = public as $$
+  select coalesce(p.red_id, c.red_id) from perfiles p left join centros c on c.id = p.centro_id
+  where p.user_id = auth.uid() and p.activo limit 1 $$;
+-- Ver: el centro ve lo suyo; el gestor ve todos los centros de su red. El administrador puro no ve datos clínicos.
+create or replace function sivec_ve_centro(c bigint) returns boolean language sql stable security definer set search_path = public as $$
+  select case sivec_rol()
+    when 'centro' then c = sivec_centro()
+    when 'gestor' then exists (select 1 from centros where id = c and red_id = sivec_red())
+    else false end $$;
+-- Registrar y editar: solo el personal del propio centro.
+create or replace function sivec_edita_centro(c bigint) returns boolean language sql stable security definer set search_path = public as $$
+  select sivec_rol() = 'centro' and c = sivec_centro() $$;
+-- Buscar la cuenta de un correo (solo el administrador), para asignarle perfil.
+create or replace function sivec_uid_por_correo(p_correo text) returns uuid language sql stable security definer set search_path = public, auth as $$
+  select u.id from auth.users u where sivec_es_admin() and lower(u.email) = lower(trim(p_correo)) limit 1 $$;
+
+-- 3) Reglas de las tablas nuevas
+alter table redes enable row level security;
+alter table centros enable row level security;
+alter table perfiles enable row level security;
+drop policy if exists "ver redes" on redes;
+drop policy if exists "admin redes" on redes;
+drop policy if exists "ver centros" on centros;
+drop policy if exists "admin centros" on centros;
+drop policy if exists "ver perfil" on perfiles;
+drop policy if exists "admin perfiles" on perfiles;
+create policy "ver redes" on redes for select to authenticated using (true);
+create policy "admin redes" on redes for all to authenticated using (sivec_es_admin()) with check (sivec_es_admin());
+create policy "ver centros" on centros for select to authenticated using (true);
+create policy "admin centros" on centros for all to authenticated using (sivec_es_admin()) with check (sivec_es_admin());
+create policy "ver perfil" on perfiles for select to authenticated using (user_id = auth.uid() or sivec_es_admin());
+create policy "admin perfiles" on perfiles for all to authenticated using (sivec_es_admin()) with check (sivec_es_admin());
+grant select, insert, update, delete on redes, centros, perfiles to authenticated;
+grant select on perfiles to anon;  -- no ve ninguna fila: solo sirve para que el sistema sepa que ya hay roles y pida iniciar sesión
+
+-- 4) Cada paciente pertenece a un centro (si no se manda, el del usuario que la registra)
+alter table pacientes add column if not exists centro_id bigint references centros(id);
+alter table pacientes alter column centro_id set default sivec_centro();
+create index if not exists pacientes_centro_idx on pacientes (centro_id);
+
+-- 5) El piloto: Red Centro y C.S. San Luis; todas las pacientes de hoy son de San Luis
+insert into redes (nombre, municipio) values ('Red Centro', 'Santa Cruz de la Sierra') on conflict (nombre) do nothing;
+insert into centros (nombre, red_id, tipo) select 'C.S. San Luis', id, 'primer_nivel' from redes where nombre = 'Red Centro' on conflict (nombre) do nothing;
+update pacientes set centro_id = (select id from centros where nombre = 'C.S. San Luis') where centro_id is null;
+
+-- 6) Las cuentas que ya existen = personal de San Luis
+insert into perfiles (user_id, correo, nombre, rol, centro_id)
+  select u.id, u.email, split_part(u.email, '@', 1), 'centro', (select id from centros where nombre = 'C.S. San Luis')
+  from auth.users u on conflict (user_id) do nothing;
+
+-- 7) Vos sos la administradora (cambiá el correo por el tuyo)
+update perfiles set es_admin = true where lower(correo) = lower('TU_CORREO@gmail.com');
+
+notify pgrst, 'reload schema';
+```
+
+Después, en el sistema: botón **Admin** → agregar los otros centros de la red, el oncológico, el hospital de 2º nivel y los usuarios.
+Cada usuario ve arriba a la derecha su nombre, su rol y su centro.
+
+---
+
+## Paso 9 — Que cada centro vea solo lo suyo, protegido por la base de datos (IMPORTANTE)
+
+El Paso 8 ya separa los centros en la pantalla. Este paso hace que la separación la ponga **Supabase**, no el navegador:
+aunque alguien tenga la clave, solo recibe las filas de su centro (o de su red, si es gestor), y solo el personal del centro puede registrar o editar.
+Reemplaza al Paso 3.3.
+
+**Hacerlo recién cuando** todas las personas entran con su usuario y cada una tiene rol y centro en **Admin → Usuarios**.
+
+```sql
+alter table pacientes enable row level security;
+alter table colposcopias enable row level security;
+alter table consultas enable row level security;
+
+-- Se sacan las reglas viejas ("cualquier usuario con sesión ve todo")
+drop policy if exists "Solo usuarias con sesión - pacientes" on pacientes;
+drop policy if exists "Solo usuarias con sesión - colposcopias" on colposcopias;
+drop policy if exists "Solo usuarias con sesión - consultas" on consultas;
+drop policy if exists "consultas acceso del sistema" on consultas;
+drop policy if exists "ver por centro" on pacientes;
+drop policy if exists "editar por centro" on pacientes;
+drop policy if exists "ver por centro" on colposcopias;
+drop policy if exists "editar por centro" on colposcopias;
+drop policy if exists "ver por centro" on consultas;
+drop policy if exists "editar por centro" on consultas;
+
+create policy "ver por centro" on pacientes for select to authenticated using (sivec_ve_centro(centro_id));
+create policy "editar por centro" on pacientes for all to authenticated
+  using (sivec_edita_centro(centro_id)) with check (sivec_edita_centro(centro_id));
+
+create policy "ver por centro" on colposcopias for select to authenticated using (
+  exists (select 1 from pacientes p where p.id::text = colposcopias.paciente_id::text and sivec_ve_centro(p.centro_id)));
+create policy "editar por centro" on colposcopias for all to authenticated
+  using (exists (select 1 from pacientes p where p.id::text = colposcopias.paciente_id::text and sivec_edita_centro(p.centro_id)))
+  with check (exists (select 1 from pacientes p where p.id::text = colposcopias.paciente_id::text and sivec_edita_centro(p.centro_id)));
+
+create policy "ver por centro" on consultas for select to authenticated using (
+  exists (select 1 from pacientes p where p.id::text = consultas.paciente_id::text and sivec_ve_centro(p.centro_id)));
+create policy "editar por centro" on consultas for all to authenticated
+  using (exists (select 1 from pacientes p where p.id::text = consultas.paciente_id::text and sivec_edita_centro(p.centro_id)))
+  with check (exists (select 1 from pacientes p where p.id::text = consultas.paciente_id::text and sivec_edita_centro(p.centro_id)));
+```
+
+### Deshacer el Paso 9 (vuelve a "cualquier usuario con sesión ve todo")
+
+```sql
+drop policy if exists "ver por centro" on pacientes;
+drop policy if exists "editar por centro" on pacientes;
+drop policy if exists "ver por centro" on colposcopias;
+drop policy if exists "editar por centro" on colposcopias;
+drop policy if exists "ver por centro" on consultas;
+drop policy if exists "editar por centro" on consultas;
+create policy "Solo usuarias con sesión - pacientes" on pacientes for all to authenticated using (true) with check (true);
+create policy "Solo usuarias con sesión - colposcopias" on colposcopias for all to authenticated using (true) with check (true);
+create policy "Solo usuarias con sesión - consultas" on consultas for all to authenticated using (true) with check (true);
+```
+
+---
+
 ## Paso 3 — Proteger los datos de las pacientes (IMPORTANTE)
 
 Hoy cualquiera que tenga la URL y la clave *anon* de Supabase puede leer todos los datos.
@@ -137,6 +306,8 @@ En cada computadora: ⚙ Configuración → **Exigir inicio de sesión** → ent
 la contraseña creados. Verificar que todo carga bien.
 
 ### 3.3 Activar RLS (recién cuando todas puedan entrar)
+
+> Si ya hiciste el **Paso 8**, usá el **Paso 9** en lugar de este.
 
 ```sql
 alter table pacientes enable row level security;
