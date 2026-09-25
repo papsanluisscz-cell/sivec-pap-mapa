@@ -707,3 +707,33 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - **Mi trabajo (todo el personal):** turno y semana; aceptar un reemplazo en un toque (con control de horas y descanso); pedir permiso con foto del certificado.
 - **Trabajo de campo sin internet:** la lista de casas se descarga en el centro. En la casa se registran vacunas, fichas de dengue y criaderos sin señal; al volver la señal, un toque sincroniza y el vacunatorio, el epidemiólogo y el mapa ya lo ven.
 - Imágenes: docs/celular-01..04.png · esboco-celular.html
+
+**Módulo 15 · SIVEC en el celular: APROVADO.**
+
+### Módulo 16 · Programas (TB, Chagas, Zoonosis, Nutrición, Salud mental) — dibujado, para aprobar
+- **Cada programa es una “etiqueta” en la ficha del paciente**, no un sistema aparte. Todos siguen el mismo patrón:
+  - entra solo por un diagnóstico o resultado;
+  - tiene su tarjeta de control, con citas y dosis;
+  - si el paciente falta, hay búsqueda activa;
+  - termina con un resultado final y el informe sale automático.
+- **TB (TAES):** cada dosis observada se marca con la huella del paciente (o la promotora en casa). Si falta, SMS y visita el mismo día.
+  - La tarjeta incluye esquema, peso, BK de control, VIH/glucemia, contactos y profilaxis, y el resultado para la cohorte.
+- **Chagas:**
+  - tamizaje de la embarazada (desde Materno);
+  - bebé de madre positiva: micrométodo al nacer y al mes, serología a los 8–10 meses;
+  - tratamiento de 60 días con controles;
+  - vigilancia de la vinchuca: la comunidad avisa y se programa el rociado.
+- **Zoonosis:** mordeduras con observación del animal 10 días (el inspector registra en el celular) y esquema antirrábico que se suspende si el animal está sano; campaña de vacunación canina con brigada sin internet; mapa de mordeduras.
+- **Nutrición:**
+  - el niño entra solo desde las curvas del carnet; manejo en casa con alimento terapéutico y control semanal hasta el alta;
+  - Nutribebé, chispitas y Carmelo registrados y descontados del almacén;
+  - programa de anemia.
+- **Salud mental y violencia:**
+  - tamizajes breves con puntaje automático (PHQ-9, Edimburgo, AUDIT-C, violencia);
+  - riesgo de suicidio: acción el mismo día y plan de seguridad;
+  - ruta de violencia con aviso legal;
+  - confidencialidad reforzada: solo el tratante y psicología ven las notas, y cada apertura queda registrada.
+- **Cohortes e indicadores:** éxito y abandono de TB, tamizaje de Chagas y recuperación nutricional. Los informes de todos los programas van automáticos al SEDES y al gestor.
+- Imágenes: docs/programas-01..07.png · esboco-programas.html
+
+**✅ Con este módulo quedan dibujados los 16 módulos pendientes del mapa del proyecto.**
