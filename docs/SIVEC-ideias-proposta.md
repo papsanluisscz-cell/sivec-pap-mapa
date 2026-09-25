@@ -575,3 +575,10 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
   - estado y mantenimiento de cada equipo; si uno está parado, los pedidos se derivan solos;
   - las mamografías se cruzan con el programa PAP/VPH.
 - Imágenes: docs/imagen-01..08.png · esboco-imagen.html
+- **Abrir la imagen con el QR (pregunta del usuario):** sin app, en el navegador.
+  - A) Dentro de la red no hace falta QR: se abre desde la ficha / línea de tiempo.
+  - B) Médico de la red: escanea el QR con el celular o con el lector de la computadora y entra con usuario (huella o PIN).
+  - C) Médico de fuera de la red: escribe el código de 6 números impreso junto al QR (el paciente lo muestra = su permiso); lo ve solo para mirar, 30 días.
+  - El QR no lleva datos del paciente, solo una llave; queda registrado quién abrió y cuándo.
+  - El visor es web (software libre) y funciona en el celular; la ecografía igual.
+  - Imagen: docs/imagen-09.png
