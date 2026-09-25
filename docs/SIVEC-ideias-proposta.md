@@ -756,3 +756,7 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - **Pase de visita** con el tablet del carro: por cama se ve lo que dice el interno, los datos del sistema y los pendientes. La doctora pregunta y corrobora; los cambios dictados se vuelven indicación urgente y se firman con huella en el carro.
 - **Carro de visita:** tablet en brazo giratorio, lector de pulsera, lector de huella, cajones (guantes, curación, glucómetro), alcohol en gel, basura, batería para 8 h y ruedas con freno.
 - Imágenes: docs/piso-01..10.png · esboco-piso.html
+- **PISO: APROVADO.** Escenas ilustradas para presentación (docs/piso-escena-01..03.png · esboco-piso-escenas.html):
+  1. El interno escribe o dicta la evolución de la mañana en la estación de enfermería; el residente revisa y firma con huella.
+  2. Retiro de sonda vesical: la indicación aparece como tarea; el registro se hace en 30 s en el celular (hora, balón, orina, aspecto, molestia) y queda la alarma de 1ª micción en 6 h.
+  3. Pase de visita con el carro: tablet visible para todo el equipo; la planta corrobora con la paciente y el residente firma en el carro.
