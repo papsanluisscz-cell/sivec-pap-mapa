@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<title>SIVEC — Passo a passo: da empresa ao governo</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+  :root { --w:#7d2a4c; --wd:#5a1c36; --ink:#2a1820; --soft:#6f6168; --line:#e6dadf; --tint:#f7eef2; }
+  * { box-sizing:border-box; }
+  body { font-family:"Liberation Sans","DejaVu Sans",Arial,sans-serif; color:var(--ink); font-size:10.6pt; line-height:1.5; margin:0; }
+  h1 { font-size:28pt; line-height:1.1; margin:0 0 10pt; color:var(--wd); }
+  h2 { font-size:16pt; color:var(--wd); margin:0 0 8pt; padding-bottom:4pt; border-bottom:2px solid var(--w); }
+  h3 { font-size:12pt; margin:12pt 0 4pt; color:var(--ink); break-after:avoid; page-break-after:avoid; }
+  h2 { break-after:avoid; page-break-after:avoid; }
+  .keep { break-inside:avoid; page-break-inside:avoid; }
+  p { margin:4pt 0; }
+  .pg { page-break-before:always; }
+  .cover { height:250mm; display:flex; flex-direction:column; justify-content:center; gap:14pt; }
+  .logo { width:62px; height:62px; border-radius:24%; background:linear-gradient(145deg,#9c3a5f,#5a1c36); color:#fff; font-weight:900; font-size:32pt; display:flex; align-items:center; justify-content:center; }
+  .eyebrow { font-size:9.5pt; letter-spacing:.14em; text-transform:uppercase; color:var(--w); font-weight:700; }
+  .lead { font-size:13pt; color:#4a3a42; }
+  .warn { background:#fff7e0; border:1px solid #ecd9a0; border-radius:8px; padding:8pt 10pt; font-size:9.5pt; color:#5b4712; }
+  .box { background:var(--tint); border-radius:8px; padding:8pt 11pt; margin:6pt 0; }
+  .rec { border:2px solid var(--w); border-radius:8px; padding:8pt 11pt; margin:6pt 0; background:#fff; }
+  .rec b.t { color:var(--w); }
+  table { width:100%; border-collapse:collapse; margin:6pt 0; font-size:9.6pt; page-break-inside:avoid; }
+  th { background:var(--w); color:#fff; text-align:left; padding:5pt 6pt; font-weight:700; }
+  td { border-bottom:1px solid var(--line); padding:5pt 6pt; vertical-align:top; }
+  tr:nth-child(even) td { background:#fbf7f9; }
+  .step { display:grid; grid-template-columns:30px 1fr; gap:8pt; margin:7pt 0; page-break-inside:avoid; }
+  .n { width:26px; height:26px; border-radius:50%; background:var(--w); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:10.5pt; }
+  .step b.h { display:block; font-size:11pt; }
+  ul { margin:3pt 0 3pt 16pt; padding:0; } li { margin:1.5pt 0; }
+  .ck li { list-style:none; margin-left:-14pt; } .ck li::before { content:"☐ "; color:var(--w); font-weight:700; }
+  .tl { display:grid; grid-template-columns:repeat(6,1fr); gap:0; margin:10pt 0; }
+  .tl div { padding:7pt 6pt; color:#fff; font-size:8.8pt; line-height:1.35; }
+  .tl b { display:block; font-size:9.6pt; }
+  .small { font-size:9pt; color:var(--soft); }
+  .letter { border:1px solid var(--line); border-radius:6px; padding:12pt 14pt; font-size:9.8pt; background:#fff; }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:10pt; }
+</style>
+</head>
+<body>
+
+<!-- ================= CAPA ================= -->
+<section class="cover">
+  <div class="logo">S</div>
+  <div class="eyebrow">SIVEC · Sistema Integral de Vigilancia y Enlace Clínico</div>
+  <h1>Passo a passo: da abertura da empresa até a apresentação ao governo</h1>
+  <p class="lead">Guia prático com os modelos que mais convêm ao SIVEC: como proteger o sistema, abrir a empresa, habilitar-se como fornecedor do Estado e chegar à contratação.</p>
+  <div class="warn"><b>Importante:</b> este guia organiza passos e decisões; <b>não substitui um advogado e um contador na Bolívia</b>. Nomes de órgãos, requisitos, taxas e faixas de contratação mudam: confirme cada um no momento do trâmite. Os termos oficiais estão em espanhol para uso direto.</div>
+  <p class="small">Versão de setembro de 2026 · Santa Cruz de la Sierra</p>
+</section>
+
+<!-- ================= RESUMO ================= -->
+<section class="pg">
+  <h2>1. O caminho em uma página</h2>
+  <div class="tl">
+    <div style="background:#7a1f2b"><b>Etapa 0</b>Semanas 1–2<br>Advogado e contas no seu nome</div>
+    <div style="background:#9c3a5f"><b>Etapa 1</b>Semanas 2–6<br>Proteger: SENAPI (autor e marca)</div>
+    <div style="background:#5a1c36"><b>Etapa 2</b>Semanas 3–10<br>Abrir a S.R.L.</div>
+    <div style="background:#2f5e8f"><b>Etapa 3</b>Semanas 8–12<br>Licença e contratos</div>
+    <div style="background:#2f6b4f"><b>Etapa 4</b>Meses 2–4<br>Sistema pronto para vender + RUPE</div>
+    <div style="background:#b45309"><b>Etapa 5</b>Meses 3–6<br>Governo: apresentar, propor, contratar</div>
+  </div>
+  <h3>Os modelos que recomendo para o SIVEC</h3>
+  <div class="rec"><b class="t">Estrutura jurídica →</b> <b>Você, pessoa física, é o dono do SIVEC</b> (código, marca, desenhos). Uma <b>S.R.L.</b> recebe uma <b>licença exclusiva</b> para vender, implantar e dar suporte. Assim, sócios, investidores ou dívidas da empresa nunca tocam na titularidade.</div>
+  <div class="rec"><b class="t">Modelo de venda ao Estado →</b> <b>Serviço mensal (licença + nuvem + suporte + capacitação)</b>, nunca venda do código. Começar com <b>um piloto de 6 meses por um valor fixo mensal por rede</b> e, depois, <b>valor mensal por estabelecimento</b> (município) ou <b>por habitante/ano</b> (departamento ou país).</div>
+  <div class="rec"><b class="t">Cliente de entrada →</b> <b>Governo municipal</b> (administra o 1º e o 2º nível no SUS), com o apoio de um <b>diretor de rede</b> e do <b>SEDES</b>. O Ministério de Saúde entra como aliado para validar e escalar.</div>
+  <div class="rec"><b class="t">Dados →</b> <b>Pertencem ao Estado e aos pacientes</b>. O contrato garante a entrega completa ao final. Isso gera confiança e não tira nada da sua propriedade.</div>
+  <h3>O que NÃO fazer</h3>
+  <ul>
+    <li>Não entregar o código-fonte nem “ceder direitos” ao Estado.</li>
+    <li>Não assinar nada com o Estado antes de resolver com o advogado a sua situação como servidor público.</li>
+    <li>Não oferecer o sistema de graça por tempo indeterminado: um piloto gratuito sem prazo vira dependência sem contrato.</li>
+    <li>Não mostrar dados reais de pacientes em apresentações: sempre usar a base de DEMO.</li>
+  </ul>
+</section>
+
+<!-- ================= ETAPA 0 ================= -->
+<section class="pg">
+  <h2>2. Etapa 0 — Antes de tudo (semanas 1–2)</h2>
+  <div class="step"><div class="n">1</div><div><b class="h">Consulta com advogado: servidor público e titularidade</b>
+    Se você trabalha no sistema público de saúde, leve ao advogado:
+    <ul><li>o seu contrato de trabalho e as funções;</li><li>quando, onde e com que equipamentos o SIVEC foi desenvolvido;</li><li>o uso atual no C.S. San Luis e quem autorizou.</li></ul>
+    Perguntas para ele responder por escrito:
+    <ul><li>O SIVEC pode ser reclamado pelo empregador?</li><li>Posso ser sócio de uma empresa que contrata com o Estado? E com a minha própria instituição ou rede?</li><li>Qual estrutura me protege: sócio-gerente separado, sair do cargo ao assinar, ou outra?</li></ul>
+  </div></div>
+  <div class="step"><div class="n">2</div><div><b class="h">Todas as contas no seu nome</b>
+    <ul><li><b>Código:</b> criar uma conta ou organização própria (ex.: <i>sivec-bo</i>) e transferir o repositório atual; verificação em 2 passos.</li>
+    <li><b>Supabase, domínio, Google Drive, e-mail do sistema:</b> com o seu e-mail pessoal e pagos por você.</li>
+    <li><b>Senhas</b> num gerenciador, com um contato de emergência de confiança.</li>
+    <li><b>Nunca</b> usar e-mail, computador ou conta do Estado para o SIVEC.</li></ul></div></div>
+  <div class="step"><div class="n">3</div><div><b class="h">Provas de autoria com data</b>
+    <ul><li>Guardar o histórico do código (cada mudança tem data e autor) e fazer backup.</li><li>Reunir os documentos de projeto, desenhos e esboços.</li><li>Opcional: entregar num cartório (<i>notaría de fe pública</i>) uma cópia lacrada do código e dos documentos.</li></ul></div></div>
+  <div class="box"><b>Resultado da etapa:</b> sabe se pode contratar com o Estado e como; todas as contas estão sob seu controle; há provas de autoria.</div>
+
+  <h2 style="margin-top:14pt">3. Etapa 1 — Proteger no SENAPI (semanas 2–6)</h2>
+  <div class="step"><div class="n">4</div><div><b class="h">Registro de direito de autor do software</b>
+    Órgão: <b>SENAPI</b> — <i>Dirección de Derecho de Autor y Derechos Conexos</i>. Registrar o SIVEC como <b>programa de computador</b>, com você como autor e titular.
+    <ul><li>Costuma pedir: formulário, descrição da obra, trecho do código-fonte ou suporte digital, manual ou descrição de funcionamento, documento de identidade e pagamento da taxa.</li>
+    <li>O direito nasce com a criação; o registro é a <b>prova pública com data</b>.</li></ul></div></div>
+  <div class="step"><div class="n">5</div><div><b class="h">Busca e registro da marca “SIVEC” e do logo</b>
+    <ul><li>Primeiro: <b>búsqueda de antecedentes</b>. Existem sistemas chamados “SIVEC” em outros países e pode haver marca parecida na Bolívia.</li>
+    <li>Se estiver livre: pedir o registro (nome + logo). Classes sugeridas para validar com o advogado: <b>9</b> (software), <b>42</b> (software como serviço, hospedagem) e <b>44</b> (serviços de saúde).</li>
+    <li>Se não estiver livre: escolher um nome complementar (ex.: “SIVEC Salud”) antes de imprimir material.</li></ul></div></div>
+  <div class="box"><b>Sobre código escrito com ajuda de IA:</b> a proteção de obras geradas com IA ainda é discutida no mundo. O que protege você é o seu trabalho criativo (o que o sistema faz, o desenho e as decisões médicas), o histórico documentado e o registro como obra sua. Comente com o advogado.</div>
+</section>
+
+<!-- ================= ETAPA 2 ================= -->
+<section class="pg">
+  <h2>4. Etapa 2 — Abrir a empresa (semanas 3–10)</h2>
+  <h3>Por que S.R.L.</h3>
+  <table><tr><th>Tipo</th><th>A favor</th><th>Contra</th><th>Para o SIVEC</th></tr>
+    <tr><td>Empresa unipersonal</td><td>simples e barata</td><td>você responde com seu patrimônio; difícil entrar sócios</td><td>só para começar muito pequeno</td></tr>
+    <tr><td><b>S.R.L.</b></td><td>responsabilidade limitada ao capital; aceita sócios</td><td>um pouco mais de trâmite</td><td><b>recomendada</b></td></tr>
+    <tr><td>S.A.</td><td>grandes investimentos</td><td>cara e complexa</td><td>no futuro, se houver investidores</td></tr></table>
+  <h3>Passos (a ordem pode variar; confirme no SEPREC e com o contador)</h3>
+  <div class="step"><div class="n">6</div><div><b class="h">Nome da empresa — controle de homonímia no SEPREC</b> (<i>Servicio Plurinacional de Registro de Comercio</i>). Ex.: “SIVEC Salud Digital S.R.L.”. Deve combinar com a marca pedida no SENAPI.</div></div>
+  <div class="step"><div class="n">7</div><div><b class="h">Escritura de constituição num cartório</b> com o estatuto.
+    <ul><li><b>Objeto social:</b> desenvolvimento, licenciamento, hospedagem, implantação, capacitação e suporte de sistemas de informação em saúde; comercialização de equipamentos relacionados.</li>
+    <li><b>Capital, sócios e quotas</b>; <b>representante legal</b> (definido conforme a resposta do advogado sobre o seu cargo público).</li></ul></div></div>
+  <div class="step"><div class="n">8</div><div><b class="h">Matrícula de comércio no SEPREC</b> com a escritura e os documentos pedidos.</div></div>
+  <div class="step"><div class="n">9</div><div><b class="h">NIT no Servicio de Impuestos Nacionales (SIN)</b>
+    <ul><li>Regime geral, com <b>faturamento eletrônico/em linha</b>: o Estado paga contra fatura.</li>
+    <li>Impostos a conferir com o contador: IVA 13%, IT 3% e IUE 25% sobre o lucro.</li></ul></div></div>
+  <div class="step"><div class="n">10</div><div><b class="h">Licença de funcionamento municipal</b> no endereço da empresa (pode ser um escritório pequeno ou compartilhado).</div></div>
+  <div class="step"><div class="n">11</div><div><b class="h">Conta bancária da empresa</b>, também necessária para as garantias bancárias das contratações públicas.</div></div>
+  <div class="step"><div class="n">12</div><div><b class="h">Ao contratar pessoas:</b> registro como empregador no Ministério de Trabalho, seguro social de saúde (Caja) e aposentadoria (Gestora), mais folha de pagamento em dia (o Estado costuma pedir certidões de não-dívida).</div></div>
+  <div class="box"><b>Equipe mínima externa desde o dia 1:</b> <b>contador</b> (mensal) e <b>advogado</b> (sob demanda). Sem contabilidade em dia não se consegue concorrer.</div>
+</section>
+
+<!-- ================= ETAPA 3 ================= -->
+<section class="pg">
+  <h2>5. Etapa 3 — Licença e contratos (semanas 8–12)</h2>
+  <h3>A estrutura de titularidade</h3>
+  <div class="box" style="font-family:'DejaVu Sans Mono',monospace;font-size:9.4pt;line-height:1.6">VOCÊ (pessoa) ─── dono do SIVEC: código, marca, desenhos<br>&nbsp;&nbsp;&nbsp;│ contrato de LICENÇA EXCLUSIVA (renovável, com royalty)<br>&nbsp;&nbsp;&nbsp;▼<br>SIVEC S.R.L. ─── vende, implanta, hospeda e dá suporte<br>&nbsp;&nbsp;&nbsp;│ contratos de SERVIÇO<br>&nbsp;&nbsp;&nbsp;▼<br>ESTADO ─── usa o serviço · os DADOS são dele e dos pacientes</div>
+  <div class="step"><div class="n">13</div><div><b class="h">Contrato de licença você → S.R.L.</b>
+    <ul><li>Exclusiva, pelo território da Bolívia, com prazo renovável.</li><li><b>Royalty</b> (ex.: 5–10% do faturamento) — definir com o contador por causa dos impostos.</li><li>Cláusula: se a empresa for vendida, fechar ou descumprir, a licença volta a você.</li><li>Melhorias feitas pela empresa passam a ser suas (ou licenciadas de volta).</li></ul></div></div>
+  <div class="step"><div class="n">14</div><div><b class="h">Contratos com quem trabalhar no SIVEC</b>
+    <ul><li><b>Cessão de direitos patrimoniais</b> sobre o que desenvolver.</li><li><b>Confidencialidade</b>, incluindo dados de pacientes.</li><li>Não concorrência razoável, se o advogado considerar válida.</li></ul></div></div>
+  <div class="step"><div class="n">15</div><div><b class="h">Acordo de sócios</b> (se houver): o que cada um aporta, o que recebe, o que acontece se sair. Os sócios entram na <b>empresa</b>, não no <b>SIVEC</b>.</div></div>
+  <div class="step"><div class="n">16</div><div><b class="h">Regularizar o piloto do C.S. San Luis</b> com um convênio simples com a rede ou o SEDES: <b>licença de uso</b> temporária, sem cessão de direitos; dados do Estado; confidencialidade; possibilidade de usar os resultados (anônimos) como referência.</div></div>
+  <div class="step"><div class="n">17</div><div><b class="h">Lista de componentes de terceiros</b> (mapas, PDF, banco de dados): licenças abertas permitem uso comercial, mas exigem manter os avisos de autoria.</div></div>
+
+  <h2 style="margin-top:14pt">6. Etapa 4 — Pronto para vender (meses 2–4)</h2>
+  <h3>Técnico mínimo antes da primeira proposta</h3>
+  <ul class="ck">
+    <li>Banco de dados no <b>plano pago</b> (Supabase Pro), com cópias diárias e sem pausa por inatividade</li>
+    <li>Página do sistema publicada num endereço próprio (ex.: <b>app.sivec.bo</b>, domínio .bo na ADSIB)</li>
+    <li><b>Login real com perfis e permissões</b> por cargo e por centro; registro de acessos</li>
+    <li><b>Base de DEMO</b> com pacientes inventados, separada da real</li>
+    <li>Teste de restauração da cópia de segurança</li>
+    <li>Números do piloto (pacientes, seguimentos, documentos) exportados do painel</li></ul>
+  <div class="step"><div class="n">18</div><div><b class="h">Registro como fornecedor do Estado: RUPE no SICOES</b>
+    <ul><li>Com NIT, matrícula de comércio e dados da empresa.</li><li>Também deixar prontos: certidões de não-dívida (impostos, seguridade social) e cartas de apresentação.</li></ul></div></div>
+  <div class="step"><div class="n">19</div><div><b class="h">Kit comercial</b>
+    <ul><li><b>Apresentação executiva</b> (20 min) e <b>“Cómo funciona”</b> (técnica).</li><li><b>Demo ao vivo</b> (roteiro guiado, modo apresentação, base de DEMO).</li><li><b>Folha de uma página</b> (problema, solução, piloto, preço por habitante).</li><li><b>Modelo de proposta</b> técnica e econômica (ver etapa 5).</li></ul></div></div>
+</section>
+
+<!-- ================= ETAPA 5 ================= -->
+<section class="pg">
+  <h2>7. Etapa 5 — Chegar ao governo, propor e contratar (meses 3–6)</h2>
+  <h3>Quem decide e quem paga no SUS</h3>
+  <table><tr><th>Ator</th><th>Papel</th><th>O que quer ouvir</th></tr>
+    <tr><td><b>Governo municipal</b> (Secretaria de Saúde)</td><td>administra o 1º e o 2º nível; <b>cliente principal</b></td><td>menos filas, resultados visíveis na gestão, custo previsível</td></tr>
+    <tr><td><b>Diretor de rede de saúde</b></td><td>aliado interno; indica onde começar</td><td>informes automáticos, menos papel, controle da rede</td></tr>
+    <tr><td><b>SEDES</b></td><td>coordena redes e 3º nível; pode padronizar no departamento</td><td>vigilância, SNIS em dia, indicadores do departamento</td></tr>
+    <tr><td><b>Ministério de Saúde</b></td><td>normas, SNIS, sistema nacional</td><td>integração com o sistema nacional, padrões, escala</td></tr>
+    <tr><td><b>Cooperação internacional</b> (OPS/OMS, BID, UNICEF, agências)</td><td>pode <b>financiar pilotos</b> de saúde digital</td><td>impacto medido, sustentabilidade</td></tr></table>
+
+  <h3>Sequência recomendada</h3>
+  <div class="step"><div class="n">20</div><div><b class="h">Aliado interno</b> Apresentar ao <b>diretor da Red Centro</b> com os números do piloto. Pedir que ele leve (ou acompanhe) à Secretaria Municipal de Saúde.</div></div>
+  <div class="step"><div class="n">21</div><div><b class="h">Pedir audiência por escrito</b> À Secretaria Municipal de Saúde e, em paralelo, ao SEDES (modelo de carta no Anexo A).</div></div>
+  <div class="step"><div class="n">22</div><div><b class="h">Reunião de 40 minutos</b> 20 min de apresentação executiva + 15 min de demo ao vivo + 5 min de próximo passo. Levar a folha de uma página impressa.</div></div>
+  <div class="step"><div class="n">23</div><div><b class="h">Proposta formal</b> Em até 1 semana depois da reunião:
+    <ul><li><b>Técnica:</b> alcance (quais centros e módulos), cronograma de 6 meses, equipe, capacitação, suporte, segurança, metas de impacto com linha de base.</li>
+    <li><b>Econômica:</b> valor mensal do piloto por rede + implantação; opção de equipamentos à parte; forma de pagamento mensal contra fatura.</li>
+    <li><b>Garantias:</b> dados do Estado, entrega ao final, disponibilidade de 99,5%.</li></ul></div></div>
+  <div class="step"><div class="n">24</div><div><b class="h">Entrar no orçamento (POA)</b> O Estado planeja o orçamento do ano seguinte no <b>meio do ano</b>. Se o POA deste ano já está fechado, buscar: modificação orçamentária, contratação menor para uma fase inicial, ou financiamento de cooperação para o piloto — e garantir o SIVEC no POA seguinte.</div></div>
+
+  <div class="keep"><h3>Como o Estado contrata (faixas aproximadas — confirmar a norma vigente)</h3>
+  <table><tr><th>Modalidade</th><th>Faixa aproximada</th><th>Uso para o SIVEC</th></tr>
+    <tr><td>Contratação menor</td><td>até ~Bs 50.000</td><td>fase inicial curta ou diagnóstico da rede</td></tr>
+    <tr><td><b>ANPE</b></td><td>~Bs 50.001 a 1.000.000</td><td><b>piloto de uma rede</b> (ex.: Red Centro ≈ Bs 490 mil/ano)</td></tr>
+    <tr><td>Licitação pública</td><td>acima de ~Bs 1.000.000</td><td>município inteiro, departamento</td></tr>
+    <tr><td>Contratação direta</td><td>casos previstos em lei</td><td>avaliar com advogado (exclusividade técnica)</td></tr></table></div>
+  <p class="small">Documentos típicos para concorrer: NIT, matrícula de comércio, RUPE, certidões de não-dívida, proposta técnica e econômica, experiência (o piloto conta) e garantias bancárias (seriedade da proposta e cumprimento do contrato), nas porcentagens que a norma define.</p>
+</section>
+
+<!-- ================= PRECO E DEPOIS ================= -->
+<section class="pg">
+  <h2>8. O que propor: preço e escala</h2>
+  <table><tr><th>Nível</th><th>Mensal por estabelecimento</th><th>Implantação única</th></tr>
+    <tr><td>1º nível (puesto / centro de salud)</td><td>US$ 180 (≈ Bs 1.250)</td><td>US$ 600</td></tr>
+    <tr><td>2º nível (hospital básico)</td><td>US$ 1.400</td><td>US$ 6.000</td></tr>
+    <tr><td>3º nível (hospital de especialidades)</td><td>US$ 3.800</td><td>US$ 15.000</td></tr></table>
+  <table><tr><th>Cenário</th><th>Estabelecimentos</th><th>Anual</th><th>Por habitante/ano</th></tr>
+    <tr><td>Red Centro (piloto)</td><td>26</td><td>US$ 70.800</td><td>US$ 0,39</td></tr>
+    <tr><td>Município de Santa Cruz</td><td>126</td><td>US$ 679.200</td><td>US$ 0,40</td></tr>
+    <tr><td>Departamento de Santa Cruz</td><td>677</td><td>US$ 2,64 M</td><td>US$ 0,78</td></tr>
+    <tr><td>Bolívia</td><td>3.880</td><td>US$ 14,2 M</td><td>US$ 1,16</td></tr></table>
+  <p class="small">Valores de referência, sem impostos, tipo de cambio Bs 6,96; número de estabelecimentos e população aproximados. Detalhe e premissas editáveis em <b>SIVEC-modelo-financeiro.xlsx</b>.</p>
+  <div class="rec"><b class="t">Atenção:</b> o piloto de uma rede <b>não paga sozinho</b> a equipe central (o equilíbrio vem perto de 108 centros de 1º nível). Negociar o piloto como <b>valor fixo mensal</b> que cubra a equipe mínima, ou <b>vinculado ao compromisso de ampliação</b>, ou com <b>financiamento de cooperação</b>.</div>
+
+  <h2 style="margin-top:14pt">9. Depois de assinar</h2>
+  <div class="step"><div class="n">25</div><div><b class="h">Mês 1 — Linha de base</b> Metas acordadas por escrito; responsável do município e referente em cada centro.</div></div>
+  <div class="step"><div class="n">26</div><div><b class="h">Meses 2–5 — Implantação centro por centro</b> Equipamentos e internet, configuração, capacitação por função, arranque acompanhado, papel em paralelo 2–4 semanas.</div></div>
+  <div class="step"><div class="n">27</div><div><b class="h">Todo mês — Fatura pontual e relatório</b> De uso e metas. Capital de giro para aguentar <b>90+ dias</b> de atraso de pagamento.</div></div>
+  <div class="step"><div class="n">28</div><div><b class="h">Mês 6 — Relatório de impacto</b> Proposta de ampliação (município inteiro → departamento), a tempo do POA seguinte.</div></div>
+
+  <div class="keep"><h2 style="margin-top:14pt">10. Riscos principais</h2>
+  <table><tr><th>Risco</th><th>Como reduzir</th></tr>
+    <tr><td>Conflito como servidor público</td><td>advogado antes de tudo; estrutura com representante separado</td></tr>
+    <tr><td>Atraso de pagamento do Estado</td><td>capital de giro de 4 meses; faturamento mensal pontual</td></tr>
+    <tr><td>Troca de autoridades</td><td>convênio com a instituição, não com a pessoa; resultados rápidos e visíveis</td></tr>
+    <tr><td>“O Ministério já tem um sistema”</td><td>posicionar o SIVEC como complemento integrado que envia dados ao sistema nacional</td></tr>
+    <tr><td>Tudo depende de você</td><td>líder técnico cedo, documentação e manuais</td></tr>
+    <tr><td>Segurança de dados</td><td>permissões, auditoria, cópias, revisão externa anual</td></tr></table></div>
+</section>
+
+<!-- ================= ANEXOS ================= -->
+<section class="pg">
+  <h2>Anexo A — Modelo de carta pedindo audiência (em espanhol)</h2>
+  <div class="letter">
+    <p>Santa Cruz de la Sierra, [fecha]</p>
+    <p>Señor/a<br>[Nombre]<br>[Cargo] — Secretaría Municipal de Salud<br>Gobierno Autónomo Municipal de Santa Cruz de la Sierra<br>Presente.-</p>
+    <p><b>Ref.: Solicitud de audiencia para presentar el SIVEC — resultados del piloto en el C.S. San Luis</b></p>
+    <p>De mi mayor consideración:</p>
+    <p>Me dirijo a usted para solicitar una audiencia de cuarenta minutos a fin de presentar el <b>SIVEC — Sistema Integral de Vigilancia y Enlace Clínico</b>, desarrollado por médicos de la Red Centro y en uso desde enero de 2026 en el Centro de Salud San Luis para el programa de prevención del cáncer de cuello uterino.</p>
+    <p>El SIVEC permite que cada paciente tenga una sola historia en toda la red, llena automáticamente los formularios oficiales, sigue a las pacientes con resultados alterados y genera los informes del SNIS sin planillas. En la audiencia mostraremos los resultados del piloto y una demostración en vivo, y propondremos una implantación por etapas con metas medibles.</p>
+    <p>Quedo a su disposición en el teléfono [__] o el correo [__].</p>
+    <p>Atentamente,</p>
+    <p><br>[Nombre]<br>[Cargo / empresa]</p>
+  </div>
+
+  <h2 style="margin-top:14pt">Anexo B — Lista de verificação geral</h2>
+  <div class="two">
+    <ul class="ck">
+      <li>Parecer do advogado sobre cargo público</li>
+      <li>Repositório e contas no meu nome</li>
+      <li>Provas de autoria guardadas</li>
+      <li>Registro de direito de autor (SENAPI)</li>
+      <li>Busca e pedido de marca (SENAPI)</li>
+      <li>Homonímia e escritura da S.R.L.</li>
+      <li>Matrícula de comércio (SEPREC)</li>
+      <li>NIT e faturamento eletrônico (SIN)</li>
+      <li>Licença municipal</li>
+      <li>Conta bancária da empresa</li>
+      <li>Contador contratado</li>
+    </ul>
+    <ul class="ck">
+      <li>Contrato de licença eu → S.R.L.</li>
+      <li>Contratos da equipe (cessão + sigilo)</li>
+      <li>Convênio do piloto San Luis</li>
+      <li>Supabase pago + cópias testadas</li>
+      <li>Domínio .bo e página publicada</li>
+      <li>Login, perfis e auditoria</li>
+      <li>Base de DEMO</li>
+      <li>RUPE no SICOES + certidões</li>
+      <li>Kit comercial (deck, demo, folha, proposta)</li>
+      <li>Carta de audiência enviada</li>
+      <li>Proposta formal entregue</li>
+    </ul>
+  </div>
+  <p class="small" style="margin-top:14pt">Documento de apoio do projeto SIVEC. Complementa: <b>SIVEC-guia-empresa-a-venta.md</b> (guia detalhado), <b>SIVEC-modelo-financeiro.xlsx</b> (números) e a apresentação de venda.</p>
+</section>
+</body>
+</html>

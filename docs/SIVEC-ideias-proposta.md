@@ -805,3 +805,4 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - **Encuesta de satisfacción** con caritas + 2 preguntas (¿le explicaron bien?, ¿le trataron con respeto?), anónima, a la salida.
 - **Admin:** contenidos, traducciones, mapa editable, uso y equipos (tótem US$ 1.000–1.500, tablet US$ 300).
 - **Idea pendiente:** gamificación de la satisfacción (“mi ganado / mi estancia” o árbol que crece). Privada por médico, pública solo por centro; crece con calidad + satisfacción; mínimo de 20 respuestas. **Esperando que el usuario elija la metáfora.**
+- **PDF paso a paso (empresa → gobierno):** docs/negocio/SIVEC-passo-a-passo-empresa-governo.pdf (12 páginas). Fuente: docs/negocio/pdf-src/passo-a-passo.html. Usuario aprobó el kiosco con mapa y la encuesta de satisfacción.
