@@ -582,3 +582,33 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
   - El QR no lleva datos del paciente, solo una llave; queda registrado quién abrió y cuándo.
   - El visor es web (software libre) y funciona en el celular; la ecografía igual.
   - Imagen: docs/imagen-09.png
+
+**Módulo 9 · Imagen: APROVADO** (incluye abrir con QR).
+
+### Módulo 10 · Odonto — dibujado, para aprobar
+- **Odontograma FDI por toques:** se toca la cara del diente (V, L, M, D, O) y se elige el hallazgo; rojo = por tratar, azul = realizado.
+  - Hallazgos: caries, obturación, ausente, extracción indicada, corona, endodoncia y sellante.
+  - Los índices CPO-D, IHO-S y riesgo de caries se calculan solos.
+  - Queda el historial de odontogramas por fecha.
+- **Historia y examen:**
+  - trae de la ficha SIVEC las alertas (HTA, alergia a penicilina, embarazo);
+  - motivo y hábitos por toques (incluye acullico);
+  - tejidos blandos, con alerta de cáncer oral;
+  - índice periodontal por sextante.
+- **Plan de tratamiento** armado desde el odontograma:
+  - por prioridad: urgencia, prevención, restaurador, cirugía, rehabilitación;
+  - en sesiones agendadas, con cobertura SUS;
+  - consentimiento con huella y derivación con el botón Derivar;
+  - alta odontológica básica y control automático a los 6 meses.
+- **Sesión en el sillón:**
+  - procedimiento por toques (anestesia con aviso de dosis en HTA, material con lote);
+  - receta que respeta las alergias;
+  - paquete de instrumental escaneado (trazabilidad de la esterilización);
+  - el odontograma se actualiza solo.
+- **Niños, embarazadas y escuelas:**
+  - dientes temporales y ceo-d, flúor y sellantes (aparece en el carnet de salud infantil);
+  - la consulta de la embarazada queda ligada al control prenatal;
+  - brigadas escolares sin internet.
+- **Agenda de sillones** con lugares para urgencia (ficha del día); **esterilización** con ciclos del autoclave, prueba biológica y paquetes vencidos bloqueados.
+- **Indicadores:** CPO-D a los 12 años (meta OMS < 3), altas, embarazadas con consulta, obturaciones vs extracciones, e insumos que se descuentan solos (Almacén).
+- Imágenes: docs/odonto-01..07.png · esboco-odonto.html
