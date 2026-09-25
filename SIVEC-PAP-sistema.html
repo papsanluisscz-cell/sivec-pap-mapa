@@ -3806,7 +3806,9 @@ async function consultaGuardar(row, editId) {
     const { error } = editId ? await sb.from('consultas').update(r).eq('id', editId) : await sb.from('consultas').insert([r]);
     const m = error && /Could not find the '([^']+)' column/.exec(error.message || '');
     if (!m || !(m[1] in r)) { if (!error && faltan.length) showToast('Consulta guardada. Faltan columnas en Supabase (' + faltan.join(', ') + '): ejecutar el Paso 7 del SQL.', 'err'); return { error }; }
-    const col = m[1], val = r[col]; delete r[col]; faltan.push(col);
+    const col = m[1], val = r[col]; delete r[col];
+    if (col === 'centro_id') continue; // opcional: solo sirve para separar por centro
+    faltan.push(col);
     if (val && typeof val === 'string' && col !== 'observaciones' && 'observaciones' in r) r.observaciones = [r.observaciones, (CONS_ETIQ[col] || col) + ': ' + val].filter(Boolean).join(' · ');
   }
   return { error: { message: 'Demasiadas columnas faltantes en la tabla consultas: ejecutar el Paso 7 del SQL.' } };
@@ -4086,10 +4088,12 @@ function soapVacio(v) {
   return !['subjetivo', 'objetivo_oce', 'objetivo_leucorrea', 'objetivo_color', 'objetivo', 'analisis', 'plan_texto', 'derivacion', 'observaciones'].some(k => v[k]) && !(v.plan || []).length
     && !Object.values(d.gineco || {}).some(Boolean);
 }
+// En algunos Supabase consultas.fecha es "timestamp" (vuelve 2026-09-25T00:00:00+00:00): se deja solo la fecha.
+function consultaSoloFecha(c) { if (c && c.fecha) c.fecha = String(c.fecha).slice(0, 10); return c; }
 async function getLatestConsulta(pacienteId) {
   if (!(await consultasOk())) return null;
   const { data, error } = await sb.from('consultas').select('*').eq('paciente_id', String(pacienteId)).order('fecha', { ascending: false }).order('created_at', { ascending: false }).limit(1);
-  return error || !data || !data.length ? null : data[0];
+  return error || !data || !data.length ? null : consultaSoloFecha(data[0]);
 }
 // Última consulta de cualquier toma de la misma paciente (para traer los datos gineco-obstétricos)
 async function ultimaConsultaDelGrupo(p) {
@@ -4212,7 +4216,7 @@ function consultaModalEl() {
     const v = soapLeer(form);
     if (soapVacio(v)) { alert('La consulta está vacía.'); return; }
     const doctora = form.querySelector('[data-s="doctora"]').value;
-    const row = await consultaFila(Object.assign(v, { paciente_id: String(consultaPaciente.id), fecha: form.querySelector('[data-s="fecha"]').value || hoyISO(), doctora }));
+    const row = await consultaFila(Object.assign(v, { paciente_id: String(consultaPaciente.id), centro_id: consultaPaciente.centro_id || undefined, fecha: form.querySelector('[data-s="fecha"]').value || hoyISO(), doctora }));
     const { error } = await consultaGuardar(row, consultaEditId);
     if (error) { alert('Error al guardar la consulta: ' + error.message); return; }
     espRecordar(doctora, espBuscar(v.codigo_esp));
@@ -4276,7 +4280,7 @@ async function guardarSoapDeRegistro(nueva) {
   // Si solo quedó marcada la "Toma de PAP realizada" que viene por defecto, no se guarda consulta
   const soloToma = soapVacio(Object.assign({}, v, { objetivo: v.detalle.o_libre || ((v.detalle.o_otros || []).some(x => !x.startsWith('Toma')) ? 'x' : null) }));
   if (soapVacio(v) || soloToma) { soapEscribir(det, null, { esp: espPorDoctora(nueva.doctora), ootros: ['Toma de PAP realizada'] }); return; }
-  const row = await consultaFila(Object.assign(v, { paciente_id: String(nueva.id), fecha: nueva.fecha_toma || hoyISO(), doctora: nueva.doctora || null }));
+  const row = await consultaFila(Object.assign(v, { paciente_id: String(nueva.id), centro_id: nueva.centro_id || undefined, fecha: nueva.fecha_toma || hoyISO(), doctora: nueva.doctora || null }));
   const { error } = await consultaGuardar(row, null);
   if (error) showToast('La toma se guardó, pero la consulta no: ' + error.message, 'err');
   else espRecordar(nueva.doctora, espBuscar(v.codigo_esp));
@@ -4377,7 +4381,7 @@ async function openFicha(p) {
     sb.from('colposcopias').select('*').in('paciente_id', grupo.map(x => x.id)).order('fecha', { ascending: false }),
     consultasOk().then(ok => ok ? sb.from('consultas').select('*').in('paciente_id', grupo.map(x => String(x.id))) : { data: [] }),
   ]);
-  fichaConsultas = (cons && cons.data) || [];
+  fichaConsultas = ((cons && cons.data) || []).map(consultaSoloFecha);
   if (fichaPaciente === p) render(data || []);
 }
 // "+ Nueva toma": abre Registrar con los datos personales ya completados.
@@ -4915,6 +4919,7 @@ function b64ToBytes(b64) {
 
 function fmtFecha(d) {
   if (!d) return '';
+  if (/^\d{4}-\d{2}-\d{2}T/.test(String(d))) d = String(d).slice(0, 10); // columnas "timestamp" (ej. consultas.fecha en algunos Supabase)
   const parts = String(d).split('-');
   if (parts.length !== 3) return d;
   return `${parts[2]}/${parts[1]}/${parts[0]}`;
