@@ -795,3 +795,13 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - Control de equipos: último envío, pendientes, bloqueo y borrado a distancia.
 
 ### Guía de empresa a venta: docs/negocio/SIVEC-guia-empresa-a-venta.md
+
+### Kiosco de información — dibujado, para aprobar (docs/kiosco-01..05.png · esboco-kiosco.html)
+- **Tótem táctil en la entrada:** 6 botones grandes (dónde voy, mi turno, ¿resultado listo?, documentos, campañas, encuesta). Audio en castellano, quechua y guaraní; se cierra solo a los 30 s.
+- **Mapa del hospital por pisos** (idea del usuario): “usted está aquí” → destino, con indicaciones, audio, impresión y QR al celular. Ruta sin escaleras.
+  - “Visitar a un internado” da piso y cama, sin diagnóstico.
+  - El mismo mapa va en la TV y en el SMS de la cita.
+- **Mi turno** con huella o CI: quien tiene cita imprime su ficha sin fila. Los resultados solo dicen “listo / en proceso”.
+- **Encuesta de satisfacción** con caritas + 2 preguntas (¿le explicaron bien?, ¿le trataron con respeto?), anónima, a la salida.
+- **Admin:** contenidos, traducciones, mapa editable, uso y equipos (tótem US$ 1.000–1.500, tablet US$ 300).
+- **Idea pendiente:** gamificación de la satisfacción (“mi ganado / mi estancia” o árbol que crece). Privada por médico, pública solo por centro; crece con calidad + satisfacción; mínimo de 20 respuestas. **Esperando que el usuario elija la metáfora.**
