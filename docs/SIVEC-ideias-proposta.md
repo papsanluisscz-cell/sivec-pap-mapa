@@ -775,3 +775,23 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - **Presentación de venta** (27 diapositivas, en español) con notas del orador: problema → solución → prueba → modelo y precios → confianza → propuesta de piloto.
   - Arquetipo: Cuidador con voz de Sabio.
   - Números entre [__] se completan con datos reales.
+
+### Ambulancias y traslados — dibujado, para aprobar (docs/ambulancias-01..08.png · esboco-ambulancias.html)
+- **Central:** mapa en vivo (“Uber” de ambulancias) y sugerencia de la más cercana con el equipo necesario. Entradas: Derivar urgente, 160 y hospital.
+- **Pedido desde el centro:** armado con la ficha, prioridad, destino con cama confirmada y requerimientos; SMS a la familia. Sin internet sale por SMS.
+- **App del chofer** (navegador del celular): alarma de misión (aceptar en 60 s), ruta, estados con hora y control diario del vehículo.
+- **Paramédico:** signos cada 10 min; si empeora, eleva la prioridad y alerta al hospital; funciona sin señal.
+- **Hospital:** “llegan pronto”, con signos en vivo y qué preparar.
+- **Entrega:** SBAR con huella de quien entrega y quien recibe; línea de tiempo automática en la ficha.
+- **Flota:** turnos, oxígeno, km, mantenimiento. Sin control diario no recibe misiones rojas.
+- **Indicadores:** tiempos pedido→salida y pedido→hospital, motivos, dónde faltan ambulancias.
+
+### Funciona sin internet — dibujado, para aprobar (docs/sin-internet-01..07.png · esboco-sin-internet.html)
+- El equipo guarda una copia cifrada de los pacientes del centro y una cola de envío; envía en orden, con la hora real.
+- Barra de estado siempre visible; aviso si un equipo pasa más de 24 h sin enviar.
+- Paciente nueva con número provisional; al volver la conexión se une a su historia (nunca se duplica).
+- Si dos personas registran lo mismo, decide una persona y queda registrado. Consultas y notas se suman, no se pisan.
+- Qué funciona sin internet y qué espera (SEGIP, referencias, resultados de fuera, SMS).
+- Control de equipos: último envío, pendientes, bloqueo y borrado a distancia.
+
+### Guía de empresa a venta: docs/negocio/SIVEC-guia-empresa-a-venta.md

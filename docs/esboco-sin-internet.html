@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIVEC sin internet</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --wine:#7d2a4c; --wine-d:#5a1c36; --ink:#2d2429; --soft:#7a6a71; --line:#eadde3; --paper:#faf6f4; --tint:#f7e9ef;
+    --n1:#2f6fb0; --n2:#0e7490; --n3:#7c3aed; --n4:#b4235a; --ok:#15803d; --okbg:#dcf3e5; --warn:#8a5a00; --warnbg:#fdf0d5; --bad:#991b1b; --badbg:#fde2e2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#e8e2e5; font-family:"Source Sans 3","Segoe UI",Arial,sans-serif; color:var(--ink); }
+  .topbar { position:sticky; top:0; z-index:5; background:#2a1720; color:#fff; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; }
+  .topbar b { margin-right:6px; font-size:15px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; border:1px solid #6b4a58; background:transparent; color:#fff; border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tab.on { background:#fff; color:var(--wine-d); border-color:#fff; }
+  .warn { max-width:1100px; margin:14px auto 0; background:#fff7e0; border:1px solid #ecd9a0; border-radius:10px; padding:10px 14px; font-size:14px; color:#5b4712; }
+  .scr { display:none; max-width:1100px; margin:14px auto 30px; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,.14); }
+  .scr.on { display:block; }
+  .app { background:linear-gradient(135deg,#6d2142,#9c3a5f); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; }
+  .app .brand { font-weight:800; font-size:20px; letter-spacing:.04em; } .app .brand span { font-size:11px; background:#fff; color:var(--wine-d); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:3px; letter-spacing:.08em; }
+  .app .who { font-size:14px; opacity:.95; }
+  .body { padding:18px 22px 22px; }
+  h2 { margin:0 0 4px; font-size:20px; } .sub { color:var(--soft); font-size:14px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cols { display:grid; gap:14px; } .c2 { grid-template-columns:1fr 1fr; } .c3 { grid-template-columns:1fr 1fr 1fr; } .c21 { grid-template-columns:1.6fr 1fr; }
+  .lbl { font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); margin:10px 0 5px; }
+  .lbl:first-child { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:13px; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .chip.on { background:var(--tint); border-color:var(--wine); color:var(--wine-d); font-weight:700; }
+  .inp { border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13.5px; background:#fff; min-height:36px; }
+  .inp.tall { min-height:62px; line-height:1.45; }
+  .pri { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pri div { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; background:#fff; }
+  .pri div b { display:block; font-size:14px; } .pri div.on { border:2px solid var(--wine); background:var(--tint); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  .auto { background:#f3f7fb; border:1px dashed #b9cde3; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.55; }
+  .auto b { color:#1e4f8a; }
+  .att { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; } .att span { font-size:12.5px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13.5px; font-weight:700; border-radius:9px; padding:8px 14px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .btn.p { background:var(--wine); border-color:var(--wine); color:#fff; } .btn.g { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fp { width:26px; height:30px; vertical-align:middle; }
+  table.l { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; border-radius:12px; overflow:hidden; }
+  table.l th { text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--soft); padding:9px 10px; border-bottom:1px solid var(--line); background:#fff; }
+  table.l td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .st { font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .st.bad { background:var(--badbg); color:var(--bad); } .st.warn { background:var(--warnbg); color:var(--warn); } .st.ok { background:var(--okbg); color:var(--ok); } .st.info { background:#e0ecfa; color:#1e4f8a; } .st.mut { background:#eee; color:#555; }
+  .lvl { font-size:11px; font-weight:800; color:#fff; border-radius:6px; padding:2px 7px; }
+  .mini { font-size:12px; color:var(--soft); }
+  .note { max-width:1100px; margin:-16px auto 30px; background:#fff; border-radius:10px; padding:12px 16px; font-size:14px; line-height:1.5; color:#3b3035; border-left:4px solid var(--wine); }
+  /* flujo */
+  .levels { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin:6px 0 4px; }
+  .lv { text-align:center; padding:0 8px; }
+  .lv .ic { width:74px; height:74px; border-radius:18px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; }
+  .lv b { display:block; font-size:15px; } .lv span { font-size:12.5px; color:var(--soft); }
+  .arrows { position:relative; height:74px; margin-top:-120px; margin-bottom:60px; pointer-events:none; }
+  .loop { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+  .loop div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12.3px; text-align:center; position:relative; }
+  .loop div b { display:block; font-size:13px; } .loop i { font-style:normal; display:block; font-size:18px; }
+  .loop div:not(:last-child)::after { content:"›"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--soft); font-size:18px; }
+  .world { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .world div { background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:12.3px; line-height:1.4; }
+  .world b { display:block; font-size:13px; color:var(--wine-d); }
+  /* seguimiento */
+  .steps { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin:8px 0 4px; }
+  .steps div { text-align:center; font-size:12px; position:relative; padding-top:30px; }
+  .steps div::before { content:""; position:absolute; top:9px; left:0; right:0; height:4px; background:#e3d6dc; }
+  .steps div:first-child::before { left:50%; } .steps div:last-child::before { right:50%; }
+  .steps div.done::before { background:var(--ok); } .steps div.cur::before { background:linear-gradient(90deg,var(--ok) 50%,#e3d6dc 50%); }
+  .steps i { position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:50%; background:#e3d6dc; color:#fff; font-style:normal; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:3px solid var(--paper); }
+  .steps .done i { background:var(--ok); } .steps .cur i { background:var(--wine); box-shadow:0 0 0 4px rgba(125,42,76,.18); }
+  .steps b { display:block; font-size:12.5px; } .steps small { color:var(--soft); }
+  .tl { border-left:3px solid var(--line); margin-left:8px; padding-left:14px; }
+  .tl div { position:relative; font-size:13px; margin-bottom:10px; line-height:1.4; }
+  .tl div::before { content:""; position:absolute; left:-21px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--c,#999); border:2px solid #fff; }
+  .kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .kpi small { display:block; font-size:12px; color:var(--soft); font-weight:600; } .kpi b { font-size:28px; letter-spacing:-.01em; } .kpi span { font-size:12px; color:var(--soft); }
+  .bars div.r { display:grid; grid-template-columns:170px 1fr 54px; align-items:center; gap:10px; font-size:13px; margin:7px 0; }
+  .bars .trk { height:14px; border-radius:0 4px 4px 0; background:transparent; position:relative; }
+  .bars .fill { height:14px; border-radius:0 4px 4px 0; background:var(--wine); }
+  .bars .ref { position:absolute; top:-3px; bottom:-3px; width:2px; background:#2d2429; }
+  .bars .v { font-weight:700; text-align:right; }
+  .alertc { border-left:4px solid var(--bad); }
+
+  .role .rh { display:flex; gap:10px; align-items:center; margin-bottom:8px; } .role .rh b { display:block; font-size:15px; } .role .rh small { color:var(--soft); font-size:12px; }
+  .ri { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .todo { display:flex; align-items:center; gap:10px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .todo:last-child { border-bottom:none; }
+  .todo .st { min-width:30px; text-align:center; font-size:13px; }
+  .mini2 { font-size:13px; line-height:1.5; } .mini2 b { display:block; margin-bottom:2px; }
+  .flowbar { display:flex; gap:6px; margin-bottom:12px; } .flowbar span { flex:1; text-align:center; font-size:13px; font-weight:700; padding:7px; border-radius:9px; background:#fff; border:1px solid var(--line); color:var(--soft); }
+  .flowbar span.on { background:var(--okbg); color:var(--ok); border-color:#b8e3c7; } .flowbar span.cur { background:var(--wine); color:#fff; border-color:var(--wine); }
+  .found { display:flex; gap:12px; align-items:center; margin-top:10px; padding:10px; border-radius:10px; background:#f3f9f5; border:1px solid #cfe9d8; }
+  .photo2 { width:64px; height:72px; border-radius:10px; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:24px; flex:none; }
+  .k2 { display:block; font-size:10.5px; font-weight:700; color:var(--soft); text-transform:uppercase; letter-spacing:.04em; }
+  .scanner { width:150px; height:160px; margin:6px auto 0; border-radius:18px; background:radial-gradient(circle at 50% 45%, #fff 0, #f7e9ef 70%); border:3px solid #d9b9c6; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -6px 12px rgba(125,42,76,.12); }
+  .ticket { margin-top:12px; text-align:center; }
+  .tk { border:2px dashed var(--wine); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:2px; font-size:13.5px; } .tk b { font-size:40px; color:var(--wine-d); letter-spacing:.04em; line-height:1.1; } .tk small { color:var(--soft); font-size:11.5px; }
+  .q2 { padding:8px 10px; border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:13.5px; background:#fff; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; } .q2 .mini { width:100%; }
+  .q2.cur { border:2px solid var(--wine); background:var(--tint); } .q2 .st { margin-left:auto; }
+  .vit2 { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .vit2 div { background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 8px; font-size:16px; font-weight:800; } .vit2 small { display:block; font-size:10.5px; color:var(--soft); font-weight:700; text-transform:uppercase; }
+  .tv { background:#120810; border-radius:16px; padding:14px; color:#fff; border:8px solid #2a2a2a; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
+  .tvh { display:flex; justify-content:space-between; font-size:13px; color:#cfb7c2; font-weight:700; letter-spacing:.08em; }
+  .tvnow { background:linear-gradient(135deg,#7d2a4c,#b4235a); border-radius:12px; padding:16px; text-align:center; } .tvnow small { display:block; font-size:13px; letter-spacing:.2em; font-weight:800; color:#ffe4ee; }
+  .tvnow b { display:block; font-size:64px; line-height:1.05; letter-spacing:.04em; } .tvnow span { display:block; font-size:24px; font-weight:700; } .tvnow em { display:block; font-style:normal; font-size:20px; margin-top:4px; color:#ffe4ee; }
+  .tvlist div { display:flex; gap:12px; align-items:baseline; font-size:18px; padding:6px 4px; border-bottom:1px solid #3a2530; } .tvlist b { color:#f1a7c3; min-width:70px; } .tvlist span { margin-left:auto; color:#cfb7c2; font-size:15px; }
+  .tvf { font-size:13px; color:#cfb7c2; }
+  .doc { display:grid; grid-template-columns:34px 1fr auto auto; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--line); font-size:13.5px; } .di { font-size:22px; text-align:center; } .dest { font-size:12.5px; color:var(--soft); font-weight:600; }
+  .st.warn { margin:0; max-width:none; padding:2px 9px; border:none; font-size:11.5px; }
+  .todo .st.warn { font-size:13px; }
+
+  .svc { display:flex; flex-wrap:wrap; gap:8px; } .svc span { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 12px; font-size:13.5px; font-weight:600; }
+  .prob { display:flex; align-items:center; gap:8px; font-size:13.5px; padding:6px 0; border-bottom:1px dashed var(--line); } .prob .mini { margin-left:auto; }
+  .dotc { width:10px; height:10px; border-radius:50%; flex:none; }
+  .tpl { border:1px solid; border-left-width:5px; border-radius:10px; padding:9px 11px; font-size:13px; line-height:1.45; background:#fff; } .tpl b { display:block; font-size:14px; margin-bottom:2px; }
+  .opt { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; } .opt span { border:1px solid var(--line); border-radius:12px; padding:10px; font-size:22px; background:#fff; text-align:center; } .opt b { display:block; font-size:14px; margin-top:4px; } .opt small { display:block; font-size:12px; color:var(--soft); }
+  .opt .sel { border:2px solid var(--wine); background:var(--tint); }
+  .side { border-left:4px solid var(--line); padding:5px 10px; margin-bottom:8px; font-size:13.5px; line-height:1.45; } .side b { display:block; }
+  .stk { display:grid; grid-template-columns:150px 1fr auto; gap:8px; align-items:center; font-size:13px; margin:6px 0; } .stk div { height:10px; background:#eee4e8; border-radius:5px; overflow:hidden; } .stk i { display:block; height:100%; background:#15803d; border-radius:5px; } .stk b { font-size:12.5px; }
+  .phn { background:#e5ddd5; border:9px solid #1f1f1f; border-radius:26px; padding:10px; display:flex; flex-direction:column; gap:8px; min-height:430px; }
+  .phh { background:#075e54; color:#fff; font-size:13px; font-weight:700; margin:-10px -10px 4px; padding:10px 12px; border-radius:16px 16px 0 0; }
+  .msg { font-size:13px; line-height:1.4; border-radius:10px; padding:7px 9px; max-width:88%; box-shadow:0 1px 1px rgba(0,0,0,.12); } .msg.in { background:#fff; align-self:flex-start; } .msg.out { background:#dcf8c6; align-self:flex-end; font-weight:800; }
+  .ck { font-size:13.5px; line-height:1.45; } .ck b { display:block; font-size:15px; margin-bottom:3px; }
+
+  .kv2 { display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:4px 0; border-bottom:1px dashed var(--line); } .kv2 span { color:var(--soft); }
+  .req { display:flex; flex-wrap:wrap; gap:6px; } .req span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .req .ok { background:var(--okbg); color:var(--ok); } .req .no { background:var(--warnbg); color:var(--warn); }
+  .qx { position:relative; height:30px; background:#f3eef0; border-radius:8px; margin:6px 0; padding-left:34px; } .qx b { position:absolute; left:8px; top:6px; font-size:13px; }
+  .qx span { position:absolute; top:3px; bottom:3px; margin-left:34px; border-radius:6px; color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; padding:0 6px; white-space:nowrap; overflow:hidden; }
+  .who2 { display:grid; gap:6px; } .who2 div { border:1px solid var(--line); border-radius:8px; padding:6px 9px; background:#f7fbf8; font-size:12.5px; } .who2 b { display:block; color:var(--wine-d); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; } .who2 span { color:#166534; }
+  .beds { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .bed { border-radius:10px; padding:8px; font-size:13px; font-weight:700; border:1px solid var(--line); min-height:76px; } .bed b { display:block; font-size:18px; } .bed small { display:block; font-weight:500; font-size:11.5px; color:var(--soft); }
+  .bed.p { background:#fbe4ee; } .bed.a { background:#fde2e2; } .bed.g { background:#ede4fb; } .bed.free { background:#ecf8f1; color:#15803d; } .bed.clean { background:#fdf0d5; color:#8a5a00; } .bed.sel { outline:3px solid var(--wine); }
+  .leg2 { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-left:6px; border:1px solid var(--line); }
+  .dose { border:1px solid var(--line); border-radius:10px; padding:7px 9px; margin-bottom:6px; font-size:13px; display:flex; flex-direction:column; } .dose span { color:var(--soft); font-size:12px; } .dose em { font-style:normal; margin-top:2px; }
+  .srch { border-left:4px solid #c2410c; background:#fff7f0; border-radius:6px; padding:6px 9px; margin-bottom:6px; font-size:13px; } .srch b { display:block; font-size:12px; color:#c2410c; text-transform:uppercase; letter-spacing:.04em; }
+  .amb { border:9px solid #1f1f1f; border-radius:26px; background:#fff; overflow:hidden; min-height:420px; display:flex; flex-direction:column; }
+  .ah { background:#ea580c; color:#fff; font-weight:800; font-size:14px; padding:10px 12px; } .ab { padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .big2 { font-size:40px; font-weight:900; text-align:center; color:#ea580c; margin-top:6px; }
+
+  .tree div { padding:6px 8px; border-radius:8px; font-size:13.5px; } .tree small { color:var(--soft); margin-left:4px; }
+  .tree .t0 { font-weight:800; } .tree .t1 { padding-left:18px; font-weight:700; } .tree .t2 { padding-left:32px; font-weight:700; } .tree .t3 { padding-left:50px; } .tree .mut { color:var(--soft); }
+  .tree .on { background:#f3eef0; } .tree .sel { background:var(--tint); outline:2px solid var(--wine); }
+  .fing { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:8px; } .fing span { font-size:12px; font-weight:700; border-radius:999px; padding:3px 9px; background:#f3eef0; } .fing .done { background:var(--okbg); color:var(--ok); } .fing .cur { background:var(--wine); color:#fff; }
+  table.mx td, table.mx th { text-align:center; font-size:12.5px; padding:8px 6px; } table.mx td:first-child, table.mx th:first-child { text-align:left; }
+  table.mx2 td, table.mx2 th { text-align:center; font-size:12.5px; } table.mx2 td:first-child, table.mx2 th:first-child { text-align:left; }
+  table.mx2 td.on { color:#15803d; font-size:18px; } table.mx2 td.pi { color:#c2410c; font-size:18px; } table.mx2 td { color:#c9bcc2; font-size:18px; } table.mx2 td:first-child { font-size:13.5px; color:var(--ink); }
+  .catl { padding:8px 10px; border-radius:9px; font-size:13.5px; margin-bottom:4px; display:flex; justify-content:space-between; } .catl small { color:var(--soft); } .catl.on { background:var(--tint); font-weight:700; }
+  table.mx2 { table-layout:fixed; } table.mx2 th { font-size:10px; padding:6px 3px; letter-spacing:.02em; white-space:normal; text-align:center; } table.mx2 th:first-child { width:170px; } table.mx2 td { padding:8px 3px; }
+  .ring2 { width:150px; height:150px; border-radius:50%; margin:6px auto 0; background:conic-gradient(#7d2a4c 0 71%, #eadde3 71% 100%); display:flex; align-items:center; justify-content:center; } .ring2 > div { width:118px; height:118px; border-radius:50%; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; color:var(--soft); } .ring2 b { font-size:40px; color:var(--ink); line-height:1; }
+  .ctl { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; } .ctl span { text-align:center; border-radius:10px; padding:8px 4px; font-weight:800; font-size:14px; background:#f3eef0; color:#9c8b92; } .ctl small { display:block; font-weight:600; font-size:11px; } .ctl .d { background:#dcf3e5; color:#15803d; } .ctl .n { background:var(--wine); color:#fff; }
+  .chk3 { display:flex; flex-direction:column; gap:4px; } .chk3 span { font-size:12.8px; font-weight:600; border-radius:7px; padding:3px 8px; } .chk3 .ok { background:#ecf8f1; color:#15803d; } .chk3 .no { background:#fdf0d5; color:#8a5a00; }
+  .rk { display:flex; gap:10px; align-items:center; font-size:14px; padding:7px 0; border-bottom:1px dashed var(--line); } .rk .st { min-width:44px; text-align:center; }
+  .vg { width:100%; border-collapse:separate; border-spacing:4px; font-size:12.5px; } .vg th { font-size:10.5px; text-transform:uppercase; color:var(--soft); font-weight:800; text-align:center; } .vg th:first-child { text-align:left; }
+  .vg td { text-align:center; border-radius:8px; padding:5px 2px; font-weight:700; } .vg td:first-child { text-align:left; font-weight:700; background:none; padding-left:0; }
+  .vg .d { background:#dcf3e5; color:#15803d; } .vg .h { background:var(--wine); color:#fff; } .vg .a { background:#fde2e2; color:#991b1b; } .vg .f { background:#f3eef0; color:#9c8b92; } .vg .x { background:none; }
+  .fr { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:13.5px; } .fr:last-child { border:none; }
+  .tbig { font-size:30px; font-weight:900; line-height:1; }
+  .zn { display:grid; grid-template-columns:150px 1fr 60px; gap:8px; align-items:center; font-size:13px; padding:4px 0; }
+  .bar2 { height:12px; border-radius:6px; background:#eee; position:relative; overflow:hidden; } .bar2 i { position:absolute; left:0; top:0; bottom:0; border-radius:6px; } .bar2 .m { position:absolute; top:-2px; bottom:-2px; width:2px; background:#2d2429; }
+  .flow3 { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; } .flow3 span { text-align:center; font-size:12.5px; font-weight:700; border-radius:10px; padding:8px 4px; background:#f3eef0; color:#8a7a81; } .flow3 span small { display:block; font-weight:600; font-size:11px; } .flow3 .d { background:#dcf3e5; color:#15803d; } .flow3 .n { background:var(--wine); color:#fff; }
+  .al { display:flex; flex-wrap:wrap; gap:6px; } .al span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .al .r { background:#fde2e2; color:#991b1b; } .al .y { background:#fdf0d5; color:#8a5a00; } .al .g { background:#ecf8f1; color:#15803d; }
+  table.lab { width:100%; border-collapse:collapse; font-size:12.8px; } table.lab th { font-size:11px; text-transform:uppercase; color:var(--soft); text-align:left; padding:4px 6px; border-bottom:1px solid var(--line); } table.lab td { padding:5px 6px; border-bottom:1px dashed var(--line); }
+  .dt { display:inline-block; min-width:22px; text-align:center; border-radius:6px; padding:1px 6px; font-weight:800; font-size:12px; } .dt.ok { background:#dcf3e5; color:#15803d; } .dt.w { background:#fdf0d5; color:#8a5a00; } .dt.b { background:#fde2e2; color:#991b1b; } .dt.p { background:#eee; color:#888; }
+  .phs { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .dev { width:280px; height:560px; margin:0 auto; border-radius:36px; border:9px solid #17121a; background:#fff; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 14px 30px rgba(60,20,40,.2); }
+  .dev .sb { height:24px; display:flex; justify-content:space-between; align-items:center; padding:0 16px; font-size:10.5px; font-weight:700; color:#fff; background:var(--wine-d); flex:none; }
+  .dev .hd { background:linear-gradient(145deg,#8a3056,#5a1c36); color:#fff; padding:8px 14px 12px; flex:none; font-size:12px; } .dev .hd strong { display:block; font-size:16px; }
+  .dev .ct { flex:1; overflow:hidden; padding:10px; display:flex; flex-direction:column; gap:8px; background:#faf6f8; }
+  .dev .c { background:#fff; border:1px solid var(--line); border-radius:14px; padding:9px 11px; font-size:12.3px; line-height:1.4; }
+  .dev .c .t { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--soft); font-weight:800; margin-bottom:3px; }
+  .dev .nv { flex:none; display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); background:#fff; padding:5px 0 8px; text-align:center; font-size:10px; font-weight:700; color:#8a7a81; } .dev .nv .o { color:var(--wine); }
+  .dev .li { display:flex; justify-content:space-between; gap:6px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .dev .bt2 { display:block; text-align:center; font-weight:800; font-size:12.5px; border-radius:10px; padding:8px; background:var(--wine); color:#fff; margin-top:6px; } .dev .bt2.o2 { background:#fff; color:var(--wine); border:1.5px solid var(--wine); }
+  .cap2 { text-align:center; font-size:13.5px; margin-top:10px; color:#43363d; line-height:1.4; }
+  .bar { height:9px; border-radius:6px; background:#eee; overflow:hidden; } .bar i { display:block; height:100%; background:var(--ok,#15803d); }
+  .tl2 { display:grid; grid-template-columns:1fr 70px 1fr; gap:0; }
+  .tlc { border-radius:14px; padding:12px 14px; } .tlc h4 { margin:0 0 10px; font-size:15px; }
+  .ev { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 10px; font-size:12.8px; margin-bottom:7px; line-height:1.35; } .ev small { color:var(--soft); display:block; font-size:11.5px; }
+  .ev.lk { border:2px solid var(--wine); }
+  .ring2 { width:150px; height:150px; border-radius:50%; margin:6px auto 0; background:conic-gradient(#7d2a4c 0 71%, #eadde3 71% 100%); display:flex; align-items:center; justify-content:center; } .ring2 > div { width:118px; height:118px; border-radius:50%; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; color:var(--soft); } .ring2 b { font-size:40px; color:var(--ink); line-height:1; }
+  .ctl { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; } .ctl span { text-align:center; border-radius:10px; padding:8px 4px; font-weight:800; font-size:14px; background:#f3eef0; color:#9c8b92; } .ctl small { display:block; font-weight:600; font-size:11px; } .ctl .d { background:#dcf3e5; color:#15803d; } .ctl .n { background:var(--wine); color:#fff; }
+  .chk3 { display:flex; flex-direction:column; gap:4px; } .chk3 span { font-size:12.8px; font-weight:600; border-radius:7px; padding:3px 8px; } .chk3 .ok { background:#ecf8f1; color:#15803d; } .chk3 .no { background:#fdf0d5; color:#8a5a00; }
+  .rk { display:flex; gap:10px; align-items:center; font-size:14px; padding:7px 0; border-bottom:1px dashed var(--line); } .rk .st { min-width:44px; text-align:center; }
+  .flow3 { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; } .flow3 span { text-align:center; font-size:12.5px; font-weight:700; border-radius:10px; padding:8px 4px; background:#f3eef0; color:#8a7a81; } .flow3 span small { display:block; font-weight:600; font-size:11px; } .flow3 .d { background:#dcf3e5; color:#15803d; } .flow3 .n { background:var(--wine); color:#fff; }
+  .al { display:flex; flex-wrap:wrap; gap:6px; } .al span { font-size:12.5px; font-weight:700; border-radius:8px; padding:4px 9px; } .al .r { background:#fde2e2; color:#991b1b; } .al .y { background:#fdf0d5; color:#8a5a00; } .al .g { background:#ecf8f1; color:#15803d; }
+  table.lab { width:100%; border-collapse:collapse; font-size:12.8px; } table.lab th { font-size:11px; text-transform:uppercase; color:var(--soft); text-align:left; padding:4px 6px; border-bottom:1px solid var(--line); } table.lab td { padding:5px 6px; border-bottom:1px dashed var(--line); }
+  .dt { display:inline-block; min-width:22px; text-align:center; border-radius:6px; padding:1px 6px; font-weight:800; font-size:12px; } .dt.ok { background:#dcf3e5; color:#15803d; } .dt.w { background:#fdf0d5; color:#8a5a00; } .dt.b { background:#fde2e2; color:#991b1b; } .dt.p { background:#eee; color:#888; }
+  .phs { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .dev { width:280px; height:560px; margin:0 auto; border-radius:36px; border:9px solid #17121a; background:#fff; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 14px 30px rgba(60,20,40,.2); }
+  .dev .sb { height:24px; display:flex; justify-content:space-between; align-items:center; padding:0 16px; font-size:10.5px; font-weight:700; color:#fff; background:var(--wine-d); flex:none; }
+  .dev .hd { background:linear-gradient(145deg,#8a3056,#5a1c36); color:#fff; padding:8px 14px 12px; flex:none; font-size:12px; } .dev .hd strong { display:block; font-size:16px; }
+  .dev .ct { flex:1; overflow:hidden; padding:10px; display:flex; flex-direction:column; gap:8px; background:#faf6f8; }
+  .dev .c { background:#fff; border:1px solid var(--line); border-radius:14px; padding:9px 11px; font-size:12.3px; line-height:1.4; }
+  .dev .c .t { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--soft); font-weight:800; margin-bottom:3px; }
+  .dev .nv { flex:none; display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); background:#fff; padding:5px 0 8px; text-align:center; font-size:10px; font-weight:700; color:#8a7a81; } .dev .nv .o { color:var(--wine); }
+  .dev .li { display:flex; justify-content:space-between; gap:6px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .dev .bt2 { display:block; text-align:center; font-weight:800; font-size:12.5px; border-radius:10px; padding:8px; background:var(--wine); color:#fff; margin-top:6px; } .dev .bt2.o2 { background:#fff; color:var(--wine); border:1.5px solid var(--wine); }
+  .cap2 { text-align:center; font-size:13.5px; margin-top:10px; color:#43363d; line-height:1.4; }
+  .bar { height:9px; border-radius:6px; background:#eee; overflow:hidden; } .bar i { display:block; height:100%; background:var(--ok,#15803d); }
+  .tl2 { display:grid; grid-template-columns:1fr 70px 1fr; gap:0; }
+  .tlc { border-radius:14px; padding:12px 14px; } .tlc h4 { margin:0 0 10px; font-size:15px; }
+  .ev { background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 10px; font-size:12.8px; margin-bottom:7px; line-height:1.35; } .ev small { color:var(--soft); display:block; font-size:11.5px; }
+  .ev.lk { border:2px solid var(--wine); }
+  .paper { background:#fff; max-width:1000px; margin:0 auto; border:1px solid #ddd; box-shadow:0 4px 16px rgba(0,0,0,.10); padding:26px 30px; font-size:12px; color:#222; line-height:1.35; }
+  .ph1 { display:flex; align-items:center; gap:12px; border-bottom:3px solid var(--wine); padding-bottom:8px; }
+  .ph1 .lg { width:40px; height:40px; border-radius:24%; background:linear-gradient(145deg,#9c3a5f,#5a1c36); color:#fff; font-weight:900; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .ph1 h3 { margin:0; font-size:18px; letter-spacing:.02em; } .ph1 .sm { font-size:11px; color:#666; }
+  .sec { margin-top:10px; border:1px solid #d8cdd2; border-radius:6px; overflow:hidden; }
+  .sec > h5 { margin:0; background:#f3e7ec; color:var(--wine-d); font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; padding:4px 8px; }
+  .sec .in2 { padding:6px 8px; }
+  .fg { display:grid; gap:4px 10px; } .fg div { border-bottom:1px solid #eee; padding:2px 0; } .fg small { display:block; font-size:9.5px; color:#8a7a81; text-transform:uppercase; letter-spacing:.03em; } .fg b { font-size:12.5px; }
+  .pt { width:100%; border-collapse:collapse; font-size:11.3px; } .pt th { background:#faf5f7; font-size:9.8px; text-transform:uppercase; color:#6f6168; border:1px solid #e6dce0; padding:3px 4px; text-align:left; } .pt td { border:1px solid #eee4e8; padding:3px 4px; }
+  .ya { color:#991b1b; font-weight:800; } .no2 { color:#15803d; }
+  .alx { background:#fff4f4; border:1px solid #f3c4c4; border-radius:6px; padding:5px 8px; }
+  .sig { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:12px; } .sig div { border-top:1px solid #999; padding-top:3px; font-size:10.5px; color:#555; text-align:center; }
+  .cn { display:grid; grid-template-columns:1fr 1fr; gap:0; max-width:1000px; margin:0 auto; background:#fff; border:1px solid #ddd; box-shadow:0 4px 16px rgba(0,0,0,.10); }
+  .cn > div { padding:16px 18px; font-size:12px; line-height:1.4; } .cn > div + div { border-left:2px dashed #ccc; }
+  .cn h6 { margin:10px 0 4px; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--wine-d); }
+</style>
+</head>
+<body>
+<div class="topbar"><b>ESBOZO — Funciona sin internet:</b>
+  <button class="tab on" data-t="w1">1. Cómo funciona</button>
+  <button class="tab" data-t="w2">2. Se cae el internet</button>
+  <button class="tab" data-t="w3">3. Trabajar sin internet</button>
+  <button class="tab" data-t="w4">4. Vuelve el internet</button>
+  <button class="tab" data-t="w5">5. Si dos cambiaron lo mismo</button>
+  <button class="tab" data-t="w6">6. Qué funciona y qué espera</button>
+  <button class="tab" data-t="w7">7. Control de equipos</button>
+</div>
+<div class="warn">⚠️ Dibujo para aprobar, con datos inventados. Técnica: el navegador guarda los datos en el propio equipo (cifrados) y los envía en orden cuando vuelve la conexión. Sirve en computadoras, tablets y celulares.</div>
+
+<!-- ============ W1 ============ -->
+<section class="scr on" id="w1">
+  <div class="app"><div class="brand">SIVEC <span>SIN INTERNET</span></div><div class="who">🔌 Cómo funciona · explicado en una imagen</div></div>
+  <div class="body">
+    <div class="card">
+      <svg viewBox="0 0 1000 330" width="100%" role="img" aria-label="Esquema del funcionamiento sin internet" font-family="Liberation Sans, DejaVu Sans, Arial">
+        <rect x="20" y="40" width="250" height="230" rx="16" fill="#f7e9ef" stroke="#7d2a4c" stroke-width="2"/><text x="145" y="72" text-anchor="middle" font-size="17" font-weight="800" fill="#5a1c36">① Equipo del centro</text>
+        <text x="145" y="100" text-anchor="middle" font-size="13" fill="#4a3a42">computadora · tablet · celular</text>
+        <rect x="45" y="118" width="200" height="56" rx="10" fill="#fff" stroke="#d6cdd1"/><text x="145" y="142" text-anchor="middle" font-size="13.5" font-weight="700" fill="#2d2429">Pacientes del centro</text><text x="145" y="161" text-anchor="middle" font-size="12" fill="#6f6168">copia local cifrada</text>
+        <rect x="45" y="186" width="200" height="66" rx="10" fill="#fff7e0" stroke="#ecd9a0"/><text x="145" y="210" text-anchor="middle" font-size="13.5" font-weight="700" fill="#8a5a00">Cola de envío</text><text x="145" y="229" text-anchor="middle" font-size="12" fill="#8a5a00">lo nuevo espera aquí</text><text x="145" y="245" text-anchor="middle" font-size="12" fill="#8a5a00">en orden, con hora</text>
+        <path d="M290 110 H690" stroke="#15803d" stroke-width="4" marker-end="url(#ar)"/><text x="490" y="98" text-anchor="middle" font-size="14" font-weight="700" fill="#15803d">con internet: envía al momento</text>
+        <path d="M290 210 H690" stroke="#b45309" stroke-width="4" stroke-dasharray="10 7" marker-end="url(#ar2)"/><text x="490" y="198" text-anchor="middle" font-size="14" font-weight="700" fill="#b45309">sin internet: guarda y envía después</text>
+        <path d="M690 150 H290" stroke="#2f6fb0" stroke-width="3" marker-end="url(#ar3)"/><text x="490" y="170" text-anchor="middle" font-size="13" fill="#2f6fb0">baja lo nuevo de la red (resultados, referencias)</text>
+        <rect x="710" y="40" width="270" height="230" rx="16" fill="#e0ecfa" stroke="#2f6fb0" stroke-width="2"/><text x="845" y="72" text-anchor="middle" font-size="17" font-weight="800" fill="#1e4f8a">② Servidor SIVEC</text>
+        <text x="845" y="100" text-anchor="middle" font-size="13" fill="#4a3a42">base de datos central</text>
+        <text x="845" y="140" text-anchor="middle" font-size="13" fill="#2d2429">✓ recibe y revisa cada registro</text><text x="845" y="165" text-anchor="middle" font-size="13" fill="#2d2429">✓ avisa si hay choques</text><text x="845" y="190" text-anchor="middle" font-size="13" fill="#2d2429">✓ lo reparte al hospital,</text><text x="845" y="208" text-anchor="middle" font-size="13" fill="#2d2429">farmacia, laboratorio, gestor</text><text x="845" y="240" text-anchor="middle" font-size="13" fill="#2d2429">✓ copia de seguridad diaria</text>
+        <defs><marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#15803d"/></marker><marker id="ar2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#b45309"/></marker><marker id="ar3" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#2f6fb0"/></marker></defs>
+        <text x="500" y="310" text-anchor="middle" font-size="14" fill="#6f6168">Cada registro lleva: quién, qué equipo, a qué hora se hizo (no a qué hora llegó)</text>
+      </svg></div>
+    <div class="cols c3" style="margin-top:12px">
+      <div class="card" style="font-size:13px"><div class="lbl">Qué se guarda en el equipo</div>Pacientes del propio centro, citas del día, catálogos (medicamentos, exámenes, vacunas), formularios. No toda la base del país.</div>
+      <div class="card" style="font-size:13px"><div class="lbl">Cuánto aguanta</div>Días de trabajo normal sin internet. Al volver, se sube todo en minutos, incluso con 4G débil.</div>
+      <div class="card" style="font-size:13px"><div class="lbl">Seguridad</div>Todo cifrado en el equipo; se abre solo con usuario y PIN. Si se roba el equipo, Admin lo bloquea y lo borra a distancia.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ W2 ============ -->
+<section class="scr" id="w2">
+  <div class="app"><div class="brand">SIVEC <span>C.S. SAN LUIS</span></div><div class="who"><span style="background:#fde68a;color:#7c2d12;border-radius:999px;padding:3px 12px;font-weight:800">● Sin internet · desde 09:12 · 7 registros guardados en este equipo</span></div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">La barra superior siempre dice cómo está la conexión</div>
+        <div style="display:flex;flex-direction:column;gap:10px;font-size:14px">
+          <div style="background:#dcf3e5;color:#14532d;border-radius:10px;padding:10px 14px;font-weight:700">● En línea · todo enviado</div>
+          <div style="background:#fde68a;color:#7c2d12;border-radius:10px;padding:10px 14px;font-weight:700">● Sin internet · 7 registros guardados en este equipo · se envían solos al volver</div>
+          <div style="background:#e0ecfa;color:#1e4f8a;border-radius:10px;padding:10px 14px;font-weight:700">⟳ Enviando 7 de 7…</div>
+          <div style="background:#fde2e2;color:#991b1b;border-radius:10px;padding:10px 14px;font-weight:700">⚠ 1 registro necesita revisión (dos personas cambiaron lo mismo)</div></div>
+        <div class="mini" style="margin-top:8px">El personal no tiene que hacer nada distinto: sigue trabajando igual.</div></div>
+      <div>
+        <div class="card"><div class="lbl">Qué no hace nadie</div><div style="font-size:13px;line-height:1.6">✗ Volver al papel “porque se cayó el sistema”<br>✗ Anotar en un cuaderno para pasar después<br>✗ Perder la consulta al cerrar el navegador</div></div>
+        <div class="card" style="margin-top:12px;font-size:13px"><div class="lbl">Aviso al centro</div>Si un equipo pasa más de 24 h sin enviar, el responsable del centro y el soporte reciben aviso.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ W3 ============ -->
+<section class="scr" id="w3">
+  <div class="app"><div class="brand">SIVEC <span>RECEPCIÓN</span></div><div class="who"><span style="background:#fde68a;color:#7c2d12;border-radius:999px;padding:3px 12px;font-weight:800">● Sin internet · 7 guardados</span> &nbsp; Lic. Rivero · 10:05</div></div>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card"><div class="lbl">Paciente conocida · se abre desde la copia local</div>
+        <div style="font-size:14px;line-height:1.6"><b>Carla Torres</b> · 26 a · 28 sem · huella ✓ (verificada en el equipo)<br>Historia completa del centro disponible</div>
+        <div class="chk3" style="margin-top:8px"><span class="ok">✓ Ficha del día asignada · consultorio 1</span><span class="ok">✓ Triaje registrado 10:07</span><span class="no">⏳ Verificación SEGIP: cuando vuelva internet</span></div></div>
+      <div class="card"><div class="lbl">Paciente nueva · se registra igual</div>
+        <div style="font-size:14px;line-height:1.6"><b>Nuevo:</b> Rosa Quispe · CI 7.221.450<br>Número provisional <b>SL-TMP-0007</b></div>
+        <div class="mini" style="margin-top:6px">Al volver la conexión, el SIVEC revisa si ya existía en otro centro (por CI y huella) y une las historias; nunca duplica.</div></div>
+      <div class="card"><div class="lbl">Consultorio · receta y documentos</div>
+        <div style="font-size:14px;line-height:1.6">SOAP completo · receta · formularios oficiales <b>se imprimen sin internet</b>.<br>La receta queda en cola para farmacia (misma red local si hay) o se entrega impresa.</div></div>
+      <div class="card"><div class="lbl">Pedido que necesita a la red</div>
+        <div style="font-size:14px;line-height:1.6">Referencia al hospital: <b>queda lista y sale sola</b> al volver la conexión.<br>Si es <b>urgente</b>: aviso por SMS a la central y se llama por teléfono.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ W4 ============ -->
+<section class="scr" id="w4">
+  <div class="app"><div class="brand">SIVEC <span>C.S. SAN LUIS</span></div><div class="who"><span style="background:#e0ecfa;color:#1e4f8a;border-radius:999px;padding:3px 12px;font-weight:800">⟳ Volvió el internet 11:40 · enviando</span></div></div>
+  <div class="body">
+    <div class="cols c21">
+      <div class="card"><div class="lbl">Cola de envío · en el orden en que se hicieron</div>
+        <table class="l"><thead><tr><th>Hora</th><th>Registro</th><th>Quién</th><th>Estado</th></tr></thead><tbody>
+          <tr><td>09:20</td><td>Triaje · Carla Torres</td><td>Lic. Rivero</td><td><span class="st ok">enviado</span></td></tr>
+          <tr><td>09:34</td><td>Consulta SOAP · Carla Torres</td><td>Dra. Méndez</td><td><span class="st ok">enviado</span></td></tr>
+          <tr><td>09:36</td><td>Receta · hierro · dTpa</td><td>Dra. Méndez</td><td><span class="st ok">enviado → farmacia</span></td></tr>
+          <tr><td>10:05</td><td>Paciente nueva · Rosa Quispe</td><td>Lic. Rivero</td><td><span class="st ok">unida a historia de Plan 3000</span></td></tr>
+          <tr><td>10:30</td><td>Referencia a gineco · Juana M.</td><td>Dra. Méndez</td><td><span class="st ok">enviado → hospital</span></td></tr>
+          <tr><td>11:02</td><td>Vacuna · Mateo R.</td><td>Lic. Cuéllar</td><td><span class="st warn">revisar</span></td></tr>
+          <tr><td>11:15</td><td>Nota de enfermería</td><td>Lic. Rivero</td><td><span class="st info">enviando…</span></td></tr></tbody></table></div>
+      <div>
+        <div class="card"><div class="lbl">Qué llegó de la red</div><div style="font-size:13px;line-height:1.6">🧪 2 resultados de laboratorio<br>↩️ 1 contrarreferencia del hospital<br>📦 pedido de almacén: en camino</div></div>
+        <div class="card" style="margin-top:12px;font-size:13px"><div class="lbl">Tiempo</div>7 registros en 12 segundos por 4G.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ W5 ============ -->
+<section class="scr" id="w5">
+  <div class="app"><div class="brand">SIVEC <span>REVISAR</span></div><div class="who">⚠ Dos personas registraron lo mismo mientras no había internet</div></div>
+  <div class="body">
+    <div class="card"><div class="lbl">Vacuna SRP de Mateo R. · aparece dos veces</div>
+      <div class="cols c2" style="gap:14px">
+        <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:13.5px;line-height:1.6"><b>En este equipo</b> (sin internet)<br>SRP 1 · 11:02 · lote SR-25A031<br>Lic. Cuéllar · vacunatorio</div>
+        <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:13.5px;line-height:1.6"><b>En el servidor</b><br>SRP 1 · 10:40 · lote SR-25A031<br>Brigada casa por casa · celular del centro</div></div>
+      <div class="lbl" style="margin-top:12px">¿Qué pasó?</div>
+      <div class="chips"><span class="chip on">Es la misma dosis → dejar una</span><span class="chip">Fueron dos dosis → avisar posible doble vacunación</span></div>
+      <div class="mini" style="margin-top:6px">Lo decide una persona, nunca el sistema a ciegas. Queda registrado quién resolvió y por qué.</div></div>
+    <div class="card" style="margin-top:12px"><div class="lbl">Reglas para que casi nunca pase</div>
+      <div style="font-size:13px;line-height:1.6">• Las notas y consultas se <b>suman</b>, no se pisan (cada una es un registro nuevo)<br>• Los datos únicos (dosis, dispensación, cama) se revisan por paciente + fecha + lote<br>• Solo cosas que cambian el mismo campo del mismo paciente piden revisión</div></div>
+  </div>
+</section>
+
+<!-- ============ W6 ============ -->
+<section class="scr" id="w6">
+  <div class="app"><div class="brand">SIVEC <span>SIN INTERNET</span></div><div class="who">📋 Qué funciona sin conexión y qué espera</div></div>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card"><div class="lbl" style="color:#15803d">Funciona sin internet</div>
+        <div class="chk3"><span class="ok">✓ Recepción, fichas del día, triaje</span><span class="ok">✓ Consulta SOAP, receta, formularios e impresión</span><span class="ok">✓ Vacunas, controles prenatales, crecimiento</span><span class="ok">✓ Enfermería: signos, medicación, curaciones</span><span class="ok">✓ Farmacia del centro (su propio stock)</span><span class="ok">✓ Brigadas y visitas casa por casa</span><span class="ok">✓ Ambulancia: signos en el viaje</span></div></div>
+      <div class="card"><div class="lbl" style="color:#b45309">Espera a la conexión</div>
+        <div class="chk3"><span class="no">⏳ Verificación de identidad con SEGIP</span><span class="no">⏳ Referencia al hospital (urgente: SMS + llamada)</span><span class="no">⏳ Resultados que vienen de otro lugar</span><span class="no">⏳ Ver pacientes de otros centros</span><span class="no">⏳ Tablero del gestor al día</span><span class="no">⏳ Mensajes SMS a pacientes</span></div></div>
+    </div>
+    <div class="card" style="margin-top:12px;font-size:13px"><div class="lbl">Hospital con red interna</div>Si se corta el internet de afuera pero la red interna funciona, los servicios del hospital siguen hablándose entre sí con un servidor local de respaldo (opcional para 2º y 3er nivel).</div>
+  </div>
+</section>
+
+<!-- ============ W7 ============ -->
+<section class="scr" id="w7">
+  <div class="app"><div class="brand">SIVEC <span>ADMIN</span></div><div class="who">🖥️ Equipos de la red · última sincronización</div></div>
+  <div class="body">
+    <div class="card"><table class="l"><thead><tr><th>Equipo</th><th>Centro</th><th>Usuario</th><th>Último envío</th><th>Pendientes</th><th>Estado</th></tr></thead><tbody>
+      <tr><td>PC recepción</td><td>C.S. San Luis</td><td>Lic. Rivero</td><td>hace 1 min</td><td>0</td><td><span class="st ok">al día</span></td></tr>
+      <tr><td>PC consultorio 1</td><td>C.S. San Luis</td><td>Dra. Méndez</td><td>hace 3 min</td><td>0</td><td><span class="st ok">al día</span></td></tr>
+      <tr><td>Celular brigada</td><td>C.S. San Luis</td><td>Brigada UV 93</td><td>hace 2 h</td><td>38</td><td><span class="st warn">en campo</span></td></tr>
+      <tr><td>Tablet carro piso 2</td><td>Hosp. 2º nivel</td><td>R2 Quispe</td><td>hace 5 min</td><td>0</td><td><span class="st ok">al día</span></td></tr>
+      <tr><td>PC vacunatorio</td><td>C.S. Los Lotes</td><td>Lic. Soria</td><td>hace 3 días</td><td>142</td><td><span class="st bad">revisar internet</span></td></tr>
+      <tr><td>Celular A4</td><td>Ambulancias</td><td>J. Rojas</td><td>—</td><td>—</td><td><span class="st bad">reportado perdido · bloqueado</span></td></tr></tbody></table>
+      <div class="mini" style="margin-top:6px">Un equipo perdido se bloquea y se borra a distancia; sus datos ya enviados están a salvo en el servidor.</div></div>
+  </div>
+</section>
+
+<div class="note" id="note"></div>
+<script>
+  const NOTES = {
+    w1: '<b>Como funciona:</b> cada equipamento guarda uma cópia cifrada dos pacientes do centro e uma fila de envio. Com internet envia na hora; sem internet guarda e envia depois, em ordem e com a hora real em que foi feito. Também baixa da rede resultados e referências.',
+    w2: '<b>Caiu a internet:</b> a barra de cima sempre diz o estado (em linha, sem internet com X guardados, enviando, precisa revisar). O pessoal segue trabalhando igual; sem papel nem caderno. Equipamento >24 h sem enviar avisa o responsável.',
+    w3: '<b>Trabalhar sem internet:</b> paciente conhecida abre da cópia local com huella; paciente nova recebe número provisório e ao voltar a internet se une à história existente; consulta, receita e formulários se imprimem; referência sai sozinha ao voltar (urgente: SMS + ligação).',
+    w4: '<b>Volta a internet:</b> a fila é enviada na ordem em que foi feita; paciente nova se une à história de outro centro; chegam resultados e contrarreferências. 7 registros em 12 segundos por 4G.',
+    w5: '<b>Se duas pessoas mudaram o mesmo:</b> exemplo da mesma vacina registrada pela brigada e pelo vacinatório; uma pessoa decide (mesma dose ou duas doses) e fica registrado. Regras para que quase nunca aconteça: consultas e notas se somam, não se pisam.',
+    w6: '<b>O que funciona e o que espera:</b> recepção, consulta, receita, impressão, vacinas, enfermagem, farmácia do centro, brigadas e ambulância funcionam sem internet; SEGIP, referência, resultados de fora, painel e SMS esperam. Hospital pode ter servidor local de reserva.',
+    w7: '<b>Controle de equipamentos:</b> o admin vê cada equipamento, quando enviou pela última vez e quantos registros pendentes; alerta de centro sem internet há dias; celular perdido é bloqueado e apagado à distância.',
+  };
+  const tabs = document.querySelectorAll('.tab');
+  function show(t) { tabs.forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === t)); document.getElementById('note').innerHTML = NOTES[t]; }
+  tabs.forEach(b => b.onclick = () => show(b.dataset.t));
+  show(location.hash.slice(1).split('?')[0] || 'w1');
+</script>
+
+<script>if(/demo/.test(location.search)){document.querySelectorAll(".warn,.note").forEach(function(e){e.style.display="none"});var tb=document.querySelector(".topbar b");if(tb)tb.textContent=tb.textContent.replace(/ESBOZO|ESCENAS/,"SIVEC");}</script>
+</body>
+</html>
