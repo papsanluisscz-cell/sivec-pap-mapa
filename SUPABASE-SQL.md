@@ -153,6 +153,7 @@ alter table perfiles_usuario add column if not exists correo text;
 alter table perfiles_usuario add column if not exists es_admin boolean not null default false;
 alter table perfiles_usuario add column if not exists red_id uuid;
 alter table perfiles_usuario add column if not exists activo boolean not null default true;
+alter table perfiles_usuario drop constraint if exists perfiles_usuario_rol_check;  -- regla vieja con otros nombres de rol
 alter table perfiles_usuario alter column rol set default 'centro';
 create unique index if not exists perfiles_usuario_id_uq on perfiles_usuario (id);
 
@@ -220,6 +221,7 @@ insert into perfiles_usuario (id, correo, nombre_completo, rol, centro_id)
 update perfiles_usuario p set correo = u.email from auth.users u where u.id = p.id and p.correo is null;
 update perfiles_usuario set rol = 'centro' where rol is null or rol not in ('centro', 'gestor', 'oncologico', 'colposcopia', 'admin');
 update perfiles_usuario set centro_id = sivec_san_luis() where rol = 'centro' and centro_id is null;
+alter table perfiles_usuario add constraint perfiles_usuario_rol_check check (rol in ('centro', 'gestor', 'oncologico', 'colposcopia', 'admin'));
 
 -- 7) Vos: centro San Luis + administradora (cambiá el correo si hace falta)
 update perfiles_usuario set es_admin = true, rol = 'centro', centro_id = coalesce(centro_id, sivec_san_luis())
