@@ -95,6 +95,34 @@ alter table colposcopias add column if not exists cuello_mapa jsonb;
 
 ---
 
+## Paso 7 — Reparar la tabla de consultas (si al guardar sale "Could not find the '…' column of 'consultas'")
+
+Pasa cuando la tabla `consultas` ya existía de una versión anterior: el Paso 5 no la vuelve a crear, entonces le faltan columnas.
+Este SQL agrega todas las que faltan (las que ya existen no se tocan) y le pide a Supabase que vuelva a leer la estructura.
+
+```sql
+alter table consultas add column if not exists paciente_id text;
+alter table consultas add column if not exists fecha date default current_date;
+alter table consultas add column if not exists doctora text;
+alter table consultas add column if not exists subjetivo text;
+alter table consultas add column if not exists objetivo_oce text;
+alter table consultas add column if not exists objetivo_leucorrea text;
+alter table consultas add column if not exists objetivo_color text;
+alter table consultas add column if not exists objetivo text;
+alter table consultas add column if not exists analisis text;
+alter table consultas add column if not exists observaciones text;
+alter table consultas add column if not exists plan jsonb;
+alter table consultas add column if not exists plan_texto text;
+alter table consultas add column if not exists derivacion text;
+alter table consultas add column if not exists created_at timestamptz default now();
+alter table consultas add column if not exists detalle jsonb;
+alter table consultas add column if not exists especialidad text;
+alter table consultas add column if not exists codigo_esp text;
+notify pgrst, 'reload schema';
+```
+
+---
+
 ## Paso 3 — Proteger los datos de las pacientes (IMPORTANTE)
 
 Hoy cualquiera que tenga la URL y la clave *anon* de Supabase puede leer todos los datos.

@@ -3487,6 +3487,20 @@ async function consultaFila(v) {
   if (!(await consultasExtraOk())) { delete row.detalle; delete row.especialidad; delete row.codigo_esp; }
   return row;
 }
+// Si la tabla "consultas" del Supabase fue creada con una versión vieja y le falta alguna columna,
+// no se pierde la consulta: se quita esa columna, su texto pasa a "observaciones" y se avisa (SQL Paso 7).
+const CONS_ETIQ = { subjetivo: 'S', objetivo: 'O', analisis: 'A', plan_texto: 'P', derivacion: 'Derivación', objetivo_oce: 'OCE', objetivo_leucorrea: 'Leucorrea', objetivo_color: 'Color' };
+async function consultaGuardar(row, editId) {
+  const r = Object.assign({}, row), faltan = [];
+  for (let i = 0; i < 12; i++) {
+    const { error } = editId ? await sb.from('consultas').update(r).eq('id', editId) : await sb.from('consultas').insert([r]);
+    const m = error && /Could not find the '([^']+)' column/.exec(error.message || '');
+    if (!m || !(m[1] in r)) { if (!error && faltan.length) showToast('Consulta guardada. Faltan columnas en Supabase (' + faltan.join(', ') + '): ejecutar el Paso 7 del SQL.', 'err'); return { error }; }
+    const col = m[1], val = r[col]; delete r[col]; faltan.push(col);
+    if (val && typeof val === 'string' && col !== 'observaciones' && 'observaciones' in r) r.observaciones = [r.observaciones, (CONS_ETIQ[col] || col) + ': ' + val].filter(Boolean).join(' · ');
+  }
+  return { error: { message: 'Demasiadas columnas faltantes en la tabla consultas: ejecutar el Paso 7 del SQL.' } };
+}
 
 // ---- Especialidad (código que va en el D1: "Otro diagnóstico: T - código") ----
 const ESPECIALIDADES = [
@@ -3889,8 +3903,7 @@ function consultaModalEl() {
     if (soapVacio(v)) { alert('La consulta está vacía.'); return; }
     const doctora = form.querySelector('[data-s="doctora"]').value;
     const row = await consultaFila(Object.assign(v, { paciente_id: String(consultaPaciente.id), fecha: form.querySelector('[data-s="fecha"]').value || hoyISO(), doctora }));
-    const q = consultaEditId ? sb.from('consultas').update(row).eq('id', consultaEditId) : sb.from('consultas').insert([row]);
-    const { error } = await q;
+    const { error } = await consultaGuardar(row, consultaEditId);
     if (error) { alert('Error al guardar la consulta: ' + error.message); return; }
     espRecordar(doctora, espBuscar(v.codigo_esp));
     ov.classList.remove('open');
@@ -3954,7 +3967,7 @@ async function guardarSoapDeRegistro(nueva) {
   const soloToma = soapVacio(Object.assign({}, v, { objetivo: v.detalle.o_libre || ((v.detalle.o_otros || []).some(x => !x.startsWith('Toma')) ? 'x' : null) }));
   if (soapVacio(v) || soloToma) { soapEscribir(det, null, { esp: espPorDoctora(nueva.doctora), ootros: ['Toma de PAP realizada'] }); return; }
   const row = await consultaFila(Object.assign(v, { paciente_id: String(nueva.id), fecha: nueva.fecha_toma || hoyISO(), doctora: nueva.doctora || null }));
-  const { error } = await sb.from('consultas').insert([row]);
+  const { error } = await consultaGuardar(row, null);
   if (error) showToast('La toma se guardó, pero la consulta no: ' + error.message, 'err');
   else espRecordar(nueva.doctora, espBuscar(v.codigo_esp));
   soapEscribir(det, null, { esp: espPorDoctora(nueva.doctora), ootros: ['Toma de PAP realizada'] }); det.open = false;
