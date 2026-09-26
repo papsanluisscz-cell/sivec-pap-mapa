@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mascotas SIVEC</title>
+<style>
+  :root { --wine: #7d2a4c; --wine-d: #5a1834; --rose: #fbe3ec; --ink: #3a2a32; --soft: #85707a; --line: #ecdde3; --paper: #fbf6f3; --card: #fff; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, "Segoe UI", Arial, sans-serif; color: var(--ink); background: var(--paper); }
+  .hero { background: radial-gradient(120% 120% at 10% 0%, #9c3a5f 0%, #5a1834 55%, #1c0a13 100%); color: #fff; padding: 44px 20px 36px; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+  .eyebrow { font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; color: #f1a7c3; font-weight: 700; }
+  h1 { font-size: clamp(30px, 5vw, 46px); margin: 8px 0 10px; line-height: 1.05; }
+  .hero p { max-width: 720px; margin: 0; color: rgba(255,255,255,.85); font-size: 16px; line-height: 1.5; }
+  h2 { font-size: 24px; margin: 40px 0 6px; color: var(--wine-d); }
+  .lead { margin: 0 0 18px; color: var(--soft); max-width: 780px; line-height: 1.5; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px; box-shadow: 0 6px 20px rgba(125,42,76,.06); display: flex; flex-direction: column; }
+  .stage { border-radius: 14px; background: linear-gradient(180deg, var(--rose), #fff); display: grid; place-items: center; padding: 10px 0 0; }
+  .stage svg { width: 100%; max-width: 250px; height: auto; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--wine); background: var(--rose); border-radius: 999px; padding: 3px 10px; margin-top: 14px; }
+  .card h3 { margin: 8px 0 4px; font-size: 22px; }
+  .card .who { color: var(--soft); font-size: 13.5px; margin-bottom: 10px; }
+  .card p { margin: 0 0 8px; font-size: 14px; line-height: 1.5; }
+  .pc { font-size: 13px; margin: 6px 0 0; padding-left: 18px; line-height: 1.55; }
+  .pc li.m::marker { content: "− "; color: #b45309; font-weight: 800; }
+  .pc li.p::marker { content: "+ "; color: #15803d; font-weight: 800; }
+  .tests { display: flex; align-items: flex-end; gap: 12px; margin-top: auto; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 11px; color: var(--soft); }
+  .tests div { text-align: center; }
+  .tests svg { display: block; margin: 0 auto 3px; }
+  .bw svg { filter: grayscale(1) contrast(1.1); }
+  .pick { border: 2px solid var(--wine); position: relative; }
+  .pick::before { content: "Recomendado"; position: absolute; top: -12px; right: 16px; background: var(--wine); color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .06em; padding: 4px 10px; border-radius: 999px; }
+  .family { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+  .fm { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px 10px 12px; text-align: center; }
+  .fm svg { width: 110px; height: 110px; }
+  .fm b { display: block; font-size: 15px; margin-top: 4px; }
+  .fm span { display: block; font-size: 12px; color: var(--soft); margin-top: 2px; line-height: 1.35; }
+  .fm.boss { grid-column: span 2; background: linear-gradient(160deg, #fff7e6, #fff); border-color: #f0d9a6; }
+  .fm.boss svg { width: 140px; height: 140px; }
+  .rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .rule { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--wine); border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 1.45; }
+  .rule b { display: block; margin-bottom: 2px; color: var(--wine-d); }
+  .uses { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+  .use { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; font-size: 13.5px; }
+  .use .mock { border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; gap: 10px; align-items: center; }
+  .wa { background: #e7f7ee; } .wa .bub { background: #fff; border-radius: 10px; padding: 8px 10px; font-size: 12.5px; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .sys { background: #faf3f6; border: 1px dashed #e3c9d4; flex-direction: column; text-align: center; color: var(--soft); font-size: 12.5px; }
+  .poster { background: linear-gradient(160deg, #7d2a4c, #3b1022); color: #fff; }
+  .poster b { font-size: 16px; display: block; }
+  ol.next { line-height: 1.7; font-size: 15px; padding-left: 20px; }
+  footer { color: var(--soft); font-size: 12px; padding: 30px 0 40px; }
+  @media (max-width: 860px) { .grid3 { grid-template-columns: 1fr; } .fm.boss { grid-column: span 1; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- Lazo del logo SIVEC (se usa como "ADN" de toda la familia) -->
+    <symbol id="lazoMini" viewBox="0 0 32 32">
+      <path d="M16 4c-3.2 0-5.4 2.4-5.4 5.3 0 3.4 2.6 7 5.4 10.4 2.8-3.4 5.4-7 5.4-10.4C21.4 6.4 19.2 4 16 4Z" fill="none" stroke="#7d2a4c" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M12.6 16.6 7 27.5M19.4 16.6 25 27.5" stroke="#7d2a4c" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- CONCEPTO 1 · LAZI, el lazo -->
+    <symbol id="lazi" viewBox="0 0 200 220">
+      <ellipse cx="100" cy="208" rx="58" ry="7" fill="rgba(90,24,52,.13)"/>
+      <path d="M90 126 58 194" stroke="#6d2142" stroke-width="24" stroke-linecap="round"/>
+      <path d="M110 126 142 194" stroke="#9c3a5f" stroke-width="24" stroke-linecap="round"/>
+      <ellipse cx="52" cy="200" rx="17" ry="9" fill="#4a1229"/>
+      <ellipse cx="148" cy="200" rx="17" ry="9" fill="#4a1229"/>
+      <path d="M56 92 Q34 102 38 126" fill="none" stroke="#7d2a4c" stroke-width="10" stroke-linecap="round"/>
+      <circle cx="38" cy="128" r="7.5" fill="#7d2a4c"/>
+      <path d="M100 20C71 20 51 41 51 66c0 29 23 56 49 82 26-26 49-53 49-82 0-25-20-46-49-46Z" fill="#fde9f0" stroke="#7d2a4c" stroke-width="16" stroke-linejoin="round"/>
+      <ellipse cx="85" cy="66" rx="9" ry="11" fill="#fff"/><ellipse cx="115" cy="66" rx="9" ry="11" fill="#fff"/>
+      <circle cx="87" cy="69" r="5.6" fill="#2a1520"/><circle cx="117" cy="69" r="5.6" fill="#2a1520"/>
+      <circle cx="89" cy="66.5" r="1.9" fill="#fff"/><circle cx="119" cy="66.5" r="1.9" fill="#fff"/>
+      <ellipse cx="74" cy="86" rx="7" ry="4" fill="#f19ab8" opacity=".85"/><ellipse cx="126" cy="86" rx="7" ry="4" fill="#f19ab8" opacity=".85"/>
+      <path d="M89 88q11 11 22 0" fill="none" stroke="#5a1834" stroke-width="3.6" stroke-linecap="round"/>
+      <path d="M144 92q22 2 24 20" fill="none" stroke="#7d2a4c" stroke-width="10" stroke-linecap="round"/>
+      <g transform="rotate(-8 172 116)">
+        <rect x="156" y="104" width="36" height="25" rx="3.5" fill="#fff" stroke="#7d2a4c" stroke-width="3"/>
+        <path d="M157 106l17 12 17-12" fill="none" stroke="#7d2a4c" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="191" cy="104" r="8" fill="#16a34a"/><path d="m187 104 3 3 5-6" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+      <circle cx="162" cy="114" r="7.5" fill="#7d2a4c"/>
+    </symbol>
+
+    <!-- CONCEPTO 2 · PABY, la paraba frente roja (endémica de Bolivia) -->
+    <symbol id="paby" viewBox="0 0 200 220">
+      <ellipse cx="104" cy="210" rx="60" ry="6" fill="rgba(90,24,52,.12)"/>
+      <path d="M112 150 152 212 134 214 104 158Z" fill="#3f5a22"/>
+      <path d="M100 152 120 215 102 215 90 156Z" fill="#5d7f31"/>
+      <path d="M36 180h130" stroke="#8a5a34" stroke-width="9" stroke-linecap="round"/>
+      <path d="M150 180l14 10" stroke="#8a5a34" stroke-width="6" stroke-linecap="round"/>
+      <ellipse cx="96" cy="126" rx="41" ry="50" fill="#6b8f3a"/>
+      <ellipse cx="91" cy="138" rx="24" ry="34" fill="#93b556"/>
+      <path d="M80 176c-2 6 0 10 5 10M88 176c0 6 2 9 6 10M104 176c-2 6 0 10 5 10M112 176c0 6 2 9 6 10" fill="none" stroke="#3b3438" stroke-width="4" stroke-linecap="round"/>
+      <path d="M118 102c34 6 44 38 28 64-10-14-22-26-30-42Z" fill="#52752c"/>
+      <path d="M118 102c15 0 25 6 30 15-11 1-23-1-30-6Z" fill="#e8772e"/>
+      <circle cx="100" cy="66" r="37" fill="#6b8f3a"/>
+      <path d="M66 62c0-20 16-32 34-32 11 0 20 4 26 10-17 2-35 8-48 24Z" fill="#d93a3a"/>
+      <ellipse cx="108" cy="67" rx="15" ry="14" fill="#f3efe6"/>
+      <circle cx="110" cy="66" r="6.5" fill="#1f1418"/><circle cx="112.3" cy="63.6" r="2.2" fill="#fff"/>
+      <ellipse cx="96" cy="84" rx="6.5" ry="3.8" fill="#f19ab8" opacity=".75"/>
+      <path d="M121 70c19-3 28 12 20 29-4-8-11-12-21-12Z" fill="#3b3438"/>
+      <path d="M120 87c9 1 13 7 11 13-6-2-10-6-13-10Z" fill="#26201f"/>
+      <circle cx="84" cy="118" r="12" fill="#fff" stroke="#7d2a4c" stroke-width="2.5"/>
+      <use href="#lazoMini" x="75" y="109" width="18" height="18"/>
+      <g transform="rotate(-14 160 150)">
+        <rect x="142" y="138" width="36" height="25" rx="3.5" fill="#fff" stroke="#7d2a4c" stroke-width="3"/>
+        <path d="M143 140l17 12 17-12" fill="none" stroke="#7d2a4c" stroke-width="3" stroke-linejoin="round"/>
+      </g>
+      <path d="M146 160c-6-8-10-14-14-22" stroke="#52752c" stroke-width="9" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- CONCEPTO 3 · SIVI, la promotora de salud -->
+    <symbol id="sivi" viewBox="0 0 200 220">
+      <ellipse cx="100" cy="210" rx="52" ry="6" fill="rgba(90,24,52,.13)"/>
+      <path d="M78 76c-6 20-4 44-14 72" fill="none" stroke="#2a1a14" stroke-width="13" stroke-linecap="round"/>
+      <path d="M72 96l-8 4M70 110l-8 4M68 124l-8 4M66 138l-7 3" stroke="#4a3228" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M58 150l6-4 6 5-6 4Z" fill="#7d2a4c"/>
+      <rect x="84" y="168" width="14" height="36" rx="6" fill="#3b2f3a"/><rect x="102" y="168" width="14" height="36" rx="6" fill="#3b2f3a"/>
+      <ellipse cx="89" cy="205" rx="11" ry="6" fill="#2a1f28"/><ellipse cx="111" cy="205" rx="11" ry="6" fill="#2a1f28"/>
+      <path d="M64 174c0-42 12-60 36-60s36 18 36 60Z" fill="#fde9f0"/>
+      <path d="M64 174c0-40 10-56 28-60l4 60Z" fill="#7d2a4c"/>
+      <path d="M136 174c0-40-10-56-28-60l-4 60Z" fill="#7d2a4c"/>
+      <circle cx="122" cy="140" r="9" fill="#fff"/>
+      <use href="#lazoMini" x="115" y="133" width="14" height="14"/>
+      <path d="M130 124q20-14 20-36" fill="none" stroke="#a8704a" stroke-width="12" stroke-linecap="round"/>
+      <circle cx="150" cy="84" r="8.5" fill="#a8704a"/>
+      <path d="M144 76l-2-6M150 74v-7M156 76l3-6" stroke="#a8704a" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="100" cy="76" r="33" fill="#a8704a"/>
+      <path d="M67 78c-2-30 18-40 33-40 19 0 35 12 33 40-8-16-20-22-33-21-13 0-25 6-33 21Z" fill="#2a1a14"/>
+      <path d="M100 40c-2 8-2 14 0 18" stroke="#4a3228" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="68" cy="88" r="3.5" fill="#e0a82e"/><circle cx="132" cy="88" r="3.5" fill="#e0a82e"/>
+      <path d="M84 71q5-4 10 0M106 71q5-4 10 0" fill="none" stroke="#2a1a14" stroke-width="2.4" stroke-linecap="round"/>
+      <ellipse cx="89" cy="80" rx="3.8" ry="4.6" fill="#1f1418"/><ellipse cx="111" cy="80" rx="3.8" ry="4.6" fill="#1f1418"/>
+      <circle cx="90.3" cy="78.4" r="1.3" fill="#fff"/><circle cx="112.3" cy="78.4" r="1.3" fill="#fff"/>
+      <ellipse cx="80" cy="91" rx="6" ry="3.4" fill="#d9707f" opacity=".6"/><ellipse cx="120" cy="91" rx="6" ry="3.4" fill="#d9707f" opacity=".6"/>
+      <path d="M91 93q9 8 18 0" fill="none" stroke="#5a1834" stroke-width="3" stroke-linecap="round"/>
+      <path d="M70 124q-14 26 8 34" fill="none" stroke="#a8704a" stroke-width="12" stroke-linecap="round"/>
+      <rect x="72" y="138" width="44" height="32" rx="5" fill="#2b2230"/>
+      <rect x="76" y="142" width="36" height="24" rx="2" fill="#e9f5f1"/>
+      <path d="M80 162v-6M86 162v-10M92 162v-8M98 162v-13" stroke="#7d2a4c" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="106" cy="148" r="3.5" fill="#16a34a"/>
+      <circle cx="80" cy="160" r="7" fill="#a8704a"/>
+    </symbol>
+
+    <!-- FAMILIA (fauna boliviana) · cabezas en insignia -->
+    <symbol id="fPaby" viewBox="0 0 120 120">
+      <circle cx="60" cy="62" r="34" fill="#6b8f3a"/>
+      <path d="M28 60c0-20 15-32 32-32 11 0 20 4 26 11-17 2-33 7-46 23Z" fill="#d93a3a"/>
+      <ellipse cx="68" cy="62" rx="14" ry="13" fill="#f3efe6"/>
+      <circle cx="70" cy="61" r="6" fill="#1f1418"/><circle cx="72" cy="59" r="2" fill="#fff"/>
+      <path d="M80 66c18-3 26 11 19 27-4-8-10-11-20-11Z" fill="#3b3438"/>
+      <ellipse cx="56" cy="80" rx="6" ry="3.4" fill="#f19ab8" opacity=".75"/>
+    </symbol>
+    <symbol id="fTatu" viewBox="0 0 120 120">
+      <path d="M22 78c0-26 18-44 42-44s40 18 40 44Z" fill="#7b8ba1"/>
+      <path d="M42 40v38M56 35v43M70 35v43M84 40v38" stroke="#5b6b82" stroke-width="3"/>
+      <path d="M20 78h86" stroke="#5b6b82" stroke-width="4" stroke-linecap="round"/>
+      <path d="M22 70c-10 0-16 4-16 10 6 2 14 0 18-4Z" fill="#b99a86"/>
+      <ellipse cx="30" cy="54" rx="6" ry="9" fill="#b99a86" transform="rotate(-20 30 54)"/>
+      <circle cx="20" cy="72" r="3" fill="#1f1418"/>
+      <g transform="translate(78 64)"><path d="M0 0h18v6H0Z" fill="#fff" stroke="#2563eb" stroke-width="2"/><path d="M18 3h8M-4 3h4" stroke="#2563eb" stroke-width="2"/></g>
+    </symbol>
+    <symbol id="fVicuna" viewBox="0 0 120 120">
+      <ellipse cx="60" cy="108" rx="34" ry="16" fill="#c98a4b"/>
+      <path d="M52 104c0-22 2-40 6-54h16c-2 16-2 34 0 54Z" fill="#c98a4b"/>
+      <path d="M60 104c0-16 1-30 4-44h6c-1 14-1 28 0 44Z" fill="#fff5e8"/>
+      <path d="M58 32l-5-15 10 9M74 30l4-15-9 9" fill="#c98a4b" stroke="#a86d34" stroke-width="2" stroke-linejoin="round"/>
+      <ellipse cx="66" cy="40" rx="15" ry="12" fill="#c98a4b"/>
+      <ellipse cx="79" cy="46" rx="8" ry="6" fill="#e6b886"/>
+      <circle cx="63" cy="38" r="3.4" fill="#1f1418"/><circle cx="64" cy="37" r="1.1" fill="#fff"/>
+      <path d="M76 48q3 2 6 0" fill="none" stroke="#5a3a1a" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M22 70q10-10 20-4M26 58q8-8 16-3" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+    </symbol>
+    <symbol id="fHornero" viewBox="0 0 120 120">
+      <path d="M58 100c0-22 10-36 26-36s24 14 24 36Z" fill="#c07a45"/>
+      <path d="M78 100c0-12 3-18 7-18s7 6 7 18Z" fill="#6b3f1f"/>
+      <ellipse cx="44" cy="70" rx="22" ry="20" fill="#b5652e"/>
+      <ellipse cx="40" cy="76" rx="12" ry="12" fill="#e7b489"/>
+      <circle cx="46" cy="46" r="15" fill="#b5652e"/>
+      <path d="M58 46l14 2-14 4Z" fill="#6b4a2f"/>
+      <circle cx="50" cy="44" r="3.4" fill="#1f1418"/><circle cx="51" cy="43" r="1.1" fill="#fff"/>
+      <path d="M40 42h14" stroke="#e7b489" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M36 90l-4 12M46 90l2 12" stroke="#6b4a2f" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="fPerro" viewBox="0 0 120 120">
+      <ellipse cx="60" cy="60" rx="30" ry="28" fill="#d9a066"/>
+      <path d="M32 48c-10 4-12 22-4 30 6-6 8-18 8-26Z" fill="#8a5a34"/>
+      <path d="M88 48c10 4 12 22 4 30-6-6-8-18-8-26Z" fill="#8a5a34"/>
+      <ellipse cx="60" cy="72" rx="15" ry="11" fill="#f3dcc0"/>
+      <ellipse cx="60" cy="66" rx="5.5" ry="4" fill="#2a1a14"/>
+      <path d="M60 70v5M53 77q7 5 14 0" fill="none" stroke="#2a1a14" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="49" cy="54" r="3.8" fill="#1f1418"/><circle cx="71" cy="54" r="3.8" fill="#1f1418"/>
+      <circle cx="50" cy="53" r="1.2" fill="#fff"/><circle cx="72" cy="53" r="1.2" fill="#fff"/>
+      <path d="M40 90q20 10 40 0" fill="none" stroke="#0d9488" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="60" cy="98" r="6" fill="#fcd34d" stroke="#b45309" stroke-width="1.5"/>
+      <path d="m57 98 2 2 4-4" fill="none" stroke="#b45309" stroke-width="1.6" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="fCapi" viewBox="0 0 120 120">
+      <path d="M18 86c0-24 14-40 36-40 18 0 30 10 34 26 2 8-2 14-10 14Z" fill="#9a6a45"/>
+      <path d="M74 60c14 0 24 8 24 20 0 6-4 8-10 8H72Z" fill="#9a6a45"/>
+      <ellipse cx="90" cy="80" rx="8" ry="6" fill="#6b4a2f"/>
+      <ellipse cx="46" cy="44" rx="5" ry="4" fill="#6b4a2f"/>
+      <circle cx="72" cy="66" r="3.4" fill="#1f1418"/><circle cx="73" cy="65" r="1.1" fill="#fff"/>
+      <path d="M44 100c0-10 7-16 16-16 8 0 13 5 14 12 1 4-1 6-5 6H46Z" fill="#b8865e"/>
+      <circle cx="64" cy="92" r="2.4" fill="#1f1418"/>
+      <path d="M40 30q6-8 12 0M62 24q6-8 12 0" fill="none" stroke="#e11d74" stroke-width="3" stroke-linecap="round" opacity=".6"/>
+    </symbol>
+    <symbol id="fJaguar" viewBox="0 0 120 120">
+      <path d="M30 40l2-16 16 10Z" fill="#e0a13a"/><path d="M90 40l-2-16-16 10Z" fill="#e0a13a"/>
+      <path d="M33 34l1-7 7 5Z" fill="#6b3a1a"/><path d="M87 34l-1-7-7 5Z" fill="#6b3a1a"/>
+      <ellipse cx="60" cy="62" rx="34" ry="32" fill="#e8ad45"/>
+      <ellipse cx="60" cy="78" rx="18" ry="13" fill="#fbe8c8"/>
+      <g fill="none" stroke="#6b3a1a" stroke-width="2.4">
+        <circle cx="40" cy="46" r="4"/><circle cx="80" cy="46" r="4"/><circle cx="60" cy="38" r="4"/><circle cx="32" cy="64" r="3.4"/><circle cx="88" cy="64" r="3.4"/>
+      </g>
+      <path d="M44 58q5-4 10 0M66 58q5-4 10 0" fill="none" stroke="#1f1418" stroke-width="3" stroke-linecap="round"/>
+      <path d="M55 72l5 4 5-4Z" fill="#6b3a1a"/>
+      <path d="M60 76v4M52 83q8 5 16 0" fill="none" stroke="#6b3a1a" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="60" cy="102" r="11" fill="#fff" stroke="#7d2a4c" stroke-width="2.5"/>
+      <use href="#lazoMini" x="52" y="94" width="16" height="16"/>
+    </symbol>
+    <clipPath id="insignia"><circle cx="60" cy="60" r="54"/></clipPath>
+  </defs>
+</svg>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">SIVEC · Identidad</div>
+    <h1>Una familia de mascotas</h1>
+    <p>Tres conceptos para la mascota del <b>SIVEC PAP/VPH</b>. Después, la familia: una mascota por programa y una para el SIVEC completo. Todas llevan el <b>lazo del logo</b> como "ADN" común, para que se reconozcan como familia.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <h2>SIVEC PAP/VPH · tres conceptos</h2>
+  <p class="lead">Cada concepto se probó en tamaño pequeño (ícono, WhatsApp) y en blanco y negro (fotocopia del centro), porque así se va a usar en la práctica.</p>
+
+  <div class="grid3">
+    <article class="card">
+      <div class="stage"><svg viewBox="0 0 200 220"><use href="#lazi"/></svg></div>
+      <span class="tag">Concepto 1</span>
+      <h3>Lazi</h3>
+      <div class="who">El lazo del logo, con vida</div>
+      <p>Es el mismo lazo del SIVEC, con carita y un sobre con el resultado listo. Es la opción más directa: la mascota <i>es</i> la marca.</p>
+      <ul class="pc"><li class="p">Se conecta al instante con el logo y con la causa (el lazo de la prevención).</li><li class="p">Muy simple de dibujar, bordar o imprimir.</li><li class="m">Menos carácter propio; difícil de convertir en familia (todos serían lazos).</li></ul>
+      <div class="tests"><div><svg width="48" height="52" viewBox="0 0 200 220"><use href="#lazi"/></svg>48 px</div><div><svg width="28" height="30" viewBox="0 0 200 220"><use href="#lazi"/></svg>28 px</div><div class="bw"><svg width="48" height="52" viewBox="0 0 200 220"><use href="#lazi"/></svg>B/N</div></div>
+    </article>
+
+    <article class="card pick">
+      <div class="stage"><svg viewBox="0 0 200 220"><use href="#paby"/></svg></div>
+      <span class="tag">Concepto 2</span>
+      <h3>Paby</h3>
+      <div class="who">La paraba frente roja · endémica de Bolivia</div>
+      <p>La mensajera: lleva el resultado a cada mujer y la vuelve a llamar cuando le toca control. Es el <b>Enlace</b> del SIVEC. Lleva el lazo en el pecho.</p>
+      <ul class="pc"><li class="p">Identidad boliviana y cruceña; no habla del cuerpo, habla de cuidar y avisar.</li><li class="p">Abre la familia "fauna de Bolivia": cada programa, un animal.</li><li class="p">Encaja con los recordatorios por WhatsApp ("Paby te avisa").</li><li class="m">Necesita buena ilustración final para no parecer un loro cualquiera.</li></ul>
+      <div class="tests"><div><svg width="48" height="52" viewBox="0 0 200 220"><use href="#paby"/></svg>48 px</div><div><svg width="28" height="30" viewBox="0 0 200 220"><use href="#paby"/></svg>28 px</div><div class="bw"><svg width="48" height="52" viewBox="0 0 200 220"><use href="#paby"/></svg>B/N</div></div>
+    </article>
+
+    <article class="card">
+      <div class="stage"><svg viewBox="0 0 200 220"><use href="#sivi"/></svg></div>
+      <span class="tag">Concepto 3</span>
+      <h3>Sivi</h3>
+      <div class="who">La promotora de salud</div>
+      <p>Una trabajadora de salud con chaleco bordó, tablet y trenza, que saluda. Representa al equipo que hace la búsqueda activa casa por casa.</p>
+      <ul class="pc"><li class="p">Muy humana y cercana; las mujeres se ven reflejadas.</li><li class="p">Pone en valor al personal del centro.</li><li class="m">Una persona siempre representa "a alguien": hay que cuidar que no sea un estereotipo.</li><li class="m">Envejece rápido (ropa, peinado) y es más difícil hacer la familia.</li></ul>
+      <div class="tests"><div><svg width="48" height="52" viewBox="0 0 200 220"><use href="#sivi"/></svg>48 px</div><div><svg width="28" height="30" viewBox="0 0 200 220"><use href="#sivi"/></svg>28 px</div><div class="bw"><svg width="48" height="52" viewBox="0 0 200 220"><use href="#sivi"/></svg>B/N</div></div>
+    </article>
+  </div>
+
+  <h2>La familia · fauna de Bolivia</h2>
+  <p class="lead">Con el concepto 2, cada programa tiene un animal cuyo significado se cuenta solo. Todos llevan el lazo bordó y el color de su programa. El jaguar reúne a todos: es el SIVEC completo.</p>
+  <div class="family">
+    <div class="fm"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#fdf2f6" stroke="#7d2a4c" stroke-width="4"/><g clip-path="url(#insignia)"><use href="#fPaby"/></g></svg><b>Paby</b><span>PAP/VPH<br>la mensajera que avisa</span></div>
+    <div class="fm"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#eff4ff" stroke="#2563eb" stroke-width="4"/><g clip-path="url(#insignia)"><use href="#fTatu"/></g></svg><b>Tatú</b><span>Vacunas<br>la armadura que protege</span></div>
+    <div class="fm"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#fff8eb" stroke="#f59e0b" stroke-width="4"/><g clip-path="url(#insignia)"><use href="#fVicuna"/></g></svg><b>Vicu</b><span>Tuberculosis<br>el aire limpio del altiplano</span></div>
+    <div class="fm"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#f1faf3" stroke="#16a34a" stroke-width="4"/><g clip-path="url(#insignia)"><use href="#fHornero"/></g></svg><b>Hornerito</b><span>Chagas<br>la casa bien hecha, sin vinchucas</span></div>
+    <div class="fm"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#ecfdf9" stroke="#0d9488" stroke-width="4"/><g clip-path="url(#insignia)"><use href="#fPerro"/></g></svg><b>Firu</b><span>Zoonosis · rabia<br>el perro vacunado</span></div>
+    <div class="fm"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#fdf0f7" stroke="#e11d74" stroke-width="4"/><g clip-path="url(#insignia)"><use href="#fCapi"/></g></svg><b>Capi</b><span>Materno · prenatal<br>la mamá con su cría</span></div>
+    <div class="fm boss"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#fff7e6" stroke="#d97706" stroke-width="5"/><g clip-path="url(#insignia)"><use href="#fJaguar"/></g></svg><b>Yagua · SIVEC</b><span>El sistema completo: fuerte, atento y guardián de todo el territorio.<br>Lleva el lazo al cuello: el SIVEC nació del PAP.</span></div>
+  </div>
+
+  <h2>Reglas de la familia</h2>
+  <div class="rules">
+    <div class="rule"><b>El lazo es el ADN</b>Toda mascota lleva el lazo bordó del logo (en el pecho, el cuello o un sobre).</div>
+    <div class="rule"><b>Un color por programa</b>Es el mismo color que el programa tiene en los tableros, para que se reconozca de un vistazo.</div>
+    <div class="rule"><b>Tono respetuoso</b>Hablamos de cáncer y de enfermedades serias: son mascotas cálidas y atentas, nunca graciosas a costa del tema ni infantiles.</div>
+    <div class="rule"><b>Tiene que funcionar pequeño y en B/N</b>Se va a ver en íconos, en WhatsApp y en fotocopias del centro.</div>
+    <div class="rule"><b>Nunca asusta ni culpa</b>La mascota avisa, acompaña y felicita. Los mensajes difíciles (resultado positivo) los da siempre una persona del equipo.</div>
+  </div>
+
+  <h2>Dónde aparecería</h2>
+  <div class="uses">
+    <div class="use"><div class="mock wa"><svg width="44" height="48" viewBox="0 0 200 220"><use href="#paby"/></svg><div class="bub"><b>Paby · C.S. San Luis</b><br>¡Hola! Tu resultado del PAP ya llegó 💌 Pasá a recogerlo de lunes a viernes, de 8:00 a 16:00.</div></div>Los recordatorios por WhatsApp: resultado listo, control que vence, cita de colposcopia.</div>
+    <div class="use"><div class="mock sys"><svg width="60" height="66" viewBox="0 0 200 220"><use href="#paby"/></svg>No hay muestras por leer. ¡Todo al día! 🎉</div>Dentro del sistema: pantallas vacías, la ayuda y cuando el centro alcanza su meta del mes.</div>
+    <div class="use"><div class="mock poster"><svg width="70" height="77" viewBox="0 0 200 220"><use href="#paby"/></svg><div><b>Hacete el PAP</b>Es gratis con el SUS. Paby te avisa cuando está tu resultado.</div></div>Carteles y folletos de la campaña en los centros, las ferias de salud y las redes sociales.</div>
+  </div>
+
+  <h2>Próximos pasos</h2>
+  <ol class="next">
+    <li>Elegir el concepto (o una mezcla: por ejemplo, Paby llevando a Lazi como insignia).</li>
+    <li>Probarlo con 5 a 10 mujeres en la sala de espera de San Luis y con el equipo: ¿qué les transmite? ¿les gusta el nombre?</li>
+    <li>Poner el nombre final a votación del personal: suma pertenencia.</li>
+    <li>Encargar la ilustración final a un ilustrador boliviano, con poses (saluda, avisa, festeja, acompaña) y la guía de uso.</li>
+    <li>Recién entonces hacer el resto de la familia, programa por programa, a medida que cada uno entra al SIVEC.</li>
+  </ol>
+  <footer>Bocetos de concepto · no son la ilustración final · 26/09/2026</footer>
+</main>
+</body>
+</html>
