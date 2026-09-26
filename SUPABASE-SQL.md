@@ -1184,3 +1184,42 @@ drop policy if exists "Solo usuarias con sesión - colposcopias" on colposcopias
 alter table pacientes disable row level security;
 alter table colposcopias disable row level security;
 ```
+
+
+---
+
+## Ajuste de datos (26/09/2026) — marcar como entregados los resultados de tomas de más de 90 días
+
+Pedido del autor: los resultados de tomas de más de 90 días que ya tienen resultado fueron entregados, pero no se marcaron.
+Se marcan como entregados con fecha = toma + 3 meses (toma 03/04 → entrega 03/07). No se tocan las tomas sin resultado
+ni las de menos de 90 días. Antes se guarda un respaldo en `respaldo_entregas_2026_09` para poder deshacerlo.
+
+```sql
+-- 1) Respaldo: qué tomas se van a marcar (para poder deshacer)
+create table if not exists respaldo_entregas_2026_09 as
+  select id, recibio_resultado, fecha_recibio_resultado, now() as marcado_el from pacientes where false;
+insert into respaldo_entregas_2026_09 (id, recibio_resultado, fecha_recibio_resultado, marcado_el)
+  select id, recibio_resultado, fecha_recibio_resultado, now() from pacientes
+   where deleted_at is null and coalesce(recibio_resultado, false) = false
+     and fecha_toma <= current_date - 90
+     and (estado_pap in ('Positivo', 'Negativo') or coalesce(resultado_pap, '') <> '' or coalesce(resultado_vph, '') <> '')
+     and id not in (select id from respaldo_entregas_2026_09);
+
+-- 2) Marcar como entregado, con fecha = toma + 3 meses (toma 03/04 → entrega 03/07)
+with u as (
+  update pacientes p set recibio_resultado = true,
+         fecha_recibio_resultado = coalesce(p.fecha_recibio_resultado, (p.fecha_toma + interval '3 months')::date)
+   where p.id in (select id from respaldo_entregas_2026_09) and coalesce(p.recibio_resultado, false) = false
+  returning 1)
+select (select count(*) from u) as marcadas_ahora,
+       (select count(*) from pacientes where deleted_at is null and coalesce(estado_pap, 'Pendiente') = 'Pendiente'
+          and coalesce(resultado_pap, '') = '' and coalesce(resultado_vph, '') = '' and fecha_toma <= current_date - 90) as sin_resultado_mas_de_90_dias,
+       (select count(*) from pacientes where deleted_at is null and fecha_toma > current_date - 90) as tomas_de_menos_de_90_dias;
+```
+
+### Deshacer
+
+```sql
+update pacientes p set recibio_resultado = r.recibio_resultado, fecha_recibio_resultado = r.fecha_recibio_resultado
+  from respaldo_entregas_2026_09 r where r.id = p.id;
+```

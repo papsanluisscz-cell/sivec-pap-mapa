@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>SIVEC PAP/VPH — Lista de insumos y equipos</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 16mm 15mm; }
+  :root { --w:#7d2a4c; --wd:#5a1c36; --ink:#2a1820; --soft:#6f6168; --line:#e6dadf; --tint:#f7eef2; }
+  * { box-sizing:border-box; }
+  body { font-family:"Liberation Sans","DejaVu Sans",Arial,sans-serif; color:var(--ink); font-size:10.2pt; line-height:1.45; margin:0; }
+  h1 { font-size:24pt; line-height:1.1; margin:0 0 8pt; color:var(--wd); }
+  h2 { font-size:14.5pt; color:var(--wd); margin:14pt 0 7pt; padding-bottom:3pt; border-bottom:2px solid var(--w); break-after:avoid; }
+  h3 { font-size:11.2pt; margin:10pt 0 4pt; break-after:avoid; }
+  p { margin:4pt 0; }
+  .pg { page-break-before:always; }
+  .eyebrow { font-size:9pt; letter-spacing:.14em; text-transform:uppercase; color:var(--w); font-weight:700; }
+  .lead { font-size:11.5pt; color:#4a3a42; }
+  .warn { background:#fff7e0; border:1px solid #ecd9a0; border-radius:8px; padding:7pt 10pt; font-size:9.3pt; color:#5b4712; margin:6pt 0; }
+  .box { background:var(--tint); border-radius:8px; padding:7pt 10pt; margin:6pt 0; }
+  .ok { background:#eaf7ef; border:1px solid #b9e2c7; border-radius:8px; padding:7pt 10pt; margin:6pt 0; color:#134d2c; }
+  table { width:100%; border-collapse:collapse; margin:5pt 0; font-size:9pt; }
+  thead { display:table-header-group; }
+  tr { break-inside:avoid; }
+  th { background:var(--w); color:#fff; text-align:left; padding:4pt 5pt; font-weight:700; }
+  td { border-bottom:1px solid var(--line); padding:4pt 5pt; vertical-align:top; }
+  tr:nth-child(even) td { background:#fbf7f9; }
+  td.n, th.n { text-align:right; white-space:nowrap; }
+  .tag { display:inline-block; font-size:7.8pt; font-weight:800; border-radius:999px; padding:0 6pt; white-space:nowrap; }
+  .i { background:#fde2e2; color:#991b1b; } .r { background:#fff1d6; color:#8a5300; } .o { background:#e8eef9; color:#1e3a8a; } .y { background:#dcf5e9; color:#0d6b47; }
+  .step { display:grid; grid-template-columns:24px 1fr; gap:7pt; margin:5pt 0; break-inside:avoid; }
+  .num { width:22px; height:22px; border-radius:50%; background:var(--w); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:9.5pt; }
+  .small { font-size:8.6pt; color:var(--soft); }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:9pt; }
+  .card { border:1px solid var(--line); border-radius:8px; padding:7pt 9pt; break-inside:avoid; }
+  .card b.t { color:var(--w); display:block; margin-bottom:2pt; }
+  ul { margin:2pt 0 2pt 15pt; padding:0; } li { margin:1pt 0; }
+  code { font-family:"DejaVu Sans Mono",monospace; font-size:8.8pt; background:var(--tint); padding:0 3pt; border-radius:3px; }
+</style>
+</head>
+<body>
+
+<div class="eyebrow">SIVEC PAP/VPH · Red Centro · Santa Cruz de la Sierra</div>
+<h1>Lista de insumos y equipos</h1>
+<p class="lead">Qué hace falta en cada lugar para usar el SIVEC PAP/VPH: el centro que toma la muestra, el laboratorio que la lee, el hospital que hace colposcopia y la gestión de la red. Incluye cómo instalar el lector de código de barras.</p>
+<div class="warn"><b>Precios referenciales</b> (septiembre de 2026, mercado de Santa Cruz, en bolivianos): sirven para planificar, no para comprar. <b>Pedir al menos tres cotizaciones</b> antes de cualquier compra. Casi todos los centros ya tienen computadora e internet: se compra solo lo que falta.</div>
+<p><span class="tag i">IMPRESCINDIBLE</span> sin esto no funciona el circuito · <span class="tag r">RECOMENDADO</span> evita problemas en el día a día · <span class="tag o">OPCIONAL</span> mejora, se puede dejar para después · <span class="tag y">YA EXISTE</span> normalmente ya está en el centro</p>
+
+<h2>1. Qué necesita cada lugar</h2>
+<div class="two">
+  <div class="card"><b class="t">Centro de salud (1er nivel) — toma y envío</b>
+    <ul><li>Computadora con Chrome e internet <span class="tag y">YA EXISTE</span></li>
+    <li>Impresora láser A4 (etiquetas, hoja de remisión, D1, historia clínica) <span class="tag i">IMPRESCINDIBLE</span></li>
+    <li>Hojas de etiquetas adhesivas A4 <span class="tag i">IMPRESCINDIBLE</span></li>
+    <li>Portaláminas y bolsa/sobre para el lote <span class="tag i">IMPRESCINDIBLE</span></li>
+    <li>UPS (cortes de luz) <span class="tag r">RECOMENDADO</span> · Router 4G de respaldo <span class="tag r">RECOMENDADO</span></li>
+    <li>Lector de código de barras <span class="tag o">OPCIONAL</span></li></ul></div>
+  <div class="card"><b class="t">Laboratorio de citología (oncológico) — recepción e informe</b>
+    <ul><li>Computadora en recepción y en la mesa de lectura <span class="tag y">YA EXISTE</span></li>
+    <li><b>Lector de código de barras 2D USB</b> en recepción <span class="tag i">IMPRESCINDIBLE</span></li>
+    <li>Soporte de mesa para el lector (manos libres) <span class="tag r">RECOMENDADO</span></li>
+    <li>UPS <span class="tag r">RECOMENDADO</span></li>
+    <li>Impresora de etiquetas para láminas resistente a alcohol/xilol <span class="tag o">OPCIONAL (fase 2)</span></li></ul></div>
+  <div class="card"><b class="t">Hospital con colposcopia (2º/3er nivel, oncológico)</b>
+    <ul><li>Computadora en el consultorio de colposcopia <span class="tag y">YA EXISTE</span></li>
+    <li>Impresora (contrarreferencia en papel si la paciente la pide) <span class="tag y">YA EXISTE</span></li>
+    <li>Lector de código de barras (buscar a la paciente por la boleta) <span class="tag o">OPCIONAL</span></li>
+    <li>Tablet de 10" junto al colposcopio <span class="tag o">OPCIONAL</span></li></ul></div>
+  <div class="card"><b class="t">Gestión de la red y administración</b>
+    <ul><li>Computadora o notebook con Chrome <span class="tag y">YA EXISTE</span></li>
+    <li>Pantalla/TV con el tablero "en vivo" en la oficina de la red <span class="tag o">OPCIONAL</span></li>
+    <li>Base de datos con respaldo diario (Supabase Pro) <span class="tag i">IMPRESCINDIBLE al crecer</span></li>
+    <li>Un correo por persona (Gmail sirve) <span class="tag i">IMPRESCINDIBLE</span></li></ul></div>
+</div>
+
+<h2 class="pg" style="margin-top:0">2. Lista detallada</h2>
+<table>
+<thead><tr><th style="width:24%">Insumo / equipo</th><th>Especificación mínima · modelos de referencia</th><th style="width:15%">Dónde · cantidad</th><th class="n" style="width:14%">Precio ref. (Bs)</th><th style="width:11%">Prioridad</th></tr></thead>
+<tbody>
+<tr><td><b>Lector de código de barras 2D, USB con cable</b></td><td>Lee <b>Code 128</b> (etiquetas actuales) y <b>QR / DataMatrix</b> (etiquetas chicas de lámina, fase 2). Funciona como teclado (HID), sin driver. Con cable, no bluetooth, para empezar. Ref.: Zebra DS2208, Honeywell Voyager 1470g; genéricos 2D (Netum, Eyoyo) sirven.</td><td>Laboratorio: 1 por recepción. Centros y colposcopia: opcional, 1.</td><td class="n">250–450 genérico<br>900–1.400 marca</td><td><span class="tag i">IMPRESC.</span> lab</td></tr>
+<tr><td>Soporte de mesa para el lector</td><td>Pie/atril que deja el lector apuntando hacia abajo: se pasan las láminas sin tocar el lector. Muchos lectores ya lo traen.</td><td>Laboratorio</td><td class="n">60–150</td><td><span class="tag r">RECOM.</span></td></tr>
+<tr><td><b>Impresora láser A4 monocromática</b></td><td>Láser (la tinta de inyección se corre con la humedad y el alcohol y el código deja de leerse). Ref.: Brother HL-1212W, HP LaserJet M111w, Pantum P2500W.</td><td>1 por centro que toma PAP (si no tiene)</td><td class="n">900–1.500<br><span class="small">tóner 150–350</span></td><td><span class="tag i">IMPRESC.</span></td></tr>
+<tr><td><b>Hojas de etiquetas adhesivas A4</b></td><td>24 etiquetas por hoja (3 × 8, aprox. 70 × 37 mm), para impresora láser. Van en el <b>portaláminas / frasco de VPH / ficha</b>. El SIVEC imprime 24 por hoja; se ajusta el tamaño exacto a la marca que se compre.</td><td>Centros: 1 hoja cada 24 tomas</td><td class="n">3–6 por hoja<br><span class="small">caja de 100: 250–450</span></td><td><span class="tag i">IMPRESC.</span></td></tr>
+<tr><td>Láminas portaobjetos con extremo esmerilado</td><td>Las de siempre. El extremo esmerilado permite escribir el código con lápiz de grafito (resiste la tinción).</td><td>Centros</td><td class="n">—</td><td><span class="tag y">YA EXISTE</span></td></tr>
+<tr><td>Portaláminas (mailers) y bolsa/sobre del lote</td><td>Portaláminas plástico de 1 a 5 láminas; una bolsa o sobre por lote con la hoja de remisión adentro.</td><td>Centros</td><td class="n">3–8 c/u</td><td><span class="tag i">IMPRESC.</span></td></tr>
+<tr><td>UPS / no-break 600–800 VA</td><td>Da 10–15 minutos para guardar y apagar cuando se corta la luz.</td><td>1 por computadora que registra</td><td class="n">350–600</td><td><span class="tag r">RECOM.</span></td></tr>
+<tr><td>Router 4G de respaldo + chip de datos</td><td>Si se cae el internet del centro, se sigue trabajando. Chip de Entel, Tigo o Viva con plan de datos.</td><td>1 por centro</td><td class="n">250–450<br><span class="small">+ 70–150 / mes</span></td><td><span class="tag r">RECOM.</span></td></tr>
+<tr><td>Impresora de etiquetas térmica (fase 2)</td><td>Para etiquetar la <b>lámina misma</b>: transferencia térmica con ribbon de resina y etiqueta de poliéster resistente a <b>alcohol y xilol</b> (la tinción de Papanicolaou los usa: el papel común se borra o se despega). Ref.: Zebra ZD421t / ZD230t. La térmica directa (Brother QL) <b>no</b> sirve para la lámina.</td><td>Laboratorio o centros grandes</td><td class="n">2.500–4.500<br><span class="small">etiquetas + ribbon aparte</span></td><td><span class="tag o">OPCIONAL</span></td></tr>
+<tr><td>Tablet de 10"</td><td>Android o iPad con Chrome, junto al colposcopio o para el pase de visita.</td><td>Colposcopia</td><td class="n">1.500–2.500</td><td><span class="tag o">OPCIONAL</span></td></tr>
+<tr><td>Pantalla / TV con el tablero en vivo</td><td>Cualquier TV con entrada HDMI conectada a una PC, con el botón "Red" abierto.</td><td>Oficina de la red</td><td class="n">1.800–3.500</td><td><span class="tag o">OPCIONAL</span></td></tr>
+<tr><td><b>Base de datos Supabase Pro</b></td><td>Respaldo diario automático, más capacidad y soporte. El plan gratis sirve para el piloto, pero se pausa si no se usa y no tiene respaldo diario.</td><td>SIVEC (uno para toda la red)</td><td class="n">≈ 175 / mes<br><span class="small">USD 25</span></td><td><span class="tag i">IMPRESC.</span> al crecer</td></tr>
+<tr><td>Correo por persona</td><td>Cada profesional entra con su propio usuario (Gmail u otro). Nunca compartir usuarios.</td><td>Todos</td><td class="n">gratis</td><td><span class="tag i">IMPRESC.</span></td></tr>
+<tr><td>Google Chrome actualizado</td><td>El SIVEC funciona en Chrome o Edge actualizados, en Windows, Mac, Android o iPad.</td><td>Todas las computadoras</td><td class="n">gratis</td><td><span class="tag i">IMPRESC.</span></td></tr>
+</tbody></table>
+
+<h2 class="pg" style="margin-top:0">3. Cómo instalar el lector de código de barras</h2>
+<div class="ok"><b>No necesita programas ni drivers.</b> El lector USB funciona como un teclado: cuando lee una etiqueta, "escribe" el código y aprieta Enter. El SIVEC ya está preparado para recibirlo.</div>
+<div class="step"><div class="num">1</div><div><b>Enchufar</b> el lector en un puerto USB de la computadora. Windows lo reconoce solo en unos segundos (a veces suena un pitido).</div></div>
+<div class="step"><div class="num">2</div><div><b>Probar en el Bloc de notas:</b> abrir el Bloc de notas y leer una etiqueta impresa por el SIVEC. Tiene que aparecer el código, por ejemplo <code>M-26-000123</code>, y el cursor bajar a la línea siguiente (eso es el "Enter").</div></div>
+<div class="step"><div class="num">3</div><div><b>Si el guion sale como <code>'</code> o <code>?</code></b> (<code>M'26'000123</code>): pasa porque el lector escribe como teclado de EE.UU. y la computadora tiene teclado latinoamericano. <b>El SIVEC ya lo corrige solo</b>, así que se puede usar igual. Si se quiere que salga perfecto también en otros programas: en el manual del lector, leer el código de configuración <i>"Keyboard country: Latin American / Spanish"</i> o <i>"Emulate ALT + Keypad"</i>.</div></div>
+<div class="step"><div class="num">4</div><div><b>Si no baja de línea</b> (no hace "Enter"): en el manual, leer el código <i>"Add CR suffix"</i> / <i>"Enter"</i>. Casi todos lo traen activado de fábrica.</div></div>
+<div class="step"><div class="num">5</div><div><b>Code 128 activado</b> (viene de fábrica). En lectores 2D, dejar activados también <b>QR</b> y <b>DataMatrix</b> para las etiquetas chicas de la fase 2.</div></div>
+<div class="step"><div class="num">6</div><div><b>Usarlo en el SIVEC (laboratorio):</b> Portal → Recepción → leer el código de la <b>hoja de remisión</b> (se abre el lote) → leer cada lámina (queda "✓ Llegó bien") → las que no sirven se marcan con el motivo → <b>Confirmar recepción</b>.</div></div>
+<div class="box"><b>Consejos:</b> leer a 5–15 cm, con buena luz y la etiqueta sin arrugas; imprimir las etiquetas en <b>láser</b>; si una etiqueta no se lee, escribir el código a mano en el mismo cuadro y apretar Enter.</div>
+
+<h3>¿Dónde va la etiqueta?</h3>
+<table>
+<thead><tr><th style="width:26%">Qué</th><th>Cómo se identifica hoy (fase 1)</th><th>Fase 2 (si se compra impresora térmica)</th></tr></thead>
+<tbody>
+<tr><td>Lámina de PAP</td><td>Código escrito con <b>lápiz de grafito</b> en el extremo esmerilado (resiste la tinción) + <b>etiqueta con código de barras en el portaláminas</b></td><td>Etiqueta chica (≈ 22 × 22 mm) con QR/DataMatrix, de poliéster resistente al xilol, en el extremo esmerilado</td></tr>
+<tr><td>Frasco de VPH</td><td>Etiqueta A4 con código de barras pegada en el frasco</td><td>Igual, en rollo</td></tr>
+<tr><td>Lote</td><td>Hoja de remisión con el código del lote (2 copias: una viaja, otra queda firmada)</td><td>Igual</td></tr>
+</tbody></table>
+
+<h2 class="pg" style="margin-top:0">4. Presupuesto de referencia — piloto Red Centro</h2>
+<p class="small">9 centros de salud + el laboratorio del oncológico + 1 hospital con colposcopia. Se asume que todos ya tienen computadora e internet.</p>
+<table>
+<thead><tr><th>Concepto</th><th class="n">Cantidad</th><th class="n">Mínimo (Bs)</th><th class="n">Máximo (Bs)</th><th>Prioridad</th></tr></thead>
+<tbody>
+<tr><td>Lector 2D USB para el laboratorio (+ soporte)</td><td class="n">1</td><td class="n">310</td><td class="n">1.550</td><td><span class="tag i">IMPRESC.</span></td></tr>
+<tr><td>Hojas de etiquetas A4 (≈ 2.400 tomas/año ÷ 24)</td><td class="n">100 hojas/año</td><td class="n">300</td><td class="n">600</td><td><span class="tag i">IMPRESC.</span></td></tr>
+<tr><td>Portaláminas y bolsas del lote (año)</td><td class="n">≈ 600</td><td class="n">1.800</td><td class="n">4.800</td><td><span class="tag i">IMPRESC.</span></td></tr>
+<tr><td>Supabase Pro (año)</td><td class="n">12 meses</td><td class="n">2.100</td><td class="n">2.100</td><td><span class="tag i">IMPRESC.</span> al crecer</td></tr>
+<tr><td><b>Subtotal imprescindible</b></td><td></td><td class="n"><b>4.510</b></td><td class="n"><b>9.050</b></td><td></td></tr>
+<tr><td>Impresora láser (solo centros que no tengan; se estiman 5)</td><td class="n">5</td><td class="n">4.500</td><td class="n">7.500</td><td><span class="tag i">IMPRESC.</span> si falta</td></tr>
+<tr><td>UPS por computadora que registra</td><td class="n">11</td><td class="n">3.850</td><td class="n">6.600</td><td><span class="tag r">RECOM.</span></td></tr>
+<tr><td>Router 4G de respaldo (equipo)</td><td class="n">9</td><td class="n">2.250</td><td class="n">4.050</td><td><span class="tag r">RECOM.</span></td></tr>
+<tr><td>Planes de datos 4G (año)</td><td class="n">9 × 12</td><td class="n">7.560</td><td class="n">16.200</td><td><span class="tag r">RECOM.</span></td></tr>
+<tr><td>Lectores para centros y colposcopia</td><td class="n">10</td><td class="n">2.500</td><td class="n">14.000</td><td><span class="tag o">OPCIONAL</span></td></tr>
+<tr><td>Impresora térmica de etiquetas para láminas (fase 2)</td><td class="n">1</td><td class="n">2.500</td><td class="n">4.500</td><td><span class="tag o">OPCIONAL</span></td></tr>
+</tbody></table>
+<p class="small">Totales orientativos. El equipamiento se compra una vez; etiquetas, portaláminas, datos 4G y Supabase son gastos anuales.</p>
+
+<h2>5. Antes de empezar en un centro nuevo (lista de control)</h2>
+<ul style="list-style:none;margin-left:2pt">
+<li>☐ El administrador creó el establecimiento en <b>Admin → Establecimientos</b> (y marcó colposcopia / recibe muestras si corresponde).</li>
+<li>☐ Cada persona tiene su usuario en <b>Admin → Usuarios</b> (con permiso de Laboratorio o Colposcopia si corresponde).</li>
+<li>☐ La computadora quedó conectada con el <b>código de conexión</b> (⚙ Configuración) y cada persona entró una vez.</li>
+<li>☐ Se imprimió una hoja de etiquetas de prueba y el lector la lee (Bloc de notas).</li>
+<li>☐ Se armó un lote de prueba y el laboratorio lo recibió en su Portal.</li>
+<li>☐ Capacitación de 2 horas: registrar, armar lote, marcar resultado entregado, derivar, leer la contrarreferencia.</li>
+</ul>
+<p class="small">SIVEC · Sistema Integral de Vigilancia y Enlace Clínico · documento de trabajo, septiembre de 2026.</p>
+</body>
+</html>
