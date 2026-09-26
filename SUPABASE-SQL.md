@@ -490,6 +490,165 @@ notify pgrst, 'reload schema';
 
 ---
 
+## Paso 13 — Derivación digital a colposcopia / biopsia y contrarreferencia
+
+El centro deriva desde la paciente (⋯ → **🩺 Derivar a colposcopia / biopsia**) a un establecimiento con colposcopia habilitada.
+El usuario con rol **Colposcopia** de ese establecimiento la ve en su **Portal**: da la cita, registra colposcopia, biopsia y tratamiento,
+y envía la **contrarreferencia**, que llega a la ficha del centro ("🩺 contrarreferencia · nueva"). El resultado de la biopsia se carga después
+y vuelve a avisar al centro. El seguimiento PAP+ avanza solo (colposcopia agendada → realizada → tratamiento) y la colposcopia queda en la ficha.
+
+```sql
+-- 1) Derivación a colposcopia / biopsia y contrarreferencia
+create table if not exists derivaciones (
+  id uuid primary key default gen_random_uuid(),
+  paciente_id uuid not null references pacientes(id) on delete cascade,
+  centro_origen uuid not null,
+  destino_id uuid not null,
+  motivo text,
+  indicacion text,                      -- Colposcopia · Colposcopia + biopsia · Tratamiento
+  prioridad text not null default 'normal',
+  notas text,
+  derivado_por text,
+  fecha_derivacion date not null default current_date,
+  estado text not null default 'enviada', -- enviada · citada · atendida · contrarreferida · no_asistio · cancelada
+  fecha_cita date,
+  fecha_atencion date,
+  atendido_por text,
+  colposcopia jsonb,
+  biopsia_tomada boolean,
+  biopsia_resultado text,
+  fecha_biopsia_resultado date,
+  tratamiento text,
+  contrarreferencia text,
+  proximo_control text,
+  fecha_contrarreferencia timestamptz,
+  visto_origen_at timestamptz,
+  creado_por uuid default auth.uid(),
+  created_at timestamptz not null default now()
+);
+create index if not exists derivaciones_paciente_idx on derivaciones (paciente_id);
+create index if not exists derivaciones_destino_idx on derivaciones (destino_id, estado);
+alter table derivaciones enable row level security;
+drop policy if exists "origen ve sus derivaciones" on derivaciones;
+drop policy if exists "destino ve sus derivadas" on derivaciones;
+create policy "origen ve sus derivaciones" on derivaciones for select to authenticated using (sivec_ve_centro(centro_origen));
+create policy "destino ve sus derivadas" on derivaciones for select to authenticated using (sivec_rol() = 'colposcopia' and destino_id = sivec_centro());
+grant select on derivaciones to authenticated;
+
+-- 2) El centro deriva (solo a establecimientos con colposcopia habilitada)
+create or replace function sivec_derivar(p_paciente uuid, p_destino uuid, p_motivo text, p_indicacion text, p_prioridad text, p_notas text, p_por text)
+returns derivaciones language plpgsql security definer set search_path = public as $$
+declare v_p pacientes; v_d derivaciones; v_dest text;
+begin
+  select * into v_p from pacientes where id = p_paciente and deleted_at is null;
+  if not found or not sivec_edita_centro(v_p.centro_id) then raise exception 'Solo el centro de la paciente puede derivarla.'; end if;
+  select nombre into v_dest from centros_salud where id = p_destino and hace_colposcopia and activo is not false;
+  if v_dest is null then raise exception 'Ese establecimiento no tiene colposcopia habilitada.'; end if;
+  if exists (select 1 from derivaciones where paciente_id = p_paciente and estado in ('enviada', 'citada', 'atendida')) then
+    raise exception 'Esta toma ya tiene una derivación en curso.'; end if;
+  insert into derivaciones (paciente_id, centro_origen, destino_id, motivo, indicacion, prioridad, notas, derivado_por)
+    values (p_paciente, v_p.centro_id, p_destino, nullif(trim(p_motivo), ''), nullif(trim(p_indicacion), ''), coalesce(nullif(p_prioridad, ''), 'normal'), nullif(trim(p_notas), ''), nullif(trim(p_por), ''))
+    returning * into v_d;
+  update pacientes set derivacion_pap = v_dest where id = p_paciente;
+  return v_d;
+end $$;
+
+create or replace function sivec_der_cancelar(p_id uuid) returns void language plpgsql security definer set search_path = public as $$
+begin
+  update derivaciones set estado = 'cancelada' where id = p_id and estado in ('enviada', 'citada') and sivec_edita_centro(centro_origen);
+  if not found then raise exception 'No se puede cancelar esta derivación.'; end if;
+end $$;
+
+create or replace function sivec_der_visto(p_ids uuid[]) returns void language sql security definer set search_path = public as $$
+  update derivaciones set visto_origen_at = now() where id = any(p_ids) and sivec_edita_centro(centro_origen) $$;
+
+-- 3) Portal de colposcopia: solo las pacientes derivadas a este establecimiento, con sus antecedentes de PAP/VPH
+create or replace function sivec_colpo_lista()
+returns table (id uuid, paciente_id uuid, nombre text, carnet text, fecha_nacimiento date, celular text, direccion text,
+  centro_origen uuid, motivo text, indicacion text, prioridad text, notas text, derivado_por text, fecha_derivacion date,
+  estado text, fecha_cita date, fecha_atencion date, atendido_por text, colposcopia jsonb, biopsia_tomada boolean,
+  biopsia_resultado text, tratamiento text, contrarreferencia text, proximo_control text, fecha_contrarreferencia timestamptz, antecedentes text)
+language sql stable security definer set search_path = public as $$
+  select d.id, d.paciente_id, p.nombre, p.carnet, p.fecha_nacimiento, p.celular, p.direccion,
+    d.centro_origen, d.motivo, d.indicacion, d.prioridad, d.notas, d.derivado_por, d.fecha_derivacion,
+    d.estado, d.fecha_cita, d.fecha_atencion, d.atendido_por, d.colposcopia, d.biopsia_tomada,
+    d.biopsia_resultado, d.tratamiento, d.contrarreferencia, d.proximo_control, d.fecha_contrarreferencia,
+    (select string_agg(to_char(q.fecha_toma, 'MM/YYYY') || ' ' || coalesce(nullif(q.resultado_pap, ''), 'PAP pendiente')
+        || case when q.resultado_vph is not null and q.resultado_vph <> '' then ' · VPH ' || q.resultado_vph || coalesce(' ' || q.vph_genotipo, '') else '' end, '  |  ' order by q.fecha_toma desc)
+       from pacientes q where q.deleted_at is null and (q.id = p.id or (coalesce(p.carnet, '') <> '' and q.carnet = p.carnet)))
+  from derivaciones d join pacientes p on p.id = d.paciente_id
+  where sivec_rol() = 'colposcopia' and d.destino_id = sivec_centro() and d.estado <> 'cancelada'
+  order by (d.prioridad = 'urgente') desc, d.fecha_derivacion $$;
+
+create or replace function sivec_colpo_etapa(p_paciente uuid, p_etapa text) returns void language sql security definer set search_path = public as $$
+  update pacientes set seg_etapa = p_etapa, seg_fechas = coalesce(seg_fechas, '{}'::jsonb) || jsonb_build_object(p_etapa, to_char(current_date, 'YYYY-MM-DD'))
+   where id = p_paciente $$;
+
+create or replace function sivec_colpo_cita(p_id uuid, p_fecha date) returns void language plpgsql security definer set search_path = public as $$
+declare v_pac uuid;
+begin
+  update derivaciones set estado = 'citada', fecha_cita = p_fecha
+   where id = p_id and sivec_rol() = 'colposcopia' and destino_id = sivec_centro() and estado in ('enviada', 'citada', 'no_asistio')
+   returning paciente_id into v_pac;
+  if v_pac is null then raise exception 'Derivación no encontrada en este establecimiento.'; end if;
+  perform sivec_colpo_etapa(v_pac, 'colpo_agendada');
+end $$;
+
+create or replace function sivec_colpo_no_asistio(p_id uuid) returns void language plpgsql security definer set search_path = public as $$
+begin
+  update derivaciones set estado = 'no_asistio', fecha_contrarreferencia = now(), visto_origen_at = null,
+         contrarreferencia = coalesce(contrarreferencia, 'La paciente no asistió a la cita: realizar búsqueda activa y volver a citar.')
+   where id = p_id and sivec_rol() = 'colposcopia' and destino_id = sivec_centro() and estado in ('enviada', 'citada');
+  if not found then raise exception 'Derivación no encontrada en este establecimiento.'; end if;
+end $$;
+
+-- Atender: colposcopia (+ biopsia) y, si p_enviar, la contrarreferencia vuelve al centro
+create or replace function sivec_colpo_atender(p_id uuid, p_colpo jsonb, p_biopsia boolean, p_tratamiento text, p_contrarref text, p_proximo text, p_por text, p_enviar boolean)
+returns void language plpgsql security definer set search_path = public as $$
+declare v_d derivaciones;
+begin
+  select * into v_d from derivaciones where id = p_id and sivec_rol() = 'colposcopia' and destino_id = sivec_centro() and estado <> 'cancelada';
+  if not found then raise exception 'Derivación no encontrada en este establecimiento.'; end if;
+  update derivaciones set colposcopia = p_colpo, biopsia_tomada = p_biopsia, tratamiento = nullif(trim(p_tratamiento), ''),
+         contrarreferencia = nullif(trim(p_contrarref), ''), proximo_control = nullif(trim(p_proximo), ''),
+         atendido_por = nullif(trim(p_por), ''), fecha_atencion = coalesce(fecha_atencion, current_date),
+         estado = case when p_enviar then 'contrarreferida' else 'atendida' end,
+         fecha_contrarreferencia = case when p_enviar then now() else fecha_contrarreferencia end,
+         visto_origen_at = case when p_enviar then null else visto_origen_at end
+   where id = p_id;
+  perform sivec_colpo_etapa(v_d.paciente_id, case when coalesce(p_tratamiento, '') not in ('', 'Ninguno (control)') then 'tratamiento' else 'colpo_realizada' end);
+  -- Compatibilidad: también queda como colposcopia en la ficha (Historia clínica)
+  if v_d.fecha_atencion is null then
+    begin
+      insert into colposcopias (paciente_id, fecha, zona_afectada, lesion, otros_hallazgos, prueba_schiller, centro_id)
+      values (v_d.paciente_id, current_date, p_colpo ->> 'zt',
+              array(select jsonb_array_elements_text(coalesce(p_colpo -> 'hallazgos', '[]'::jsonb))),
+              concat_ws(' · ', 'Impresión: ' || (p_colpo ->> 'impresion'), case when p_biopsia then 'Biopsia tomada' end, p_colpo ->> 'observaciones'),
+              p_colpo ->> 'schiller', v_d.destino_id);
+    exception when others then null;
+    end;
+  end if;
+end $$;
+
+create or replace function sivec_colpo_biopsia(p_id uuid, p_resultado text) returns void language plpgsql security definer set search_path = public as $$
+begin
+  update derivaciones set biopsia_resultado = nullif(trim(p_resultado), ''), fecha_biopsia_resultado = current_date,
+         visto_origen_at = case when estado = 'contrarreferida' then null else visto_origen_at end
+   where id = p_id and sivec_rol() = 'colposcopia' and destino_id = sivec_centro() and biopsia_tomada;
+  if not found then raise exception 'Derivación sin biopsia o de otro establecimiento.'; end if;
+end $$;
+
+revoke execute on function sivec_derivar(uuid, uuid, text, text, text, text, text), sivec_der_cancelar(uuid), sivec_der_visto(uuid[]),
+  sivec_colpo_lista(), sivec_colpo_etapa(uuid, text), sivec_colpo_cita(uuid, date), sivec_colpo_no_asistio(uuid),
+  sivec_colpo_atender(uuid, jsonb, boolean, text, text, text, text, boolean), sivec_colpo_biopsia(uuid, text) from public, anon;
+grant execute on function sivec_derivar(uuid, uuid, text, text, text, text, text), sivec_der_cancelar(uuid), sivec_der_visto(uuid[]),
+  sivec_colpo_lista(), sivec_colpo_cita(uuid, date), sivec_colpo_no_asistio(uuid),
+  sivec_colpo_atender(uuid, jsonb, boolean, text, text, text, text, boolean), sivec_colpo_biopsia(uuid, text) to authenticated;
+notify pgrst, 'reload schema';
+```
+
+---
+
 ## Paso 3 — Proteger los datos de las pacientes (IMPORTANTE)
 
 Hoy cualquiera que tenga la URL y la clave *anon* de Supabase puede leer todos los datos.

@@ -835,3 +835,12 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - No centro: faixa azul **"🔬 N resultados novos do laboratório"** + etiqueta "Resultado novo / Muestra rechazada" e botão **✓ Visto** em cada paciente; próximo passo "Repetir toma (muestra rechazada: …)", "En camino al laboratorio", "En el laboratorio desde…".
 - Imagens: `docs/pap-real/lab_*.png`.
 - **[26/09] Primeiro lote real:** L-2026-0001 (3 amostras) montado no Supabase do piloto; etiquetas e hoja de remisión impressas. Ajustes: idade "NaN" → "—" quando a data de nascimento está mal cadastrada; impressão sem cabeçalho/rodapé do Chrome; **código de conexão** (⚙ Configuración → "Copiar código de conexión" → colar no outro computador) para conectar laboratório e outros centros sem digitar URL e chave.
+
+### [26/09/2026] Circuito centro → oncológico → centro FUNCIONANDO no Supabase real
+- O autor testou: lote L-2026-0001 enviado por San Luis, recebido e informado pelo usuário do laboratório (janela anônima), resultado chegou digital à ficha ("1 resultado nuevo del laboratorio").
+
+### [26/09/2026] SIVEC PAP · Passo 4 PROGRAMADO — derivação digital a colposcopia/biópsia e contrarreferência
+- SQL **Paso 13**: tabela `derivaciones` + funções (`sivec_derivar`, `sivec_colpo_lista`, `sivec_colpo_cita`, `sivec_colpo_atender`, `sivec_colpo_biopsia`, `sivec_colpo_no_asistio`, `sivec_der_visto`, `sivec_der_cancelar`). O hospital não lê a tabela de pacientes: só as derivadas a ele, com antecedentes PAP/VPH e celular.
+- Centro: ⋯ → **🩺 Derivar a colposcopia / biopsia** (destino = estabelecimentos com colposcopia; motivo sugerido pelo Bethesda/VPH; indicação; prioridade urgente automática em alto grau/VPH 16-18) → boleta de referência impressa (com espaço de contrarreferência em papel para hospitais que ainda não usam o SIVEC). Etiqueta 🩺 no cartão (esperando cita / cita dd/mm / contrarreferencia · nueva), faixa roxa "contrarreferencias nuevas", próximo passo atualizado sozinho.
+- Portal de colposcopia (papel "Colposcopia"): Derivadas / Citadas / Biopsia pendiente / Atendidas; cita, não compareceu (avisa o centro para busca ativa), colposcopia com toques (adequada, ZT, achados, Schiller, impressão), biópsia, tratamento (LEEP/cono, crioterapia, ablação, oncologia…), próximo controle, texto de contrarreferência automático → enviar. Resultado da biópsia (CIN 1/2/3, Ca in situ, AIS, invasor) volta a avisar o centro. Colposcopia gravada também na tabela `colposcopias` (ficha/HC) e seguimento PAP+ avança sozinho.
+- Imagens: `docs/pap-real/der_*.png`.

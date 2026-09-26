@@ -481,6 +481,20 @@
   .vistoBtn { font-size: 11px; font-weight: 700; border: 1px solid #93c5fd; background: #fff; color: #1e40af; border-radius: 6px; padding: 1px 7px; margin-left: 4px; cursor: pointer; }
   #resultadosBanner { background: linear-gradient(135deg,#e0ecff,#d6e6ff); border: 1px solid #93b4e6; border-radius: 12px; padding: 12px 18px; margin: 0 22px 14px; font-size: 13.5px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: #1e3a5f; }
   body.dark #resultadosBanner { background: #1d2733; border-color: #34475e; color: #cfe0f5; }
+  /* Derivación a colposcopia y contrarreferencia */
+  #derOverlay { position: fixed; inset: 0; background: rgba(30,10,20,.45); z-index: 960; display: none; align-items: flex-start; justify-content: center; padding: 30px 16px; overflow: auto; }
+  #derOverlay.open { display: flex; }
+  #derBox { background: var(--surface); color: var(--ink); border-radius: 14px; padding: 20px 22px; width: 640px; max-width: 100%; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
+  #derBox h2 { margin: 0 0 4px; font-size: 18px; }
+  #derBox .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; align-items: center; }
+  #derBox textarea, #derBox select, #derBox input[type=text], #derBox input[type=date] { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; background: var(--surface); color: var(--ink); font-family: inherit; font-size: 13px; }
+  .derDato { display: grid; grid-template-columns: 150px 1fr; gap: 4px 10px; font-size: 13px; margin: 8px 0; } .derDato b { color: var(--ink-soft); font-weight: 700; }
+  .derChip { font-size: 11px; font-weight: 700; border-radius: 6px; padding: 1px 7px; margin-left: 4px; background: #ede9fe; color: #5b21b6; cursor: pointer; border: none; font-family: inherit; }
+  .derChip.nuevo { background: #fde2e2; color: #991b1b; } .derChip.ok { background: #dcf5e9; color: #0d6b47; }
+  #contrarrefBanner { background: linear-gradient(135deg,#efe7ff,#e6dcff); border: 1px solid #b9a3ea; border-radius: 12px; padding: 12px 18px; margin: 0 22px 14px; font-size: 13.5px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: #3b2170; }
+  body.dark #contrarrefBanner { background: #251d33; border-color: #4a3a66; color: #ddd0fb; }
+  .colFila { cursor: pointer; } .colFila:hover td { background: color-mix(in srgb, var(--teal-700) 5%, transparent); } .colFila.on td { background: color-mix(in srgb, var(--teal-700) 10%, transparent); }
+  .urg { font-size: 10.5px; font-weight: 800; color: #fff; background: #dc2626; border-radius: 5px; padding: 1px 6px; margin-left: 4px; }
   .rolTag { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 8px; background: #f3e5ea; color: #7d2a4c; }
   body.dark .rolTag { background: #3a2530; color: #f1a7c3; }
   .sinRolBox { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 32px; width: 380px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -864,6 +878,7 @@
 </div>
 
 <div id="loteOverlay"><div id="loteBox"></div></div>
+<div id="derOverlay"><div id="derBox"></div></div>
 <iframe id="printFrame" title="Impresión" style="position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden"></iframe>
 
 <div id="sinRolOverlay">
@@ -1055,6 +1070,7 @@
         <button id="exportExcelBtn" class="rowBtn">📊 Descargar Excel</button>
       </div>
       <div id="resultadosBanner" style="display:none"></div>
+      <div id="contrarrefBanner" style="display:none"></div>
       <div id="overdueBanner" style="display:none"></div>
       <div id="vencimientoBanner" style="display:none"></div>
       <div id="birthdayBanner" style="display:none"></div>
@@ -1254,6 +1270,10 @@
       <div id="portalLab" style="display:none">
         <div class="labTabs"><button type="button" data-lt="rec" class="on">📥 Recepción <b id="labNRec"></b></button><button type="button" data-lt="leer">🔬 Por leer <b id="labNLeer"></b></button><button type="button" data-lt="inf">✅ Informadas</button></div>
         <div id="labPane"></div>
+      </div>
+      <div id="portalColpo" style="display:none">
+        <div class="labTabs" id="colTabs"><button type="button" data-ct="nuevas" class="on">📥 Derivadas <b id="colNNuevas"></b></button><button type="button" data-ct="citadas">📅 Citadas <b id="colNCitadas"></b></button><button type="button" data-ct="biopsia">🧫 Biopsia pendiente <b id="colNBiop"></b></button><button type="button" data-ct="hechas">✅ Atendidas</button></div>
+        <div id="colPane"></div>
       </div>
     </div>
 
@@ -1897,13 +1917,15 @@ document.getElementById('centroSel').addEventListener('change', e => {
 });
 
 function loadPortal() {
-  const onco = perfil && perfil.rol === 'oncologico';
+  const onco = perfil && perfil.rol === 'oncologico', colpo = perfil && perfil.rol === 'colposcopia';
   document.getElementById('portalLab').style.display = onco ? '' : 'none';
+  document.getElementById('portalColpo').style.display = colpo ? '' : 'none';
   document.getElementById('portalTitulo').textContent = onco ? '🔬 Portal del laboratorio — ' + (centroNombre(perfil.centro_id) || '') : 'Portal de colposcopia';
   document.getElementById('portalTexto').innerHTML = onco
     ? 'Recibí los lotes que mandan los centros, informá PAP (Bethesda) y VPH, y firmá: el resultado <b>aparece solo en la ficha del centro</b>, sin papel. Solo se ven las muestras enviadas a este establecimiento.'
-    : 'Acá van a llegar las pacientes derivadas por los centros, para registrar colposcopia, biopsia, tratamiento y la contrarreferencia. (En construcción: próximo paso del SIVEC PAP.)';
+    : 'Pacientes derivadas por los centros: dale la cita, registrá la colposcopia, la biopsia y el tratamiento, y mandá la <b>contrarreferencia</b>: llega sola a la ficha del centro. Solo se ven las pacientes derivadas a este establecimiento.';
   if (onco) labCargar();
+  if (colpo) { document.getElementById('portalTitulo').textContent = '🩺 Portal de colposcopia — ' + (centroNombre(perfil.centro_id) || ''); colCargar(); }
 }
 
 // ================= Portal del laboratorio (Paso 12 del SQL) =================
@@ -2427,6 +2449,241 @@ async function loteImprimir(l, que) {
   setTimeout(() => { fr.contentWindow.focus(); fr.contentWindow.print(); }, 250);
 }
 
+// ================= Derivación a colposcopia / biopsia y contrarreferencia (Paso 13 del SQL) =================
+let derivTablaPromise = null, derivMap = new Map();
+function derivOk() {
+  if (!sb) return Promise.resolve(false);
+  if (!derivTablaPromise) derivTablaPromise = sb.from('derivaciones').select('id').limit(1).then(({ error }) => !error, () => false);
+  return derivTablaPromise;
+}
+let derivSi = false;
+function derivDisponible() { return derivSi && conRoles() && perfil.rol === 'centro'; }
+function derivDe(p) { return derivMap.get(String(p.id)) || null; }
+function derEsNueva(d) { return ['contrarreferida', 'no_asistio'].includes(d.estado) && !d.visto_origen_at; }
+async function derCargar() {
+  derivMap = new Map();
+  derivSi = conRoles() && await derivOk();
+  if (!derivSi) return;
+  const { data } = await selectAll(() => sb.from('derivaciones').select('*').neq('estado', 'cancelada'));
+  (data || []).sort((a, b) => String(a.created_at).localeCompare(String(b.created_at))).forEach(d => derivMap.set(String(d.paciente_id), d));
+}
+const DER_ESTADO = { enviada: 'esperando cita', citada: 'citada', atendida: 'atendida', contrarreferida: 'contrarreferencia', no_asistio: 'no asistió' };
+function derChipHTML(p) {
+  const d = derivDe(p); if (!d) return '';
+  const nueva = derEsNueva(d);
+  const txt = d.estado === 'citada' ? 'cita ' + fmtFecha(d.fecha_cita).slice(0, 5) : DER_ESTADO[d.estado] || d.estado;
+  return ` <button type="button" class="derChip${nueva ? ' nuevo' : d.estado === 'contrarreferida' ? ' ok' : ''}" data-der="${esc(p.id)}" title="Derivación a ${esc(centroNombre(d.destino_id))}">🩺 ${esc(txt)}${nueva ? ' · nueva' : ''}</button>`;
+}
+function derMotivoSugerido(p) {
+  const bet = bethesdaDe(p);
+  return [bet && bet !== 'NILM' ? bet : '', p.resultado_vph === 'Positiva' ? 'VPH+' + (p.vph_genotipo ? ' ' + p.vph_genotipo : '') : ''].filter(Boolean).join(' · ');
+}
+function derCerrar() { document.getElementById('derOverlay').classList.remove('open'); }
+function derAbrir(p) {
+  const d = derivDe(p);
+  if (d && !['cancelada'].includes(d.estado)) return derDetalle(p, d);
+  derFormulario(p);
+}
+function derFormulario(p) {
+  const dest = centros.filter(c => c.hace_colposcopia && c.activo !== false);
+  const box = document.getElementById('derBox');
+  if (!dest.length) { alert('Todavía no hay establecimientos con colposcopia habilitada: el administrador los marca en Admin → Establecimientos.'); return; }
+  const bet = bethesdaDe(p), alto = bet && (BETHESDA_BY_CODE[bet] || {}).nivel === 'alto';
+  let st = { indicacion: 'Colposcopia + biopsia', prioridad: alto || /16|18/.test(p.vph_genotipo || '') ? 'urgente' : 'normal' };
+  const pinta = () => {
+    box.innerHTML = `<h2>🩺 Derivar a colposcopia</h2><p class="hint" style="margin:0">${esc(p.nombre)} · CI ${esc(p.carnet || '—')} · ${edadDe(p.fecha_nacimiento) ?? '—'} años · toma ${fmtFecha(p.fecha_toma)}</p>
+      <div class="labSec">Destino (establecimientos con colposcopia)</div><select id="derDestino">${dest.map(c => `<option value="${c.id}">${esc(c.nombre)} · ${esc(TIPOS_CENTRO[c.tipo] || '')}</option>`).join('')}</select>
+      <div class="labSec">Motivo</div><input type="text" id="derMotivo" value="${esc(derMotivoSugerido(p))}" placeholder="Ej: HSIL, ASC-H, LSIL persistente, VPH 16/18">
+      <div class="labSec">Indicación</div><div class="labChips">${['Colposcopia', 'Colposcopia + biopsia', 'Tratamiento (LEEP / cono)'].map(v => `<button type="button" class="labChip${st.indicacion === v ? ' on' : ''}" data-dg="indicacion" data-v="${v}">${v}</button>`).join('')}</div>
+      <div class="labSec">Prioridad</div><div class="labChips">${[['normal', 'Normal'], ['urgente', 'Urgente']].map(([k, v]) => `<button type="button" class="labChip${k === 'urgente' ? ' alto' : ''}${st.prioridad === k ? ' on' : ''}" data-dg="prioridad" data-v="${k}">${v}</button>`).join('')}</div>
+      <div class="labSec">Notas para el hospital (opcional)</div><textarea id="derNotas" rows="2" placeholder="Antecedentes, embarazo, dificultades para asistir…"></textarea>
+      <div class="acts"><button type="button" class="primary" data-da="enviar">📤 Derivar</button><button type="button" class="rowBtn" data-da="cerrar" style="margin-left:auto">Cancelar</button></div>
+      <p class="hint" style="margin:8px 0 0">El hospital la ve en su portal, le da cita y devuelve la <b>contrarreferencia</b> (colposcopia, biopsia, tratamiento) directo a esta ficha.</p>`;
+  };
+  pinta();
+  box.onclick = async e => {
+    const c = e.target.closest('[data-dg]');
+    if (c) { const keep = { d: g('derDestino'), m: g('derMotivo'), n: g('derNotas') }; st[c.dataset.dg] = c.dataset.v; pinta(); document.getElementById('derDestino').value = keep.d; document.getElementById('derMotivo').value = keep.m; document.getElementById('derNotas').value = keep.n; return; }
+    const a = e.target.closest('[data-da]'); if (!a) return;
+    if (a.dataset.da === 'cerrar') return derCerrar();
+    const destino = g('derDestino');
+    const { data, error } = await sb.rpc('sivec_derivar', { p_paciente: p.id, p_destino: destino, p_motivo: g('derMotivo'), p_indicacion: st.indicacion, p_prioridad: st.prioridad, p_notas: g('derNotas'), p_por: perfil.nombre_completo || perfil.correo || '' });
+    if (error) { alert('No se pudo derivar: ' + error.message); return; }
+    const d = Array.isArray(data) ? data[0] : data;
+    showToast(`${esc(p.nombre)} derivada a ${esc(centroNombre(destino))} ✔`, 'ok');
+    derivMap.set(String(p.id), d); p.derivacion_pap = centroNombre(destino);
+    renderBanners(allPatientsData); applyListFilters(true);
+    derDetalle(p, d, true);
+  };
+  function g(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  document.getElementById('derOverlay').classList.add('open');
+}
+function derResumenColpo(c) {
+  if (!c) return '';
+  return [c.adecuada === false ? 'Colposcopia no adecuada' : 'Colposcopia adecuada', c.zt ? 'ZT ' + c.zt : '', (c.hallazgos || []).length ? 'Hallazgos: ' + c.hallazgos.join(', ') : '', c.schiller ? 'Schiller ' + c.schiller.toLowerCase() : '', c.impresion ? 'Impresión: ' + c.impresion : '', c.observaciones || ''].filter(Boolean).join(' · ');
+}
+function derDetalle(p, d, recien) {
+  const box = document.getElementById('derBox'), dest = centroNombre(d.destino_id);
+  const fila = (k, v) => v ? `<b>${k}</b><span>${v}</span>` : '';
+  const vuelta = ['atendida', 'contrarreferida', 'no_asistio'].includes(d.estado);
+  box.innerHTML = `<h2>🩺 ${d.estado === 'contrarreferida' ? 'Contrarreferencia' : d.estado === 'no_asistio' ? 'No asistió a colposcopia' : 'Derivación a colposcopia'}</h2>
+    <p class="hint" style="margin:0">${esc(p.nombre)} · CI ${esc(p.carnet || '—')} · ${esc(dest)}</p>
+    <div class="derDato">${fila('Derivada', fmtFecha(d.fecha_derivacion) + (d.derivado_por ? ' · ' + esc(d.derivado_por) : ''))}${fila('Motivo', esc(d.motivo || '—') + ' · ' + esc(d.indicacion || '') + (d.prioridad === 'urgente' ? ' <span class="urg">URGENTE</span>' : ''))}
+      ${fila('Estado', esc(DER_ESTADO[d.estado] || d.estado) + (d.fecha_cita ? ' · cita ' + fmtFecha(d.fecha_cita) : ''))}
+      ${vuelta ? fila('Atendida', (d.fecha_atencion ? fmtFecha(d.fecha_atencion) : '') + (d.atendido_por ? ' · ' + esc(d.atendido_por) : '')) + fila('Colposcopia', esc(derResumenColpo(d.colposcopia))) + fila('Biopsia', d.biopsia_tomada ? (d.biopsia_resultado ? '<b style="color:#991b1b">' + esc(d.biopsia_resultado) + '</b>' : 'tomada · resultado pendiente') : (d.colposcopia ? 'no se tomó' : '')) + fila('Tratamiento', esc(d.tratamiento || '')) + fila('Próximo control', esc(d.proximo_control || '')) + fila('Indicaciones', esc(d.contrarreferencia || '')) : ''}</div>
+    <div class="acts">${derEsNueva(d) ? '<button type="button" class="primary" data-dd="visto">✓ Visto</button>' : ''}
+      <button type="button" class="rowBtn" data-dd="boleta">🖨 Boleta de referencia</button>
+      ${['enviada', 'citada'].includes(d.estado) ? '<button type="button" class="rowBtn" data-dd="cancelar">Cancelar derivación</button>' : ''}
+      ${['no_asistio', 'contrarreferida'].includes(d.estado) ? '<button type="button" class="rowBtn" data-dd="nueva">🩺 Derivar de nuevo</button>' : ''}
+      <button type="button" class="rowBtn" data-dd="cerrar" style="margin-left:auto">Cerrar</button></div>
+    ${recien ? '<p class="hint" style="margin:8px 0 0">Imprimí la boleta si la paciente la tiene que llevar; el hospital ya la ve en su portal.</p>' : ''}`;
+  box.onclick = async e => {
+    const a = e.target.closest('[data-dd]'); if (!a) return;
+    const k = a.dataset.dd;
+    if (k === 'cerrar') return derCerrar();
+    if (k === 'boleta') return derBoleta(p, d);
+    if (k === 'nueva') return derFormulario(p);
+    if (k === 'visto') {
+      const { error } = await sb.rpc('sivec_der_visto', { p_ids: [d.id] });
+      if (error) return alert(error.message);
+      d.visto_origen_at = new Date().toISOString(); renderBanners(allPatientsData); applyListFilters(true); derCerrar(); showToast('Contrarreferencia vista ✔', 'ok'); return;
+    }
+    if (k === 'cancelar') {
+      if (!confirm('¿Cancelar esta derivación? El hospital deja de verla.')) return;
+      const { error } = await sb.rpc('sivec_der_cancelar', { p_id: d.id });
+      if (error) return alert(error.message);
+      derivMap.delete(String(p.id)); renderBanners(allPatientsData); applyListFilters(true); derCerrar(); showToast('Derivación cancelada', 'ok');
+    }
+  };
+  document.getElementById('derOverlay').classList.add('open');
+}
+function imprimirEnFrame(titulo, css, body) {
+  const fr = document.getElementById('printFrame'), doc = fr.contentDocument;
+  doc.open(); doc.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${esc(titulo)}</title><style>@page { size: A4; margin: 0; } * { box-sizing: border-box; } body { font-family: Arial, sans-serif; color: #111; margin: 0; padding: 12mm; font-size: 10.5pt; } ${css}</style></head><body>${body}</body></html>`); doc.close();
+  setTimeout(() => { fr.contentWindow.focus(); fr.contentWindow.print(); }, 250);
+}
+function derBoleta(p, d) {
+  const org = centroNombre(d.centro_origen), dest = centroNombre(d.destino_id);
+  const css = `h1 { font-size: 15pt; margin: 0 0 2px; } .sub { color: #555; font-size: 9pt; } .g { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; margin: 10px 0; } .g b { display: block; font-size: 8pt; color: #555; text-transform: uppercase; }
+    .box { border: 1px solid #999; border-radius: 4px; padding: 8px 10px; margin: 8px 0; min-height: 22mm; } .box h3 { margin: 0 0 4px; font-size: 10pt; color: #7d2a4c; } .firma { margin-top: 18mm; border-top: 1px solid #000; width: 70mm; font-size: 9pt; padding-top: 3px; }
+    .head { display: flex; justify-content: space-between; border-bottom: 2px solid #7d2a4c; padding-bottom: 6px; } .urg { color: #b91c1c; font-weight: bold; }`;
+  const body = `<div class="head"><div><h1>Boleta de referencia — Colposcopia${d.indicacion && /biopsia/i.test(d.indicacion) ? ' y biopsia' : ''}</h1><div class="sub">SIVEC PAP/VPH · Sistema Integral de Vigilancia y Enlace Clínico</div></div><div style="text-align:right">${fmtFecha(d.fecha_derivacion)}${d.prioridad === 'urgente' ? '<div class="urg">URGENTE</div>' : ''}</div></div>
+    <div class="g"><div><b>Establecimiento que refiere</b>${esc(org)}</div><div><b>Establecimiento de destino</b>${esc(dest)}</div>
+      <div><b>Paciente</b>${esc(p.nombre || '')}</div><div><b>CI · edad</b>${esc(p.carnet || '—')} · ${edadDe(p.fecha_nacimiento) ?? '—'} años</div>
+      <div><b>Celular</b>${esc(p.celular || '—')}</div><div><b>Dirección</b>${esc(p.direccion || '—')}</div></div>
+    <div class="box"><h3>Motivo de la referencia</h3>${esc(d.motivo || '—')} · ${esc(d.indicacion || '')}<br>PAP ${fmtFecha(p.fecha_toma)}: ${esc(p.resultado_pap || 'pendiente')}${p.resultado_vph ? ' · VPH ' + esc(p.resultado_vph) + (p.vph_genotipo ? ' ' + esc(p.vph_genotipo) : '') : ''}${d.notas ? '<br>Notas: ' + esc(d.notas) : ''}</div>
+    <div class="firma">${esc(d.derivado_por || '')}<br>Firma y sello</div>
+    <div class="box" style="margin-top:14mm;min-height:60mm"><h3>Contrarreferencia (para el hospital, si no usa el SIVEC)</h3>Colposcopia: ______________________________________________<br><br>Biopsia: ______________ Resultado: ______________<br><br>Tratamiento: _____________________ Próximo control: _____________<br><br>Firma y sello: ______________________</div>`;
+  imprimirEnFrame('Boleta de referencia — ' + (p.nombre || ''), css, body);
+}
+
+// ---- Portal de colposcopia (rol "Colposcopia") ----
+const COL_HALLAZGOS = ['Normal', 'Acetoblanco tenue', 'Acetoblanco denso', 'Mosaico fino', 'Mosaico grueso', 'Puntillado fino', 'Puntillado grueso', 'Leucoplasia', 'Vasos atípicos', 'Sospecha de invasión'];
+const COL_IMPRESION = ['Normal', 'Bajo grado', 'Alto grado', 'Sospecha de invasión'];
+const COL_TRAT = ['Ninguno (control)', 'LEEP / cono', 'Crioterapia', 'Ablación térmica', 'Derivar a oncología (tratamiento)', 'Histerectomía'];
+const COL_CONTROL = ['6 meses', '1 año', 'Según resultado de biopsia', 'Control en este hospital'];
+const COL_BIOPSIA = ['Negativo (cervicitis)', 'CIN 1', 'CIN 2', 'CIN 3', 'Carcinoma in situ', 'AIS', 'Carcinoma invasor'];
+let colData = [], colTab = 'nuevas', colSel = null, colForm = null;
+async function colCargar() {
+  const { data, error } = await sb.rpc('sivec_colpo_lista');
+  const pane = document.getElementById('colPane');
+  if (error) { pane.innerHTML = `<div class="labCard">Error: ${esc(error.message)}${/function|relation/.test(error.message) ? ' — ¿ya se ejecutó el Paso 13 del SQL?' : ''}</div>`; return; }
+  colData = data || []; colRender();
+}
+function colGrupo(t) {
+  return colData.filter(d => t === 'nuevas' ? ['enviada', 'no_asistio'].includes(d.estado) : t === 'citadas' ? d.estado === 'citada' : t === 'biopsia' ? d.biopsia_tomada && !d.biopsia_resultado && ['atendida', 'contrarreferida'].includes(d.estado) : ['atendida', 'contrarreferida'].includes(d.estado));
+}
+function colRender() {
+  ['nuevas', 'citadas', 'biopsia'].forEach(t => { document.getElementById('colN' + { nuevas: 'Nuevas', citadas: 'Citadas', biopsia: 'Biop' }[t]).textContent = colGrupo(t).length || ''; });
+  document.querySelectorAll('#colTabs button').forEach(b => b.classList.toggle('on', b.dataset.ct === colTab));
+  const lista = colGrupo(colTab);
+  if (!lista.find(d => d.id === colSel)) { colSel = null; colForm = null; }
+  const hoy = new Date(hoyISO() + 'T12:00:00');
+  const pane = document.getElementById('colPane');
+  pane.innerHTML = `<div class="labCard"><table><thead><tr><th>Paciente</th><th>Centro que deriva</th><th>Motivo</th><th>Derivada</th><th>${colTab === 'citadas' ? 'Cita' : 'Estado'}</th></tr></thead><tbody>${lista.map(d => {
+    const dias = Math.round((hoy - new Date(d.fecha_derivacion + 'T12:00:00')) / 86400000);
+    return `<tr class="colFila${d.id === colSel ? ' on' : ''}" data-col="${d.id}"><td><b>${esc(d.nombre)}</b>${d.prioridad === 'urgente' ? '<span class="urg">URGENTE</span>' : ''}<div class="loteCod">CI ${esc(d.carnet || '—')} · ${edadDe(d.fecha_nacimiento) ?? '—'} a · ☎ ${esc(d.celular || '—')}</div></td>
+      <td>${esc(centroNombre(d.centro_origen))}</td><td>${esc(d.motivo || '—')}<div class="loteCod">${esc(d.indicacion || '')}</div></td><td>${fmtFecha(d.fecha_derivacion)}<div class="loteCod">${dias} día${dias === 1 ? '' : 's'}</div></td>
+      <td>${d.estado === 'citada' ? fmtFecha(d.fecha_cita) : d.estado === 'no_asistio' ? '<span class="balPill no">no asistió</span>' : d.estado === 'contrarreferida' ? '<span class="balPill rec">contrarreferida</span>' : esc(DER_ESTADO[d.estado] || d.estado)}${d.biopsia_tomada ? `<div class="loteCod">biopsia: ${esc(d.biopsia_resultado || 'pendiente')}</div>` : ''}</td></tr>`;
+  }).join('') || '<tr><td colspan="5">No hay pacientes en esta lista.</td></tr>'}</tbody></table></div><div id="colDet" style="margin-top:14px"></div>`;
+  pane.onclick = e => { const r = e.target.closest('[data-col]'); if (r) { colSel = r.dataset.col; colForm = null; colRender(); } };
+  if (colSel) colDetalle(colData.find(d => d.id === colSel));
+}
+document.getElementById('colTabs').addEventListener('click', e => { const b = e.target.closest('[data-ct]'); if (!b) return; colTab = b.dataset.ct; colSel = null; colRender(); });
+function colDetalle(d) {
+  const box = document.getElementById('colDet'); if (!box || !d) return;
+  const f = colForm || (colForm = Object.assign({ adecuada: true, zt: '', hallazgos: [], schiller: '', impresion: '', biopsia: null, tratamiento: '', proximo: '', contrarref: d.contrarreferencia || '', observaciones: '' }, d.colposcopia ? { adecuada: d.colposcopia.adecuada !== false, zt: d.colposcopia.zt || '', hallazgos: d.colposcopia.hallazgos || [], schiller: d.colposcopia.schiller || '', impresion: d.colposcopia.impresion || '', observaciones: d.colposcopia.observaciones || '', biopsia: d.biopsia_tomada, tratamiento: d.tratamiento || '', proximo: d.proximo_control || '' } : {}));
+  const chip = (g, v, on, extra) => `<button type="button" class="labChip ${extra || ''}${on ? ' on' : ''}" data-cg="${g}" data-v="${esc(v)}">${esc(v)}</button>`;
+  const yaAtendida = ['atendida', 'contrarreferida'].includes(d.estado);
+  box.innerHTML = `<div class="labCard"><div class="labHead">${esc(d.nombre)} · ${edadDe(d.fecha_nacimiento) ?? '—'} a<span>CI ${esc(d.carnet || '—')} · ☎ ${esc(d.celular || '—')} · ${esc(d.direccion || '')} · deriva ${esc(centroNombre(d.centro_origen))}${d.derivado_por ? ' (' + esc(d.derivado_por) + ')' : ''}</span></div>
+    <div class="derDato"><b>Motivo</b><span>${esc(d.motivo || '—')} · ${esc(d.indicacion || '')}${d.prioridad === 'urgente' ? ' <span class="urg">URGENTE</span>' : ''}</span><b>Antecedentes PAP/VPH</b><span>${esc(d.antecedentes || '—')}</span>${d.notas ? `<b>Notas del centro</b><span>${esc(d.notas)}</span>` : ''}</div>
+    ${!yaAtendida ? `<div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin:6px 0 4px"><label style="font-size:12px;font-weight:700;color:var(--ink-soft)">FECHA DE CITA<input type="date" id="colCita" value="${esc(d.fecha_cita || '')}" style="display:block;margin-top:3px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--surface);color:var(--ink)"></label><button type="button" class="rowBtn" data-ca="cita">📅 Guardar cita</button>${d.estado === 'citada' ? '<button type="button" class="rowBtn" data-ca="noasistio">✗ No asistió</button>' : ''}</div>` : ''}
+    ${colTab === 'biopsia' || (yaAtendida && d.biopsia_tomada) ? `<div class="labSec">Resultado de la biopsia</div><div class="labChips">${COL_BIOPSIA.map(v => `<button type="button" class="labChip ${v.startsWith('Negativo') ? 'neg' : /CIN 1/.test(v) ? '' : 'alto'}${d.biopsia_resultado === v ? ' on' : ''}" data-biop="${esc(v)}">${esc(v)}</button>`).join('')}</div><p class="hint" style="margin:6px 0 0">Al guardarlo, el centro recibe el resultado como contrarreferencia nueva.</p>` : ''}
+    <div class="labCols" style="margin-top:6px"><div>
+      <div class="labSec">Colposcopia</div><div class="labChips">${chip('adecuada', 'Adecuada', f.adecuada)}${chip('adecuada', 'No adecuada', !f.adecuada)}</div>
+      <div class="labSec">Zona de transformación</div><div class="labChips">${['Tipo 1', 'Tipo 2', 'Tipo 3'].map(v => chip('zt', v, f.zt === v)).join('')}</div>
+      <div class="labSec">Hallazgos</div><div class="labChips">${COL_HALLAZGOS.map(v => chip('hallazgos', v, f.hallazgos.includes(v), v === 'Normal' ? 'neg' : /denso|grueso|Vasos|invasión|Leucoplasia/.test(v) ? 'alto' : '')).join('')}</div>
+      <div class="labSec">Test de Schiller</div><div class="labChips">${['Negativo', 'Positivo'].map(v => chip('schiller', v, f.schiller === v)).join('')}</div>
+      <div class="labSec">Impresión colposcópica</div><div class="labChips">${COL_IMPRESION.map(v => chip('impresion', v, f.impresion === v, v === 'Normal' ? 'neg' : v === 'Bajo grado' ? '' : 'alto')).join('')}</div>
+    </div><div>
+      <div class="labSec">Biopsia</div><div class="labChips">${chip('biopsia', 'Biopsia tomada', f.biopsia === true)}${chip('biopsia', 'Sin biopsia', f.biopsia === false)}</div>
+      <div class="labSec">Tratamiento</div><div class="labChips">${COL_TRAT.map(v => chip('tratamiento', v, f.tratamiento === v)).join('')}</div>
+      <div class="labSec">Próximo control</div><div class="labChips">${COL_CONTROL.map(v => chip('proximo', v, f.proximo === v)).join('')}</div>
+      <div class="labSec">Contrarreferencia · indicaciones para el centro</div><textarea id="colContra" rows="3" placeholder="Qué hacer en el centro…">${esc(f.contrarref)}</textarea>
+      <button type="button" class="rowBtn" data-ca="texto" style="margin-top:6px">✍ Armar texto con lo marcado</button>
+    </div></div>
+    <div class="acts" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button type="button" class="labFirmar" data-ca="enviar">📤 Enviar contrarreferencia al centro</button><button type="button" class="rowBtn" data-ca="guardar" style="margin-top:14px">Guardar sin enviar</button></div>
+    <div class="labNota">La colposcopia queda también en la ficha de la paciente, y el centro la recibe como <b>contrarreferencia nueva</b>. El seguimiento PAP+ del centro avanza solo (colposcopia agendada → realizada → tratamiento).</div></div>`;
+  box.onclick = async e => {
+    const c = e.target.closest('[data-cg]');
+    if (c) {
+      f.contrarref = document.getElementById('colContra').value;
+      const g = c.dataset.cg, v = c.dataset.v;
+      if (g === 'adecuada') f.adecuada = v === 'Adecuada';
+      else if (g === 'hallazgos') f.hallazgos = f.hallazgos.includes(v) ? f.hallazgos.filter(h => h !== v) : [...f.hallazgos, v];
+      else if (g === 'biopsia') f.biopsia = v === 'Biopsia tomada';
+      else f[g] = f[g] === v ? '' : v;
+      return colDetalle(d);
+    }
+    const bp = e.target.closest('[data-biop]');
+    if (bp) {
+      if (!confirm(`¿Guardar resultado de biopsia: ${bp.dataset.biop}? El centro lo recibe.`)) return;
+      const { error } = await sb.rpc('sivec_colpo_biopsia', { p_id: d.id, p_resultado: bp.dataset.biop });
+      if (error) return alert(error.message);
+      showToast('Resultado de biopsia enviado al centro ✔', 'ok'); return colCargar();
+    }
+    const a = e.target.closest('[data-ca]'); if (!a) return;
+    const k = a.dataset.ca;
+    if (k === 'texto') {
+      const t = [derResumenColpo({ adecuada: f.adecuada, zt: f.zt, hallazgos: f.hallazgos, schiller: f.schiller, impresion: f.impresion }) + '.', f.biopsia ? 'Se tomó biopsia; el resultado llegará por el SIVEC.' : '', f.tratamiento ? 'Tratamiento: ' + f.tratamiento + '.' : '', f.proximo ? 'Próximo control: ' + f.proximo + '.' : ''].filter(Boolean).join(' ');
+      f.contrarref = t; document.getElementById('colContra').value = t; return;
+    }
+    if (k === 'cita') {
+      const fe = document.getElementById('colCita').value; if (!fe) return alert('Elegí la fecha de la cita.');
+      const { error } = await sb.rpc('sivec_colpo_cita', { p_id: d.id, p_fecha: fe });
+      if (error) return alert(error.message);
+      showToast('Cita guardada ✔ — el centro la ve en la ficha', 'ok'); colTab = 'citadas'; return colCargar();
+    }
+    if (k === 'noasistio') {
+      if (!confirm('¿Marcar que la paciente no asistió? El centro recibe el aviso para buscarla.')) return;
+      const { error } = await sb.rpc('sivec_colpo_no_asistio', { p_id: d.id });
+      if (error) return alert(error.message);
+      showToast('Aviso enviado al centro ✔', 'ok'); return colCargar();
+    }
+    if (k === 'enviar' || k === 'guardar') {
+      f.contrarref = document.getElementById('colContra').value.trim();
+      if (!f.impresion) return alert('Marcá la impresión colposcópica.');
+      if (f.biopsia === null) return alert('Indicá si se tomó biopsia.');
+      if (k === 'enviar' && !f.contrarref) return alert('Escribí las indicaciones para el centro (o tocá "Armar texto con lo marcado").');
+      const colpo = { adecuada: f.adecuada, zt: f.zt, hallazgos: f.hallazgos, schiller: f.schiller, impresion: f.impresion, observaciones: f.observaciones || null };
+      const { error } = await sb.rpc('sivec_colpo_atender', { p_id: d.id, p_colpo: colpo, p_biopsia: f.biopsia, p_tratamiento: f.tratamiento, p_contrarref: f.contrarref, p_proximo: f.proximo, p_por: perfil.nombre_completo || perfil.correo || '', p_enviar: k === 'enviar' });
+      if (error) return alert(error.message);
+      showToast(k === 'enviar' ? 'Contrarreferencia enviada al centro ✔' : 'Guardado ✔', 'ok');
+      colTab = f.biopsia && k === 'enviar' ? 'biopsia' : 'hechas'; colSel = null; colForm = null; return colCargar();
+    }
+  };
+}
+
 let lastBalanceData = [];
 let lastBalanceRange = { inicio: '', fin: '' };
 
@@ -2663,6 +2920,7 @@ async function renderSegFlow(contId, data, recargar) {
 }
 
 async function loadSegPap() {
+  await derCargar();
   const tbody = document.getElementById('segPapBody');
   tbody.innerHTML = '<tr><td colspan="9">Cargando...</td></tr>';
   const { data, error } = await selectAll(() => pacQ().is('deleted_at', null).eq('estado_pap', 'Positivo').order('fecha_toma', { ascending: true }));
@@ -2689,6 +2947,7 @@ async function loadSegPap() {
 }
 
 async function loadSegVph() {
+  await derCargar();
   const tbody = document.getElementById('segVphBody');
   tbody.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
   const { data, error } = await selectAll(() => pacQ().is('deleted_at', null).eq('resultado_vph', 'Positiva').order('fecha_toma', { ascending: true }));
@@ -2816,6 +3075,7 @@ async function loadList() {
   allPatientsData = data;
   tomasIndex = buildTomasIndex(data);
   currentPatients = data;
+  await derCargar();
   populateDoctoraFilter(data);
   renderBanners(data);
   applyListFilters();
@@ -2859,6 +3119,15 @@ function renderBanners(data) {
     const vt = document.getElementById('vistosTodos');
     if (vt) vt.onclick = () => marcarVisto(nuevos);
   } else { rbanner.style.display = 'none'; rbanner.innerHTML = ''; }
+
+  const crs = data.filter(p => { const d = derivDe(p); return d && derEsNueva(d); });
+  const cb = document.getElementById('contrarrefBanner');
+  if (crs.length) {
+    const noAs = crs.filter(p => derivDe(p).estado === 'no_asistio').length;
+    cb.style.display = 'flex';
+    cb.innerHTML = `<span>🩺 <b>${crs.length} contrarreferencia${crs.length > 1 ? 's' : ''} nueva${crs.length > 1 ? 's' : ''} de colposcopia</b> <span class="bannerHint">· ${noAs ? noAs + ' no asistió (búsqueda activa) · ' : ''}tocá la etiqueta 🩺 de cada paciente para leerla</span></span>` +
+      `<button type="button" class="bannerBtn" data-quick="contrarref">${listQuick === 'contrarref' ? 'Ver todas' : 'Ver solo estas'}</button>`;
+  } else { cb.style.display = 'none'; cb.innerHTML = ''; }
 
   const hoy = new Date().toISOString().slice(0, 10);
   const atrasadas = data.filter(esAtrasada);
@@ -2962,6 +3231,15 @@ function proximoPaso(p) {
   // Si ya hay un resultado escrito (aunque el Estado siga en Pendiente), se usa el resultado.
   const papPend = !soloVph && (p.estado_pap || 'Pendiente') === 'Pendiente' && !bet;
   const yEntregar = p.recibio_resultado ? '' : ' · entregar resultado';
+  const der = derivDe(p);
+  if (der) {
+    const dest = centroNombre(der.destino_id) || 'colposcopia';
+    if (der.estado === 'enviada') return { key: 'derivada', tone: 'blue', txt: `Derivada a ${dest} · esperando cita` };
+    if (der.estado === 'citada') return { key: 'derivada', tone: 'blue', txt: `Cita de colposcopia ${fmtFecha(der.fecha_cita)} · ${dest}` };
+    if (der.estado === 'atendida') return { key: 'derivada', tone: 'blue', txt: `Atendida en ${dest} · esperando contrarreferencia` };
+    if (der.estado === 'no_asistio') return { key: 'buscar', tone: 'red', txt: `No asistió a colposcopia (${dest}) · búsqueda activa` };
+    if (der.estado === 'contrarreferida') return { key: 'contrarref', tone: der.biopsia_tomada && !der.biopsia_resultado ? 'amber' : 'green', txt: 'Contrarreferencia: ' + [der.tratamiento, der.biopsia_tomada ? 'biopsia ' + (der.biopsia_resultado || 'pendiente') : '', der.proximo_control ? 'control ' + der.proximo_control : ''].filter(Boolean).join(' · ') };
+  }
   if (p.muestra_estado === 'rechazada') return { key: 'repetir', tone: 'red', txt: 'Repetir toma (muestra rechazada' + (p.muestra_rechazo ? ': ' + p.muestra_rechazo.toLowerCase() : '') + ')' };
   if (nivel === 'insat') return { key: 'repetir', tone: 'amber', txt: 'Repetir toma (muestra insatisfactoria)' + yEntregar };
   if (papPend && p.muestra_estado === 'enviada') return { key: 'esperar', tone: 'gray', txt: 'En camino al laboratorio' + (p.lote_envio ? ' · lote ' + p.lote_envio : '') };
@@ -3012,7 +3290,7 @@ function saveClinCfg() {
 
 // ---- Filtro rápido (contadores y avisos de la lista) ----
 let listQuick = '';
-const QUICK_LABEL = { 'pap:Positivo': 'Positivo PAP', 'pap:Negativo': 'Negativo PAP', 'pap:Pendiente': 'Pendiente PAP', 'vph:Positiva': 'VPH+', atrasadas: 'Resultado atrasado', vencimientos: 'Método por vencer', nuevos: 'Resultado nuevo del laboratorio' };
+const QUICK_LABEL = { 'pap:Positivo': 'Positivo PAP', 'pap:Negativo': 'Negativo PAP', 'pap:Pendiente': 'Pendiente PAP', 'vph:Positiva': 'VPH+', atrasadas: 'Resultado atrasado', vencimientos: 'Método por vencer', nuevos: 'Resultado nuevo del laboratorio', contrarref: 'Contrarreferencia nueva' };
 // Resultado que llegó del laboratorio (portal del oncológico) y el centro todavía no marcó como visto.
 function esResultadoNuevo(p) { return !!p.fecha_informe && !p.resultado_visto_at; }
 async function marcarVisto(lista) {
@@ -3038,6 +3316,7 @@ function pasaQuick(p) {
     case 'atrasadas': return esAtrasada(p);
     case 'vencimientos': return esVencimiento(p);
     case 'nuevos': return esResultadoNuevo(p);
+    case 'contrarref': { const d = derivDe(p); return !!d && derEsNueva(d); }
     default: return true;
   }
 }
@@ -3056,6 +3335,8 @@ document.getElementById('quickFilterClear').addEventListener('click', () => { li
 document.addEventListener('click', e => {
   const b = e.target.closest('.bannerBtn[data-quick]');
   if (b) setListQuick(b.dataset.quick);
+  const dc = e.target.closest('[data-der]');
+  if (dc) { e.stopPropagation(); const p = allPatientsData.find(x => String(x.id) === dc.dataset.der); if (p) derAbrir(p); return; }
   const v = e.target.closest('[data-visto]');
   if (v) { e.stopPropagation(); const p = allPatientsData.find(x => String(x.id) === v.dataset.visto); if (p) marcarVisto([p]); }
 });
@@ -3116,7 +3397,7 @@ function renderPatientCards(data, base) {
     }
     card.innerHTML = `
       <div>
-        <div class="pcName">${esCumpleanosHoy(p.fecha_nacimiento) ? '🎂 ' : ''}${esc(p.nombre)}${tomaBadge}${esResultadoNuevo(p) ? ` <span class="resNuevo${p.estado_pap === 'Positivo' || p.resultado_vph === 'Positiva' || p.muestra_estado === 'rechazada' ? ' alto' : ''}" title="Informado por ${esc(p.informado_por || 'el laboratorio')} el ${fmtFecha(String(p.fecha_informe).slice(0, 10))}">🔬 ${p.muestra_estado === 'rechazada' ? 'Muestra rechazada' : 'Resultado nuevo'}</span>${conRoles() && perfil.rol === 'centro' ? `<button type="button" class="vistoBtn" data-visto="${esc(p.id)}">✓ Visto</button>` : ''}` : ''}${p.recibio_resultado ? ' <span title="Recibió información de su resultado" style="font-size:11px;font-weight:600;color:#0d6b47;background:#dcf5e9;border-radius:6px;padding:1px 6px;margin-left:4px">✅ Informada</span>' : ''}</div>
+        <div class="pcName">${esCumpleanosHoy(p.fecha_nacimiento) ? '🎂 ' : ''}${esc(p.nombre)}${tomaBadge}${derChipHTML(p)}${esResultadoNuevo(p) ? ` <span class="resNuevo${p.estado_pap === 'Positivo' || p.resultado_vph === 'Positiva' || p.muestra_estado === 'rechazada' ? ' alto' : ''}" title="Informado por ${esc(p.informado_por || 'el laboratorio')} el ${fmtFecha(String(p.fecha_informe).slice(0, 10))}">🔬 ${p.muestra_estado === 'rechazada' ? 'Muestra rechazada' : 'Resultado nuevo'}</span>${conRoles() && perfil.rol === 'centro' ? `<button type="button" class="vistoBtn" data-visto="${esc(p.id)}">✓ Visto</button>` : ''}` : ''}${p.recibio_resultado ? ' <span title="Recibió información de su resultado" style="font-size:11px;font-weight:600;color:#0d6b47;background:#dcf5e9;border-radius:6px;padding:1px 6px;margin-left:4px">✅ Informada</span>' : ''}</div>
         <div class="pcMeta">${esc(p.carnet) || 'Sin carnet'}${edadDe(p.fecha_nacimiento) != null ? ' · ' + edadDe(p.fecha_nacimiento) + ' años' : ''}${fueraEdad ? ` <span class="edadBadge" title="Rango objetivo ${fueraEdad.tipo}: ${fueraEdad.min}–${fueraEdad.max} años (se cambia en Configuración)">fuera de rango ${fueraEdad.tipo}</span>` : ''} · ${esc(p.doctora) || '—'} · Toma: ${fmtFecha(p.fecha_toma) || '—'}</div>
         <div class="pcPaso tone-${paso.tone}" title="Próximo paso">➜ ${esc(paso.txt)}</div>
       </div>
@@ -3148,6 +3429,7 @@ function renderPatientCards(data, base) {
         <span class="moreWrap"><button class="rowBtn moreBtn" title="Más acciones" aria-label="Más acciones">⋯</button>
           <span class="moreMenu">
             <button class="rowBtn soapBtn" data-id="${p.id}">📝 Consulta (SOAP)</button>
+            ${derivDisponible() ? `<button class="rowBtn derBtn" data-id="${p.id}">🩺 Derivar a colposcopia / biopsia</button>` : ''}
             <button class="rowBtn colpBtn" data-id="${p.id}">🔬 Colposcopia</button>
             <hr>
             <button class="rowBtn delBtn danger" data-id="${p.id}">🗑 Excluir paciente</button>
@@ -3948,6 +4230,7 @@ document.getElementById('tableBody').addEventListener('click', (e) => {
   if (btn.classList.contains('editBtn')) openEdit(patient);
   if (btn.classList.contains('delBtn')) deletePatient(patient);
   if (btn.classList.contains('colpBtn')) openColposcopia(patient);
+  if (btn.classList.contains('derBtn')) derAbrir(patient);
   if (btn.classList.contains('soapBtn')) openConsulta(patient);
   if (btn.classList.contains('bdayBtn')) openBirthdayModal(patient);
 });
