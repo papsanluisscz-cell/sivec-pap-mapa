@@ -427,6 +427,11 @@
   .estLeyenda { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; line-height: 1.7; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
   .estLeyenda i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; transform: rotate(45deg); margin-right: 7px; vertical-align: -1px; }
   .estLeyenda .lgI { display: inline-block; width: 16px; height: 19px; vertical-align: -5px; margin-right: 6px; } .estLeyenda .lgI svg { width: 100%; height: 100%; }
+  .fxEv.ext { opacity: .92; } .fxEv.ext > i { background: #7c3aed !important; box-shadow: 0 0 0 3px rgba(124,58,237,.18); }
+  .fxExt { display: inline-block; font-size: 11px; font-weight: 700; color: #6d28d9; background: #ede9fe; border-radius: 999px; padding: 1px 8px; margin-left: 4px; vertical-align: 1px; }
+  body.dark .fxExt { background: rgba(167,139,250,.18); color: #c4b5fd; }
+  .regExt { margin-top: 6px; font-size: 12.5px; padding: 8px 10px; border-radius: 8px; background: #f5f3ff; border: 1px solid #ddd6fe; color: #4c1d95; }
+  body.dark .regExt { background: rgba(124,58,237,.15); border-color: rgba(167,139,250,.35); color: #ddd6fe; }
   .estPin2 { position: relative; filter: drop-shadow(0 5px 6px rgba(0,0,0,.35)); transition: transform .15s; transform-origin: 50% 100%; }
   .estPin2:hover { transform: scale(1.12); }
   .estPin2 svg { width: 100%; height: 100%; display: block; position: relative; z-index: 1; }
@@ -1103,7 +1108,7 @@
       <form id="patientForm">
         <div class="formGrid">
           <div class="field"><label>Nombre completo *</label><input name="nombre" required></div>
-          <div class="field"><label>Carnet</label><input name="carnet"></div>
+          <div class="field"><label>Carnet</label><input name="carnet"><div id="regExt" class="regExt" style="display:none"></div></div>
           <div class="field"><label>N° Registro D1<span class="helpTip" data-tip="Número de folio impreso en el formulario físico D1 (recetario). Si no lo tenés a mano, podés dejarlo en blanco.">ⓘ</span></label><input name="numero_folio_d1" placeholder="Ej: 0056476"></div>
           <div class="field"><label>N° Registro D8<span class="helpTip" data-tip="Número de folio impreso en el formulario físico D8 (solicitud de exámenes). Si no lo tenés a mano, podés dejarlo en blanco.">ⓘ</span></label><input name="numero_folio_d8" placeholder="Ej: 0056476"></div>
           <div class="field"><label>N° Registro PAP<span class="helpTip" data-tip="Número de folio impreso en el formulario físico de PAP. Si no lo tenés a mano, podés dejarlo en blanco.">ⓘ</span></label><input name="numero_folio_pap" placeholder="Ej: 0056476"></div>
@@ -5065,6 +5070,21 @@ function checkEdadRegistro() {
 }
 ['fecha_nacimiento', 'tipo_examen'].forEach(n => { const el = document.getElementById('patientForm')[n]; if (el) el.addEventListener('change', checkEdadRegistro); });
 document.getElementById('patientForm').addEventListener('reset', () => setTimeout(checkEdadRegistro, 0));
+// Al registrar: ¿esta mujer ya se hizo tomas en otro establecimiento? (línea de tiempo entre centros, Paso 22)
+async function regBuscarOtrosCentros() {
+  const f = document.getElementById('patientForm'), box = document.getElementById('regExt');
+  if (!conRoles() || !sb) { box.style.display = 'none'; return; }
+  const ci = f.carnet.value.trim(), nom = f.nombre.value.trim(), nac = f.fecha_nacimiento.value || null;
+  if (ci.replace(/\D/g, '').length < 5 && !(nom && nac)) { box.style.display = 'none'; return; }
+  const { data, error } = await sb.rpc('sivec_linea_tiempo', { p_carnet: ci || null, p_nombre: nom || null, p_nac: nac });
+  if (error || !Array.isArray(data) || !data.length) { box.style.display = 'none'; return; }
+  const u = data.reduce((m, x) => String(x.fecha_toma || '') > String(m.fecha_toma || '') ? x : m, data[0]), lugar = String(u.centro || '').replace(/^Centro de Salud /, 'C.S. ');
+  const res = u.resultado_vph ? 'VPH ' + u.resultado_vph : u.estado_pap && u.estado_pap !== 'Pendiente' ? 'PAP ' + (bethesdaDe(u) || u.estado_pap) : 'sin resultado todavía';
+  box.innerHTML = `🏥 Esta mujer ya tiene <b>${data.length} toma${data.length > 1 ? 's' : ''}</b> en otro establecimiento. La última: <b>${fmtFecha(u.fecha_toma)}</b> en ${esc(lugar)} · ${esc(res)}. Revisá si corresponde repetir.`;
+  box.style.display = 'block';
+}
+['carnet', 'fecha_nacimiento'].forEach(n => { const el = document.getElementById('patientForm')[n]; if (el) el.addEventListener('change', regBuscarOtrosCentros); });
+document.getElementById('patientForm').addEventListener('reset', () => { document.getElementById('regExt').style.display = 'none'; });
 
 document.getElementById('bethesdaSel').innerHTML += BETHESDA.map(b => `<option value="${b.code}">${esc(b.label)}</option>`).join('');
 document.getElementById('bethesdaSel').addEventListener('change', e => {
@@ -5812,7 +5832,22 @@ async function guardarSoapDeRegistro(nueva) {
 // ================= Ficha de la paciente (línea de tiempo) =================
 // Base del futuro "Historial" del SIVEC: todas las tomas, resultados, entregas, seguimientos y colposcopias
 // de la misma paciente (agrupadas por carnet o nombre + nacimiento), de la más reciente a la más antigua.
-let fichaPaciente = null, fichaConsultas = [];
+let fichaPaciente = null, fichaConsultas = [], fichaExt = [];
+// Tomas de la misma mujer en OTROS establecimientos (Paso 22): solo el resumen, sin editar.
+function fichaEventosExt(lista) {
+  return (lista || []).map(x => {
+    const bet = bethesdaDe(x), nivel = bet && BETHESDA_BY_CODE[bet] && BETHESDA_BY_CODE[bet].nivel;
+    const soloVph = esSoloVph(x), lineas = [];
+    if (!soloVph) lineas.push(bet ? `<span class="fxRes ${nivel}">PAP: ${esc(bet)}</span>` : x.estado_pap === 'Positivo' || x.estado_pap === 'Negativo' ? `<span class="fxRes ${x.estado_pap === 'Positivo' ? 'alto' : 'neg'}">PAP: ${esc(x.estado_pap)}</span>` : '<span class="fxRes pend">PAP: esperando resultado</span>');
+    if (x.resultado_vph) lineas.push(`<span class="fxRes ${x.resultado_vph === 'Positiva' ? 'alto' : 'neg'}">VPH: ${esc(x.resultado_vph)}${x.vph_genotipo ? ' · genotipo ' + esc(x.vph_genotipo) : ''}</span>`);
+    const conRes = bet || x.estado_pap === 'Positivo' || x.estado_pap === 'Negativo' || x.resultado_vph;
+    if (conRes) lineas.push(x.recibio_resultado ? `✅ Resultado entregado${x.fecha_recibio_resultado ? ' el ' + fmtFecha(x.fecha_recibio_resultado) : ''}` : '<span class="fxWarn">📬 Resultado no entregado (en ese centro)</span>');
+    if (x.derivacion_pap) lineas.push(`➡️ Derivada a: ${esc(x.derivacion_pap)}`);
+    const tono = nivel === 'alto' || x.resultado_vph === 'Positiva' || x.estado_pap === 'Positivo' ? 'alto' : nivel === 'bajo' ? 'bajo' : conRes ? 'neg' : 'pend';
+    const lugar = String(x.centro || 'otro establecimiento').replace(/^Centro de Salud /, 'C.S. ');
+    return { fecha: x.fecha_toma || '', tono, ext: true, titulo: (soloVph ? 'Prueba de VPH' : 'Toma de PAP') + ` <span class="fxExt">🏥 ${esc(lugar)}</span>`, meta: 'Otro establecimiento', lineas };
+  });
+}
 function fichaEl() {
   let d = document.getElementById('fichaDrawer');
   if (!d) {
@@ -5869,17 +5904,18 @@ async function openFicha(p) {
   const ini = String(p.nombre || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(s => s[0]).join('').toUpperCase();
   const gen = grupo.map(x => x.vph_genotipo).filter(Boolean).pop();
   const render = colpos => {
-    const ev = fichaEventos(grupo, colpos);
+    const ev = fichaEventos(grupo, colpos).concat(fichaEventosExt(fichaExt)).sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
+    const otros = [...new Set((fichaExt || []).map(x => String(x.centro || '').replace(/^Centro de Salud /, 'C.S. ')))].filter(Boolean);
     panel.innerHTML = `
       <div class="fxHead">
         <button type="button" class="fxClose" onclick="closeFicha()" aria-label="Cerrar">✕</button>
         <div class="fxId"><span class="fxAv">${esc(ini)}</span><div><b>${esc(ultima.nombre)}</b>
           <small>${ultima.carnet ? 'CI ' + esc(ultima.carnet) : 'Sin carnet'}${edad != null ? ' · ' + edad + ' años' : ''}${ultima.celular ? ' · 📞 ' + esc(ultima.celular) : ''}</small>
           ${ultima.direccion ? `<small>📍 ${esc(ultima.direccion)}</small>` : ''}</div></div>
-        <div class="fxPills"><span class="pcPaso tone-${paso.tone}">➜ ${esc(paso.txt)}</span>${gen ? `<span class="fxPill violet">VPH ${esc(gen)}</span>` : ''}<span class="fxPill">${grupo.length} toma${grupo.length > 1 ? 's' : ''}</span>${fuera ? `<span class="fxPill amber">fuera de rango ${fuera.tipo}</span>` : ''}${info && info.mismaFecha ? '<span class="fxPill red">⚠ posible duplicado</span>' : ''}</div>
+        <div class="fxPills"><span class="pcPaso tone-${paso.tone}">➜ ${esc(paso.txt)}</span>${gen ? `<span class="fxPill violet">VPH ${esc(gen)}</span>` : ''}<span class="fxPill">${grupo.length + (fichaExt || []).length} toma${grupo.length + (fichaExt || []).length > 1 ? 's' : ''}</span>${otros.length ? `<span class="fxPill violet" title="Tomas de la misma mujer en otros establecimientos">🏥 también en ${esc(otros.join(', '))}</span>` : ''}${fuera ? `<span class="fxPill amber">fuera de rango ${fuera.tipo}</span>` : ''}${info && info.mismaFecha ? '<span class="fxPill red">⚠ posible duplicado</span>' : ''}</div>
       </div>
       <div class="fxBody"><h4>Línea de tiempo</h4>
-        ${ev.map((e, i) => `<div class="fxEv ${e.tono}" style="animation-delay:${Math.min(i, 10) * 60}ms"><i></i>
+        ${ev.map((e, i) => `<div class="fxEv ${e.tono}${e.ext ? ' ext' : ''}" style="animation-delay:${Math.min(i, 10) * 60}ms"><i></i>
           <div class="fxDate">${e.fecha ? fmtFecha(e.fecha) : 'Sin fecha'}${e.meta ? ' · ' + esc(e.meta) : ''}</div>
           <div class="fxTit">${e.titulo}${e.id != null && grupo.length > 1 ? ` <button type="button" class="fxLink" data-edit="${esc(e.id)}">editar esta toma</button>` : ''}</div>
           ${e.lineas.map(l => `<div class="fxLine">${l}</div>`).join('')}</div>`).join('')}
@@ -5887,6 +5923,7 @@ async function openFicha(p) {
       </div>
       <div class="fxFoot"><button type="button" class="fxBtn primary" data-act="edit">Editar</button><button type="button" class="fxBtn" data-act="soap">📝 Consulta</button><button type="button" class="fxBtn" data-act="print">Imprimir</button><button type="button" class="fxBtn" data-act="nueva">+ Nueva toma</button></div>`;
   };
+  fichaExt = [];
   render(null);
   d.classList.add('open');
   panel.scrollTop = 0;
@@ -5899,11 +5936,13 @@ async function openFicha(p) {
     if (b.dataset.act === 'soap') openConsulta(ultima);
     if (b.dataset.act === 'nueva') { closeFicha(); nuevaTomaDe(ultima); }
   };
-  const [{ data }, cons] = await Promise.all([
+  const [{ data }, cons, lt] = await Promise.all([
     sb.from('colposcopias').select('*').in('paciente_id', grupo.map(x => x.id)).order('fecha', { ascending: false }),
     consultasOk().then(ok => ok ? sb.from('consultas').select('*').in('paciente_id', grupo.map(x => String(x.id))) : { data: [] }),
+    conRoles() ? sb.rpc('sivec_linea_tiempo', { p_carnet: ultima.carnet || null, p_nombre: ultima.nombre || null, p_nac: ultima.fecha_nacimiento || null }).then(r => r, () => ({})) : Promise.resolve({}),
   ]);
   fichaConsultas = ((cons && cons.data) || []).map(consultaSoloFecha);
+  fichaExt = lt && !lt.error && Array.isArray(lt.data) ? lt.data : [];
   if (fichaPaciente === p) render(data || []);
 }
 // "+ Nueva toma": abre Registrar con los datos personales ya completados.

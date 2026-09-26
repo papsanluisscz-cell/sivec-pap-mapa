@@ -1409,3 +1409,115 @@ update centros_salud set lat = -17.763879, lng = -63.194321
 notify pgrst, 'reload schema';
 select nombre, direccion, lat, lng from centros_salud order by nombre;
 ```
+
+## Paso 22 — Protección de datos: cada centro lee solo lo suyo + línea de tiempo entre centros (reemplaza al Paso 9)
+
+- Centro: lee y edita solo sus pacientes. Gestor: lee las de su red. Administrador: lee todas (no edita). Sin sesión: nada.
+- Tablas viejas o de respaldo sin reglas: quedan cerradas (solo el administrador las lee).
+- Línea de tiempo: si la misma mujer (carnet, o nombre + fecha de nacimiento) se hizo tomas en otro centro, la ficha las muestra (solo el resumen) y el registro avisa. Cada consulta queda guardada en `historial_accesos`.
+
+```sql
+-- PASO 22 · Protección de datos: cada centro lee solo lo suyo + línea de tiempo entre centros
+-- A) Quién ve qué (el administrador ahora puede LEER todo; solo el centro registra y edita lo suyo)
+create or replace function sivec_ve_centro(c uuid) returns boolean language sql stable security definer set search_path = public as $$
+  select coalesce(case sivec_rol()
+    when 'centro' then c = sivec_centro()
+    when 'gestor' then exists (select 1 from centros_salud where id = c and red_id = sivec_red())
+    when 'admin'  then true
+    else false end, false) $$;
+
+-- B) Reglas en la base de datos (reemplazan a todas las anteriores de estas tablas)
+do $$ declare r record; begin
+  for r in select policyname, tablename from pg_policies where schemaname = 'public' and tablename in ('pacientes', 'colposcopias', 'consultas') loop
+    execute format('drop policy %I on %I', r.policyname, r.tablename);
+  end loop;
+end $$;
+alter table pacientes enable row level security;
+alter table colposcopias enable row level security;
+alter table consultas enable row level security;
+create policy "ver por centro" on pacientes for select to authenticated using (sivec_ve_centro(centro_id));
+create policy "registrar en su centro" on pacientes for insert to authenticated with check (sivec_edita_centro(centro_id));
+create policy "editar en su centro" on pacientes for update to authenticated using (sivec_edita_centro(centro_id)) with check (sivec_edita_centro(centro_id));
+create policy "borrar en su centro" on pacientes for delete to authenticated using (sivec_edita_centro(centro_id));
+create policy "ver por centro" on colposcopias for select to authenticated using (
+  exists (select 1 from pacientes p where p.id = colposcopias.paciente_id and sivec_ve_centro(p.centro_id)));
+create policy "editar por centro" on colposcopias for all to authenticated
+  using (exists (select 1 from pacientes p where p.id = colposcopias.paciente_id and sivec_edita_centro(p.centro_id)))
+  with check (exists (select 1 from pacientes p where p.id = colposcopias.paciente_id and sivec_edita_centro(p.centro_id)));
+create policy "ver por centro" on consultas for select to authenticated using (
+  exists (select 1 from pacientes p where p.id::text = consultas.paciente_id::text and sivec_ve_centro(p.centro_id)));
+create policy "editar por centro" on consultas for all to authenticated
+  using (exists (select 1 from pacientes p where p.id::text = consultas.paciente_id::text and sivec_edita_centro(p.centro_id)))
+  with check (exists (select 1 from pacientes p where p.id::text = consultas.paciente_id::text and sivec_edita_centro(p.centro_id)));
+
+-- C) Tablas viejas o de respaldo: cerradas (solo el administrador las lee). Sin reglas, cualquiera con la clave podía leerlas.
+do $$ declare t text; begin
+  for t in select tablename from pg_tables where schemaname = 'public' and not rowsecurity loop
+    execute format('alter table %I enable row level security', t);
+    execute format('drop policy if exists "solo administrador" on %I', t);
+    execute format('create policy "solo administrador" on %I for select to authenticated using (sivec_es_admin())', t);
+  end loop;
+end $$;
+
+-- D) Línea de tiempo entre centros: la misma mujer (mismo carnet, o mismo nombre + fecha de nacimiento)
+--    se ve en la ficha aunque se haya hecho la toma en otro centro. Solo resumen clínico, y queda registrado quién consultó.
+create or replace function sivec_norm(t text) returns text language sql immutable as $$
+  select btrim(regexp_replace(translate(lower(coalesce(t, '')), 'áàäâãéèëêíìïîóòöôõúùüûñç', 'aaaaaeeeeiiiiooooouuuunc'), '\s+', ' ', 'g')) $$;
+create or replace function sivec_norm_ci(t text) returns text language sql immutable as $$
+  select nullif(regexp_replace(regexp_replace(sivec_norm(t), '[^a-z0-9]', '', 'g'), '^([0-9]{4,})(lp|sc|scz|cb|or|pt|ch|tj|be|pd)$', '\1'), '') $$;
+
+create table if not exists historial_accesos (
+  id bigserial primary key, usuario uuid default auth.uid(), centro_id uuid, carnet text, nombre text,
+  encontrados int, created_at timestamptz not null default now());
+alter table historial_accesos enable row level security;
+drop policy if exists "solo administrador" on historial_accesos;
+create policy "solo administrador" on historial_accesos for select to authenticated using (sivec_es_admin());
+
+create or replace function sivec_linea_tiempo(p_carnet text, p_nombre text, p_nac date) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare
+  v_ci text := sivec_norm_ci(p_carnet);
+  v_nom text := sivec_norm(p_nombre);
+  v jsonb;
+begin
+  if sivec_rol() not in ('centro', 'gestor', 'admin') then return '[]'::jsonb; end if;
+  if v_ci is not null and (length(v_ci) < 5 or v_ci ~ '^0+$') then v_ci := null; end if;
+  if v_ci is null and (v_nom = '' or p_nac is null) then return '[]'::jsonb; end if;
+  select coalesce(jsonb_agg(jsonb_build_object(
+           'id', p.id, 'centro_id', p.centro_id, 'centro', c.nombre, 'fecha_toma', p.fecha_toma, 'tipo_examen', p.tipo_examen,
+           'estado_pap', p.estado_pap, 'resultado_pap', p.resultado_pap, 'resultado_vph', p.resultado_vph, 'vph_genotipo', p.vph_genotipo,
+           'recibio_resultado', p.recibio_resultado, 'fecha_recibio_resultado', p.fecha_recibio_resultado,
+           'derivacion_pap', p.derivacion_pap, 'seg_etapa', p.seg_etapa, 'doctora', p.doctora) order by p.fecha_toma), '[]'::jsonb)
+    into v
+    from pacientes p left join centros_salud c on c.id = p.centro_id
+   where p.deleted_at is null and not sivec_ve_centro(p.centro_id)
+     and ((v_ci is not null and sivec_norm_ci(p.carnet) = v_ci)
+       or (p_nac is not null and v_nom <> '' and p.fecha_nacimiento = p_nac and sivec_norm(p.nombre) = v_nom));
+  if jsonb_array_length(v) > 0 then
+    insert into historial_accesos (centro_id, carnet, nombre, encontrados) values (sivec_centro(), p_carnet, p_nombre, jsonb_array_length(v));
+  end if;
+  return v;
+end $$;
+revoke execute on function sivec_linea_tiempo(text, text, date) from public, anon;
+grant execute on function sivec_linea_tiempo(text, text, date) to authenticated;
+
+notify pgrst, 'reload schema';
+
+-- Resultado: reglas activas
+select tablename as tabla, count(*) as reglas, bool_and(t.rowsecurity) as protegida
+  from pg_policies p join pg_tables t using (schemaname, tablename)
+ where schemaname = 'public' group by tablename order by tablename;
+```
+
+### Deshacer el Paso 22
+
+```sql
+do $$ declare r record; begin
+  for r in select policyname, tablename from pg_policies where schemaname = 'public' and tablename in ('pacientes', 'colposcopias', 'consultas') loop
+    execute format('drop policy %I on %I', r.policyname, r.tablename);
+  end loop;
+end $$;
+create policy "Solo usuarias con sesión - pacientes" on pacientes for all to authenticated using (true) with check (true);
+create policy "Solo usuarias con sesión - colposcopias" on colposcopias for all to authenticated using (true) with check (true);
+create policy "Solo usuarias con sesión - consultas" on consultas for all to authenticated using (true) with check (true);
+```
