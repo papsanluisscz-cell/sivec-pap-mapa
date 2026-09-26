@@ -3006,6 +3006,7 @@ function redRender(D, meses, desde, hasta, modo) {
 }
 function redFeed(eventos, silencioso) {
   const box = document.getElementById('redFeed');
+  eventos = (eventos || []).filter(e => !String(e.codigo || '').startsWith('L-HIST-')); // lotes históricos (papel) no son actividad
   const cn = id => (centroNombre(id) || '').replace(/^Centro de Salud /, 'C.S. ');
   const txt = e => ({
     tomas: ['🧪', `<b>${esc(cn(e.centro_id))}</b> registró ${e.n} toma${e.n > 1 ? 's' : ''}`],
