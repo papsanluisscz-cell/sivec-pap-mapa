@@ -980,6 +980,10 @@
     body.printingBalance #balancePrintArea th, body.printingBalance #balancePrintArea td { border: 1px solid #999; padding: 3px 4px; color: #000; background: #fff; }
   }
 body:not(.cobroOn) .cobroCampo { display: none !important; }
+.vphBox { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 8px 0 4px; padding: 10px 12px; border: 1px dashed var(--line); border-radius: 10px; }
+.vphBox[hidden], .vphBox .field[hidden] { display: none !important; }
+.labMet { font-size: 11px; font-weight: 700; color: #6d28d9; background: #ede9fe; border-radius: 999px; padding: 1px 8px; margin-left: 4px; }
+.balPill.kit { background: #fef3c7; color: #92400e; }
 </style>
 </head>
 <body>
@@ -1157,6 +1161,14 @@ body:not(.cobroOn) .cobroCampo { display: none !important; }
         <div class="checkrow">
           <input type="checkbox" id="hizoVph" name="hizo_prueba_vph">
           <label for="hizoVph" style="margin:0">Se realizó prueba de VPH</label>
+        </div>
+        <div class="vphBox" data-reg hidden>
+          <div class="field"><label>Forma de toma del VPH<span class="helpTip" data-tip="Autotoma: la mujer se toma sola la muestra vaginal con un hisopo, en el establecimiento o en su casa. Toma por profesional: muestra del cuello uterino con espéculo, como el PAP. Las dos sirven para la prueba molecular de VPH (OMS 2021).">ⓘ</span></label>
+            <select name="vph_modo"><option value="">— Sin dato —</option><option value="Profesional">Toma por profesional (cuello uterino)</option><option value="Autotoma">Autotoma (vaginal, la hace la mujer)</option></select></div>
+          <div class="field vphAuto"><label>Dónde hizo la autotoma</label>
+            <select name="vph_lugar"><option value="Establecimiento">Aquí, en el establecimiento</option><option value="Casa">En su casa (se lleva el kit)</option></select></div>
+          <div class="field vphCasa"><label>Kit entregado el</label><input type="date" name="vph_kit_entregado"></div>
+          <div class="field vphCasa"><label>Kit devuelto el<span class="helpTip" data-tip="Mientras la paciente no devuelva el kit, la muestra no se puede poner en un lote. Cuando lo traiga, marcá la fecha.">ⓘ</span></label><input type="date" name="vph_kit_devuelto"></div>
         </div>
         <details class="consentBox">
           <summary>Consentimiento Telesalud (opcional) <span class="helpTip" data-tip="Llenalo solo si la paciente va a tener consulta por Telesalud. Las respuestas se imprimen automáticamente marcadas con X en la Ficha de Consentimiento.">ⓘ</span></summary>
@@ -1777,6 +1789,14 @@ body:not(.cobroOn) .cobroCampo { display: none !important; }
           <select name="recibio_tratamiento_vph"><option value="false">No</option><option value="true">Sí</option></select>
         </div>
       </div>
+      <div class="vphBox">
+          <div class="field"><label>Forma de toma del VPH<span class="helpTip" data-tip="Autotoma: la mujer se toma sola la muestra vaginal con un hisopo, en el establecimiento o en su casa. Toma por profesional: muestra del cuello uterino con espéculo, como el PAP. Las dos sirven para la prueba molecular de VPH (OMS 2021).">ⓘ</span></label>
+            <select name="vph_modo"><option value="">— Sin dato —</option><option value="Profesional">Toma por profesional (cuello uterino)</option><option value="Autotoma">Autotoma (vaginal, la hace la mujer)</option></select></div>
+          <div class="field vphAuto"><label>Dónde hizo la autotoma</label>
+            <select name="vph_lugar"><option value="Establecimiento">Aquí, en el establecimiento</option><option value="Casa">En su casa (se lleva el kit)</option></select></div>
+          <div class="field vphCasa"><label>Kit entregado el</label><input type="date" name="vph_kit_entregado"></div>
+          <div class="field vphCasa"><label>Kit devuelto el<span class="helpTip" data-tip="Mientras la paciente no devuelva el kit, la muestra no se puede poner en un lote. Cuando lo traiga, marcá la fecha.">ⓘ</span></label><input type="date" name="vph_kit_devuelto"></div>
+        </div>
       <div class="field" id="genotipoField" style="display:none"><label>Genotipo VPH</label>
         <select id="vphGenotipoSel"><option value="">— Sin dato —</option><option>16</option><option>18</option><option>16 y 18</option><option>16 + otros de alto riesgo</option><option>18 + otros de alto riesgo</option><option>Otros de alto riesgo</option></select>
         <div class="hint" id="genotipoHint" style="display:none;margin-top:4px">Para guardar el genotipo hay que ejecutar el Paso 2 de SUPABASE-SQL.md (una columna nueva).</div>
@@ -2311,6 +2331,9 @@ function codigoIgual(a, b) { const n = x => String(x || '').toUpperCase().replac
 const LAB_RECHAZOS = ['Lámina rota', 'Sin identificar', 'Datos no coinciden', 'Fijación inadecuada', 'Muestra insuficiente', 'No llegó'];
 const LAB_BETH = ['NILM', 'ASC-US', 'LSIL', 'ASC-H', 'HSIL', 'AGC', 'AIS', 'Carcinoma'];
 const LAB_HALLAZGOS = ['Candida', 'Trichomonas', 'Cambio de flora (vaginosis)', 'Actinomyces', 'Herpes', 'Cambios reactivos', 'Atrofia'];
+// Plataformas de prueba molecular de VPH más usadas en la región (se guarda en el informe)
+const LAB_VPH_METODO = ['GeneXpert (Xpert HPV)', 'cobas (Roche)', 'careHPV', 'Abbott RealTime', 'BD Onclarity', 'Otra'];
+function labMetodoUlt() { try { return localStorage.getItem('sivec_lab_metodo') || ''; } catch (e) { return ''; } }
 const LAB_VPH = [['Negativo', 'Negativa', ''], ['Positivo 16', 'Positiva', '16'], ['Positivo 18', 'Positiva', '18'], ['Positivo 16 y 18', 'Positiva', '16 y 18'], ['Otros alto riesgo', 'Positiva', 'Otros de alto riesgo']];
 let labData = [], labLotes = [], labTab = 'rec', labLoteId = null, labSelId = null, labRecep = {}, labForm = null;
 async function labCargar() {
@@ -2410,20 +2433,23 @@ function labRenderLeer() {
 }
 function labRenderForm(x, previo) {
   const box = document.getElementById('labFormBox'); if (!x) return;
-  const f = labForm || (labForm = Object.assign({ calidad: 'Satisfactoria', zt: true, hemorragica: false, inflamacion: false, bethesda: '', hallazgos: [], vph: '', observaciones: '', validador: '' }, previo || {}));
-  const vph = labIncluyeVph(x), insat = f.calidad === 'Insatisfactoria';
+  const f = labForm || (labForm = Object.assign({ calidad: 'Satisfactoria', zt: true, hemorragica: false, inflamacion: false, bethesda: '', hallazgos: [], vph: '', metodo: labMetodoUlt(), observaciones: '', validador: '' }, previo || {}));
+  const vph = labIncluyeVph(x), soloV = /^VPH/.test(labMuestraTipo(x)), insat = !soloV && f.calidad === 'Insatisfactoria';
   const chip = (grp, v, on, extra, dis) => `<button type="button" class="labChip ${extra || ''}${on ? ' on' : ''}" data-g="${grp}" data-v="${esc(v)}"${dis ? ' disabled' : ''}>${esc(v)}</button>`;
   const edad = edadDe(x.fecha_nacimiento);
-  const necesitaVal = !insat && f.bethesda && f.bethesda !== 'NILM';
+  const necesitaVal = !soloV && !insat && f.bethesda && f.bethesda !== 'NILM';
   box.innerHTML = `<div class="labCard">
     <div class="labHead">${esc(x.nombre)}${edad != null ? ' · ' + edad + ' a' : ''}<span>${esc(x.codigo_muestra)} · CI ${esc(x.carnet || '—')} · ${esc(centroNombre(x.centro_id))} · toma ${fmtFecha(x.fecha_toma)} · ${labMuestraTipo(x)}${x.anticonceptivo_metodo ? ' · ' + esc(x.anticonceptivo_metodo) : ''}${x.pap_anterior ? ' · PAP anterior ' + esc(x.pap_anterior) : ''} · ${esc(x.doctora || '')}</span></div>
     <div class="labCols"><div>
+      ${soloV ? `<div class="labSec">Muestra solo para VPH</div><p class="hint" style="margin:0">${x.vph_modo === 'Autotoma' ? 'Autotoma vaginal hecha por la paciente' + (x.vph_lugar === 'Casa' ? ' en su casa' : ' en el establecimiento') : 'Muestra cervical tomada por el profesional'}. No lleva lectura de PAP (Bethesda).</p><div class="labSec">Observaciones</div><textarea data-f="observaciones" rows="2" placeholder="Opcional">${esc(f.observaciones)}</textarea>` : `
       <div class="labSec">Calidad de la muestra</div><div class="labChips">${['Satisfactoria', 'Insatisfactoria'].map(v => chip('calidad', v, f.calidad === v)).join('')}${chip('zt', 'ZT presente', f.zt)}${chip('hemorragica', 'Hemorrágica', f.hemorragica)}${chip('inflamacion', 'Inflamación', f.inflamacion)}</div>
       <div class="labSec">Resultado (Bethesda)</div><div class="labChips">${LAB_BETH.map(v => chip('bethesda', v === 'NILM' ? 'NILM' : v, f.bethesda === v, v === 'NILM' ? 'neg' : (BETHESDA_BY_CODE[v] || {}).nivel === 'alto' ? 'alto' : '', insat)).join('')}</div>
       <div class="labSec">Hallazgos no neoplásicos</div><div class="labChips">${LAB_HALLAZGOS.map(v => chip('hallazgos', v, f.hallazgos.includes(v), '', insat)).join('')}</div>
       <div class="labSec">Observaciones</div><textarea data-f="observaciones" rows="2" placeholder="Opcional">${esc(f.observaciones)}</textarea>
+      `}
     </div><div>
-      ${vph ? `<div class="labSec">VPH</div><div class="labChips">${LAB_VPH.map(([t]) => chip('vph', t, f.vph === t, t === 'Negativo' ? 'neg' : 'alto')).join('')}</div>` : '<div class="labSec">VPH</div><p class="hint" style="margin:0">Esta muestra no incluye VPH.</p>'}
+      ${vph ? `<div class="labSec">VPH${x.vph_modo === 'Autotoma' ? '<span class="labMet">autotoma</span>' : ''}</div><div class="labChips">${LAB_VPH.map(([t]) => chip('vph', t, f.vph === t, t === 'Negativo' ? 'neg' : 'alto')).join('')}</div>
+        <div class="labSec">Prueba usada</div><div class="labChips">${LAB_VPH_METODO.map(t => chip('metodo', t, f.metodo === t)).join('')}</div>` : '<div class="labSec">VPH</div><p class="hint" style="margin:0">Esta muestra no incluye VPH.</p>'}
       <div class="labSec">Lectura y validación</div>
       <div style="font-size:13px">🖋 Lectura: <b>${esc(perfil.nombre_completo || perfil.correo || '')}</b> · ${fmtFecha(hoyISO())}</div>
       <label style="display:block;font-size:12.5px;margin-top:8px">Validado por (patólogo)${necesitaVal ? ' <b style="color:#b91c1c">— obligatorio si no es NILM</b>' : ' — opcional'}<input type="text" data-f="validador" value="${esc(f.validador)}" placeholder="Ej: Dr. Méndez"></label>
@@ -2438,6 +2464,7 @@ function labRenderForm(x, previo) {
       else if (g === 'bethesda') f.bethesda = f.bethesda === v ? '' : v;
       else if (g === 'hallazgos') f.hallazgos = f.hallazgos.includes(v) ? f.hallazgos.filter(h => h !== v) : [...f.hallazgos, v];
       else if (g === 'vph') f.vph = f.vph === v ? '' : v;
+      else if (g === 'metodo') f.metodo = f.metodo === v ? '' : v;
       else f[g] = !f[g];
       return labRenderForm(x);
     }
@@ -2446,7 +2473,8 @@ function labRenderForm(x, previo) {
   box.oninput = e => { const k = e.target.dataset.f; if (k) f[k] = e.target.value; };
 }
 async function labFirmar(x, f, vph) {
-  const insat = f.calidad === 'Insatisfactoria';
+  const soloV = /^VPH/.test(labMuestraTipo(x)), insat = !soloV && f.calidad === 'Insatisfactoria';
+  if (soloV) return labFirmarVph(x, f);
   if (!insat && !f.bethesda) { alert('Elegí el resultado Bethesda (o marcá la muestra como insatisfactoria).'); return; }
   if (vph && !f.vph) { alert('Esta muestra incluye VPH: elegí el resultado del VPH.'); return; }
   if (!insat && f.bethesda !== 'NILM' && !f.validador.trim()) { alert('Un resultado alterado necesita la validación del patólogo: escribí quién lo validó.'); return; }
@@ -2455,8 +2483,20 @@ async function labFirmar(x, f, vph) {
   const vv = LAB_VPH.find(v => v[0] === f.vph);
   const resumen = `${x.nombre} (${x.codigo_muestra})\nPAP: ${texto}${vv ? '\nVPH: ' + vv[0] : ''}${f.validador ? '\nValidado por: ' + f.validador : ''}\n\n¿Firmar y liberar? El resultado aparece en la ficha del centro.`;
   if (!confirm(resumen)) return;
-  const informe = { calidad: f.calidad, zt: f.zt, hemorragica: f.hemorragica, inflamacion: f.inflamacion, bethesda: beth, hallazgos: f.hallazgos, vph: f.vph || null, observaciones: f.observaciones || null, lector: perfil.nombre_completo || perfil.correo, validador: f.validador || null, laboratorio: centroNombre(perfil.centro_id), fecha: new Date().toISOString() };
+  const informe = { calidad: f.calidad, zt: f.zt, hemorragica: f.hemorragica, inflamacion: f.inflamacion, bethesda: beth, hallazgos: f.hallazgos, vph: f.vph || null, metodo: f.vph ? (f.metodo || null) : null, observaciones: f.observaciones || null, lector: perfil.nombre_completo || perfil.correo, validador: f.validador || null, laboratorio: centroNombre(perfil.centro_id), fecha: new Date().toISOString() };
   const { error } = await sb.rpc('sivec_lab_informar', { p_id: x.id, p_bethesda: beth, p_texto: texto, p_vph: vv ? vv[1] : null, p_genotipo: vv ? vv[2] : null, p_informe: informe, p_informado_por: perfil.nombre_completo || perfil.correo || '' });
+  if (error) { alert('No se pudo liberar: ' + error.message); return; }
+  showToast(`${esc(x.codigo_muestra)} liberado ✔ — ya está en la ficha del centro`, 'ok');
+  labForm = null; labSelId = null; await labCargar();
+}
+// Muestra solo de VPH (autotoma o cervical): sin Bethesda; el resultado de VPH va a la ficha del centro
+async function labFirmarVph(x, f) {
+  if (!f.vph) { alert('Elegí el resultado del VPH.'); return; }
+  const vv = LAB_VPH.find(v => v[0] === f.vph);
+  if (!confirm(`${x.nombre} (${x.codigo_muestra})\nVPH: ${vv[0]}${f.metodo ? '\nPrueba: ' + f.metodo : ''}\n\n¿Firmar y liberar? El resultado aparece en la ficha del centro.`)) return;
+  try { if (f.metodo) localStorage.setItem('sivec_lab_metodo', f.metodo); } catch (e) {}
+  const informe = { muestra: labMuestraTipo(x), vph: f.vph, metodo: f.metodo || null, observaciones: f.observaciones || null, lector: perfil.nombre_completo || perfil.correo, laboratorio: centroNombre(perfil.centro_id) };
+  const { error } = await sb.rpc('sivec_lab_informar', { p_id: x.id, p_bethesda: null, p_texto: null, p_vph: vv[1], p_genotipo: vv[2], p_informe: informe, p_informado_por: perfil.nombre_completo || perfil.correo || '' });
   if (error) { alert('No se pudo liberar: ' + error.message); return; }
   showToast(`${esc(x.codigo_muestra)} liberado ✔ — ya está en la ficha del centro`, 'ok');
   labForm = null; labSelId = null; await labCargar();
@@ -2506,7 +2546,7 @@ function admRender() {
         <td style="white-space:nowrap"><button class="rowBtn admOk" data-centro-guardar="${x.id}">✓ Guardar</button> <button class="rowBtn" data-cancelar>✕</button></td></tr>`
     : `<tr style="${x.activo === false ? 'opacity:.5' : ''}"><td><b>${esc(x.nombre)}</b>${x.codigo ? `<div class="loteCod">${esc(x.codigo)}</div>` : ''}${x.direccion ? `<div style="font-size:11px;color:var(--ink-soft)">${esc(x.direccion)}</div>` : ''}</td><td>${esc(redNombre(x.red_id)) || '<span style="color:var(--ink-soft)">departamental</span>'}</td><td>${esc(TIPOS_CENTRO[x.tipo] || x.tipo || '')}</td>
     <td style="text-align:center"><input type="checkbox" data-servicio="hace_colposcopia" data-centro="${x.id}"${x.hace_colposcopia ? ' checked' : ''}></td>
-    <td style="text-align:center"><input type="checkbox" data-servicio="recibe_muestras" data-centro="${x.id}"${x.recibe_muestras ? ' checked' : ''}></td>
+    <td style="text-align:center"><input type="checkbox" data-servicio="recibe_muestras" data-centro="${x.id}"${x.recibe_muestras ? ' checked' : ''}>${x.recibe_muestras ? `<div style="font-size:11px;white-space:nowrap;margin-top:3px" title="Qué pruebas procesa este laboratorio">${['PAP', 'VPH'].map(t => `<label style="display:inline-flex;gap:3px;align-items:center;margin:0 3px"><input type="checkbox" data-prueba="${t}" data-centro="${x.id}"${labPruebas(x).includes(t) ? ' checked' : ''} style="flex:0 0 auto">${t}</label>`).join('')}</div>` : ''}</td>
     <td><button class="rowBtn" data-centro-prof="${x.id}" title="${esc((x.profesionales || []).join(', '))}">👩‍⚕️ ${(x.profesionales || []).length || 'Cargar'}</button></td>
     <td style="white-space:nowrap"><button class="rowBtn" data-centro-editar="${x.id}" title="Corregir nombre, red, nivel, código o dirección">✏️</button> <button class="rowBtn" data-centro-ubicar="${x.id}" title="${x.lat != null ? 'Ubicado · cambiar en el mapa' : 'Marcar en el mapa dónde queda'}">${x.lat != null ? '📍 ✓' : '📍 Ubicar'}</button> <button class="rowBtn" data-centro-act="${x.id}">${x.activo === false ? 'Activar' : 'Desactivar'}</button></td></tr>`).join('') || '<tr><td colspan="7">Todavía no hay establecimientos.</td></tr>';
   const optRedes = redes.map(x => `<option value="${x.id}">${esc(x.nombre)}</option>`).join('');
@@ -2616,10 +2656,19 @@ document.getElementById('admCentroForm').addEventListener('submit', async e => {
   f.reset(); showToast('Establecimiento agregado ✔', 'ok'); loadAdmin();
 });
 document.getElementById('admCentros').addEventListener('change', async e => {
+  if (e.target.dataset.prueba) {
+    const c = centros.find(x => String(x.id) === e.target.dataset.centro); if (!c) return;
+    const nuevas = [...e.target.closest('td').querySelectorAll('[data-prueba]')].filter(i => i.checked).map(i => i.dataset.prueba);
+    if (!nuevas.length) { e.target.checked = true; return showToast('Un laboratorio tiene que procesar al menos una prueba.', 'err'); }
+    const { error } = await sb.from('centros_salud').update({ lab_pruebas: nuevas }).eq('id', c.id);
+    if (error) { e.target.checked = !e.target.checked; return showToast('Error: ' + esc(error.message) + (/column/.test(error.message) ? ' — ejecutar el Paso 24 del SQL.' : ''), 'err'); }
+    c.lab_pruebas = nuevas; return showToast(`${esc(c.nombre)} procesa: ${nuevas.join(' y ')} ✔`, 'ok');
+  }
   const k = e.target.dataset.servicio; if (!k) return;
   const { error } = await sb.from('centros_salud').update({ [k]: e.target.checked }).eq('id', e.target.dataset.centro);
   if (error) { e.target.checked = !e.target.checked; return showToast('Error: ' + esc(error.message) + (/column/.test(error.message) ? ' — ejecutar el Paso 11 del SQL.' : ''), 'err'); }
   const c = centros.find(x => String(x.id) === e.target.dataset.centro); if (c) c[k] = e.target.checked;
+  if (k === 'recibe_muestras') admRender();
   showToast(centroNombre(e.target.dataset.centro) + ': ' + (k === 'hace_colposcopia' ? 'colposcopia' : 'recibe muestras') + (e.target.checked ? ' habilitado' : ' deshabilitado') + ' ✔', 'ok');
 });
 document.getElementById('admCentros').addEventListener('click', async e => {
@@ -2734,6 +2783,24 @@ function calcVencimientoMetodo(metodo, fechaInicio) {
   return meses ? addMonths(fechaInicio, meses) : null;
 }
 
+// ===== Prueba de VPH: autotoma (en el establecimiento o en casa con kit) o toma por profesional (Paso 24 del SQL) =====
+const VPH_CAMPOS = ['vph_modo', 'vph_lugar', 'vph_kit_entregado', 'vph_kit_devuelto'];
+function vphSync(form) {
+  const box = form && form.querySelector('.vphBox'); if (!box) return;
+  if (box.hasAttribute('data-reg')) box.hidden = !((form.hizo_prueba_vph && form.hizo_prueba_vph.checked) || (form.tipo_examen && form.tipo_examen.value === 'VPH'));
+  const auto = form.vph_modo.value === 'Autotoma', casa = auto && form.vph_lugar.value === 'Casa';
+  box.querySelectorAll('.vphAuto').forEach(x => { x.hidden = !auto; });
+  box.querySelectorAll('.vphCasa').forEach(x => { x.hidden = !casa; });
+  if (casa && !form.vph_kit_entregado.value) form.vph_kit_entregado.value = hoyISO();
+}
+document.addEventListener('change', e => { if (e.target.form && ['tipo_examen', 'hizo_prueba_vph', 'vph_modo', 'vph_lugar'].includes(e.target.name)) vphSync(e.target.form); });
+document.addEventListener('reset', e => setTimeout(() => vphSync(e.target), 0));
+async function limpiarVph(data) {
+  if (data.vph_modo !== 'Autotoma') data.vph_lugar = null;
+  if (data.vph_lugar !== 'Casa') { data.vph_kit_entregado = null; data.vph_kit_devuelto = null; }
+  for (const k of VPH_CAMPOS) { if (data[k] === '') data[k] = null; if (!(await columnOk(k))) delete data[k]; }
+}
+function vphKitEnCasa(p) { return p.vph_lugar === 'Casa' && !p.vph_kit_devuelto && !p.fecha_envio; }
 // Cobertura de la toma: con SUS gratis; sin SUS se paga en caja (Paso 15 del SQL: monto y recibo).
 async function limpiarCobertura(data) {
   if (!COBRO_ACTIVO) { for (const k of ['cobertura', 'monto_pago', 'recibo_caja']) delete data[k]; return; }
@@ -2832,12 +2899,24 @@ function lotesOk() {
   return lotesTablaPromise;
 }
 function destinosLote() { return centros.filter(c => (c.recibe_muestras || (c.recibe_muestras === undefined && c.tipo === 'oncologico')) && c.activo !== false); }
+// Qué pruebas procesa cada laboratorio (Admin → Establecimientos). Sin dato: PAP y VPH.
+function labPruebas(c) { return Array.isArray(c && c.lab_pruebas) && c.lab_pruebas.length ? c.lab_pruebas : ['PAP', 'VPH']; }
+function loteDestinoNombre(l) { return centroNombre(l.destino_id) || l.destino_externo || 'sin destino'; }
+document.addEventListener('change', e => { if (e.target.id === 'loteDestino') { const b = document.getElementById('loteExtBox'); if (b) b.style.display = e.target.value === '__ext' ? '' : 'none'; } });
+function labsExternosUsados() { try { return JSON.parse(localStorage.getItem('sivec_labs_ext') || '[]'); } catch (e) { return []; } }
 function loteBarraHTML() {
   const dest = destinosLote();
   if (!dest.length) return `<div class="segNote">Para armar lotes hace falta un establecimiento que <b>recibe muestras</b> (el oncológico)${perfil.es_admin ? ': en <b>Admin → Establecimientos</b> marcá la casilla "Recibe muestras"' : ': pedíselo al administrador'}.</div>`;
   let ult = {}; try { ult = JSON.parse(localStorage.getItem('sivec_lote_ult') || '{}'); } catch (e) {}
   return `<div class="balLote lote2"><b id="balSel" style="align-self:center">0 marcadas</b>
-    <label>Destino<select id="loteDestino">${dest.map(c => `<option value="${c.id}"${String(c.id) === ult.destino ? ' selected' : ''}>${esc(c.nombre)}</option>`).join('')}</select></label>
+    <label>Laboratorio<select id="loteDestino">${(() => {
+      const opt = c => `<option value="${c.id}"${String(c.id) === ult.destino ? ' selected' : ''}>${esc(c.nombre)} · ${labPruebas(c).join(' y ')}</option>`;
+      const propio = dest.filter(c => String(c.id) === String(perfil.centro_id)), otros = dest.filter(c => String(c.id) !== String(perfil.centro_id));
+      return (propio.length ? `<optgroup label="Laboratorio propio">${propio.map(opt).join('')}</optgroup>` : '')
+        + (otros.length ? `<optgroup label="Externo · otros establecimientos del SIVEC">${otros.map(opt).join('')}</optgroup>` : '')
+        + `<optgroup label="Externo · fuera del SIVEC"><option value="__ext"${ult.destino === '__ext' ? ' selected' : ''}>Otro laboratorio…</option></optgroup>`;
+    })()}</select></label>
+    <label id="loteExtBox" style="display:${ult.destino === '__ext' ? '' : 'none'}">Nombre del laboratorio externo<input id="loteExterno" list="loteExtList" value="${esc(ult.externo || '')}" placeholder="Ej: laboratorio privado, INLASA…"><datalist id="loteExtList">${labsExternosUsados().map(n => `<option value="${esc(n)}">`).join('')}</datalist></label>
     <label>Fecha de envío<input type="date" id="balFechaEnvio" value="${hoyISO()}"></label>
     <label>Transporte<input id="loteTransporte" value="${esc(ult.transporte || 'Mensajero de la red')}"></label>
     <label>Entrega<input id="loteEntrega" value="${esc(ult.entrega || perfil.nombre_completo || '')}"></label>
@@ -2846,14 +2925,26 @@ function loteBarraHTML() {
 async function loteArmar(data, ids) {
   if (!ids.length) { alert('Marcá al menos una muestra.'); return; }
   const g = id => document.getElementById(id).value.trim();
-  const destino = g('loteDestino'), fecha = g('balFechaEnvio');
+  const destinoSel = g('loteDestino'), fecha = g('balFechaEnvio');
   if (!fecha) { alert('Elegí la fecha de envío.'); return; }
-  const nombreDest = centroNombre(destino);
+  const externo = destinoSel === '__ext' ? g('loteExterno') : '', destino = destinoSel === '__ext' ? '' : destinoSel;
+  if (destinoSel === '__ext' && !externo) { alert('Escribí el nombre del laboratorio externo.'); return; }
+  const nombreDest = destino ? centroNombre(destino) : externo;
+  const marcadas = data.filter(p => ids.includes(String(p.id)));
+  if (marcadas.some(vphKitEnCasa)) { alert('Hay kits de autotoma que la paciente todavía no devolvió. Marcá "Devuelto hoy" antes de enviarlos.'); return; }
+  if (destino) {
+    const pr = labPruebas(centros.find(c => String(c.id) === String(destino))), falta = [];
+    if (!pr.includes('VPH') && marcadas.some(p => /VPH/.test(tipoMuestra(p)))) falta.push('VPH');
+    if (!pr.includes('PAP') && marcadas.some(p => !esSoloVph(p))) falta.push('PAP');
+    if (falta.length && !confirm(`${nombreDest} no procesa ${falta.join(' ni ')} (según Admin → Establecimientos). ¿Enviar igual?`)) return;
+  }
   if (!confirm(`¿Armar un lote con ${ids.length} muestra${ids.length > 1 ? 's' : ''} para ${nombreDest}, enviado el ${fmtFecha(fecha)}?\n\nCada lámina recibe su código y después se imprimen la hoja de remisión y las etiquetas.`)) return;
-  try { localStorage.setItem('sivec_lote_ult', JSON.stringify({ destino, transporte: g('loteTransporte'), entrega: g('loteEntrega') })); } catch (e) {}
+  try { localStorage.setItem('sivec_lote_ult', JSON.stringify({ destino: destinoSel, externo, transporte: g('loteTransporte'), entrega: g('loteEntrega') })); if (externo) localStorage.setItem('sivec_labs_ext', JSON.stringify([externo, ...labsExternosUsados().filter(n => n !== externo)].slice(0, 12))); } catch (e) {}
   const idVals = data.filter(p => ids.includes(String(p.id))).map(p => p.id);
-  const { data: lote, error } = await sb.rpc('sivec_armar_lote', { p_ids: idVals, p_destino: destino || null, p_fecha: fecha, p_transporte: g('loteTransporte'), p_entregado: g('loteEntrega') });
-  if (error) { alert('No se pudo armar el lote: ' + error.message); return; }
+  const args = { p_ids: idVals, p_destino: destino || null, p_fecha: fecha, p_transporte: g('loteTransporte'), p_entregado: g('loteEntrega') };
+  if (externo) args.p_externo = externo;
+  const { data: lote, error } = await sb.rpc('sivec_armar_lote', args);
+  if (error) { alert('No se pudo armar el lote: ' + error.message + (externo && /p_externo|function/.test(error.message) ? '\n\nPara laboratorios externos hay que ejecutar el Paso 24 del SQL.' : '')); return; }
   const l = Array.isArray(lote) ? lote[0] : lote;
   showToast(`Lote ${l.codigo} armado: ${l.n_muestras} muestra${l.n_muestras > 1 ? 's' : ''} ✔`, 'ok');
   loadBalance(); loadLotes();
@@ -2862,7 +2953,7 @@ async function loteArmar(data, ids) {
 function loteMostrar(l) {
   const ov = document.getElementById('loteOverlay'), box = document.getElementById('loteBox');
   box.innerHTML = `<h2>📦 Lote ${esc(l.codigo)}</h2>
-    <p class="hint" style="margin:0">${l.n_muestras} muestra${l.n_muestras > 1 ? 's' : ''} · ${esc(centroNombre(l.centro_id))} → <b>${esc(centroNombre(l.destino_id) || 'sin destino')}</b> · ${fmtFecha(l.fecha_envio)}</p>
+    <p class="hint" style="margin:0">${l.n_muestras} muestra${l.n_muestras > 1 ? 's' : ''} · ${esc(centroNombre(l.centro_id))} → <b>${esc(loteDestinoNombre(l))}</b>${l.destino_externo ? ' <span class="labMet">externo</span>' : ''} · ${fmtFecha(l.fecha_envio)}</p>
     ${code128SVG(l.codigo, 44, 2)}
     <p class="hint" style="margin:6px 0 0">1) Imprimí las <b>etiquetas</b> y pegá cada una en su lámina. 2) Imprimí la <b>hoja de remisión</b> (2 copias): una viaja con el lote y el oncológico la firma al recibir.</p>
     <div class="acts"><button type="button" class="primary" data-lp="etiq">🏷 Imprimir etiquetas</button><button type="button" class="primary" data-lp="hoja">🖨 Imprimir hoja de remisión</button><button type="button" class="rowBtn" data-lp="cerrar" style="margin-left:auto">Cerrar</button></div>`;
@@ -2885,7 +2976,7 @@ async function loadLotes() {
   box.innerHTML = `<h3>📦 Últimos lotes enviados</h3><table><thead><tr><th>Lote</th><th>Enviado</th><th>Centro → destino</th><th>Muestras</th><th>Estado</th><th></th></tr></thead><tbody>${data.map(l => {
     const dias = Math.round((hoy - new Date(l.fecha_envio + 'T12:00:00')) / 86400000);
     const est = l.estado === 'recibido' ? `<span class="balPill rec">✓ recibido${l.fecha_recepcion ? ' ' + fmtFecha(String(l.fecha_recepcion).slice(0, 10)) : ''}${l.recibido_por ? ' · ' + esc(l.recibido_por) : ''}</span>` : `<span class="balPill camino">en camino · ${dias} día${dias === 1 ? '' : 's'}</span>`;
-    return `<tr><td><b>${esc(l.codigo)}</b></td><td>${fmtFecha(l.fecha_envio)}${l.transporte ? `<div class="loteCod">${esc(l.transporte)}</div>` : ''}</td><td>${esc(centroNombre(l.centro_id))} → ${esc(centroNombre(l.destino_id) || '—')}</td><td>${l.n_muestras}</td><td>${est}</td>
+    return `<tr><td><b>${esc(l.codigo)}</b></td><td>${fmtFecha(l.fecha_envio)}${l.transporte ? `<div class="loteCod">${esc(l.transporte)}</div>` : ''}</td><td>${esc(centroNombre(l.centro_id))} → ${esc(loteDestinoNombre(l))}${l.destino_externo ? '<div class="loteCod">fuera del SIVEC: cargá el resultado en la ficha de cada paciente</div>' : ''}</td><td>${l.n_muestras}</td><td>${est}</td>
       <td><button class="rowBtn" data-lote="${l.id}" data-lp="etiq">🏷 Etiquetas</button><button class="rowBtn" data-lote="${l.id}" data-lp="hoja">🖨 Hoja</button></td></tr>`;
   }).join('')}</tbody></table>`;
   box.onclick = e => { const b = e.target.closest('[data-lote]'); if (!b) return; const l = data.find(x => String(x.id) === b.dataset.lote); if (l) loteImprimir(l, b.dataset.lp); };
@@ -2901,12 +2992,12 @@ function code128SVG(txt, alto, modulo) {
   vals.forEach(v => [...C128[v]].forEach((w, i) => { const a = +w * m; if (i % 2 === 0) rects += `<rect x="${x}" y="0" width="${a}" height="${alto}"/>`; x += a; }));
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${x + q}" height="${alto}" viewBox="0 0 ${x + q} ${alto}" role="img" aria-label="${esc(t)}"><rect width="100%" height="100%" fill="#fff"/><g fill="#000">${rects}</g></svg>`;
 }
-function tipoMuestra(p) { return p.tipo_examen === 'VPH' && !p.estado_pap ? 'VPH' : (p.hizo_prueba_vph || (p.tipo_examen || '').includes('VPH') ? 'PAP + VPH' : 'PAP'); }
+function tipoMuestra(p) { const auto = p.vph_modo === 'Autotoma'; return p.tipo_examen === 'VPH' && !p.estado_pap ? (auto ? 'VPH · autotoma' : 'VPH') : (p.hizo_prueba_vph || (p.tipo_examen || '').includes('VPH') ? (auto ? 'PAP + VPH (autotoma)' : 'PAP + VPH') : 'PAP'); }
 
 async function loteImprimir(l, que) {
   const { data, error } = await sb.from('pacientes').select('*').eq('lote_id', l.id).order('codigo_muestra', { ascending: true });
   if (error) { alert('No se pudieron leer las muestras del lote: ' + error.message); return; }
-  const ps = data || [], origen = centroNombre(l.centro_id), destino = centroNombre(l.destino_id) || '—';
+  const ps = data || [], origen = centroNombre(l.centro_id), destino = loteDestinoNombre(l);
   const red = (() => { const c = centros.find(x => String(x.id) === String(l.centro_id)); return c ? redNombre(c.red_id) || c.red || '' : ''; })();
   const css = `@page { size: A4; margin: 0; } * { box-sizing: border-box; } body { font-family: Arial, sans-serif; color: #111; margin: 0; padding: 10mm; }
     h1 { font-size: 16pt; margin: 0; } .sub { font-size: 9.5pt; color: #444; }
@@ -3480,12 +3571,13 @@ async function loadBalance() {
   lastBalanceRange = { inicio, fin };
   const envioOk = await columnOk('fecha_envio');
   const lotesSi = conRoles() && perfil.rol === 'centro' && await lotesOk();
-  const enviadas = data.filter(p => p.fecha_envio).length;
+  const enviadas = data.filter(p => p.fecha_envio).length, kitsCasa = data.filter(vphKitEnCasa).length;
   const porDoc = {}; data.forEach(p => { const d = p.doctora || 'Sin doctora'; porDoc[d] = (porDoc[d] || 0) + 1; });
   const resumen = `<div class="balTiles">
       <div class="balTile"><div class="v">${data.length}</div><div class="l">Tomas en el período</div></div>
       ${envioOk ? `<div class="balTile"><div class="v" style="color:#16a34a">${enviadas}</div><div class="l">Enviadas al laboratorio</div></div>
-      <div class="balTile"><div class="v" style="color:${data.length - enviadas ? '#d97706' : '#16a34a'}">${data.length - enviadas}</div><div class="l">Falta enviar</div></div>` : ''}
+      <div class="balTile"><div class="v" style="color:${data.length - enviadas ? '#d97706' : '#16a34a'}">${data.length - enviadas - kitsCasa}</div><div class="l">Falta enviar</div></div>
+      ${kitsCasa ? `<div class="balTile"><div class="v" style="color:#92400e">${kitsCasa}</div><div class="l">Kits de autotoma en casa (esperando que los devuelvan)</div></div>` : ''}` : ''}
       ${COBRO_ACTIVO && data.some(p => p.cobertura) ? (() => { const sin = data.filter(p => p.cobertura === 'Sin SUS'); const bs = sin.reduce((a, p) => a + (Number(p.monto_pago) || 0), 0); return `<div class="balTile"><div class="v">${data.filter(p => p.cobertura === 'SUS').length} <span style="font-size:14px;color:var(--ink-soft)">SUS</span> · ${sin.length} <span style="font-size:14px;color:var(--ink-soft)">sin SUS</span></div><div class="l">Cobrado en caja: Bs ${bs.toLocaleString('es-BO')}${sin.some(p => !p.recibo_caja) ? ' · ' + sin.filter(p => !p.recibo_caja).length + ' sin recibo' : ''}</div></div>`; })() : ''}
       <div class="balTile"><div class="l" style="margin-bottom:4px">Por doctora</div><div class="balDocs">${Object.entries(porDoc).sort((a, b) => b[1] - a[1]).map(([d, n]) => `${esc(d)} <b>${n}</b>`).join(' · ')}</div></div>
     </div>
@@ -3494,7 +3586,7 @@ async function loadBalance() {
       : '<div class="segNote">Para registrar qué muestras se enviaron al laboratorio (y medir cuánto tarda el resultado), ejecutá el <b>Paso 4</b> de SUPABASE-SQL.md.</div>'}`;
   const filas = data.map((p, i) => `
     <tr class="${p.fecha_envio ? 'balSent' : ''}">
-      ${envioOk ? `<td class="noPrint"><input type="checkbox" class="balChk" value="${esc(p.id)}"${p.fecha_envio ? ' disabled' : ''}></td>` : ''}
+      ${envioOk ? `<td class="noPrint"><input type="checkbox" class="balChk" value="${esc(p.id)}"${p.fecha_envio || vphKitEnCasa(p) ? ' disabled' : ''}></td>` : ''}
       <td>${i + 1}</td>
       <td>${esc(p.nombre)}</td>
       <td>${esc(p.carnet) || '—'}</td>
@@ -3504,9 +3596,9 @@ async function loadBalance() {
       <td>${esc(p.direccion) || '—'}</td>
       <td>${fmtFecha(p.fecha_toma)}</td>
       <td>${esc(p.doctora) || '—'}</td>
-      <td>${esc(p.estado_pap) || 'Pendiente'}</td>
-      <td>${esc(p.resultado_pap) || '—'}</td>
-      ${envioOk ? `<td>${p.fecha_envio ? `<span class="balPill ok">✓ ${fmtFecha(p.fecha_envio)}${p.lote_envio ? ' · ' + esc(p.lote_envio) : ''}</span>${p.codigo_muestra ? `<div class="loteCod">${esc(p.codigo_muestra)}</div>` : ''}` : '<span class="balPill no">Falta enviar</span>'}</td>` : ''}
+      <td>${esSoloVph(p) ? tipoMuestra(p) : esc(p.estado_pap) || 'Pendiente'}</td>
+      <td>${esSoloVph(p) ? (p.resultado_vph ? 'VPH ' + esc(p.resultado_vph) + (p.vph_genotipo ? ' · ' + esc(p.vph_genotipo) : '') : '—') : esc(p.resultado_pap) || '—'}</td>
+      ${envioOk ? `<td>${vphKitEnCasa(p) ? `<span class="balPill kit">🏠 Kit en casa desde ${fmtFecha(p.vph_kit_entregado)}</span> <button type="button" class="rowBtn noPrint" data-kit-devuelto="${esc(p.id)}">📥 Devuelto hoy</button>` : p.fecha_envio ? `<span class="balPill ok">✓ ${fmtFecha(p.fecha_envio)}${p.lote_envio ? ' · ' + esc(p.lote_envio) : ''}</span>${p.codigo_muestra ? `<div class="loteCod">${esc(p.codigo_muestra)}</div>` : ''}` : '<span class="balPill no">Falta enviar</span>'}</td>` : ''}
     </tr>`).join('');
   cont.innerHTML = resumen + `
     <div id="balancePrintArea">
@@ -3525,6 +3617,12 @@ async function loadBalance() {
   if (envioOk) {
     const chks = () => [...cont.querySelectorAll('.balChk:not(:disabled)')];
     const upd = () => { cont.querySelector('#balSel').textContent = chks().filter(c => c.checked).length + ' marcadas'; };
+    cont.onclick = async e => {
+      const k = e.target.closest('[data-kit-devuelto]'); if (!k) return;
+      const { error } = await sb.from('pacientes').update({ vph_kit_devuelto: hoyISO() }).eq('id', k.dataset.kitDevuelto);
+      if (error) return showToast('Error: ' + esc(error.message) + (/column/.test(error.message) ? ' — ejecutar el Paso 24 del SQL.' : ''), 'err');
+      showToast('Kit de autotoma devuelto ✔ — ya se puede enviar al laboratorio', 'ok'); loadBalance();
+    };
     cont.onchange = e => { if (e.target.id === 'balChkAll') chks().forEach(c => c.checked = e.target.checked); if (cont.querySelector('#balSel')) upd(); };
     cont.querySelector('#balSinEnviar').onclick = () => { chks().forEach(c => c.checked = true); upd(); };
     if (lotesSi) { cont.querySelector('#balArmar').onclick = () => loteArmar(data, chks().filter(c => c.checked).map(c => c.value)); return; }
@@ -3746,7 +3844,9 @@ async function onSubmit(e) {
   delete data.disp;
   data.consent_dispositivos_lista = fd.getAll('disp');
   data.hizo_prueba_vph = form.hizoVph.checked;
+  if (!data.hizo_prueba_vph && data.tipo_examen !== 'VPH') data.vph_modo = '';
   await limpiarCobertura(data);
+  await limpiarVph(data);
   data.estado_pap = data.tipo_examen === 'VPH' ? null : 'Pendiente';
   data.fecha_estimada = data.tipo_examen === 'VPH' ? null : (data.fecha_toma ? addDays(data.fecha_toma, 90) : null);
   if (data.anticonceptivo_fecha_inicio && !data.anticonceptivo_proximo_control) {
@@ -5214,6 +5314,7 @@ function openEdit(p) {
   form.fecha_seguimiento_pap.value = p.fecha_seguimiento_pap || '';
   form.derivacion_pap.value = p.derivacion_pap || '';
   form.resultado_vph.value = p.resultado_vph || '';
+  VPH_CAMPOS.forEach(k => { if (form[k]) form[k].value = p[k] || (k === 'vph_lugar' ? 'Establecimiento' : ''); }); vphSync(form);
   document.getElementById('bethesdaSel').value = bethesdaDe(p) || '';
   document.getElementById('vphGenotipoSel').value = p.vph_genotipo || '';
   toggleGenotipo();
@@ -5260,6 +5361,7 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
   data.recibio_tratamiento_vph = data.recibio_tratamiento_vph === 'true';
   data.recibio_resultado = e.target.recibioResultadoChk.checked;
   await limpiarCobertura(data);
+  await limpiarVph(data);
   if (!data.resultado_vph) data.resultado_vph = null;
   if (data.anticonceptivo_fecha_inicio && !data.anticonceptivo_proximo_control) {
     data.anticonceptivo_proximo_control = calcVencimientoMetodo(data.anticonceptivo_metodo, data.anticonceptivo_fecha_inicio);
@@ -5927,12 +6029,15 @@ function fichaRecorrido(t, derivs, lab, ext) {
   const ev = [], tag = ext ? ` <span class="fxExt">🏥 ${esc(String(t.centro || 'otro establecimiento').replace(/^Centro de Salud /, 'C.S. '))}</span>` : '';
   const add = (fecha, ord, tono, titulo, meta, lineas) => { if (fecha) ev.push({ fecha: fxDia(fecha), ord, tono, ext, titulo: titulo + tag, meta: meta || '', lineas: (lineas || []).filter(Boolean) }); };
   const hist = /^L-HIST-/.test(t.lote_envio || ''); // tomas cargadas desde el papel: sin fechas reales de envío
+  if (t.vph_lugar === 'Casa' && t.vph_kit_entregado) add(t.vph_kit_entregado, 0.5, 'pend', '🏠 Kit de autotoma de VPH entregado', '', [t.vph_kit_devuelto ? '' : '<span class="fxWarn">Todavía no lo devolvió</span>']);
+  if (t.vph_lugar === 'Casa' && t.vph_kit_devuelto) add(t.vph_kit_devuelto, 0.8, 'pend', '📥 Kit de autotoma devuelto', '', []);
   const rech = t.muestra_estado === 'rechazada';
   if (t.fecha_envio && !hist) add(t.fecha_envio, 1, 'lab', '📦 Muestra enviada al laboratorio', t.lote_envio ? 'Lote ' + t.lote_envio : '', [lab ? 'Destino: ' + esc(lab) : '']);
   if (t.fecha_recepcion_muestra && !hist) add(t.fecha_recepcion_muestra, 2, rech ? 'alto' : 'lab', rech ? '⚠ Muestra rechazada por el laboratorio' : '🔬 Muestra recibida en el laboratorio', lab || '', [rech && t.muestra_rechazo ? 'Motivo: ' + esc(t.muestra_rechazo) + ' · repetir la toma' : '']);
   if (t.fecha_informe && !hist && !rech) {
     const bet = bethesdaDe(t), nivel = bet && BETHESDA_BY_CODE[bet] && BETHESDA_BY_CODE[bet].nivel;
-    add(t.fecha_informe, 3, 'lab', '🧾 Informe del laboratorio', t.informado_por ? 'Firmó ' + t.informado_por : '', [
+    const met = t.informe_lab && t.informe_lab.metodo;
+    add(t.fecha_informe, 3, 'lab', '🧾 Informe del laboratorio', t.informado_por ? 'Firmó ' + t.informado_por : '', [met ? '<span class="fxMut">Prueba: ' + esc(met) + '</span>' : '',
       bet ? `<span class="fxRes ${nivel}">PAP: ${esc(bet)}</span>` : t.muestra_estado === 'insatisfactoria' ? '<span class="fxWarn">Muestra insatisfactoria: repetir la toma</span>' : '',
       t.resultado_vph ? `<span class="fxRes ${t.resultado_vph === 'Positiva' ? 'alto' : 'neg'}">VPH: ${esc(t.resultado_vph)}${t.vph_genotipo ? ' · genotipo ' + esc(t.vph_genotipo) : ''}</span>` : '']);
   }
@@ -5960,7 +6065,7 @@ function fichaEventosExt(lista) {
     if (x.derivacion_pap) lineas.push(`➡️ Derivada a: ${esc(x.derivacion_pap)}`);
     const tono = nivel === 'alto' || x.resultado_vph === 'Positiva' || x.estado_pap === 'Positivo' ? 'alto' : nivel === 'bajo' ? 'bajo' : conRes ? 'neg' : 'pend';
     const lugar = String(x.centro || 'otro establecimiento').replace(/^Centro de Salud /, 'C.S. ');
-    return [{ fecha: x.fecha_toma || '', tono, ext: true, titulo: (soloVph ? 'Prueba de VPH' : 'Toma de PAP') + ` <span class="fxExt">🏥 ${esc(lugar)}</span>`, meta: 'Otro establecimiento', lineas }]
+    return [{ fecha: x.fecha_toma || '', tono, ext: true, titulo: (soloVph ? (x.vph_modo === 'Autotoma' ? 'Autotoma de VPH' : 'Prueba de VPH') : 'Toma de PAP') + ` <span class="fxExt">🏥 ${esc(lugar)}</span>`, meta: 'Otro establecimiento', lineas }]
       .concat(fichaRecorrido(x, x.derivaciones, x.laboratorio, true));
   }).flat();
 }
@@ -5984,7 +6089,8 @@ function fichaEventos(grupo, colpos) {
   grupo.forEach(p => {
     const bet = bethesdaDe(p), nivel = bet && BETHESDA_BY_CODE[bet].nivel;
     const soloVph = esSoloVph(p);
-    const tipo = soloVph ? 'Prueba de VPH' : (p.hizo_prueba_vph || p.resultado_vph ? 'Toma PAP + VPH' : 'Toma de PAP');
+    const auto = p.vph_modo === 'Autotoma';
+    const tipo = soloVph ? (auto ? 'Autotoma de VPH' : 'Prueba de VPH') : (p.hizo_prueba_vph || p.resultado_vph ? (auto ? 'Toma de PAP + autotoma de VPH' : 'Toma PAP + VPH') : 'Toma de PAP');
     const lineas = [];
     if (!soloVph) {
       if (bet) lineas.push(`<span class="fxRes ${nivel}">PAP: ${esc(bet)}</span>${normTxtGeo(p.resultado_pap) !== normTxtGeo(bet) ? ` <span class="fxMut">${esc(String(p.resultado_pap).slice(0, 60))}</span>` : ''}`);
@@ -6004,7 +6110,7 @@ function fichaEventos(grupo, colpos) {
     const tono = nivel === 'alto' || p.resultado_vph === 'Positiva' || p.estado_pap === 'Positivo' ? 'alto' : nivel === 'bajo' ? 'bajo' : conRes ? 'neg' : 'pend';
     ev.push({ fecha: p.fecha_toma || '', tono, titulo: tipo, meta: [p.doctora, p.numero_folio_pap ? 'N° ' + p.numero_folio_pap : ''].filter(Boolean).join(' · '), lineas, id: p.id });
     const lote = p.lote_id && fichaLotes.get(String(p.lote_id));
-    ev.push(...fichaRecorrido(p, fichaDerivs.filter(d => String(d.paciente_id) === String(p.id)), lote ? centroNombre(lote.destino_id) : '', false));
+    ev.push(...fichaRecorrido(p, fichaDerivs.filter(d => String(d.paciente_id) === String(p.id)), lote ? loteDestinoNombre(lote) : '', false));
     if (p.anticonceptivo_metodo && p.anticonceptivo_fecha_inicio) ev.push({ fecha: p.anticonceptivo_fecha_inicio, tono: 'met', titulo: 'Método anticonceptivo: ' + esc(p.anticonceptivo_metodo), meta: '', lineas: p.anticonceptivo_proximo_control ? [`<span class="fxMut">Próximo control: ${fmtFecha(p.anticonceptivo_proximo_control)}</span>`] : [] });
   });
   (fichaConsultas || []).filter(c => grupo.some(g => String(g.id) === String(c.paciente_id))).forEach(c => ev.push({ fecha: c.fecha || '', tono: 'soap', titulo: 'Consulta (SOAP)', meta: [c.doctora, c.especialidad && c.codigo_esp ? c.especialidad + ' · ' + c.codigo_esp : c.especialidad].filter(Boolean).join(' · '), lineas: [
@@ -6061,7 +6167,7 @@ async function openFicha(p) {
     consultasOk().then(ok => ok ? sb.from('consultas').select('*').in('paciente_id', grupo.map(x => String(x.id))) : { data: [] }),
     conRoles() ? sb.rpc('sivec_linea_tiempo', { p_carnet: ultima.carnet || null, p_nombre: ultima.nombre || null, p_nac: ultima.fecha_nacimiento || null }).then(r => r, () => ({})) : Promise.resolve({}),
     conRoles() ? derivOk().then(ok => ok ? sb.from('derivaciones').select('*').in('paciente_id', grupo.map(x => x.id)).neq('estado', 'cancelada') : {}, () => ({})) : Promise.resolve({}),
-    grupo.some(x => x.lote_id) ? lotesOk().then(ok => ok ? sb.from('lotes').select('id,destino_id').in('id', [...new Set(grupo.map(x => x.lote_id).filter(Boolean))]) : {}, () => ({})) : Promise.resolve({}),
+    grupo.some(x => x.lote_id) ? lotesOk().then(ok => ok ? sb.from('lotes').select('*').in('id', [...new Set(grupo.map(x => x.lote_id).filter(Boolean))]) : {}, () => ({})) : Promise.resolve({}),
   ]);
   fichaConsultas = ((cons && cons.data) || []).map(consultaSoloFecha);
   fichaExt = lt && !lt.error && Array.isArray(lt.data) ? lt.data : [];
@@ -6920,7 +7026,7 @@ function formPropioHTML(tipo, ctx) {
         ${fpCell('C.I. · Fecha de nacimiento', ci + ' · ' + (fmtFecha(p.fecha_nacimiento) || '—'))}${fpCell('Teléfono celular', esc(p.celular || ''))}${fpCell('Estado civil', esc((p.estado_civil || '').toUpperCase()))}${fpCell('Fecha', esc(fmtFecha(p.fecha_toma) || ''), 'nr')}
         ${fpCell('Dirección (barrio · calle · Nº · UV · Mz · lote)', dom, 'n nb nr', 'grid-column:1/5')}</div>
       <div class="sec"><div class="secT">Datos de la toma</div><div class="grid" style="grid-template-columns:1fr 1fr 1fr">
-        ${fpCell('Embarazo actual', fpChk('Sí', false) + fpChk('No', false), 'n')}${fpCell('Muestra de', fpChk('Exocérvix', !esSoloVph(p)) + fpChk('Endocérvix', !esSoloVph(p)) + fpChk('Vaginal', false), 'n')}${fpCell('Toma de muestra test VPH', fpChk('Sí', !!p.hizo_prueba_vph) + fpChk('No', !p.hizo_prueba_vph) + fpChk('Convencional', !!p.hizo_prueba_vph) + fpChk('Autotoma', false), 'n nr')}
+        ${fpCell('Embarazo actual', fpChk('Sí', false) + fpChk('No', false), 'n')}${fpCell('Muestra de', fpChk('Exocérvix', !esSoloVph(p)) + fpChk('Endocérvix', !esSoloVph(p)) + fpChk('Vaginal', p.vph_modo === 'Autotoma'), 'n')}${fpCell('Toma de muestra test VPH', fpChk('Sí', !!p.hizo_prueba_vph) + fpChk('No', !p.hizo_prueba_vph) + fpChk('Convencional', !!p.hizo_prueba_vph) + fpChk('Autotoma', false), 'n nr')}
         ${fpCell('PAP previo', g.ultimo_pap ? fpChk('Sí — ' + esc(g.ultimo_pap), true) : fpChk('Sí', false) + fpChk('No', false), 'n')}${fpCell('Cuello', fpChk('Sano', oce === 'Íntegro') + fpChk('Lesión sospechosa', !!oce && oce !== 'Íntegro'), 'n')}${fpCell('Antecedente de PAP positivo', fpChk('Sí', false) + fpChk('No', false), 'n nr')}
         ${fpCell('Tratamiento realizado', ['Cauterización', 'Crioterapia', 'LEEP', 'Cono frío', 'Histerectomía', 'Radioterapia', 'Otros'].map(x => fpChk(x, false)).join(''), 'n nb nr', 'grid-column:1/4')}</div></div>
       <div class="sec"><div class="secT">Resultado <span>lo llena el laboratorio</span></div><div class="grid" style="grid-template-columns:1.3fr 1fr">

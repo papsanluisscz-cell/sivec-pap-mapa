@@ -1596,3 +1596,136 @@ select case when pg_get_functiondef('sivec_linea_tiempo(text, text, date)'::regp
 
 ### Deshacer el Paso 23
 Volver a ejecutar solo la parte **D)** del Paso 22 (la función `sivec_linea_tiempo` anterior). Los índices pueden quedar.
+
+
+---
+
+## Paso 24 — Prueba de VPH por autotoma y laboratorio propio, de otro establecimiento o externo (requiere los Pasos 10, 12, 14, 22 y 23)
+
+- Al registrar la toma: **forma de toma del VPH** (autotoma vaginal o toma por profesional) y, si es autotoma, **dónde** (en el establecimiento o en casa con kit, con fecha de entrega y devolución).
+- Un kit que sigue en casa no entra en un lote hasta que se marca **Devuelto**.
+- Al armar el lote: **laboratorio propio**, **otro establecimiento del SIVEC** u **otro laboratorio fuera del SIVEC** (se escribe el nombre; el resultado se carga a mano en la ficha).
+- En Admin → Establecimientos se marca qué pruebas procesa cada laboratorio (**PAP**, **VPH**).
+- El laboratorio informa las muestras solo de VPH sin Bethesda y anota la prueba usada (GeneXpert, cobas, careHPV…).
+
+```sql
+-- PASO 24 · Prueba de VPH: autotoma (en el establecimiento o en casa con kit) y laboratorio propio, de otro establecimiento o fuera del SIVEC
+-- A) Cómo se tomó la muestra de VPH
+alter table pacientes add column if not exists vph_modo text;            -- 'Profesional' (cervical) · 'Autotoma' (vaginal)
+alter table pacientes add column if not exists vph_lugar text;           -- 'Establecimiento' · 'Casa'
+alter table pacientes add column if not exists vph_kit_entregado date;   -- autotoma en casa: día que se llevó el kit
+alter table pacientes add column if not exists vph_kit_devuelto date;    -- día que devolvió la muestra (antes no entra en un lote)
+
+-- B) Qué pruebas procesa cada laboratorio, y laboratorios fuera del SIVEC
+alter table centros_salud add column if not exists lab_pruebas text[];
+update centros_salud set lab_pruebas = array['PAP', 'VPH'] where recibe_muestras and lab_pruebas is null;
+alter table lotes add column if not exists destino_externo text;          -- laboratorio que no usa el SIVEC (el centro carga el resultado a mano)
+alter table lotes alter column destino_id drop not null;
+
+-- C) Armar el lote: destino del SIVEC (propio u otro establecimiento) o externo; los kits que siguen en casa no entran
+drop function if exists sivec_armar_lote(uuid[], uuid, date, text, text);
+create or replace function sivec_armar_lote(p_ids uuid[], p_destino uuid, p_fecha date, p_transporte text, p_entregado text, p_externo text default null)
+returns lotes language plpgsql security invoker set search_path = public as $$
+declare v_centro uuid; v_lote lotes; v_n int;
+begin
+  if p_destino is null and nullif(trim(coalesce(p_externo, '')), '') is null then raise exception 'Elegí el laboratorio de destino.'; end if;
+  if exists (select 1 from pacientes where id = any(p_ids) and vph_lugar = 'Casa' and vph_kit_devuelto is null) then
+    raise exception 'Hay kits de autotoma que la paciente todavía no devolvió: marcá la fecha de devolución antes de enviarlos.'; end if;
+  select min(centro_id::text)::uuid, count(*) into v_centro, v_n from pacientes where id = any(p_ids) and lote_id is null and deleted_at is null;
+  if v_n = 0 then raise exception 'Ninguna de las muestras marcadas está libre (ya estaban en otro lote).'; end if;
+  if (select count(distinct centro_id) from pacientes where id = any(p_ids) and lote_id is null) > 1 then raise exception 'Todas las muestras de un lote tienen que ser del mismo centro.'; end if;
+  insert into lotes (codigo, centro_id, destino_id, destino_externo, fecha_envio, transporte, entregado_por, n_muestras)
+    values ('L-' || to_char(coalesce(p_fecha, current_date), 'YYYY') || '-' || lpad(nextval('lote_seq')::text, 4, '0'),
+            v_centro, p_destino, case when p_destino is null then nullif(trim(p_externo), '') end,
+            coalesce(p_fecha, current_date), nullif(trim(p_transporte), ''), nullif(trim(p_entregado), ''), v_n)
+    returning * into v_lote;
+  update pacientes p set lote_id = v_lote.id, lote_envio = v_lote.codigo, fecha_envio = v_lote.fecha_envio, muestra_estado = 'enviada',
+         codigo_muestra = coalesce(p.codigo_muestra, 'M-' || to_char(coalesce(p_fecha, current_date), 'YY') || '-' || lpad(nextval('muestra_seq')::text, 6, '0'))
+   where p.id = any(p_ids) and p.lote_id is null and p.deleted_at is null;
+  get diagnostics v_n = row_count;
+  if v_n <> v_lote.n_muestras then raise exception 'No se pudieron marcar todas las muestras (permisos del centro).'; end if;
+  return v_lote;
+end $$;
+revoke execute on function sivec_armar_lote(uuid[], uuid, date, text, text, text) from public, anon;
+grant execute on function sivec_armar_lote(uuid[], uuid, date, text, text, text) to authenticated;
+
+-- D) El laboratorio ve si la muestra de VPH es autotoma
+drop function if exists sivec_lab_muestras(uuid);
+create or replace function sivec_lab_muestras(p_lote uuid default null)
+returns table (id uuid, codigo_muestra text, nombre text, carnet text, fecha_nacimiento date, fecha_toma date,
+  tipo_examen text, hizo_prueba_vph boolean, anticonceptivo_metodo text, doctora text, pap_anterior text,
+  lote_id uuid, lote_codigo text, centro_id uuid, fecha_envio date, muestra_estado text, muestra_rechazo text,
+  fecha_recepcion_muestra timestamptz, resultado_pap text, resultado_vph text, vph_genotipo text,
+  informe_lab jsonb, fecha_informe timestamptz, informado_por text, estado_pap text, vph_modo text, vph_lugar text)
+language sql stable security definer set search_path = public as $$
+  select p.id, p.codigo_muestra, p.nombre, p.carnet, p.fecha_nacimiento, p.fecha_toma, p.tipo_examen, p.hizo_prueba_vph,
+    p.anticonceptivo_metodo, p.doctora,
+    (select q.resultado_pap || ' (' || to_char(q.fecha_toma, 'YYYY') || ')' from pacientes q
+       where coalesce(p.carnet, '') <> '' and q.carnet = p.carnet and q.id <> p.id and q.fecha_toma < p.fecha_toma
+         and coalesce(q.resultado_pap, '') <> '' and q.deleted_at is null order by q.fecha_toma desc limit 1),
+    l.id, l.codigo, l.centro_id, l.fecha_envio, p.muestra_estado, p.muestra_rechazo, p.fecha_recepcion_muestra,
+    p.resultado_pap, p.resultado_vph, p.vph_genotipo, p.informe_lab, p.fecha_informe, p.informado_por,
+    p.estado_pap, p.vph_modo, p.vph_lugar
+  from pacientes p join lotes l on l.id = p.lote_id
+  where sivec_es_lab() and l.destino_id = sivec_centro() and p.deleted_at is null
+    and (p_lote is null or l.id = p_lote)
+  order by l.fecha_envio, p.codigo_muestra $$;
+revoke execute on function sivec_lab_muestras(uuid) from public, anon;
+grant execute on function sivec_lab_muestras(uuid) to authenticated;
+
+-- E) Línea de tiempo entre centros: también la forma de toma del VPH y el laboratorio externo
+create or replace function sivec_linea_tiempo(p_carnet text, p_nombre text, p_nac date) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare
+  v_ci text := sivec_norm_ci(p_carnet);
+  v_nom text := sivec_norm(p_nombre);
+  v jsonb;
+begin
+  if sivec_rol() not in ('centro', 'gestor', 'admin') then return '[]'::jsonb; end if;
+  if v_ci is not null and (length(v_ci) < 5 or v_ci ~ '^0+$') then v_ci := null; end if;
+  if v_ci is null and (v_nom = '' or p_nac is null) then return '[]'::jsonb; end if;
+  select coalesce(jsonb_agg(jsonb_build_object(
+           'id', p.id, 'centro_id', p.centro_id, 'centro', c.nombre, 'fecha_toma', p.fecha_toma, 'tipo_examen', p.tipo_examen,
+           'estado_pap', p.estado_pap, 'resultado_pap', p.resultado_pap, 'resultado_vph', p.resultado_vph, 'vph_genotipo', p.vph_genotipo,
+           'recibio_resultado', p.recibio_resultado, 'fecha_recibio_resultado', p.fecha_recibio_resultado,
+           'derivacion_pap', p.derivacion_pap, 'seg_etapa', p.seg_etapa, 'doctora', p.doctora,
+           'hizo_prueba_vph', p.hizo_prueba_vph, 'vph_modo', p.vph_modo, 'vph_lugar', p.vph_lugar,
+           'vph_kit_entregado', p.vph_kit_entregado, 'vph_kit_devuelto', p.vph_kit_devuelto,
+           'fecha_envio', p.fecha_envio, 'lote_envio', p.lote_envio, 'laboratorio', coalesce(lab.nombre, l.destino_externo),
+           'fecha_recepcion_muestra', p.fecha_recepcion_muestra, 'muestra_estado', p.muestra_estado, 'muestra_rechazo', p.muestra_rechazo,
+           'fecha_informe', p.fecha_informe, 'informado_por', p.informado_por,
+           'derivaciones', (select coalesce(jsonb_agg(jsonb_build_object(
+                'destino', dc.nombre, 'fecha_derivacion', d.fecha_derivacion, 'motivo', d.motivo, 'indicacion', d.indicacion,
+                'prioridad', d.prioridad, 'estado', d.estado, 'fecha_cita', d.fecha_cita, 'fecha_atencion', d.fecha_atencion,
+                'atendido_por', d.atendido_por, 'colposcopia', d.colposcopia, 'biopsia_tomada', d.biopsia_tomada,
+                'biopsia_resultado', d.biopsia_resultado, 'fecha_biopsia_resultado', d.fecha_biopsia_resultado,
+                'tratamiento', d.tratamiento, 'contrarreferencia', d.contrarreferencia, 'proximo_control', d.proximo_control,
+                'fecha_contrarreferencia', d.fecha_contrarreferencia) order by d.created_at), '[]'::jsonb)
+              from derivaciones d left join centros_salud dc on dc.id = d.destino_id
+             where d.paciente_id = p.id and d.estado <> 'cancelada')
+         ) order by p.fecha_toma), '[]'::jsonb)
+    into v
+    from pacientes p
+    left join centros_salud c on c.id = p.centro_id
+    left join lotes l on l.id = p.lote_id
+    left join centros_salud lab on lab.id = l.destino_id
+   where p.deleted_at is null and not sivec_ve_centro(p.centro_id)
+     and ((v_ci is not null and sivec_norm_ci(p.carnet) = v_ci)
+       or (p_nac is not null and v_nom <> '' and p.fecha_nacimiento = p_nac and sivec_norm(p.nombre) = v_nom));
+  if jsonb_array_length(v) > 0 then
+    insert into historial_accesos (centro_id, carnet, nombre, encontrados) values (sivec_centro(), p_carnet, p_nombre, jsonb_array_length(v));
+  end if;
+  return v;
+end $$;
+
+notify pgrst, 'reload schema';
+
+-- Resultado: debe decir "listo"
+select case when exists (select 1 from information_schema.columns where table_name = 'pacientes' and column_name = 'vph_modo')
+             and exists (select 1 from information_schema.columns where table_name = 'lotes' and column_name = 'destino_externo')
+             and pg_get_functiondef('sivec_lab_muestras(uuid)'::regprocedure) like '%vph_modo%'
+            then 'listo' else 'revisar' end as paso_24;
+```
+
+### Deshacer el Paso 24
+Las columnas nuevas pueden quedar (no molestan). Para volver a las funciones anteriores, ejecutar de nuevo la función `sivec_armar_lote` del Paso 10 (antes: `drop function if exists sivec_armar_lote(uuid[], uuid, date, text, text, text);`), `sivec_lab_muestras` del Paso 14 (antes: `drop function if exists sivec_lab_muestras(uuid);`) y la línea de tiempo del Paso 23.
