@@ -862,6 +862,20 @@ notify pgrst, 'reload schema';
 
 ---
 
+## Paso 15 — Cobro de la toma de PAP (sin SUS: Bs 30 en la caja del hospital)
+
+Al registrar o editar una toma: **Cobertura** SUS (gratis) o sin SUS (monto, por defecto Bs 30, y N° de recibo de caja).
+El Balance muestra cuántas fueron SUS / sin SUS, lo cobrado y cuántas no tienen recibo.
+
+```sql
+alter table pacientes add column if not exists cobertura text;
+alter table pacientes add column if not exists monto_pago numeric;
+alter table pacientes add column if not exists recibo_caja text;
+notify pgrst, 'reload schema';
+```
+
+---
+
 ## Paso 3 — Proteger los datos de las pacientes (IMPORTANTE)
 
 Hoy cualquiera que tenga la URL y la clave *anon* de Supabase puede leer todos los datos.
