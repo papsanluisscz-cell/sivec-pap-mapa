@@ -959,6 +959,107 @@ notify pgrst, 'reload schema';
 
 ---
 
+## Paso 17 — Tablero de la red "en vivo" (gráficos y actividad)
+
+El tablero del gestor pasa a tener el estilo del Panel: indicadores animados con anillos y minigráficos, embudo del tamizaje
+al tratamiento, tomas por mes (detalle por centro), avance de la meta, Bethesda, PAP/VPH, edad, cobertura, días del laboratorio
+y el **feed "Actividad de la red"** (lotes enviados/recibidos, resultados, derivaciones, contrarreferencias; sin nombres).
+Se actualiza solo cada 30 segundos y los números pasan del valor anterior al nuevo. Filtro por establecimiento. Requiere el Paso 16.
+
+```sql
+-- Tablero de la red "en vivo": detalle para los gráficos y actividad reciente (sin nombres de pacientes)
+create or replace function sivec_bethesda(t text) returns text language sql immutable as $$
+  select case
+    when t is null or trim(t) = '' then null
+    when lower(t) ~ 'insatisf' then 'Insatisfactoria'
+    when lower(t) ~ 'carcinoma' and lower(t) !~ 'in situ' then 'Carcinoma'
+    when lower(t) ~ '\mais\M|adenocarcinoma in situ' then 'AIS'
+    when lower(t) ~ '\magc\M|\magus\M|glandulares at' then 'AGC'
+    when lower(t) ~ '\mhsil\M|alto grado|\m(nic|cin) ?(2|3|ii|iii)\M|carcinoma in situ' then 'HSIL'
+    when lower(t) ~ 'asc ?-? ?h' then 'ASC-H'
+    when lower(t) ~ '\mlsil\M|bajo grado|\m(nic|cin) ?(1|i)\M' then 'LSIL'
+    when lower(t) ~ 'asc ?-? ?us|ascus' then 'ASC-US'
+    when lower(t) ~ 'nilm|negativ' then 'NILM'
+    else null end $$;
+
+create or replace function sivec_red_detalle(p_desde date, p_hasta date, p_centro uuid default null) returns jsonb
+language sql stable security definer set search_path = public as $$
+  with p as (
+    select * from pacientes
+     where deleted_at is null and fecha_toma between p_desde and p_hasta
+       and centro_id in (select sivec_centros_tablero()) and (p_centro is null or centro_id = p_centro)),
+  d as (select dv.* from derivaciones dv join p on p.id = dv.paciente_id where dv.estado <> 'cancelada')
+  select jsonb_build_object(
+    'estado', jsonb_build_object(
+       'Negativo', (select count(*) from p where estado_pap = 'Negativo'),
+       'Pendiente', (select count(*) from p where coalesce(estado_pap, 'Pendiente') = 'Pendiente' and coalesce(tipo_examen, '') <> 'VPH'),
+       'Positivo', (select count(*) from p where estado_pap = 'Positivo')),
+    'vph', jsonb_build_object('Negativa', (select count(*) from p where resultado_vph = 'Negativa'), 'Positiva', (select count(*) from p where resultado_vph = 'Positiva'),
+       'g16', (select count(*) from p where resultado_vph = 'Positiva' and vph_genotipo ~ '16'), 'g18', (select count(*) from p where resultado_vph = 'Positiva' and vph_genotipo ~ '18')),
+    'bethesda', (select coalesce(jsonb_object_agg(b, n), '{}'::jsonb) from (select sivec_bethesda(resultado_pap) b, count(*) n from p where sivec_bethesda(resultado_pap) is not null group by 1) x),
+    'edad', (select coalesce(jsonb_object_agg(g, n), '{}'::jsonb) from (
+       select case when e < 25 then '< 25' when e < 35 then '25–34' when e < 45 then '35–44' when e < 55 then '45–54' when e < 65 then '55–64' else '65 +' end g, count(*) n
+         from (select extract(year from age(fecha_toma, fecha_nacimiento))::int e from p where fecha_nacimiento is not null) y group by 1) x),
+    'cobertura', jsonb_build_object('SUS', (select count(*) from p where cobertura = 'SUS'), 'Sin SUS', (select count(*) from p where cobertura = 'Sin SUS'), 'Sin dato', (select count(*) from p where cobertura is null)),
+    'embudo', jsonb_build_object(
+       'tomas', (select count(*) from p),
+       'enviadas', (select count(*) from p where fecha_envio is not null),
+       'con_resultado', (select count(*) from p where estado_pap in ('Positivo', 'Negativo') or coalesce(resultado_vph, '') <> ''),
+       'entregadas', (select count(*) from p where recibio_resultado),
+       'positivas', (select count(*) from p where estado_pap = 'Positivo' or resultado_vph = 'Positiva'),
+       'con_conducta', (select count(*) from p where (estado_pap = 'Positivo' or resultado_vph = 'Positiva') and not sivec_pos_sin_tratar(p)),
+       'derivadas', (select count(*) from d),
+       'atendidas', (select count(*) from d where estado in ('atendida', 'contrarreferida')),
+       'tratadas', (select count(*) from d where coalesce(tratamiento, '') not in ('', 'Ninguno (control)'))),
+    'lab_mes', (select coalesce(jsonb_agg(jsonb_build_object('mes', m, 'dias', dias) order by m), '[]'::jsonb) from (
+       select to_char(date_trunc('month', fecha_toma), 'YYYY-MM') m, round(avg(extract(epoch from (fecha_informe - fecha_envio::timestamptz)) / 86400)::numeric, 1) dias
+         from p where fecha_informe is not null and fecha_envio is not null group by 1) x)
+  ) where sivec_ve_tablero() $$;
+
+drop function if exists sivec_red_mensual(date, date);
+create or replace function sivec_red_mensual(p_desde date, p_hasta date, p_centro uuid default null)
+returns table (mes date, centro_id uuid, tomas bigint)
+language sql stable security definer set search_path = public as $$
+  select date_trunc('month', p.fecha_toma)::date, p.centro_id, count(*)
+  from pacientes p
+  where p.deleted_at is null and p.fecha_toma between p_desde and p_hasta and p.centro_id in (select sivec_centros_tablero())
+    and (p_centro is null or p.centro_id = p_centro)
+  group by 1, 2 order by 1 $$;
+
+create or replace function sivec_red_actividad(p_centro uuid default null)
+returns table (fecha timestamptz, tipo text, centro_id uuid, otro_id uuid, codigo text, n bigint, alterados bigint)
+language sql stable security definer set search_path = public as $$
+  with vis as (select sivec_centros_tablero() id)
+  select * from (
+    select max(p.created_at), 'tomas', p.centro_id, null::uuid, null, count(*), null::bigint
+      from pacientes p where p.created_at > now() - interval '21 days' and p.deleted_at is null and p.centro_id in (select id from vis)
+      group by p.centro_id, date_trunc('day', p.created_at)
+    union all
+    select l.created_at, 'lote_enviado', l.centro_id, l.destino_id, l.codigo, l.n_muestras, null from lotes l
+      where l.created_at > now() - interval '60 days' and l.centro_id in (select id from vis)
+    union all
+    select l.fecha_recepcion, 'lote_recibido', l.centro_id, l.destino_id, l.codigo, l.n_muestras, null from lotes l
+      where l.fecha_recepcion > now() - interval '60 days' and l.centro_id in (select id from vis)
+    union all
+    select max(p.fecha_informe), 'resultados', p.centro_id, null, null, count(*), count(*) filter (where p.estado_pap = 'Positivo' or p.resultado_vph = 'Positiva')
+      from pacientes p where p.fecha_informe > now() - interval '60 days' and p.centro_id in (select id from vis)
+      group by p.centro_id, date_trunc('hour', p.fecha_informe)
+    union all
+    select d.created_at, 'derivacion', d.centro_origen, d.destino_id, d.prioridad, 1, null from derivaciones d
+      where d.created_at > now() - interval '60 days' and d.estado <> 'cancelada' and d.centro_origen in (select id from vis)
+    union all
+    select d.fecha_contrarreferencia, case when d.estado = 'no_asistio' then 'no_asistio' else 'contrarreferencia' end, d.centro_origen, d.destino_id, d.biopsia_resultado, 1, null from derivaciones d
+      where d.fecha_contrarreferencia > now() - interval '60 days' and d.centro_origen in (select id from vis)
+  ) x where p_centro is null or x.centro_id = p_centro
+  order by 1 desc limit 40 $$;
+
+revoke execute on function sivec_red_detalle(date, date, uuid), sivec_red_mensual(date, date, uuid), sivec_red_actividad(uuid) from public, anon;
+grant execute on function sivec_red_detalle(date, date, uuid), sivec_red_mensual(date, date, uuid), sivec_red_actividad(uuid) to authenticated;
+notify pgrst, 'reload schema';
+```
+
+---
+
 ## Paso 3 — Proteger los datos de las pacientes (IMPORTANTE)
 
 Hoy cualquiera que tenga la URL y la clave *anon* de Supabase puede leer todos los datos.

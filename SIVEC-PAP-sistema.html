@@ -497,6 +497,19 @@
   .urg { font-size: 10.5px; font-weight: 800; color: #fff; background: #dc2626; border-radius: 5px; padding: 1px 6px; margin-left: 4px; }
   /* Tablero de la red */
   #redView { padding: 24px 32px; overflow-y: auto; }
+  .redLive { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--pn-good); background: color-mix(in srgb, var(--pn-good) 10%, var(--surface)); border-radius: 999px; padding: 4px 10px; align-self: center; }
+  .redLive i { width: 8px; height: 8px; border-radius: 50%; background: var(--pn-good); box-shadow: 0 0 0 0 color-mix(in srgb, var(--pn-good) 60%, transparent); animation: redPulse 1.8s infinite; }
+  @keyframes redPulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pn-good) 55%, transparent); } 70% { box-shadow: 0 0 0 9px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+  #redCentro { border: 1px solid var(--line); border-radius: 10px; padding: 6px 9px; background: var(--surface); color: var(--ink); font-size: 12.5px; }
+  #redFeed { display: flex; flex-direction: column; gap: 2px; max-height: 330px; overflow-y: auto; }
+  .redEv { display: grid; grid-template-columns: 30px 1fr auto; gap: 8px; align-items: start; padding: 7px 4px; border-bottom: 1px dashed var(--line); font-size: 12.5px; animation: redIn .6s cubic-bezier(.2,.7,.2,1) both; }
+  .redEv .ic { width: 28px; height: 28px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; background: color-mix(in srgb, var(--pn-one) 10%, transparent); }
+  .redEv.nuevo { background: color-mix(in srgb, var(--pn-good) 10%, transparent); border-radius: 8px; }
+  .redEv small { color: var(--ink-soft); white-space: nowrap; font-size: 11px; }
+  @keyframes redIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+  .pnKpi.flash { animation: redFlash 1.2s ease; }
+  @keyframes redFlash { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pn-one) 45%, transparent); } 100% { box-shadow: 0 0 0 14px transparent; } }
+  @media (prefers-reduced-motion: reduce) { .redLive i, .redEv, .pnKpi.flash { animation: none; } }
   @media (max-width: 700px) { #redView { padding: 16px 12px; } }
   .redFiltros { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 6px 0 14px; font-size: 13px; }
   .redFiltros input { border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; background: var(--surface); color: var(--ink); margin-left: 4px; }
@@ -740,11 +753,11 @@
   .metChip { display: block; width: 100%; text-align: left; border: none; border-radius: 6px; padding: 2px 5px; margin-bottom: 3px; font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; font-family: inherit; }
   .metChip.venc { background: #fee2e2; color: #991b1b; } .metChip.prox { background: #fff4d6; color: #8a5300; } .metChip.fut { background: var(--paper); color: var(--ink-soft); border: 1px solid var(--line); }
   .metMore { font-size: 10.5px; color: var(--ink-soft); }
-  #metodosView .pnSeg button.on, #redView .pnSeg button.on { background: var(--teal-700); color: #fff; font-weight: 600; }
+  #metodosView .pnSeg button.on { background: var(--teal-700); color: #fff; font-weight: 600; }
   @media (max-width: 700px) { .metCal { grid-template-columns: repeat(2, 1fr); } .metCal.mes { grid-template-columns: repeat(7, 1fr); } .metCal.mes .metChip { font-size: 0; padding: 0; height: 6px; } }
   /* ===== Panel ===== */
-  #panelView { --pn-grid: color-mix(in srgb, var(--line) 70%, transparent); --pn-one: #7d2a4c; --pn-good: #16a34a; --pn-warn: #d97706; --pn-crit: #dc2626; --pn-mute: #9a8690; }
-  body.dark #panelView { --pn-one: #e88fb0; --pn-good: #4ade80; --pn-warn: #fbbf24; --pn-crit: #f87171; --pn-mute: #9d8490; }
+  #panelView, #redView { --pn-grid: color-mix(in srgb, var(--line) 70%, transparent); --pn-one: #7d2a4c; --pn-good: #16a34a; --pn-warn: #d97706; --pn-crit: #dc2626; --pn-mute: #9a8690; }
+  body.dark #panelView, body.dark #redView { --pn-one: #e88fb0; --pn-good: #4ade80; --pn-warn: #fbbf24; --pn-crit: #f87171; --pn-mute: #9d8490; }
   .pnTop { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
   .pnFilters { display: flex; gap: 8px; flex-wrap: wrap; }
   .pnSeg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
@@ -1293,12 +1306,34 @@
 
     <!-- TABLERO DE LA RED (gestor / administración): paso 5 -->
     <div id="redView" class="view">
-      <h2 id="redTitulo">Tablero de la red</h2>
-      <p class="hint">Números por establecimiento, sin datos de pacientes (salvo la lista de <b>positivas sin tratar</b>, para coordinar la búsqueda activa). Se actualiza solo con lo que cargan los centros, el laboratorio y la colposcopia.</p>
-      <div class="redFiltros"><span class="pnSeg" id="redPeriodo"><button type="button" data-p="anio" class="on">Este año</button><button type="button" data-p="12m">Últimos 12 meses</button><button type="button" data-p="mes">Este mes</button><button type="button" data-p="todo">Todo</button></span>
-        <label>Desde <input type="date" id="redDesde"></label><label>Hasta <input type="date" id="redHasta"></label>
-        <button type="button" class="rowBtn" id="redExcel">📊 Descargar Excel</button></div>
-      <div id="redBody"><p class="hint">Cargando…</p></div>
+      <div class="pnTop">
+        <div><h2 style="margin:0" id="redTitulo">Tablero de la red</h2><div id="redSub" style="margin:3px 0 0;font-size:13px;color:var(--ink-soft)"></div></div>
+        <div class="pnFilters">
+          <span class="redLive" title="Se actualiza solo cada 30 segundos"><i></i>En vivo · <span id="redAgo">ahora</span></span>
+          <div class="pnSeg" id="redPeriodo"><button type="button" data-p="1">Este mes</button><button type="button" data-p="3">3 meses</button><button type="button" data-p="12" class="on">12 meses</button><button type="button" data-p="anio">Este año</button><button type="button" data-p="0">Todo</button></div>
+          <select id="redCentro"><option value="">Todos los establecimientos</option></select>
+          <button type="button" class="rowBtn" id="redExcel">📊 Excel</button>
+        </div>
+      </div>
+      <div class="pnKpis" id="redKpis"></div>
+      <div class="pnGrid2">
+        <div class="pnCard"><h3>Del tamizaje al tratamiento</h3><div class="pnCap">Dónde se quedan las mujeres en el camino, en toda la red</div><div class="pnFun" id="redFunnel"></div></div>
+        <div class="pnCard"><h3>Actividad de la red <span class="redLive" style="margin-left:6px"><i></i>en vivo</span></h3><div class="pnCap">Lo que va pasando en los centros, el laboratorio y la colposcopia (sin nombres)</div><div id="redFeed"></div></div>
+      </div>
+      <div class="pnGrid2">
+        <div class="pnCard"><h3>Tomas por mes</h3><div class="pnCap" id="redColsCap">Toda la red · el mes actual resaltado · pasá el mouse para ver cada centro</div><div class="pnCols" id="redCols"></div></div>
+        <div class="pnCard"><h3>Avance de la meta</h3><div class="pnCap" id="redMetaCap">Tomas del período / meta prorrateada</div><div class="pnHb" id="redMetaHb"></div></div>
+      </div>
+      <div class="pnGrid4">
+        <div class="pnCard"><h3>Clasificación Bethesda</h3><div class="pnCap">PAP con resultado</div><div class="pnHb" id="redBeth"></div></div>
+        <div class="pnCard"><h3>Resultados del PAP</h3><div class="pnCap" id="redPapCap"></div><div class="pnStack" id="redStackPap"></div><div class="pnLegend" id="redLegPap"></div>
+          <h3 style="margin-top:20px">VPH</h3><div class="pnCap" id="redVphCap"></div><div class="pnStack" id="redStackVph"></div><div class="pnLegend" id="redLegVph"></div></div>
+        <div class="pnCard"><h3>Mujeres por edad</h3><div class="pnCap" id="redEdadCap"></div><div class="pnHb" id="redEdad"></div></div>
+        <div class="pnCard"><h3>Cobertura</h3><div class="pnCap" id="redCobCap"></div><div class="pnStack" id="redStackCob"></div><div class="pnLegend" id="redLegCob"></div>
+          <h3 style="margin-top:20px">Días del laboratorio</h3><div class="pnCap">Del envío al informe digital, por mes</div><div class="pnHb" id="redLab"></div></div>
+      </div>
+      <div class="redCard" style="margin-top:14px"><h3>Por establecimiento</h3><div id="redTabla"></div><p class="hint" style="margin:8px 0 0" id="redTablaNota"></p></div>
+      <div class="redCard" id="redPend"></div>
     </div>
 
     <!-- PORTAL (oncológico / colposcopia): pasos 3 y 4 -->
@@ -2777,64 +2812,211 @@ function colDetalle(d) {
   };
 }
 
-// ================= Tablero de la red (Paso 16 del SQL) =================
-let redPeriodo = 'anio', redData = [], redOrden = { k: 'centro', asc: true };
+// ================= Tablero de la red "en vivo" (Pasos 16 y 17 del SQL) =================
+// Mismo estilo que el Panel del centro: números que suben, anillos, embudo, barras con transición y tooltips.
+// Se actualiza solo cada 30 s mientras está abierto; los números pasan del valor anterior al nuevo.
+let redPeriodo = 12, redData = [], redOrden = { k: 'pmeta', asc: false }, redPrev = {}, redFirma = '', redUlt = 0, redTimer = null, redVistos = new Set(), redPend = [];
 function redRango() {
-  const hoy = hoyISO(), y = hoy.slice(0, 4);
-  if (redPeriodo === 'anio') return [y + '-01-01', hoy];
-  if (redPeriodo === 'mes') return [hoy.slice(0, 8) + '01', hoy];
-  if (redPeriodo === '12m') { const d = new Date(hoy + 'T12:00:00'); d.setFullYear(d.getFullYear() - 1); d.setDate(d.getDate() + 1); return [d.toISOString().slice(0, 10), hoy]; }
-  if (redPeriodo === 'todo') return ['2000-01-01', hoy];
-  return [document.getElementById('redDesde').value || y + '-01-01', document.getElementById('redHasta').value || hoy];
+  const hoy = hoyISO();
+  if (redPeriodo === 'anio') return [hoy.slice(0, 4) + '-01-01', hoy];
+  if (!redPeriodo) return ['2000-01-01', hoy];
+  const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - (redPeriodo - 1)); return [d.toISOString().slice(0, 10), hoy];
 }
-document.getElementById('redPeriodo').addEventListener('click', e => { const b = e.target.closest('[data-p]'); if (!b) return; redPeriodo = b.dataset.p; loadRed(); });
-['redDesde', 'redHasta'].forEach(id => document.getElementById(id).addEventListener('change', () => { redPeriodo = 'custom'; loadRed(); }));
-const redPct = (a, b) => b ? Math.round(100 * a / b) : null;
-async function loadRed() {
-  const body = document.getElementById('redBody');
+document.getElementById('redPeriodo').addEventListener('click', e => { const b = e.target.closest('[data-p]'); if (!b) return; redPeriodo = b.dataset.p === 'anio' ? 'anio' : Number(b.dataset.p); document.querySelectorAll('#redPeriodo button').forEach(x => x.classList.toggle('on', x === b)); redFirma = ''; loadRed(); });
+document.getElementById('redCentro').addEventListener('change', () => { redFirma = ''; loadRed(); });
+const redPct = (a, b) => b ? Math.round(100 * a / b) : 0;
+// Contador que va del valor anterior al nuevo (la primera vez, desde 0)
+function redCount(el, key, target, dec) {
+  const from = redPrev[key] != null ? redPrev[key] : 0; redPrev[key] = target;
+  const t0 = performance.now(), dur = pnReduce() || from === target ? 0 : 1100;
+  const fmt = n => dec ? n.toFixed(dec) : Math.round(n).toLocaleString('es');
+  (function step(t) { const k = dur ? Math.min(1, (t - t0) / dur) : 1; el.textContent = fmt(from + (target - from) * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); })(t0);
+  if (from !== target && redUlt) { const card = el.closest('.pnKpi'); if (card) { card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash'); } }
+}
+function redTick() {
+  const v = document.getElementById('redView');
+  if (!v || !v.classList.contains('active')) { clearInterval(redTimer); redTimer = null; return; }
+  const seg = Math.round((Date.now() - redUlt) / 1000);
+  document.getElementById('redAgo').textContent = seg < 5 ? 'recién actualizado' : seg < 60 ? `actualizado hace ${seg} s` : `actualizado hace ${Math.round(seg / 60)} min`;
+  document.querySelectorAll('#redFeed [data-t]').forEach(el => { el.textContent = redHace(el.dataset.t); });
+  if (seg >= 30 && document.visibilityState === 'visible') { redUlt = Date.now(); loadRed(true); }
+}
+function redHace(t) {
+  const s = Math.max(0, Math.round((Date.now() - new Date(t).getTime()) / 1000));
+  if (s < 60) return 'recién'; if (s < 3600) return `hace ${Math.round(s / 60)} min`; if (s < 86400) return `hace ${Math.round(s / 3600)} h`;
+  const d = Math.round(s / 86400); return d === 1 ? 'ayer' : `hace ${d} días`;
+}
+async function loadRed(silencioso) {
   const [desde, hasta] = redRango();
-  document.getElementById('redDesde').value = desde; document.getElementById('redHasta').value = hasta;
-  document.querySelectorAll('#redPeriodo button').forEach(b => b.classList.toggle('on', b.dataset.p === redPeriodo));
+  const cSel = document.getElementById('redCentro'), centro = cSel.value || null;
   const red = perfil && perfil.rol === 'gestor' ? redNombre(perfil.red_id) : '';
   document.getElementById('redTitulo').textContent = red ? 'Tablero de la ' + red : 'Tablero de las redes';
-  body.innerHTML = '<p class="hint">Cargando…</p>';
-  const [r, m, pe] = await Promise.all([sb.rpc('sivec_red_resumen', { p_desde: desde, p_hasta: hasta }), sb.rpc('sivec_red_mensual', { p_desde: desde, p_hasta: hasta }), sb.rpc('sivec_red_pendientes')]);
-  const err = r.error || m.error || pe.error;
-  if (err) { body.innerHTML = `<div class="redCard">Error: ${esc(err.message)}${/function/.test(err.message) ? ' — ¿ya se ejecutó el Paso 16 del SQL?' : ''}</div>`; return; }
-  redData = (r.data || []).filter(c => Number(c.tomas) > 0 || centros.some(x => String(x.id) === String(c.centro_id) && x.tipo === 'primer_nivel'));
-  const dias = Math.max(1, Math.round((new Date(hasta + 'T12:00:00') - new Date(desde + 'T12:00:00')) / 86400000) + 1);
-  const T = k => redData.reduce((a, c) => a + (Number(c[k]) || 0), 0);
-  const metaPer = c => c.meta_pap_anual ? Math.round(c.meta_pap_anual * Math.min(dias, 365) / 365) : null;
-  const metaTot = redData.reduce((a, c) => a + (metaPer(c) || 0), 0);
-  const labs = redData.filter(c => c.dias_lab != null), diasLab = labs.length ? (labs.reduce((a, c) => a + Number(c.dias_lab) * Number(c.enviadas || 1), 0) / labs.reduce((a, c) => a + Number(c.enviadas || 1), 0)).toFixed(1) : null;
-  const tomas = T('tomas'), pctMeta = redPct(tomas, metaTot);
-  const kpi = (v, l, s, cls) => `<div class="redKpi"><div class="v">${v}</div><div class="l">${l}</div>${s ? `<div class="s ${cls || ''}">${s}</div>` : ''}</div>`;
-  const pend = pe.data || [];
-  const hoy = new Date(hoyISO() + 'T12:00:00');
-  body.innerHTML = `<div class="redKpis">
-      ${kpi(tomas.toLocaleString('es-BO'), 'Tomas en el período', metaTot ? `${pctMeta}% de la meta (${metaTot.toLocaleString('es-BO')})` : 'sin meta cargada', metaTot ? (pctMeta >= 90 ? 'bien' : pctMeta >= 60 ? 'ojo' : 'mal') : '')}
-      ${kpi(T('mujeres').toLocaleString('es-BO'), 'Mujeres distintas')}
-      ${kpi((redPct(T('enviadas'), tomas) ?? '—') + '%', 'Enviadas al laboratorio', T('tomas') - T('enviadas') ? (T('tomas') - T('enviadas')) + ' sin enviar' : '✓ todas enviadas', T('tomas') - T('enviadas') ? 'ojo' : 'bien')}
-      ${kpi(T('atrasadas'), 'Resultado atrasado (> 90 días)', T('atrasadas') ? '⚠ buscar el resultado' : '✓ ninguno', T('atrasadas') ? 'mal' : 'bien')}
-      ${kpi(pend.length, 'Positivas sin tratar', pend.length ? '● búsqueda activa (lista abajo)' : '✓ ninguna', pend.length ? 'mal' : 'bien')}
-      ${kpi(diasLab ? diasLab + ' d' : '—', 'Días del laboratorio', 'del envío al informe digital')}
-      ${kpi(T('sin_sus') ? 'Bs ' + T('cobrado').toLocaleString('es-BO') : '—', 'Cobrado en caja', T('sin_sus') ? T('sin_sus') + ' tomas sin SUS' : 'todas con SUS')}
-    </div>
-    <div class="redCard"><h3>Tomas por mes</h3><div id="redChart"></div></div>
-    <div class="redCard"><h3>Por establecimiento</h3><div id="redTabla"></div><p class="hint" style="margin:8px 0 0">Tocá el título de una columna para ordenar. La meta es anual; en el período se prorratea.${perfil && perfil.es_admin ? ' Como administrador podés cargar la meta acá mismo.' : ''}</p></div>
-    <div class="redCard"><h3>● Positivas sin tratar · ${pend.length}</h3>${pend.length ? `<table><thead><tr><th>Establecimiento</th><th>Paciente</th><th>CI</th><th>Celular</th><th>Toma</th><th>Resultado</th><th class="num">Días</th><th>Informada</th></tr></thead><tbody>${pend.map(x => {
-      const d = Math.round((hoy - new Date(String(x.fecha_resultado || x.fecha_toma) + 'T12:00:00')) / 86400000);
-      return `<tr><td>${esc(centroNombre(x.centro_id))}</td><td><b>${esc(x.nombre)}</b></td><td>${esc(x.carnet || '—')}</td><td>${esc(x.celular || '—')}</td><td>${fmtFecha(x.fecha_toma)}</td>
-        <td>${esc(x.resultado_pap || '')}${x.resultado_vph === 'Positiva' ? ' · VPH+' + (x.vph_genotipo ? ' ' + esc(x.vph_genotipo) : '') : ''}</td><td class="num"><span class="sem ${d > 30 ? 'mal' : d > 15 ? 'ojo' : ''}">${d}</span></td><td>${x.notificada ? '✓ sí' : '<span class="sem mal">✗ no</span>'}</td></tr>`;
-    }).join('')}</tbody></table><p class="hint" style="margin:8px 0 0">PAP o VPH alterado sin derivación, colposcopia ni tratamiento registrado. Salen de la lista cuando el centro deriva o registra el seguimiento.</p>` : '<p class="hint" style="margin:0">Ninguna. 🎉</p>'}</div>`;
-  redTablaRender(metaPer);
-  redGrafico(m.data || [], desde, hasta);
-  document.getElementById('redExcel').onclick = () => redExcel(metaPer, pend, desde, hasta);
+  const [r, m, dt, act, pe] = await Promise.all([
+    sb.rpc('sivec_red_resumen', { p_desde: desde, p_hasta: hasta }),
+    sb.rpc('sivec_red_mensual', { p_desde: redPeriodo === 0 ? '2000-01-01' : (() => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - 11); return d.toISOString().slice(0, 10); })(), p_hasta: hasta, p_centro: centro }),
+    sb.rpc('sivec_red_detalle', { p_desde: desde, p_hasta: hasta, p_centro: centro }),
+    sb.rpc('sivec_red_actividad', { p_centro: centro }),
+    sb.rpc('sivec_red_pendientes')]);
+  const err = r.error || m.error || dt.error || act.error || pe.error;
+  if (err) { document.getElementById('redKpis').innerHTML = `<div class="pnCard">Error: ${esc(err.message)}${/function/.test(err.message) ? ' — ¿ya se ejecutaron los Pasos 16 y 17 del SQL?' : ''}</div>`; return; }
+  const todos = (r.data || []).filter(c => Number(c.tomas) > 0 || centros.some(x => String(x.id) === String(c.centro_id) && x.tipo === 'primer_nivel'));
+  if (cSel.options.length <= 1 || cSel.dataset.n !== String(todos.length)) {
+    const cur = cSel.value; cSel.innerHTML = '<option value="">Todos los establecimientos</option>' + todos.map(c => `<option value="${c.centro_id}">${esc(c.centro)}</option>`).join(''); cSel.value = cur; cSel.dataset.n = todos.length;
+  }
+  redData = todos.filter(c => !centro || String(c.centro_id) === String(centro));
+  redPend = (pe.data || []).filter(x => !centro || String(x.centro_id) === String(centro));
+  const D = dt.data || {}, meses = (m.data || []), eventos = act.data || [];
+  redUlt = Date.now();
+  if (!redTimer) redTimer = setInterval(redTick, 1000);
+  const firma = JSON.stringify([redData, D, meses, redPend.length]);
+  const cambio = firma !== redFirma; redFirma = firma;
+  redRender(D, meses, desde, hasta, silencioso && !cambio ? 'kpi' : silencioso ? 'suave' : 'todo');
+  redFeed(eventos, silencioso);
+  document.getElementById('redExcel').onclick = () => redExcel(desde, hasta);
 }
-function redTablaRender(metaPer) {
+function redMetaPer(c, desde, hasta) {
+  const dias = Math.max(1, Math.round((new Date(hasta + 'T12:00:00') - new Date(desde + 'T12:00:00')) / 86400000) + 1);
+  return c.meta_pap_anual ? Math.round(c.meta_pap_anual * Math.min(dias, 365) / 365) : null;
+}
+function redRender(D, meses, desde, hasta, modo) {
+  const view = document.getElementById('redView');
+  if (modo === 'todo') { view.classList.remove('pnAnim'); void view.offsetWidth; if (!pnReduce()) view.classList.add('pnAnim'); }
+  const T = k => redData.reduce((a, c) => a + (Number(c[k]) || 0), 0);
+  const metaTot = redData.reduce((a, c) => a + (redMetaPer(c, desde, hasta) || 0), 0), tomas = T('tomas');
+  const E = D.embudo || {};
+  const nombreP = { 1: 'este mes', 3: 'últimos 3 meses', 12: 'últimos 12 meses', anio: 'este año', 0: 'todo el historial' }[redPeriodo];
+  const cSel = document.getElementById('redCentro');
+  document.getElementById('redSub').textContent = `${cSel.value ? cSel.options[cSel.selectedIndex].text : redData.length + ' establecimientos'} · ${nombreP} · ${fmtFecha(desde)} a ${fmtFecha(hasta)}`;
+  // ---- meses (12) ----
+  const hoy = new Date(), ms = [];
+  for (let i = 11; i >= 0; i--) { const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1); ms.push({ key: mesKey(new Date(d.getTime() + 43200000)), label: d.toLocaleDateString('es', { month: 'short' }).replace('.', '') }); }
+  const tomasMes = ms.map(x => meses.filter(r => String(r.mes).slice(0, 7) === x.key).reduce((a, r) => a + Number(r.tomas), 0));
+  const labMes = ms.map(x => { const l = (D.lab_mes || []).find(y => y.mes === x.key); return l ? Number(l.dias) : null; });
+  const labs = redData.filter(c => c.dias_lab != null), diasLab = labs.length ? labs.reduce((a, c) => a + Number(c.dias_lab) * Math.max(1, Number(c.enviadas)), 0) / labs.reduce((a, c) => a + Math.max(1, Number(c.enviadas)), 0) : null;
+  const pctMeta = redPct(tomas, metaTot), sinTratar = redPend.length;
+  const kpi = (key, ico, lab, valHtml, delta, cls, extra) => `<div class="pnCard pnKpi" data-k="${key}"><div class="lab"><span class="ico">${ico}</span>${lab}</div><div class="val">${valHtml}</div><div class="delta ${cls || ''}">${delta}</div>${extra || ''}</div>`;
+  const ring = (v, col) => `<svg class="ring" viewBox="0 0 58 58" data-r="${v}" data-col="${col}"><circle class="bg" cx="29" cy="29" r="24"/><circle class="fg" cx="29" cy="29" r="24"/></svg>`;
+  const spark = arr => arr.filter(x => x != null).length > 2 ? `<svg class="spark" viewBox="0 0 96 34" data-s="${arr.map(x => x == null ? '' : x).join(',')}"></svg>` : '';
+  const kp = document.getElementById('redKpis');
+  const html = [
+    kpi('tomas', '🧪', 'Tomas de PAP/VPH', `<span data-c="${tomas}" data-key="tomas">0</span>`, tomasMes[11] ? `▲ ${tomasMes[11]} este mes` : 'Sin tomas este mes', tomasMes[11] ? 'up' : '', spark(tomasMes)),
+    kpi('meta', '🎯', 'Avance de la meta', metaTot ? `<span data-c="${pctMeta}" data-key="meta">0</span><small>%</small>` : '—', metaTot ? `${tomas.toLocaleString('es')} de ${metaTot.toLocaleString('es')}` : 'Cargá la meta de cada centro', metaTot ? (pctMeta >= 90 ? 'up' : pctMeta < 60 ? 'down' : '') : '', metaTot ? ring(Math.min(100, pctMeta), 'var(--pn-one)') : ''),
+    kpi('env', '📦', 'Enviadas al laboratorio', `<span data-c="${redPct(T('enviadas'), tomas)}" data-key="env">0</span><small>%</small>`, tomas - T('enviadas') ? `${(tomas - T('enviadas')).toLocaleString('es')} sin enviar` : 'Todas enviadas ✔', tomas - T('enviadas') ? 'down' : 'up', ring(redPct(T('enviadas'), tomas), 'var(--pn-one)')),
+    kpi('ent', '📬', 'Resultados entregados', `<span data-c="${redPct(T('entregadas'), T('con_resultado'))}" data-key="ent">0</span><small>%</small>`, T('atrasadas') ? `⚠ ${T('atrasadas')} resultados atrasados` : `${T('entregadas')} de ${T('con_resultado')} con resultado`, T('atrasadas') ? 'down' : '', ring(redPct(T('entregadas'), T('con_resultado')), 'var(--pn-good)')),
+    kpi('cond', '🩺', 'Positivas con conducta', `<span data-c="${redPct(E.con_conducta || 0, E.positivas || 0)}" data-key="cond">0</span><small>%</small>`, sinTratar ? `● ${sinTratar} sin tratar · búsqueda activa` : (E.positivas ? 'Todas con conducta ✔' : 'Sin positivas'), sinTratar ? 'down' : 'up', ring(redPct(E.con_conducta || 0, E.positivas || 0), 'var(--positiva)')),
+    kpi('lab', '⏱', 'Días del laboratorio', diasLab != null ? `<span data-c="${diasLab.toFixed(1)}" data-dec="1" data-key="lab">0</span><small> días</small>` : '—', diasLab != null ? 'del envío al informe digital' : 'aparece con los informes digitales', '', spark(labMes)),
+  ].join('');
+  if (modo !== 'kpi' || !kp.children.length) {
+    kp.innerHTML = html;
+    kp.querySelectorAll('svg.spark').forEach(sv => {
+      const v = sv.dataset.s.split(',').map(x => x === '' ? null : Number(x)), ok = v.filter(x => x != null), mn = Math.min(...ok), mx = Math.max(...ok);
+      const pts = v.map((y, i) => y == null ? null : [i / (v.length - 1) * 96, 30 - (y - mn) / (mx - mn || 1) * 26]).filter(Boolean);
+      const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+      sv.innerHTML = `<path class="a" d="${d} L${pts.at(-1)[0]} 34 L${pts[0][0]} 34 Z"/><path class="l" d="${d}"/><circle cx="${pts.at(-1)[0]}" cy="${pts.at(-1)[1]}" r="3" fill="var(--pn-one)"/>`;
+    });
+    kp.querySelectorAll('svg.ring').forEach(rg => { const c = rg.querySelector('.fg'), L = 2 * Math.PI * 24; c.style.stroke = rg.dataset.col; c.style.strokeDasharray = L; c.style.strokeDashoffset = L; pnLater(() => c.style.strokeDashoffset = L * (1 - Number(rg.dataset.r) / 100), 200); });
+  } else {
+    // Actualización silenciosa: solo se mueven los números que cambiaron
+    const tmp = document.createElement('div'); tmp.innerHTML = html;
+    tmp.querySelectorAll('[data-key]').forEach(n => { const el = kp.querySelector(`[data-key="${n.dataset.key}"]`); if (el) el.dataset.c = n.dataset.c; });
+  }
+  kp.querySelectorAll('[data-c]').forEach(el => redCount(el, el.dataset.key, Number(el.dataset.c), el.dataset.dec ? 1 : 0));
+  if (modo === 'kpi') return;
+
+  // ---- embudo ----
+  const fun = [['Tomas', E.tomas || 0], ['Enviadas al laboratorio', E.enviadas || 0], ['Con resultado', E.con_resultado || 0], ['Resultado entregado', E.entregadas || 0], ['Positivas (PAP o VPH)', E.positivas || 0], ['Con conducta', E.con_conducta || 0], ['Derivadas a colposcopia', E.derivadas || 0], ['Colposcopia realizada', E.atendidas || 0], ['Con tratamiento', E.tratadas || 0]];
+  const f = document.getElementById('redFunnel'); f.innerHTML = '';
+  fun.forEach(([n, v], i) => {
+    const base = i < 4 ? fun[0][1] : fun[4][1], pp = redPct(v, base), prev = i ? fun[i - 1][1] : null;
+    const row = document.createElement('div'); row.className = 'pnFrow';
+    row.innerHTML = `<div class="n">${n}</div><div class="pnTrack"><div class="pnBar" style="opacity:${i < 4 ? 1 - i * 0.12 : 0.95 - (i - 4) * 0.12};${i >= 4 ? 'background:var(--positiva)' : ''}"></div></div><div class="v">${Number(v).toLocaleString('es')}<small>${pp}%</small></div>`;
+    f.appendChild(row);
+    pnHover(row, `<b>${n}</b><br>${v} · ${pp}% ${i < 4 ? 'de las tomas' : 'de las positivas'}${prev != null && i !== 4 ? `<br>${redPct(v, prev)}% del paso anterior` : ''}`);
+    pnLater(() => row.querySelector('.pnBar').style.width = (v ? Math.max(pp, 1.5) : 0) + '%', 250 + i * 110);
+    if (i === 1 && fun[0][1] - v > 0) f.insertAdjacentHTML('beforeend', `<div class="pnDrop">⚠ ${(fun[0][1] - v).toLocaleString('es')} muestras todavía sin enviar</div>`);
+    if (i === 3 && fun[2][1] - v > 0) f.insertAdjacentHTML('beforeend', `<div class="pnDrop">⚠ ${fun[2][1] - v} resultados sin entregar a la paciente</div>`);
+    if (i === 5 && sinTratar) f.insertAdjacentHTML('beforeend', `<div class="pnDrop">● ${sinTratar} positivas sin tratar (lista abajo)</div>`);
+  });
+
+  // ---- tomas por mes ----
+  const cols = document.getElementById('redCols'); cols.innerHTML = '';
+  const top = Math.max(10, Math.ceil(Math.max(...tomasMes) / 10) * 10);
+  [0.5, 1].forEach(g => cols.insertAdjacentHTML('beforeend', `<div class="gl" style="bottom:calc(22px + ${g} * (100% - 22px))">${Math.round(top * g)}</div>`));
+  const maxI = tomasMes.indexOf(Math.max(...tomasMes));
+  ms.forEach((mm, i) => {
+    const c = document.createElement('div'); c.className = 'pnCol' + (i === 11 ? ' cur show' : '') + (i === maxI ? ' show' : '');
+    c.innerHTML = `<div class="lbl">${tomasMes[i]}</div><div class="b"></div><div class="m">${mm.label}</div>`;
+    cols.appendChild(c);
+    const det = meses.filter(r => String(r.mes).slice(0, 7) === mm.key).map(r => [centroNombre(r.centro_id).replace(/^Centro de Salud /, 'C.S. '), Number(r.tomas)]).sort((a, b) => b[1] - a[1]);
+    pnHover(c, `<b>${mm.label} · ${tomasMes[i]} tomas</b>${det.slice(0, 9).map(([n, v]) => `<br>${esc(n)}: ${v}`).join('')}`);
+    pnLater(() => c.querySelector('.b').style.height = (tomasMes[i] / top * 100) + '%', 300 + i * 45);
+  });
+
+  // ---- barras horizontales / apiladas ----
+  const hb = (id, arr, colorFn, labelFn, tipFn) => {
+    const el = document.getElementById(id); el.innerHTML = '';
+    const mx = Math.max(0, ...arr.map(a => a[1])), tot = arr.reduce((a, x) => a + x[1], 0);
+    if (!tot) { el.innerHTML = '<div class="pnEmpty">Sin datos en el período</div>'; return; }
+    arr.forEach((a, i) => {
+      const r = document.createElement('div'); r.className = 'pnHrow';
+      r.innerHTML = `<div title="${esc(a[0])}">${labelFn ? labelFn(a) : esc(a[0])}</div><div class="t"><div class="f" style="background:${colorFn(a)}"></div></div><div class="num">${a[3] != null ? a[3] : a[1]}</div>`;
+      el.appendChild(r);
+      pnHover(r, tipFn ? tipFn(a) : `<b>${esc(a[0])}</b><br>${a[1]} · ${redPct(a[1], tot)}%`);
+      pnLater(() => r.querySelector('.f').style.width = (a[1] ? Math.max(a[2] === 'pct' ? Math.min(100, a[1]) : a[1] / mx * 100, 2) : 0) + '%', 400 + i * 70);
+    });
+  };
+  const stack = (id, legId, capId, arr, cap) => {
+    const sEl = document.getElementById(id), lg = document.getElementById(legId), tot = arr.reduce((a, x) => a + x[1], 0);
+    document.getElementById(capId).textContent = cap(tot); sEl.innerHTML = ''; lg.innerHTML = '';
+    if (!tot) { lg.innerHTML = '<span class="pnEmpty">Sin datos en el período</span>'; return; }
+    arr.filter(a => a[1]).forEach(([n, v, col], i) => {
+      const d = document.createElement('div'); d.style.background = col; sEl.appendChild(d);
+      pnHover(d, `<b>${n}</b><br>${v} · ${redPct(v, tot)}%`);
+      pnLater(() => d.style.width = (v / tot * 100) + '%', 350 + i * 100);
+      lg.insertAdjacentHTML('beforeend', `<span><i style="background:${col}"></i>${n} <b>${v}</b> (${redPct(v, tot)}%)</span>`);
+    });
+  };
+  const metaRows = redData.map(c => { const mp = redMetaPer(c, desde, hasta); return [c.centro.replace(/^Centro de Salud /, 'C.S. '), mp ? redPct(Number(c.tomas), mp) : 0, 'pct', mp ? redPct(Number(c.tomas), mp) + '%' : '—', c, mp]; }).sort((a, b) => b[1] - a[1]);
+  hb('redMetaHb', metaRows, a => a[1] >= 90 ? 'var(--pn-good)' : a[1] >= 60 ? 'var(--pn-warn)' : 'var(--pn-crit)', null, a => `<b>${esc(a[4].centro)}</b><br>${a[4].tomas} tomas${a[5] ? ` de ${a[5]} (meta del período)<br>meta anual ${a[4].meta_pap_anual}` : '<br>sin meta cargada'}`);
+  document.getElementById('redMetaCap').textContent = metaTot ? 'Tomas del período / meta prorrateada · verde ≥ 90%, ámbar ≥ 60%, rojo < 60%' : 'Cargá la meta anual de cada centro en la tabla de abajo (administración)';
+  const betCol = { neg: 'var(--pn-good)', bajo: 'var(--pn-warn)', alto: 'var(--pn-crit)', insat: 'var(--pn-mute)' }, B = D.bethesda || {};
+  hb('redBeth', BETHESDA.map(b => [b.code, Number(B[b.code] || 0), b.nivel]).filter(a => a[1] || ['NILM', 'ASC-US', 'LSIL', 'HSIL'].includes(a[0])), a => betCol[a[2]]);
+  const ES = D.estado || {}, V = D.vph || {}, C = D.cobertura || {};
+  stack('redStackPap', 'redLegPap', 'redPapCap', [['Negativo', Number(ES.Negativo || 0), 'var(--negativa)'], ['Pendiente', Number(ES.Pendiente || 0), 'var(--pendiente)'], ['Positivo', Number(ES.Positivo || 0), 'var(--positiva)']], t => `De ${t.toLocaleString('es')} tomas de PAP`);
+  stack('redStackVph', 'redLegVph', 'redVphCap', [['Negativa', Number(V.Negativa || 0), 'var(--pn-good)'], ['Positiva', Number(V.Positiva || 0), 'var(--positiva-vph)']], t => `De ${t} pruebas con resultado${V.g16 || V.g18 ? ` · genotipo 16: ${V.g16 || 0} · 18: ${V.g18 || 0}` : ''}`);
+  stack('redStackCob', 'redLegCob', 'redCobCap', [['SUS', Number(C.SUS || 0), 'var(--pn-good)'], ['Sin SUS', Number(C['Sin SUS'] || 0), 'var(--pn-warn)'], ['Sin dato', Number(C['Sin dato'] || 0), 'var(--pn-mute)']], t => `De ${t.toLocaleString('es')} tomas${T('cobrado') ? ` · cobrado en caja: Bs ${T('cobrado').toLocaleString('es')}` : ''}`);
+  const Ed = D.edad || {}, grupos = ['< 25', '25–34', '35–44', '45–54', '55–64', '65 +'];
+  document.getElementById('redEdadCap').textContent = `En color: rango objetivo (${clinCfg.papEdadMin}–${clinCfg.papEdadMax})`;
+  hb('redEdad', grupos.map(g => { const [a, b] = g === '< 25' ? [0, 24] : g === '65 +' ? [65, 200] : g.split('–').map(Number); return [g, Number(Ed[g] || 0), a >= clinCfg.papEdadMin && b <= clinCfg.papEdadMax]; }), a => a[2] ? 'var(--pn-one)' : 'var(--pn-mute)');
+  hb('redLab', ms.map((mm, i) => [mm.label, labMes[i] || 0, null, labMes[i] != null ? labMes[i] + ' d' : '—']).filter(a => a[1] || a[3] !== '—'), a => a[1] > 30 ? 'var(--pn-crit)' : a[1] > 15 ? 'var(--pn-warn)' : 'var(--pn-good)');
+
+  redTablaRender(desde, hasta);
+  redPendRender();
+}
+function redFeed(eventos, silencioso) {
+  const box = document.getElementById('redFeed');
+  const cn = id => (centroNombre(id) || '').replace(/^Centro de Salud /, 'C.S. ');
+  const txt = e => ({
+    tomas: ['🧪', `<b>${esc(cn(e.centro_id))}</b> registró ${e.n} toma${e.n > 1 ? 's' : ''}`],
+    lote_enviado: ['📦', `<b>${esc(cn(e.centro_id))}</b> envió el lote ${esc(e.codigo)} (${e.n} muestras) a ${esc(cn(e.otro_id) || 'laboratorio')}`],
+    lote_recibido: ['📥', `<b>${esc(cn(e.otro_id) || 'El laboratorio')}</b> recibió el lote ${esc(e.codigo)} de ${esc(cn(e.centro_id))}`],
+    resultados: ['🔬', `Llegaron <b>${e.n} resultado${e.n > 1 ? 's' : ''}</b> a ${esc(cn(e.centro_id))}${e.alterados ? ` · <span style="color:var(--pn-crit);font-weight:700">${e.alterados} alterado${e.alterados > 1 ? 's' : ''}</span>` : ''}`],
+    derivacion: ['🩺', `<b>${esc(cn(e.centro_id))}</b> derivó una paciente a colposcopia en ${esc(cn(e.otro_id))}${e.codigo === 'urgente' ? ' · <span style="color:var(--pn-crit);font-weight:700">urgente</span>' : ''}`],
+    contrarreferencia: ['↩️', `<b>${esc(cn(e.otro_id))}</b> envió una contrarreferencia a ${esc(cn(e.centro_id))}${e.codigo ? ' · biopsia ' + esc(e.codigo) : ''}`],
+    no_asistio: ['⚠️', `Una paciente de <b>${esc(cn(e.centro_id))}</b> no asistió a colposcopia en ${esc(cn(e.otro_id))}`],
+  }[e.tipo] || ['•', esc(e.tipo)]);
+  const clave = e => e.tipo + '|' + e.fecha + '|' + e.centro_id + '|' + (e.codigo || '');
+  if (!eventos.length) { box.innerHTML = '<div class="pnEmpty">Todavía no hay actividad registrada en los últimos días.</div>'; return; }
+  const primera = !redVistos.size;
+  box.innerHTML = eventos.map((e, i) => { const [ic, t] = txt(e), nuevo = silencioso && !primera && !redVistos.has(clave(e));
+    return `<div class="redEv${nuevo ? ' nuevo' : ''}" style="animation-delay:${silencioso ? 0 : Math.min(i, 12) * 60}ms"><span class="ic">${ic}</span><div>${t}</div><small data-t="${esc(e.fecha)}">${redHace(e.fecha)}</small></div>`; }).join('');
+  eventos.forEach(e => redVistos.add(clave(e)));
+}
+function redTablaRender(desde, hasta) {
+  const metaPer = c => redMetaPer(c, desde, hasta);
   const cols = [['centro', 'Establecimiento'], ['tomas', 'Tomas'], ['meta', 'Meta período'], ['pmeta', '% meta'], ['enviadas', 'Enviadas'], ['con_resultado', 'Con resultado'], ['atrasadas', 'Atrasadas'], ['positivas', 'Positivas'], ['pos_sin_tratar', 'Sin tratar'], ['derivadas', 'Derivadas'], ['contrarreferidas', 'Contrarref.'], ['entregadas', 'Entregadas'], ['rechazadas', 'Rechaz./insat.'], ['dias_lab', 'Días lab.'], ['sin_sus', 'Sin SUS']];
-  const val = (c, k) => k === 'meta' ? metaPer(c) : k === 'pmeta' ? redPct(Number(c.tomas), metaPer(c)) : k === 'centro' ? c.centro : c[k] == null ? null : Number(c[k]);
-  const filas = redData.slice().sort((a, b) => { const x = val(a, redOrden.k), y = val(b, redOrden.k); const r = x == null ? 1 : y == null ? -1 : typeof x === 'string' ? x.localeCompare(y) : x - y; return redOrden.asc ? r : -r; });
+  const val = (c, k) => k === 'meta' ? metaPer(c) : k === 'pmeta' ? (metaPer(c) ? redPct(Number(c.tomas), metaPer(c)) : null) : k === 'centro' ? c.centro : c[k] == null ? null : Number(c[k]);
+  const filas = redData.slice().sort((a, b) => { const x = val(a, redOrden.k), y = val(b, redOrden.k); const r = x == null ? 1 : y == null ? -1 : typeof x === 'string' ? x.localeCompare(y) : x - y; return x == null || y == null ? r : (redOrden.asc ? r : -r); });
   const esAdm = perfil && (perfil.es_admin || perfil.rol === 'admin');
   const box = document.getElementById('redTabla');
   box.innerHTML = `<table><thead><tr>${cols.map(([k, t]) => `<th data-ord="${k}" class="${k === 'centro' ? '' : 'num'}">${t}${redOrden.k === k ? (redOrden.asc ? ' ▲' : ' ▼') : ''}</th>`).join('')}</tr></thead><tbody>${filas.map(c => {
@@ -2849,42 +3031,29 @@ function redTablaRender(metaPer) {
       <td class="num">${Number(c.rechazadas) ? `<span class="sem ojo">${c.rechazadas}</span>` : '0'}</td><td class="num">${c.dias_lab ?? '—'}</td>
       <td class="num">${Number(c.sin_sus) ? `${c.sin_sus} · Bs ${Number(c.cobrado).toLocaleString('es-BO')}` : '0'}</td></tr>`;
   }).join('') || '<tr><td colspan="15">Sin establecimientos.</td></tr>'}</tbody></table>`;
-  box.onclick = e => { const th = e.target.closest('[data-ord]'); if (!th) return; redOrden = { k: th.dataset.ord, asc: redOrden.k === th.dataset.ord ? !redOrden.asc : th.dataset.ord === 'centro' }; redTablaRender(metaPer); };
+  document.getElementById('redTablaNota').textContent = 'Tocá el título de una columna para ordenar. La meta es anual; en el período se prorratea.' + (esAdm ? ' Como administrador podés cargar la meta acá mismo.' : '');
+  box.onclick = e => { const th = e.target.closest('[data-ord]'); if (!th) return; redOrden = { k: th.dataset.ord, asc: redOrden.k === th.dataset.ord ? !redOrden.asc : th.dataset.ord === 'centro' }; redTablaRender(desde, hasta); };
   box.onchange = async e => {
     const i = e.target.closest('[data-meta]'); if (!i) return;
     const v = i.value === '' ? null : Math.max(0, parseInt(i.value, 10) || 0);
     const { error } = await sb.from('centros_salud').update({ meta_pap_anual: v }).eq('id', i.dataset.meta);
     if (error) return showToast('No se pudo guardar la meta: ' + esc(error.message), 'err');
-    showToast('Meta guardada ✔', 'ok'); loadRed();
+    showToast('Meta guardada ✔', 'ok'); redFirma = ''; loadRed(true);
   };
 }
-function redGrafico(rows, desde, hasta) {
-  const box = document.getElementById('redChart');
-  const meses = []; const d = new Date(desde.slice(0, 7) + '-01T12:00:00'), fin = new Date(hasta.slice(0, 7) + '-01T12:00:00');
-  if (redPeriodo === 'todo') { const min = rows.reduce((a, r) => r.mes < a ? r.mes : a, hasta.slice(0, 7) + '-01'); d.setTime(new Date(min.slice(0, 7) + '-01T12:00:00').getTime()); }
-  while (d <= fin && meses.length < 60) { meses.push(d.toISOString().slice(0, 7)); d.setMonth(d.getMonth() + 1); }
-  const tot = meses.map(mm => rows.filter(r => String(r.mes).slice(0, 7) === mm).reduce((a, r) => a + Number(r.tomas), 0));
-  const porCentro = mm => rows.filter(r => String(r.mes).slice(0, 7) === mm).map(r => [centroNombre(r.centro_id), Number(r.tomas)]).sort((a, b) => b[1] - a[1]);
-  const max = Math.max(1, ...tot), W = Math.max(320, box.clientWidth || 900), H = 190, pl = 34, pb = 26, pt = 10, bw = (W - pl - 8) / Math.max(1, meses.length);
-  const MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-  const paso = Math.max(1, Math.ceil(max / 4 / 5) * 5), ymax = Math.ceil(max / paso) * paso, ticks = []; for (let t = 0; t <= ymax; t += paso) ticks.push(t);
-  const yy = v => pt + (H - pt - pb) * (1 - v / ymax);
-  box.innerHTML = `<svg width="${W}" height="${H}" role="img" aria-label="Tomas por mes">
-    ${ticks.map(t => `<line x1="${pl}" x2="${W - 4}" y1="${yy(t)}" y2="${yy(t)}" stroke="var(--line)" stroke-width="1"/><text x="${pl - 6}" y="${yy(t) + 4}" text-anchor="end" font-size="10.5" fill="var(--ink-soft)">${t}</text>`).join('')}
-    ${meses.map((mm, i) => { const x = pl + i * bw + Math.max(2, bw * 0.18), w = Math.max(3, bw * 0.64), h = Math.max(0, yy(0) - yy(tot[i]));
-      return `<g class="redBar" data-i="${i}"><rect x="${pl + i * bw}" y="${pt}" width="${bw}" height="${H - pt - pb}" fill="transparent"/>${tot[i] ? `<path d="M${x},${yy(0)} v${-(h - 4)} q0,-4 4,-4 h${w - 8} q4,0 4,4 v${h - 4} z" fill="var(--teal-700)"/>` : ''}
-        ${meses.length <= 14 || i % Math.ceil(meses.length / 12) === 0 ? `<text x="${pl + i * bw + bw / 2}" y="${H - 8}" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">${MES[+mm.slice(5, 7) - 1]}${mm.slice(5, 7) === '01' || i === 0 ? ' ' + mm.slice(2, 4) : ''}</text>` : ''}</g>`; }).join('')}
-  </svg>`;
-  let tip = document.getElementById('redTip'); if (!tip) { tip = document.createElement('div'); tip.id = 'redTip'; document.body.appendChild(tip); }
-  box.onmousemove = e => { const g = e.target.closest('.redBar'); if (!g) { tip.style.display = 'none'; return; } const i = +g.dataset.i, mm = meses[i];
-    tip.innerHTML = `<b>${MES[+mm.slice(5, 7) - 1]} ${mm.slice(0, 4)} · ${tot[i]} tomas</b>${porCentro(mm).slice(0, 8).map(([n, v]) => `<br>${esc(n)}: ${v}`).join('')}`;
-    tip.style.display = 'block'; tip.style.left = Math.min(e.clientX + 12, innerWidth - 260) + 'px'; tip.style.top = (e.clientY + 12) + 'px'; };
-  box.onmouseleave = () => { tip.style.display = 'none'; };
+function redPendRender() {
+  const hoy = new Date(hoyISO() + 'T12:00:00'), pend = redPend;
+  document.getElementById('redPend').innerHTML = `<h3>● Positivas sin tratar · ${pend.length}</h3>${pend.length ? `<table><thead><tr><th>Establecimiento</th><th>Paciente</th><th>CI</th><th>Celular</th><th>Toma</th><th>Resultado</th><th class="num">Días</th><th>Informada</th></tr></thead><tbody>${pend.map(x => {
+    const d = Math.round((hoy - new Date(String(x.fecha_resultado || x.fecha_toma) + 'T12:00:00')) / 86400000);
+    return `<tr><td>${esc(centroNombre(x.centro_id))}</td><td><b>${esc(x.nombre)}</b></td><td>${esc(x.carnet || '—')}</td><td>${esc(x.celular || '—')}</td><td>${fmtFecha(x.fecha_toma)}</td>
+      <td>${esc(x.resultado_pap || '')}${x.resultado_vph === 'Positiva' ? ' · VPH+' + (x.vph_genotipo ? ' ' + esc(x.vph_genotipo) : '') : ''}</td><td class="num"><span class="sem ${d > 30 ? 'mal' : d > 15 ? 'ojo' : ''}">${d}</span></td><td>${x.notificada ? '✓ sí' : '<span class="sem mal">✗ no</span>'}</td></tr>`;
+  }).join('')}</tbody></table><p class="hint" style="margin:8px 0 0">PAP o VPH alterado sin derivación, colposcopia ni tratamiento registrado. Salen de la lista cuando el centro deriva o registra el seguimiento.</p>` : '<p class="hint" style="margin:0">Ninguna. 🎉</p>'}`;
 }
-function redExcel(metaPer, pend, desde, hasta) {
+function redExcel(desde, hasta) {
+  const metaPer = c => redMetaPer(c, desde, hasta);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(redData.map(c => ({ 'Establecimiento': c.centro, 'Red': c.red || 'departamental', 'Tomas': Number(c.tomas), 'Mujeres': Number(c.mujeres), 'Meta anual': c.meta_pap_anual, 'Meta período': metaPer(c), '% meta': redPct(Number(c.tomas), metaPer(c)), 'Enviadas': Number(c.enviadas), 'Con resultado': Number(c.con_resultado), 'Pendientes': Number(c.pendientes), 'Atrasadas (>90 d)': Number(c.atrasadas), 'Positivas': Number(c.positivas), 'Positivas sin tratar': Number(c.pos_sin_tratar), 'Derivadas': Number(c.derivadas), 'Contrarreferidas': Number(c.contrarreferidas), 'Resultado entregado': Number(c.entregadas), 'Rechazadas/insatisfactorias': Number(c.rechazadas), 'Días laboratorio': c.dias_lab, 'Sin SUS': Number(c.sin_sus), 'Cobrado Bs': Number(c.cobrado) }))), 'Por establecimiento');
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(pend.map(x => ({ 'Establecimiento': centroNombre(x.centro_id), 'Paciente': x.nombre, 'CI': x.carnet, 'Celular': x.celular, 'Toma': x.fecha_toma, 'Resultado PAP': x.resultado_pap, 'VPH': x.resultado_vph, 'Genotipo': x.vph_genotipo, 'Informada': x.notificada ? 'Sí' : 'No' }))), 'Positivas sin tratar');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(redData.map(c => ({ 'Establecimiento': c.centro, 'Red': c.red || 'departamental', 'Tomas': Number(c.tomas), 'Mujeres': Number(c.mujeres), 'Meta anual': c.meta_pap_anual, 'Meta período': metaPer(c), '% meta': metaPer(c) ? redPct(Number(c.tomas), metaPer(c)) : null, 'Enviadas': Number(c.enviadas), 'Con resultado': Number(c.con_resultado), 'Pendientes': Number(c.pendientes), 'Atrasadas (>90 d)': Number(c.atrasadas), 'Positivas': Number(c.positivas), 'Positivas sin tratar': Number(c.pos_sin_tratar), 'Derivadas': Number(c.derivadas), 'Contrarreferidas': Number(c.contrarreferidas), 'Resultado entregado': Number(c.entregadas), 'Rechazadas/insatisfactorias': Number(c.rechazadas), 'Días laboratorio': c.dias_lab, 'Sin SUS': Number(c.sin_sus), 'Cobrado Bs': Number(c.cobrado) }))), 'Por establecimiento');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(redPend.map(x => ({ 'Establecimiento': centroNombre(x.centro_id), 'Paciente': x.nombre, 'CI': x.carnet, 'Celular': x.celular, 'Toma': x.fecha_toma, 'Resultado PAP': x.resultado_pap, 'VPH': x.resultado_vph, 'Genotipo': x.vph_genotipo, 'Informada': x.notificada ? 'Sí' : 'No' }))), 'Positivas sin tratar');
   XLSX.writeFile(wb, `SIVEC-PAP_tablero_${desde}_${hasta}.xlsx`);
 }
 
