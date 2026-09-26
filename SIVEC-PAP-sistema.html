@@ -447,6 +447,40 @@
   .admForm input, .admForm select { flex: 1 1 140px; }
   .admForm .primary { padding: 7px 14px; }
   body.soloLectura .editBtn, body.soloLectura .delBtn { display: none !important; }
+  /* Portal del laboratorio (oncológico) */
+  .labTabs { display: flex; gap: 6px; margin: 4px 0 14px; flex-wrap: wrap; }
+  .labTabs button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 7px 14px; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 13px; }
+  .labTabs button.on { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
+  .labTabs b { background: rgba(0,0,0,.12); border-radius: 999px; padding: 0 7px; margin-left: 3px; font-size: 11.5px; }
+  .labCard { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .labCard table { font-size: 12.5px; } .labCard td, .labCard th { padding: 7px 8px; }
+  .labGrid { display: grid; grid-template-columns: 330px 1fr; gap: 14px; align-items: start; }
+  @media (max-width: 900px) { .labGrid { grid-template-columns: 1fr; } }
+  .labList { display: flex; flex-direction: column; gap: 8px; max-height: calc(100vh - 260px); overflow: auto; }
+  .labItem { text-align: left; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 9px 11px; cursor: pointer; font-family: inherit; }
+  .labItem.on { border: 2px solid var(--teal-700); background: color-mix(in srgb, var(--teal-700) 7%, var(--surface)); }
+  .labItem b { font-family: ui-monospace, Consolas, monospace; margin-right: 6px; } .labItem small { display: block; color: var(--ink-soft); margin-top: 2px; }
+  .labItem .late { color: #c2410c; font-weight: 700; }
+  .labSec { font-size: 11.5px; font-weight: 800; letter-spacing: .4px; color: var(--ink-soft); text-transform: uppercase; margin: 12px 0 6px; }
+  .labChips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .labChip { border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 6px 13px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; }
+  .labChip.on { background: color-mix(in srgb, var(--teal-700) 12%, var(--surface)); border-color: var(--teal-700); color: var(--teal-900); }
+  .labChip.neg.on { background: #dcf5e9; border-color: #16a34a; color: #0d6b47; }
+  .labChip.alto.on { background: #fde2e2; border-color: #dc2626; color: #991b1b; }
+  .labChip:disabled { opacity: .35; cursor: default; }
+  .labHead { font-size: 17px; font-weight: 800; } .labHead span { font-size: 12.5px; font-weight: 400; color: var(--ink-soft); margin-left: 6px; }
+  .labCols { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; } @media (max-width: 1100px) { .labCols { grid-template-columns: 1fr; } }
+  .labCard textarea, .labCard input[type=text], .labCard select { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; background: var(--surface); color: var(--ink); font-family: inherit; font-size: 13px; }
+  .labFirmar { background: #15803d; color: #fff; border: none; border-radius: 10px; padding: 11px 18px; font-weight: 800; font-size: 14px; cursor: pointer; margin-top: 14px; }
+  .labNota { background: #eef4fb; border: 1px solid #c9daf0; border-radius: 10px; padding: 10px 12px; font-size: 12.5px; margin-top: 12px; color: #1e3a5f; }
+  body.dark .labNota { background: #1d2733; border-color: #34475e; color: #cfe0f5; }
+  #labScan { font-size: 15px; padding: 10px 12px; border: 2px dashed var(--teal-500); border-radius: 10px; width: 100%; background: var(--surface); color: var(--ink); margin: 8px 0 10px; }
+  tr.labOk td { background: color-mix(in srgb, #16a34a 9%, transparent); } tr.labNo td { background: color-mix(in srgb, #dc2626 9%, transparent); }
+  .resNuevo { font-size: 11px; font-weight: 700; color: #1e40af; background: #dbeafe; border-radius: 6px; padding: 1px 6px; margin-left: 4px; }
+  .resNuevo.alto { color: #991b1b; background: #fde2e2; }
+  .vistoBtn { font-size: 11px; font-weight: 700; border: 1px solid #93c5fd; background: #fff; color: #1e40af; border-radius: 6px; padding: 1px 7px; margin-left: 4px; cursor: pointer; }
+  #resultadosBanner { background: linear-gradient(135deg,#e0ecff,#d6e6ff); border: 1px solid #93b4e6; border-radius: 12px; padding: 12px 18px; margin: 0 22px 14px; font-size: 13.5px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: #1e3a5f; }
+  body.dark #resultadosBanner { background: #1d2733; border-color: #34475e; color: #cfe0f5; }
   .rolTag { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 8px; background: #f3e5ea; color: #7d2a4c; }
   body.dark .rolTag { background: #3a2530; color: #f1a7c3; }
   .sinRolBox { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 32px; width: 380px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -1020,6 +1054,7 @@
         </select>
         <button id="exportExcelBtn" class="rowBtn">📊 Descargar Excel</button>
       </div>
+      <div id="resultadosBanner" style="display:none"></div>
       <div id="overdueBanner" style="display:none"></div>
       <div id="vencimientoBanner" style="display:none"></div>
       <div id="birthdayBanner" style="display:none"></div>
@@ -1216,6 +1251,10 @@
     <div id="portalView" class="view">
       <h2 id="portalTitulo">Portal</h2>
       <p class="hint" id="portalTexto"></p>
+      <div id="portalLab" style="display:none">
+        <div class="labTabs"><button type="button" data-lt="rec" class="on">📥 Recepción <b id="labNRec"></b></button><button type="button" data-lt="leer">🔬 Por leer <b id="labNLeer"></b></button><button type="button" data-lt="inf">✅ Informadas</button></div>
+        <div id="labPane"></div>
+      </div>
     </div>
 
     <!-- TRASH -->
@@ -1833,10 +1872,180 @@ document.getElementById('centroSel').addEventListener('change', e => {
 
 function loadPortal() {
   const onco = perfil && perfil.rol === 'oncologico';
-  document.getElementById('portalTitulo').textContent = onco ? 'Portal del oncológico' : 'Portal de colposcopia (2º nivel)';
-  document.getElementById('portalTexto').textContent = onco
-    ? 'Acá van a llegar los lotes de láminas que mandan los centros, para confirmar la recepción e informar PAP, VPH y biopsias. El resultado vuelve solo al centro. (En construcción: próximos pasos del SIVEC PAP.)'
-    : 'Acá van a llegar las pacientes derivadas por los centros, para registrar colposcopia, biopsia, tratamiento y la contrarreferencia. (En construcción: próximos pasos del SIVEC PAP.)';
+  document.getElementById('portalLab').style.display = onco ? '' : 'none';
+  document.getElementById('portalTitulo').textContent = onco ? '🔬 Portal del laboratorio — ' + (centroNombre(perfil.centro_id) || '') : 'Portal de colposcopia';
+  document.getElementById('portalTexto').innerHTML = onco
+    ? 'Recibí los lotes que mandan los centros, informá PAP (Bethesda) y VPH, y firmá: el resultado <b>aparece solo en la ficha del centro</b>, sin papel. Solo se ven las muestras enviadas a este establecimiento.'
+    : 'Acá van a llegar las pacientes derivadas por los centros, para registrar colposcopia, biopsia, tratamiento y la contrarreferencia. (En construcción: próximo paso del SIVEC PAP.)';
+  if (onco) labCargar();
+}
+
+// ================= Portal del laboratorio (Paso 12 del SQL) =================
+// El oncológico no lee la tabla de pacientes: usa funciones del banco que devuelven solo sus muestras.
+const LAB_RECHAZOS = ['Lámina rota', 'Sin identificar', 'Datos no coinciden', 'Fijación inadecuada', 'Muestra insuficiente', 'No llegó'];
+const LAB_BETH = ['NILM', 'ASC-US', 'LSIL', 'ASC-H', 'HSIL', 'AGC', 'AIS', 'Carcinoma'];
+const LAB_HALLAZGOS = ['Candida', 'Trichomonas', 'Cambio de flora (vaginosis)', 'Actinomyces', 'Herpes', 'Cambios reactivos', 'Atrofia'];
+const LAB_VPH = [['Negativo', 'Negativa', ''], ['Positivo 16', 'Positiva', '16'], ['Positivo 18', 'Positiva', '18'], ['Positivo 16 y 18', 'Positiva', '16 y 18'], ['Otros alto riesgo', 'Positiva', 'Otros de alto riesgo']];
+let labData = [], labLotes = [], labTab = 'rec', labLoteId = null, labSelId = null, labRecep = {}, labForm = null;
+async function labCargar() {
+  const pane = document.getElementById('labPane');
+  const [m, l] = await Promise.all([sb.rpc('sivec_lab_muestras', { p_lote: null }), sb.from('lotes').select('*').eq('destino_id', perfil.centro_id).order('fecha_envio', { ascending: false }).limit(80)]);
+  const err = m.error || l.error;
+  if (err) { pane.innerHTML = `<div class="labCard">Error: ${esc(err.message)}${/function|column|relation/.test(err.message) ? ' — ¿ya se ejecutó el Paso 12 del SQL?' : ''}</div>`; return; }
+  labData = m.data || []; labLotes = l.data || [];
+  labRender();
+}
+function labMuestraTipo(x) { return tipoMuestra(x); }
+function labIncluyeVph(x) { return /VPH/.test(labMuestraTipo(x)); }
+function labRender() {
+  const enCamino = labLotes.filter(l => l.estado !== 'recibido').length, porLeer = labData.filter(x => x.muestra_estado === 'recibida').length;
+  document.getElementById('labNRec').textContent = enCamino || ''; document.getElementById('labNLeer').textContent = porLeer || '';
+  document.querySelectorAll('.labTabs button').forEach(b => b.classList.toggle('on', b.dataset.lt === labTab));
+  if (labTab === 'rec') return labLoteId ? labRenderLote() : labRenderLotes();
+  if (labTab === 'leer') return labRenderLeer();
+  return labRenderInformadas();
+}
+document.querySelector('.labTabs').addEventListener('click', e => { const b = e.target.closest('[data-lt]'); if (!b) return; labTab = b.dataset.lt; labLoteId = null; labRender(); });
+
+function labRenderLotes() {
+  const hoy = new Date(hoyISO() + 'T12:00:00');
+  const filas = labLotes.map(l => {
+    const dias = Math.round((hoy - new Date(l.fecha_envio + 'T12:00:00')) / 86400000);
+    return `<tr><td><b>${esc(l.codigo)}</b></td><td>${esc(centroNombre(l.centro_id))}</td><td>${fmtFecha(l.fecha_envio)}${l.transporte ? `<div class="loteCod">${esc(l.transporte)}</div>` : ''}</td><td>${l.n_muestras}</td>
+      <td>${l.estado === 'recibido' ? `<span class="balPill rec">✓ recibido ${fmtFecha(String(l.fecha_recepcion || '').slice(0, 10))}</span>${l.observaciones ? `<div class="loteCod">${esc(l.observaciones)}</div>` : ''}` : `<span class="balPill camino">en camino · ${dias} día${dias === 1 ? '' : 's'}</span>`}</td>
+      <td><button type="button" class="${l.estado === 'recibido' ? 'rowBtn' : 'primary'}" data-abrir-lote="${l.id}">${l.estado === 'recibido' ? 'Ver' : '📥 Recibir'}</button></td></tr>`;
+  }).join('');
+  const pane = document.getElementById('labPane');
+  pane.innerHTML = `<div class="labCard"><table><thead><tr><th>Lote</th><th>Centro</th><th>Enviado</th><th>Muestras</th><th>Estado</th><th></th></tr></thead><tbody>${filas || '<tr><td colspan="6">Todavía no llegó ningún lote.</td></tr>'}</tbody></table></div>`;
+  pane.onclick = e => { const b = e.target.closest('[data-abrir-lote]'); if (b) { labLoteId = b.dataset.abrirLote; labRecep = {}; labRender(); } };
+}
+function labRenderLote() {
+  const l = labLotes.find(x => String(x.id) === String(labLoteId)); if (!l) { labLoteId = null; return labRender(); }
+  const ms = labData.filter(x => String(x.lote_id) === String(l.id)), abierto = l.estado !== 'recibido';
+  const fila = x => {
+    const r = labRecep[x.id] || '';
+    const cls = abierto ? (r === 'ok' ? 'labOk' : r ? 'labNo' : '') : (x.muestra_estado === 'rechazada' ? 'labNo' : 'labOk');
+    const estado = abierto ? `<select data-recep="${x.id}"><option value="">— sin marcar —</option><option value="ok"${r === 'ok' ? ' selected' : ''}>✓ Llegó bien</option>${LAB_RECHAZOS.map(m => `<option${r === m ? ' selected' : ''}>${m}</option>`).join('')}</select>`
+      : (x.muestra_estado === 'rechazada' ? `✗ ${esc(x.muestra_rechazo || 'rechazada')}` : '✓ ' + esc(x.muestra_estado || ''));
+    return `<tr class="${cls}" data-cod="${esc(x.codigo_muestra)}"><td><b class="loteCod" style="font-size:12.5px;color:var(--ink)">${esc(x.codigo_muestra)}</b></td><td>${esc(x.nombre)}</td><td>${esc(x.carnet || '—')}</td><td>${labMuestraTipo(x)}</td><td>${fmtFecha(x.fecha_toma)}</td><td style="min-width:180px">${estado}</td></tr>`;
+  };
+  const marcadas = ms.filter(x => labRecep[x.id]).length;
+  const pane = document.getElementById('labPane');
+  pane.innerHTML = `<div class="labCard"><button type="button" class="rowBtn" data-volver>← Lotes</button>
+    <div class="labHead" style="margin-top:8px">📦 Lote ${esc(l.codigo)}<span>${esc(centroNombre(l.centro_id))} · enviado ${fmtFecha(l.fecha_envio)} · ${esc(l.transporte || '')} · entrega ${esc(l.entregado_por || '—')} · ${l.n_muestras} muestras</span></div>
+    ${abierto ? `<input id="labScan" placeholder="📷 Escaneá el código de barras de cada lámina (o escribí el código y Enter)" autocomplete="off">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px"><b id="labMarcadas">${marcadas} de ${ms.length} marcadas</b><button type="button" class="rowBtn" data-todas>✓ Marcar todas las que faltan como "llegó bien"</button></div>` : `<p class="hint">Recibido el ${fmtFecha(String(l.fecha_recepcion || '').slice(0, 10))} por ${esc(l.recibido_por || '—')}.</p>`}
+    <table><thead><tr><th>Código</th><th>Paciente</th><th>CI</th><th>Tipo</th><th>Toma</th><th>Recepción</th></tr></thead><tbody>${ms.map(fila).join('')}</tbody></table>
+    ${abierto ? `<button type="button" class="labFirmar" data-confirmar>📥 Confirmar recepción del lote</button><div class="labNota">Al confirmar, las rechazadas vuelven al centro con el motivo ("repetir toma") y las demás pasan a <b>Por leer</b>.</div>` : ''}</div>`;
+  const scan = document.getElementById('labScan'); if (scan) scan.focus();
+  if (scan) scan.onkeydown = e => {
+    if (e.key !== 'Enter') return; e.preventDefault();
+    const cod = scan.value.trim().toUpperCase(); scan.value = '';
+    const x = ms.find(y => (y.codigo_muestra || '').toUpperCase() === cod);
+    if (!x) { showToast(`El código ${esc(cod)} no es de este lote.`, 'err'); return; }
+    labRecep[x.id] = 'ok'; labRenderLote(); showToast(`${esc(x.codigo_muestra)} · ${esc(x.nombre)} ✔`, 'ok');
+  };
+  pane.onchange = e => { const s2 = e.target.closest('[data-recep]'); if (s2) { if (s2.value) labRecep[s2.dataset.recep] = s2.value; else delete labRecep[s2.dataset.recep]; labRenderLote(); } };
+  pane.onclick = async e => {
+    if (e.target.closest('[data-volver]')) { labLoteId = null; return labRender(); }
+    if (e.target.closest('[data-todas]')) { ms.forEach(x => { if (!labRecep[x.id]) labRecep[x.id] = 'ok'; }); return labRenderLote(); }
+    if (e.target.closest('[data-confirmar]')) {
+      const falta = ms.filter(x => !labRecep[x.id]);
+      if (falta.length) { alert(`Faltan ${falta.length} muestra(s) sin marcar: escaneala, marcala "llegó bien" o elegí el motivo (por ejemplo "No llegó").`); return; }
+      const rech = {}; ms.forEach(x => { if (labRecep[x.id] !== 'ok') rech[x.id] = labRecep[x.id]; });
+      const nR = Object.keys(rech).length;
+      if (!confirm(`¿Confirmar la recepción del lote ${l.codigo}? ${ms.length - nR} llegaron bien${nR ? ', ' + nR + ' rechazada(s)' : ''}.`)) return;
+      const { error } = await sb.rpc('sivec_lab_recibir', { p_lote: l.id, p_rechazos: rech, p_recibido_por: perfil.nombre_completo || perfil.correo || '' });
+      if (error) { alert('No se pudo confirmar: ' + error.message); return; }
+      showToast(`Lote ${esc(l.codigo)} recibido ✔`, 'ok');
+      labLoteId = null; labTab = 'leer'; labSelId = null; await labCargar();
+    }
+  };
+}
+function labRenderLeer() {
+  const lista = labData.filter(x => x.muestra_estado === 'recibida').sort((a, b) => String(a.fecha_recepcion_muestra).localeCompare(String(b.fecha_recepcion_muestra)) || String(a.codigo_muestra).localeCompare(String(b.codigo_muestra)));
+  if (!lista.find(x => String(x.id) === String(labSelId))) { labSelId = lista.length ? lista[0].id : null; labForm = null; }
+  const hoy = new Date(hoyISO() + 'T12:00:00');
+  const item = x => { const d = x.fecha_recepcion_muestra ? Math.round((hoy - new Date(String(x.fecha_recepcion_muestra).slice(0, 10) + 'T12:00:00')) / 86400000) : 0;
+    return `<button type="button" class="labItem${String(x.id) === String(labSelId) ? ' on' : ''}" data-sel="${x.id}"><b>${esc(x.codigo_muestra)}</b>${esc(x.nombre)}<small>${esc(centroNombre(x.centro_id))} · ${labMuestraTipo(x)} · <span class="${d > 15 ? 'late' : ''}">${d} día${d === 1 ? '' : 's'}${d > 15 ? ' ⚠' : ''}</span></small></button>`; };
+  const pane = document.getElementById('labPane');
+  pane.innerHTML = `<div class="labGrid"><div class="labCard"><div class="labSec" style="margin-top:0">Por leer · ${lista.length}</div><div class="labList">${lista.map(item).join('') || '<p class="hint">No hay muestras por leer. 🎉</p>'}</div>
+    <p class="hint" style="margin:8px 0 0">Ordenadas por antigüedad; las de más de 15 días se marcan.</p></div><div id="labFormBox">${labSelId ? '' : '<div class="labCard"><p class="hint">Elegí una muestra.</p></div>'}</div></div>`;
+  pane.onclick = e => { const b = e.target.closest('[data-sel]'); if (b) { labSelId = b.dataset.sel; labForm = null; labRenderLeer(); } };
+  if (labSelId) labRenderForm(labData.find(x => String(x.id) === String(labSelId)));
+}
+function labRenderForm(x, previo) {
+  const box = document.getElementById('labFormBox'); if (!x) return;
+  const f = labForm || (labForm = Object.assign({ calidad: 'Satisfactoria', zt: true, hemorragica: false, inflamacion: false, bethesda: '', hallazgos: [], vph: '', observaciones: '', validador: '' }, previo || {}));
+  const vph = labIncluyeVph(x), insat = f.calidad === 'Insatisfactoria';
+  const chip = (grp, v, on, extra, dis) => `<button type="button" class="labChip ${extra || ''}${on ? ' on' : ''}" data-g="${grp}" data-v="${esc(v)}"${dis ? ' disabled' : ''}>${esc(v)}</button>`;
+  const edad = edadDe(x.fecha_nacimiento);
+  const necesitaVal = !insat && f.bethesda && f.bethesda !== 'NILM';
+  box.innerHTML = `<div class="labCard">
+    <div class="labHead">${esc(x.nombre)}${edad != null ? ' · ' + edad + ' a' : ''}<span>${esc(x.codigo_muestra)} · CI ${esc(x.carnet || '—')} · ${esc(centroNombre(x.centro_id))} · toma ${fmtFecha(x.fecha_toma)} · ${labMuestraTipo(x)}${x.anticonceptivo_metodo ? ' · ' + esc(x.anticonceptivo_metodo) : ''}${x.pap_anterior ? ' · PAP anterior ' + esc(x.pap_anterior) : ''} · ${esc(x.doctora || '')}</span></div>
+    <div class="labCols"><div>
+      <div class="labSec">Calidad de la muestra</div><div class="labChips">${['Satisfactoria', 'Insatisfactoria'].map(v => chip('calidad', v, f.calidad === v)).join('')}${chip('zt', 'ZT presente', f.zt)}${chip('hemorragica', 'Hemorrágica', f.hemorragica)}${chip('inflamacion', 'Inflamación', f.inflamacion)}</div>
+      <div class="labSec">Resultado (Bethesda)</div><div class="labChips">${LAB_BETH.map(v => chip('bethesda', v === 'NILM' ? 'NILM' : v, f.bethesda === v, v === 'NILM' ? 'neg' : (BETHESDA_BY_CODE[v] || {}).nivel === 'alto' ? 'alto' : '', insat)).join('')}</div>
+      <div class="labSec">Hallazgos no neoplásicos</div><div class="labChips">${LAB_HALLAZGOS.map(v => chip('hallazgos', v, f.hallazgos.includes(v), '', insat)).join('')}</div>
+      <div class="labSec">Observaciones</div><textarea data-f="observaciones" rows="2" placeholder="Opcional">${esc(f.observaciones)}</textarea>
+    </div><div>
+      ${vph ? `<div class="labSec">VPH</div><div class="labChips">${LAB_VPH.map(([t]) => chip('vph', t, f.vph === t, t === 'Negativo' ? 'neg' : 'alto')).join('')}</div>` : '<div class="labSec">VPH</div><p class="hint" style="margin:0">Esta muestra no incluye VPH.</p>'}
+      <div class="labSec">Lectura y validación</div>
+      <div style="font-size:13px">🖋 Lectura: <b>${esc(perfil.nombre_completo || perfil.correo || '')}</b> · ${fmtFecha(hoyISO())}</div>
+      <label style="display:block;font-size:12.5px;margin-top:8px">Validado por (patólogo)${necesitaVal ? ' <b style="color:#b91c1c">— obligatorio si no es NILM</b>' : ' — opcional'}<input type="text" data-f="validador" value="${esc(f.validador)}" placeholder="Ej: Dr. Méndez"></label>
+      <button type="button" class="labFirmar" data-firmar>🖋 Firmar y liberar</button>
+    </div></div>
+    <div class="labNota">↩ Al liberar, el resultado aparece <b>en la ficha del centro</b> (estado, Bethesda, VPH y genotipo), con el aviso "resultado nuevo". Si es alterado, el centro lo ve en rojo y en su seguimiento PAP+/VPH+.</div></div>`;
+  box.onclick = async e => {
+    const c = e.target.closest('.labChip');
+    if (c && !c.disabled) {
+      const g = c.dataset.g, v = c.dataset.v;
+      if (g === 'calidad') { f.calidad = v; if (v === 'Insatisfactoria') { f.bethesda = ''; f.hallazgos = []; } }
+      else if (g === 'bethesda') f.bethesda = f.bethesda === v ? '' : v;
+      else if (g === 'hallazgos') f.hallazgos = f.hallazgos.includes(v) ? f.hallazgos.filter(h => h !== v) : [...f.hallazgos, v];
+      else if (g === 'vph') f.vph = f.vph === v ? '' : v;
+      else f[g] = !f[g];
+      return labRenderForm(x);
+    }
+    if (e.target.closest('[data-firmar]')) labFirmar(x, f, vph);
+  };
+  box.oninput = e => { const k = e.target.dataset.f; if (k) f[k] = e.target.value; };
+}
+async function labFirmar(x, f, vph) {
+  const insat = f.calidad === 'Insatisfactoria';
+  if (!insat && !f.bethesda) { alert('Elegí el resultado Bethesda (o marcá la muestra como insatisfactoria).'); return; }
+  if (vph && !f.vph) { alert('Esta muestra incluye VPH: elegí el resultado del VPH.'); return; }
+  if (!insat && f.bethesda !== 'NILM' && !f.validador.trim()) { alert('Un resultado alterado necesita la validación del patólogo: escribí quién lo validó.'); return; }
+  const beth = insat ? 'Insatisfactoria' : f.bethesda;
+  const texto = insat ? 'Muestra insatisfactoria' + (f.observaciones ? ' — ' + f.observaciones : '') : [beth, ...f.hallazgos].join(' · ');
+  const vv = LAB_VPH.find(v => v[0] === f.vph);
+  const resumen = `${x.nombre} (${x.codigo_muestra})\nPAP: ${texto}${vv ? '\nVPH: ' + vv[0] : ''}${f.validador ? '\nValidado por: ' + f.validador : ''}\n\n¿Firmar y liberar? El resultado aparece en la ficha del centro.`;
+  if (!confirm(resumen)) return;
+  const informe = { calidad: f.calidad, zt: f.zt, hemorragica: f.hemorragica, inflamacion: f.inflamacion, bethesda: beth, hallazgos: f.hallazgos, vph: f.vph || null, observaciones: f.observaciones || null, lector: perfil.nombre_completo || perfil.correo, validador: f.validador || null, laboratorio: centroNombre(perfil.centro_id), fecha: new Date().toISOString() };
+  const { error } = await sb.rpc('sivec_lab_informar', { p_id: x.id, p_bethesda: beth, p_texto: texto, p_vph: vv ? vv[1] : null, p_genotipo: vv ? vv[2] : null, p_informe: informe, p_informado_por: perfil.nombre_completo || perfil.correo || '' });
+  if (error) { alert('No se pudo liberar: ' + error.message); return; }
+  showToast(`${esc(x.codigo_muestra)} liberado ✔ — ya está en la ficha del centro`, 'ok');
+  labForm = null; labSelId = null; await labCargar();
+}
+function labRenderInformadas() {
+  const lista = labData.filter(x => ['informada', 'insatisfactoria', 'rechazada'].includes(x.muestra_estado)).sort((a, b) => String(b.fecha_informe).localeCompare(String(a.fecha_informe))).slice(0, 150);
+  const pane = document.getElementById('labPane');
+  pane.innerHTML = `<div class="labCard"><table><thead><tr><th>Informado</th><th>Código</th><th>Paciente</th><th>Centro</th><th>PAP</th><th>VPH</th><th>Por</th><th></th></tr></thead><tbody>${lista.map(x => `<tr>
+    <td>${fmtFecha(String(x.fecha_informe || '').slice(0, 10))}</td><td class="loteCod" style="color:var(--ink)">${esc(x.codigo_muestra)}</td><td>${esc(x.nombre)}</td><td>${esc(centroNombre(x.centro_id))}</td>
+    <td>${x.muestra_estado === 'rechazada' ? '✗ rechazada: ' + esc(x.muestra_rechazo || '') : esc(x.resultado_pap || '—')}</td><td>${esc(x.resultado_vph || '—')}${x.vph_genotipo ? ' · ' + esc(x.vph_genotipo) : ''}</td><td>${esc(x.informado_por || '')}${x.informe_lab && x.informe_lab.validador ? ' / ' + esc(x.informe_lab.validador) : ''}</td>
+    <td>${x.muestra_estado !== 'rechazada' ? `<button type="button" class="rowBtn" data-corregir="${x.id}">Corregir</button>` : ''}</td></tr>`).join('') || '<tr><td colspan="8">Todavía no hay informes.</td></tr>'}</tbody></table></div>`;
+  pane.onclick = e => {
+    const b = e.target.closest('[data-corregir]'); if (!b) return;
+    const x = labData.find(y => String(y.id) === b.dataset.corregir); if (!x) return;
+    const inf = x.informe_lab || {};
+    labTab = 'leer'; labSelId = x.id;
+    labForm = { calidad: inf.calidad || 'Satisfactoria', zt: inf.zt !== false, hemorragica: !!inf.hemorragica, inflamacion: !!inf.inflamacion, bethesda: inf.bethesda === 'Insatisfactoria' ? '' : (inf.bethesda || ''), hallazgos: inf.hallazgos || [], vph: inf.vph || '', observaciones: inf.observaciones || '', validador: inf.validador || '' };
+    document.querySelectorAll('.labTabs button').forEach(bb => bb.classList.toggle('on', bb.dataset.lt === 'leer'));
+    const paneL = document.getElementById('labPane');
+    paneL.innerHTML = `<div class="labGrid"><div class="labCard"><button type="button" class="rowBtn" data-volver-inf>← Informadas</button><p class="hint">Corrigiendo el informe de <b>${esc(x.codigo_muestra)}</b>. Al volver a firmar, el centro lo recibe otra vez como "resultado nuevo".</p></div><div id="labFormBox"></div></div>`;
+    paneL.onclick = ev => { if (ev.target.closest('[data-volver-inf]')) { labTab = 'inf'; labForm = null; labRender(); } };
+    labRenderForm(x);
+  };
 }
 
 // --- Administración ---
@@ -2611,6 +2820,19 @@ function renderBanners(data) {
     banner.innerHTML = '';
   }
 
+  const nuevos = data.filter(esResultadoNuevo);
+  const rbanner = document.getElementById('resultadosBanner');
+  if (nuevos.length) {
+    const alt = nuevos.filter(p => p.estado_pap === 'Positivo' || p.resultado_vph === 'Positiva').length;
+    const rep = nuevos.filter(p => ['rechazada', 'insatisfactoria'].includes(p.muestra_estado)).length;
+    rbanner.style.display = 'flex';
+    rbanner.innerHTML = `<span>🔬 <b>${nuevos.length} resultado${nuevos.length > 1 ? 's' : ''} nuevo${nuevos.length > 1 ? 's' : ''} del laboratorio</b> <span class="bannerHint">· ${[alt ? alt + ' alterado' + (alt > 1 ? 's' : '') : '', rep ? rep + ' para repetir toma' : '', 'llegaron sin papel'].filter(Boolean).join(' · ')}</span></span>` +
+      `<button type="button" class="bannerBtn" data-quick="nuevos">${listQuick === 'nuevos' ? 'Ver todas' : 'Ver solo estas'}</button>` +
+      (conRoles() && perfil.rol === 'centro' ? `<button type="button" class="bannerBtn" id="vistosTodos">✓ Marcar todos como vistos</button>` : '');
+    const vt = document.getElementById('vistosTodos');
+    if (vt) vt.onclick = () => marcarVisto(nuevos);
+  } else { rbanner.style.display = 'none'; rbanner.innerHTML = ''; }
+
   const hoy = new Date().toISOString().slice(0, 10);
   const atrasadas = data.filter(esAtrasada);
   const obanner = document.getElementById('overdueBanner');
@@ -2713,7 +2935,10 @@ function proximoPaso(p) {
   // Si ya hay un resultado escrito (aunque el Estado siga en Pendiente), se usa el resultado.
   const papPend = !soloVph && (p.estado_pap || 'Pendiente') === 'Pendiente' && !bet;
   const yEntregar = p.recibio_resultado ? '' : ' · entregar resultado';
+  if (p.muestra_estado === 'rechazada') return { key: 'repetir', tone: 'red', txt: 'Repetir toma (muestra rechazada' + (p.muestra_rechazo ? ': ' + p.muestra_rechazo.toLowerCase() : '') + ')' };
   if (nivel === 'insat') return { key: 'repetir', tone: 'amber', txt: 'Repetir toma (muestra insatisfactoria)' + yEntregar };
+  if (papPend && p.muestra_estado === 'enviada') return { key: 'esperar', tone: 'gray', txt: 'En camino al laboratorio' + (p.lote_envio ? ' · lote ' + p.lote_envio : '') };
+  if (papPend && p.muestra_estado === 'recibida') return { key: 'esperar', tone: 'gray', txt: 'En el laboratorio' + (p.fecha_recepcion_muestra ? ' desde ' + fmtFecha(String(p.fecha_recepcion_muestra).slice(0, 10)) : '') };
   if (papPend) {
     if (esAtrasada(p)) return { key: 'buscar', tone: 'red', txt: 'Buscar resultado (atrasado)' };
     const est = p.fecha_estimada || addDays(p.fecha_toma, 90);
@@ -2760,7 +2985,17 @@ function saveClinCfg() {
 
 // ---- Filtro rápido (contadores y avisos de la lista) ----
 let listQuick = '';
-const QUICK_LABEL = { 'pap:Positivo': 'Positivo PAP', 'pap:Negativo': 'Negativo PAP', 'pap:Pendiente': 'Pendiente PAP', 'vph:Positiva': 'VPH+', atrasadas: 'Resultado atrasado', vencimientos: 'Método por vencer' };
+const QUICK_LABEL = { 'pap:Positivo': 'Positivo PAP', 'pap:Negativo': 'Negativo PAP', 'pap:Pendiente': 'Pendiente PAP', 'vph:Positiva': 'VPH+', atrasadas: 'Resultado atrasado', vencimientos: 'Método por vencer', nuevos: 'Resultado nuevo del laboratorio' };
+// Resultado que llegó del laboratorio (portal del oncológico) y el centro todavía no marcó como visto.
+function esResultadoNuevo(p) { return !!p.fecha_informe && !p.resultado_visto_at; }
+async function marcarVisto(lista) {
+  const ids = lista.map(p => p.id);
+  const { error } = await sb.from('pacientes').update({ resultado_visto_at: new Date().toISOString() }).in('id', ids);
+  if (error) { showToast('No se pudo marcar: ' + esc(error.message), 'err'); return; }
+  const t = new Date().toISOString(); lista.forEach(p => { p.resultado_visto_at = t; });
+  renderBanners(allPatientsData); applyListFilters(true);
+  showToast(lista.length > 1 ? `${lista.length} resultados marcados como vistos ✔` : 'Resultado visto ✔', 'ok');
+}
 function esAtrasada(p) {
   if (esSoloVph(p)) return false;
   const fechaEst = p.fecha_estimada || addDays(p.fecha_toma, 90);
@@ -2775,6 +3010,7 @@ function pasaQuick(p) {
     case 'vph:Positiva': return p.resultado_vph === 'Positiva';
     case 'atrasadas': return esAtrasada(p);
     case 'vencimientos': return esVencimiento(p);
+    case 'nuevos': return esResultadoNuevo(p);
     default: return true;
   }
 }
@@ -2793,6 +3029,8 @@ document.getElementById('quickFilterClear').addEventListener('click', () => { li
 document.addEventListener('click', e => {
   const b = e.target.closest('.bannerBtn[data-quick]');
   if (b) setListQuick(b.dataset.quick);
+  const v = e.target.closest('[data-visto]');
+  if (v) { e.stopPropagation(); const p = allPatientsData.find(x => String(x.id) === v.dataset.visto); if (p) marcarVisto([p]); }
 });
 
 const LIST_PAGE = 50;
@@ -2851,7 +3089,7 @@ function renderPatientCards(data, base) {
     }
     card.innerHTML = `
       <div>
-        <div class="pcName">${esCumpleanosHoy(p.fecha_nacimiento) ? '🎂 ' : ''}${esc(p.nombre)}${tomaBadge}${p.recibio_resultado ? ' <span title="Recibió información de su resultado" style="font-size:11px;font-weight:600;color:#0d6b47;background:#dcf5e9;border-radius:6px;padding:1px 6px;margin-left:4px">✅ Informada</span>' : ''}</div>
+        <div class="pcName">${esCumpleanosHoy(p.fecha_nacimiento) ? '🎂 ' : ''}${esc(p.nombre)}${tomaBadge}${esResultadoNuevo(p) ? ` <span class="resNuevo${p.estado_pap === 'Positivo' || p.resultado_vph === 'Positiva' || p.muestra_estado === 'rechazada' ? ' alto' : ''}" title="Informado por ${esc(p.informado_por || 'el laboratorio')} el ${fmtFecha(String(p.fecha_informe).slice(0, 10))}">🔬 ${p.muestra_estado === 'rechazada' ? 'Muestra rechazada' : 'Resultado nuevo'}</span>${conRoles() && perfil.rol === 'centro' ? `<button type="button" class="vistoBtn" data-visto="${esc(p.id)}">✓ Visto</button>` : ''}` : ''}${p.recibio_resultado ? ' <span title="Recibió información de su resultado" style="font-size:11px;font-weight:600;color:#0d6b47;background:#dcf5e9;border-radius:6px;padding:1px 6px;margin-left:4px">✅ Informada</span>' : ''}</div>
         <div class="pcMeta">${esc(p.carnet) || 'Sin carnet'}${edadDe(p.fecha_nacimiento) != null ? ' · ' + edadDe(p.fecha_nacimiento) + ' años' : ''}${fueraEdad ? ` <span class="edadBadge" title="Rango objetivo ${fueraEdad.tipo}: ${fueraEdad.min}–${fueraEdad.max} años (se cambia en Configuración)">fuera de rango ${fueraEdad.tipo}</span>` : ''} · ${esc(p.doctora) || '—'} · Toma: ${fmtFecha(p.fecha_toma) || '—'}</div>
         <div class="pcPaso tone-${paso.tone}" title="Próximo paso">➜ ${esc(paso.txt)}</div>
       </div>

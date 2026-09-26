@@ -405,6 +405,90 @@ select nombre, coalesce((select nombre from redes where id = red_id), 'departame
 
 ---
 
+## Paso 12 — Portal del laboratorio (oncológico): recepción, informe PAP/VPH y resultado digital al centro
+
+El usuario con rol **Laboratorio de citología** (establecimiento que recibe muestras) entra al **Portal**:
+recibe cada lote (escaneando el código de barras de cada lámina o marcándola), rechaza con motivo las que no sirven,
+informa **Bethesda + hallazgos + VPH/genotipo**, con validación del patólogo si no es NILM, y firma.
+El resultado se escribe en la ficha del centro y aparece como **"🔬 Resultado nuevo"** hasta que el centro lo marca como visto.
+El oncológico **no tiene acceso a la tabla de pacientes**: solo a sus muestras, por estas funciones.
+
+```sql
+-- 1) Informe del laboratorio en cada toma
+alter table pacientes add column if not exists fecha_recepcion_muestra timestamptz;
+alter table pacientes add column if not exists fecha_informe timestamptz;
+alter table pacientes add column if not exists informado_por text;
+alter table pacientes add column if not exists informe_lab jsonb;
+alter table pacientes add column if not exists resultado_visto_at timestamptz;
+alter table pacientes add column if not exists vph_genotipo text;
+
+-- 2) El oncológico ve SOLO las muestras que le mandaron, con lo necesario para leerlas (no la ficha entera)
+create or replace function sivec_lab_muestras(p_lote uuid default null)
+returns table (id uuid, codigo_muestra text, nombre text, carnet text, fecha_nacimiento date, fecha_toma date,
+  tipo_examen text, hizo_prueba_vph boolean, anticonceptivo_metodo text, doctora text, pap_anterior text,
+  lote_id uuid, lote_codigo text, centro_id uuid, fecha_envio date, muestra_estado text, muestra_rechazo text,
+  fecha_recepcion_muestra timestamptz, resultado_pap text, resultado_vph text, vph_genotipo text,
+  informe_lab jsonb, fecha_informe timestamptz, informado_por text)
+language sql stable security definer set search_path = public as $$
+  select p.id, p.codigo_muestra, p.nombre, p.carnet, p.fecha_nacimiento, p.fecha_toma, p.tipo_examen, p.hizo_prueba_vph,
+    p.anticonceptivo_metodo, p.doctora,
+    (select q.resultado_pap || ' (' || to_char(q.fecha_toma, 'YYYY') || ')' from pacientes q
+       where coalesce(p.carnet, '') <> '' and q.carnet = p.carnet and q.id <> p.id and q.fecha_toma < p.fecha_toma
+         and coalesce(q.resultado_pap, '') <> '' and q.deleted_at is null order by q.fecha_toma desc limit 1),
+    l.id, l.codigo, l.centro_id, l.fecha_envio, p.muestra_estado, p.muestra_rechazo, p.fecha_recepcion_muestra,
+    p.resultado_pap, p.resultado_vph, p.vph_genotipo, p.informe_lab, p.fecha_informe, p.informado_por
+  from pacientes p join lotes l on l.id = p.lote_id
+  where sivec_rol() = 'oncologico' and l.destino_id = sivec_centro() and p.deleted_at is null
+    and (p_lote is null or l.id = p_lote)
+  order by l.fecha_envio, p.codigo_muestra $$;
+
+-- 3) Recepción del lote: todas llegan salvo las rechazadas (con motivo); el centro se entera del rechazo
+create or replace function sivec_lab_recibir(p_lote uuid, p_rechazos jsonb, p_recibido_por text)
+returns lotes language plpgsql security definer set search_path = public as $$
+declare v_lote lotes; v_rech int;
+begin
+  select * into v_lote from lotes where id = p_lote and destino_id = sivec_centro() and sivec_rol() = 'oncologico';
+  if not found then raise exception 'Este lote no fue enviado a su establecimiento.'; end if;
+  update pacientes set muestra_estado = 'rechazada', muestra_rechazo = p_rechazos ->> id::text,
+         fecha_recepcion_muestra = now(), fecha_informe = now(), informado_por = nullif(trim(p_recibido_por), ''), resultado_visto_at = null
+   where lote_id = p_lote and coalesce(p_rechazos, '{}'::jsonb) ? id::text and coalesce(muestra_estado, 'enviada') = 'enviada';
+  get diagnostics v_rech = row_count;
+  update pacientes set muestra_estado = 'recibida', fecha_recepcion_muestra = now()
+   where lote_id = p_lote and coalesce(muestra_estado, 'enviada') = 'enviada';
+  update lotes set estado = 'recibido', fecha_recepcion = now(), recibido_por = nullif(trim(p_recibido_por), ''),
+         observaciones = case when v_rech > 0 then v_rech || ' muestra(s) rechazada(s)' else observaciones end
+   where id = p_lote returning * into v_lote;
+  return v_lote;
+end $$;
+
+-- 4) Informe (Bethesda + VPH): el resultado aparece en la ficha del centro y queda "sin ver" hasta que el centro lo marca
+create or replace function sivec_lab_informar(p_id uuid, p_bethesda text, p_texto text, p_vph text, p_genotipo text, p_informe jsonb, p_informado_por text)
+returns void language plpgsql security definer set search_path = public as $$
+declare v_ok boolean; v_estado text;
+begin
+  select true into v_ok from pacientes p join lotes l on l.id = p.lote_id
+   where p.id = p_id and l.destino_id = sivec_centro() and sivec_rol() = 'oncologico'
+     and p.muestra_estado in ('recibida', 'informada', 'insatisfactoria');
+  if v_ok is null then raise exception 'La muestra no está recibida en su establecimiento.'; end if;
+  v_estado := case when p_bethesda is null then null when p_bethesda = 'NILM' then 'Negativo' when p_bethesda = 'Insatisfactoria' then 'Pendiente' else 'Positivo' end;
+  update pacientes set
+    resultado_pap = case when p_bethesda is null then resultado_pap else coalesce(nullif(trim(p_texto), ''), p_bethesda) end,
+    estado_pap = coalesce(v_estado, estado_pap),
+    resultado_vph = coalesce(p_vph, resultado_vph),
+    vph_genotipo = case when p_vph = 'Positiva' then nullif(p_genotipo, '') when p_vph = 'Negativa' then null else vph_genotipo end,
+    informe_lab = p_informe, fecha_informe = now(), informado_por = nullif(trim(p_informado_por), ''),
+    muestra_estado = case when p_bethesda = 'Insatisfactoria' then 'insatisfactoria' else 'informada' end,
+    resultado_visto_at = null
+  where id = p_id;
+end $$;
+
+revoke execute on function sivec_lab_muestras(uuid), sivec_lab_recibir(uuid, jsonb, text), sivec_lab_informar(uuid, text, text, text, text, jsonb, text) from public, anon;
+grant execute on function sivec_lab_muestras(uuid), sivec_lab_recibir(uuid, jsonb, text), sivec_lab_informar(uuid, text, text, text, text, jsonb, text) to authenticated;
+notify pgrst, 'reload schema';
+```
+
+---
+
 ## Paso 3 — Proteger los datos de las pacientes (IMPORTANTE)
 
 Hoy cualquiera que tenga la URL y la clave *anon* de Supabase puede leer todos los datos.
