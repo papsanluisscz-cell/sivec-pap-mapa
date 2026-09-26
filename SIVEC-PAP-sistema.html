@@ -815,7 +815,7 @@
 <div id="toastContainer"></div>
 <div id="blocker" style="display:none">
   <h2 style="margin:0;font-size:16px">Falta conectar el banco de datos</h2>
-  <p style="color:var(--ink-soft);max-width:360px;margin:0">Configurá la URL y la clave de Supabase para empezar a usar el sistema.</p>
+  <p style="color:var(--ink-soft);max-width:360px;margin:0">Pegá el <b>código de conexión</b> (se copia desde otra computadora que ya usa el SIVEC: ⚙ Configuración → "Copiar código de conexión") o configurá la URL y la clave de Supabase.</p>
   <button onclick="document.getElementById('settingsPanel').classList.add('open')">Abrir configuración</button>
 </div>
 
@@ -1273,7 +1273,13 @@
   <button class="closeX" onclick="document.getElementById('settingsPanel').classList.remove('open')">✕</button>
   <h2>Configuración</h2>
   <p class="hint">Estos datos quedan guardados en este navegador. Solo hay que configurarlo una vez por dispositivo.</p>
-  <label>Project URL de Supabase</label>
+  <label>Código de conexión</label>
+  <p class="hint" style="margin-top:0">Para conectar otra computadora sin escribir la URL y la clave: en una computadora que ya funciona tocá "Copiar código de conexión", mandalo (WhatsApp/correo) y pegalo acá. Después cada persona entra con su propio usuario.</p>
+  <input id="codigoConexion" placeholder="SIVEC-…">
+  <button class="primary" onclick="usarCodigoConexion()">Conectar con el código</button>
+  <button class="primary" onclick="copiarCodigoConexion()" style="margin-left:6px">📋 Copiar código de conexión</button>
+
+  <label style="margin-top:24px">Project URL de Supabase</label>
   <input id="urlInput" placeholder="https://xxxxx.supabase.co">
   <label>Clave anon public</label>
   <input id="keyInput" placeholder="eyJhbGciOi...">
@@ -1643,6 +1649,26 @@ function saveConfig() {
   if (url) localStorage.setItem('sb_url', url);
   if (key) localStorage.setItem('sb_key', key);
   location.reload();
+}
+
+// Código de conexión = URL + clave pública (anon) de Supabase en un solo texto. No incluye usuarios ni contraseñas:
+// los datos quedan protegidos por el inicio de sesión de cada persona.
+function copiarCodigoConexion() {
+  const { url, key } = getConfig();
+  if (!url || !key) { alert('Esta computadora todavía no está conectada.'); return; }
+  const cod = 'SIVEC-' + btoa(JSON.stringify({ u: url, k: key }));
+  const ok = () => showToast('Código de conexión copiado ✔ Pegalo en la otra computadora (⚙ Configuración).', 'ok');
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(cod).then(ok, () => prompt('Copiá este código:', cod));
+  else prompt('Copiá este código:', cod);
+}
+function usarCodigoConexion() {
+  const raw = (document.getElementById('codigoConexion').value || '').trim().replace(/^SIVEC-/, '');
+  try {
+    const { u, k } = JSON.parse(atob(raw));
+    if (!/^https:\/\//.test(u) || !k) throw new Error();
+    localStorage.setItem('sb_url', u); localStorage.setItem('sb_key', k);
+    location.reload();
+  } catch (e) { alert('El código no es válido. Copialo de nuevo desde la otra computadora.'); }
 }
 
 function saveDriveFolder() {
@@ -2214,7 +2240,8 @@ function calcVencimientoMetodo(metodo, fechaInicio) {
 
 function edadDe(fechaNacimiento) {
   if (!fechaNacimiento) return null;
-  const nac = new Date(fechaNacimiento + 'T00:00:00');
+  const nac = new Date(String(fechaNacimiento).slice(0, 10) + 'T00:00:00');
+  if (isNaN(nac)) return null; // fecha mal cargada: mejor "—" que "NaN"
   const hoy = new Date();
   let edad = hoy.getFullYear() - nac.getFullYear();
   const m = hoy.getMonth() - nac.getMonth();
@@ -2370,7 +2397,7 @@ async function loteImprimir(l, que) {
   if (error) { alert('No se pudieron leer las muestras del lote: ' + error.message); return; }
   const ps = data || [], origen = centroNombre(l.centro_id), destino = centroNombre(l.destino_id) || '—';
   const red = (() => { const c = centros.find(x => String(x.id) === String(l.centro_id)); return c ? redNombre(c.red_id) || c.red || '' : ''; })();
-  const css = `@page { size: A4; margin: 10mm; } * { box-sizing: border-box; } body { font-family: Arial, sans-serif; color: #111; margin: 0; }
+  const css = `@page { size: A4; margin: 0; } * { box-sizing: border-box; } body { font-family: Arial, sans-serif; color: #111; margin: 0; padding: 10mm; }
     h1 { font-size: 16pt; margin: 0; } .sub { font-size: 9.5pt; color: #444; }
     .head { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #7d2a4c; padding-bottom: 6px; margin-bottom: 8px; }
     .datos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 14px; font-size: 9.5pt; margin-bottom: 8px; } .datos b { display: block; font-size: 8pt; color: #555; text-transform: uppercase; }
