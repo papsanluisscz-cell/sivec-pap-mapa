@@ -1223,3 +1223,69 @@ select (select count(*) from u) as marcadas_ahora,
 update pacientes p set recibio_resultado = r.recibio_resultado, fecha_recibio_resultado = r.fecha_recibio_resultado
   from respaldo_entregas_2026_09 r where r.id = p.id;
 ```
+
+## Ajuste de datos (26/09/2026) — todas las tomas de San Luis como enviadas al Oncológico e informadas
+
+Pedido del autor: todas las muestras se enviaron al Oncológico (antes en papel); se registran como enviadas en la fecha de la toma,
+en lotes históricos mensuales `L-HIST-AAAA-MM` ya recibidos. Las que tienen resultado quedan **informadas** en el portal del laboratorio
+(devueltas a San Luis, sin aviso de "resultado nuevo": `fecha_informe` queda vacía); las que no tienen resultado quedan **Por leer**.
+Respaldo en `respaldo_envios_2026_09`. Es idempotente.
+
+```sql
+-- 0) Respaldo de lo que cambia (para poder deshacer)
+create table if not exists respaldo_envios_2026_09 as
+  select id, fecha_envio, lote_id, lote_envio, codigo_muestra, muestra_estado, fecha_recepcion_muestra, informado_por, informe_lab
+    from pacientes where false;
+insert into respaldo_envios_2026_09
+  select id, fecha_envio, lote_id, lote_envio, codigo_muestra, muestra_estado, fecha_recepcion_muestra, informado_por, informe_lab
+    from pacientes p
+   where p.deleted_at is null and p.lote_id is null and p.fecha_toma is not null
+     and p.centro_id = sivec_san_luis()
+     and not exists (select 1 from respaldo_envios_2026_09 r where r.id = p.id);
+
+-- 1) Un lote histórico por mes: San Luis → Oncológico, ya recibido
+insert into lotes (codigo, centro_id, destino_id, fecha_envio, transporte, entregado_por, n_muestras, estado, recibido_por, fecha_recepcion, observaciones, created_at)
+  select 'L-HIST-' || to_char(date_trunc('month', p.fecha_toma), 'YYYY-MM'), sivec_san_luis(),
+         (select id from centros_salud where recibe_muestras order by created_at nulls last limit 1),
+         max(p.fecha_toma), 'En papel (antes del SIVEC)', 'Registro histórico', count(*), 'recibido', 'Registro histórico',
+         max(p.fecha_toma)::timestamptz, 'Envíos anteriores al lote digital, cargados el 26/09/2026', max(p.fecha_toma)::timestamptz
+    from pacientes p where p.id in (select id from respaldo_envios_2026_09)
+   group by date_trunc('month', p.fecha_toma)
+  on conflict (codigo) do nothing;
+
+-- 2) Cada toma a su lote: enviada el día de la toma; con resultado = informada; sin resultado = en el laboratorio
+with h as (
+  select p.id, 'H-' || to_char(p.fecha_toma, 'YY') || '-' || lpad((row_number() over (order by p.fecha_toma, p.created_at, p.id))::text, 6, '0') cod
+    from pacientes p where p.id in (select id from respaldo_envios_2026_09) and p.lote_id is null)
+update pacientes p set
+  lote_id = l.id, lote_envio = l.codigo,
+  fecha_envio = coalesce(p.fecha_envio, p.fecha_toma),
+  codigo_muestra = coalesce(p.codigo_muestra, h.cod),
+  fecha_recepcion_muestra = coalesce(p.fecha_recepcion_muestra, p.fecha_toma::timestamptz),
+  muestra_estado = case
+    when p.estado_pap in ('Positivo', 'Negativo') or coalesce(p.resultado_pap, '') <> '' or coalesce(p.resultado_vph, '') <> ''
+      then case when p.resultado_pap ilike '%insatisf%' then 'insatisfactoria' else 'informada' end
+    else 'recibida' end,
+  informado_por = case when p.estado_pap in ('Positivo', 'Negativo') or coalesce(p.resultado_pap, '') <> '' or coalesce(p.resultado_vph, '') <> ''
+    then coalesce(p.informado_por, 'Registro histórico (papel)') else p.informado_por end,
+  informe_lab = coalesce(p.informe_lab, jsonb_build_object('historico', true, 'fuente', 'papel', 'bethesda', sivec_bethesda(p.resultado_pap)))
+from h, lotes l
+where p.id = h.id and l.codigo = 'L-HIST-' || to_char(date_trunc('month', p.fecha_toma), 'YYYY-MM');
+
+-- 3) Resultado
+select count(*) filter (where lote_envio like 'L-HIST-%') as tomas_en_lotes_historicos,
+       count(*) filter (where lote_envio like 'L-HIST-%' and muestra_estado = 'informada') as informadas,
+       count(*) filter (where lote_envio like 'L-HIST-%' and muestra_estado = 'insatisfactoria') as insatisfactorias,
+       count(*) filter (where lote_envio like 'L-HIST-%' and muestra_estado = 'recibida') as en_el_laboratorio_sin_resultado,
+       (select count(*) from lotes where codigo like 'L-HIST-%') as lotes_historicos
+  from pacientes where deleted_at is null;
+```
+
+Deshacer:
+
+```sql
+update pacientes p set fecha_envio = r.fecha_envio, lote_id = r.lote_id, lote_envio = r.lote_envio, codigo_muestra = r.codigo_muestra,
+       muestra_estado = r.muestra_estado, fecha_recepcion_muestra = r.fecha_recepcion_muestra, informado_por = r.informado_por, informe_lab = r.informe_lab
+  from respaldo_envios_2026_09 r where r.id = p.id;
+delete from lotes where codigo like 'L-HIST-%';
+```
