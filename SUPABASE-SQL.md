@@ -1729,3 +1729,52 @@ select case when exists (select 1 from information_schema.columns where table_na
 
 ### Deshacer el Paso 24
 Las columnas nuevas pueden quedar (no molestan). Para volver a las funciones anteriores, ejecutar de nuevo la función `sivec_armar_lote` del Paso 10 (antes: `drop function if exists sivec_armar_lote(uuid[], uuid, date, text, text, text);`), `sivec_lab_muestras` del Paso 14 (antes: `drop function if exists sivec_lab_muestras(uuid);`) y la línea de tiempo del Paso 23.
+
+---
+
+## Paso 25 — Hospitales de 2º y 3º nivel con laboratorio propio (requiere el Paso 24)
+
+Si el establecimiento **recibe muestras** (tiene laboratorio), al armar el lote aparece elegido su propio laboratorio y el botón dice **"🔬 Pasar a mi laboratorio"**.
+Las muestras no viajan: quedan **recibidas** y listas para leer en el Portal del laboratorio. En la derivación a colposcopia también aparece primero el mismo hospital.
+
+```sql
+-- PASO 25 · Hospitales con laboratorio propio: las muestras pasan directo a su laboratorio (sin transporte ni recepción)
+create or replace function sivec_armar_lote(p_ids uuid[], p_destino uuid, p_fecha date, p_transporte text, p_entregado text, p_externo text default null)
+returns lotes language plpgsql security invoker set search_path = public as $$
+declare v_centro uuid; v_lote lotes; v_n int; v_interno boolean;
+begin
+  if p_destino is null and nullif(trim(coalesce(p_externo, '')), '') is null then raise exception 'Elegí el laboratorio de destino.'; end if;
+  if exists (select 1 from pacientes where id = any(p_ids) and vph_lugar = 'Casa' and vph_kit_devuelto is null) then
+    raise exception 'Hay kits de autotoma que la paciente todavía no devolvió: marcá la fecha de devolución antes de enviarlos.'; end if;
+  select min(centro_id::text)::uuid, count(*) into v_centro, v_n from pacientes where id = any(p_ids) and lote_id is null and deleted_at is null;
+  if v_n = 0 then raise exception 'Ninguna de las muestras marcadas está libre (ya estaban en otro lote).'; end if;
+  if (select count(distinct centro_id) from pacientes where id = any(p_ids) and lote_id is null) > 1 then raise exception 'Todas las muestras de un lote tienen que ser del mismo centro.'; end if;
+  insert into lotes (codigo, centro_id, destino_id, destino_externo, fecha_envio, transporte, entregado_por, n_muestras)
+    values ('L-' || to_char(coalesce(p_fecha, current_date), 'YYYY') || '-' || lpad(nextval('lote_seq')::text, 4, '0'),
+            v_centro, p_destino, case when p_destino is null then nullif(trim(p_externo), '') end,
+            coalesce(p_fecha, current_date), nullif(trim(p_transporte), ''), nullif(trim(p_entregado), ''), v_n)
+    returning * into v_lote;
+  v_interno := p_destino is not null and p_destino = v_centro;
+  update pacientes p set lote_id = v_lote.id, lote_envio = v_lote.codigo, fecha_envio = v_lote.fecha_envio, muestra_estado = 'enviada',
+         codigo_muestra = coalesce(p.codigo_muestra, 'M-' || to_char(coalesce(p_fecha, current_date), 'YY') || '-' || lpad(nextval('muestra_seq')::text, 6, '0'))
+   where p.id = any(p_ids) and p.lote_id is null and p.deleted_at is null;
+  get diagnostics v_n = row_count;
+  if v_n <> v_lote.n_muestras then raise exception 'No se pudieron marcar todas las muestras (permisos del centro).'; end if;
+  -- Laboratorio propio (hospital de 2º/3º nivel): la muestra no viaja, queda recibida y lista para leer
+  if v_interno then
+    update pacientes set muestra_estado = 'recibida', fecha_recepcion_muestra = now() where lote_id = v_lote.id;
+    update lotes set estado = 'recibido', fecha_recepcion = now(), recibido_por = 'Laboratorio propio (interno)' where id = v_lote.id returning * into v_lote;
+  end if;
+  return v_lote;
+end $$;
+revoke execute on function sivec_armar_lote(uuid[], uuid, date, text, text, text) from public, anon;
+grant execute on function sivec_armar_lote(uuid[], uuid, date, text, text, text) to authenticated;
+
+notify pgrst, 'reload schema';
+
+-- Resultado: debe decir "listo"
+select case when pg_get_functiondef('sivec_armar_lote(uuid[], uuid, date, text, text, text)'::regprocedure) like '%v_interno%' then 'listo' else 'revisar' end as paso_25;
+```
+
+### Deshacer el Paso 25
+Volver a ejecutar la función `sivec_armar_lote` del Paso 24.
