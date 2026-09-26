@@ -2021,6 +2021,9 @@ document.getElementById('portalSwitch').addEventListener('click', e => { const b
 
 // ================= Portal del laboratorio (Paso 12 del SQL) =================
 // El oncológico no lee la tabla de pacientes: usa funciones del banco que devuelven solo sus muestras.
+// Los lectores USB escriben como teclado de EE.UU.: con teclado latinoamericano el guion puede salir como ' o ?.
+// Por eso se comparan solo letras y números (M-26-000123 = M'26'000123 = m26000123).
+function codigoIgual(a, b) { const n = x => String(x || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); return !!n(a) && n(a) === n(b); }
 const LAB_RECHAZOS = ['Lámina rota', 'Sin identificar', 'Datos no coinciden', 'Fijación inadecuada', 'Muestra insuficiente', 'No llegó'];
 const LAB_BETH = ['NILM', 'ASC-US', 'LSIL', 'ASC-H', 'HSIL', 'AGC', 'AIS', 'Carcinoma'];
 const LAB_HALLAZGOS = ['Candida', 'Trichomonas', 'Cambio de flora (vaginosis)', 'Actinomyces', 'Herpes', 'Cambios reactivos', 'Atrofia'];
@@ -2055,7 +2058,15 @@ function labRenderLotes() {
       <td><button type="button" class="${l.estado === 'recibido' ? 'rowBtn' : 'primary'}" data-abrir-lote="${l.id}">${l.estado === 'recibido' ? 'Ver' : '📥 Recibir'}</button></td></tr>`;
   }).join('');
   const pane = document.getElementById('labPane');
-  pane.innerHTML = `<div class="labCard"><table><thead><tr><th>Lote</th><th>Centro</th><th>Enviado</th><th>Muestras</th><th>Estado</th><th></th></tr></thead><tbody>${filas || '<tr><td colspan="6">Todavía no llegó ningún lote.</td></tr>'}</tbody></table></div>`;
+  pane.innerHTML = `<div class="labCard"><input id="labScanLote" placeholder="📷 Escaneá el código de barras de la hoja de remisión para abrir el lote" autocomplete="off" style="font-size:14px;padding:9px 12px;border:2px dashed var(--teal-500);border-radius:10px;width:100%;background:var(--surface);color:var(--ink);margin-bottom:10px">
+    <table><thead><tr><th>Lote</th><th>Centro</th><th>Enviado</th><th>Muestras</th><th>Estado</th><th></th></tr></thead><tbody>${filas || '<tr><td colspan="6">Todavía no llegó ningún lote.</td></tr>'}</tbody></table></div>`;
+  const sl = document.getElementById('labScanLote'); sl.focus();
+  sl.onkeydown = e => {
+    if (e.key !== 'Enter') return; e.preventDefault();
+    const l = labLotes.find(x => codigoIgual(x.codigo, sl.value)); sl.value = '';
+    if (!l) { showToast('Ese lote no fue enviado a este establecimiento.', 'err'); return; }
+    labLoteId = l.id; labRecep = {}; labRender();
+  };
   pane.onclick = e => { const b = e.target.closest('[data-abrir-lote]'); if (b) { labLoteId = b.dataset.abrirLote; labRecep = {}; labRender(); } };
 }
 function labRenderLote() {
@@ -2080,7 +2091,7 @@ function labRenderLote() {
   if (scan) scan.onkeydown = e => {
     if (e.key !== 'Enter') return; e.preventDefault();
     const cod = scan.value.trim().toUpperCase(); scan.value = '';
-    const x = ms.find(y => (y.codigo_muestra || '').toUpperCase() === cod);
+    const x = ms.find(y => codigoIgual(y.codigo_muestra, cod));
     if (!x) { showToast(`El código ${esc(cod)} no es de este lote.`, 'err'); return; }
     labRecep[x.id] = 'ok'; labRenderLote(); showToast(`${esc(x.codigo_muestra)} · ${esc(x.nombre)} ✔`, 'ok');
   };
