@@ -381,6 +381,34 @@ notify pgrst, 'reload schema';
 
 ---
 
+## Paso 11 — Servicios de cada establecimiento (colposcopia · recibe muestras) y oncológico de 4º nivel
+
+El oncológico no pertenece a una red: es **4º nivel, departamental**, recibe las muestras de todas las redes y también hace colposcopia.
+La colposcopia no depende del nivel: en **Admin → Establecimientos** se marca en cada uno si **hace colposcopia** y si **recibe muestras**.
+Los centros que ya registraron colposcopias en el SIVEC quedan habilitados solos.
+
+```sql
+-- Servicios de cada establecimiento (independientes del nivel)
+alter table centros_salud add column if not exists hace_colposcopia boolean not null default false;
+alter table centros_salud add column if not exists recibe_muestras boolean not null default false;
+
+-- El oncológico: 4º nivel, departamental (sin red), recibe las muestras y hace colposcopia
+update centros_salud set tipo = 'oncologico', red_id = null, red = null, recibe_muestras = true, hace_colposcopia = true
+  where tipo = 'oncologico' or nombre ilike '%oncol%';
+
+-- Los centros que ya registraron colposcopias en el SIVEC quedan habilitados para colposcopia
+update centros_salud set hace_colposcopia = true
+  where id in (select p.centro_id from colposcopias c join pacientes p on p.id = c.paciente_id where p.centro_id is not null);
+
+notify pgrst, 'reload schema';
+
+select nombre, coalesce((select nombre from redes where id = red_id), 'departamental') as red, tipo,
+       hace_colposcopia as colposcopia, recibe_muestras
+  from centros_salud order by recibe_muestras desc, nombre;
+```
+
+---
+
 ## Paso 3 — Proteger los datos de las pacientes (IMPORTANTE)
 
 Hoy cualquiera que tenga la URL y la clave *anon* de Supabase puede leer todos los datos.

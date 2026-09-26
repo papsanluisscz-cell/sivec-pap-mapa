@@ -1185,12 +1185,14 @@
         </section>
         <section class="admCard">
           <h3>Establecimientos</h3>
-          <table><thead><tr><th>Establecimiento</th><th>Red</th><th>Tipo</th><th>Código</th><th></th></tr></thead><tbody id="admCentros"></tbody></table>
+          <table><thead><tr><th>Establecimiento</th><th>Red</th><th>Nivel</th><th title="Se le pueden derivar pacientes para colposcopia">Colposcopia</th><th title="Recibe los lotes de láminas e informa PAP/VPH">Recibe muestras</th><th></th></tr></thead><tbody id="admCentros"></tbody></table>
           <form id="admCentroForm" class="admForm">
             <input name="nombre" placeholder="Nombre (ej: C.S. Villa 1ro de Mayo)" required>
-            <select name="red_id" required></select>
+            <select name="red_id"></select>
             <select name="tipo"></select>
             <input name="codigo" placeholder="Código (opcional)" style="flex:0 1 120px">
+            <label style="display:flex;gap:5px;align-items:center;font-size:12.5px;flex:0 0 auto"><input type="checkbox" name="hace_colposcopia" style="flex:0 0 auto"> Hace colposcopia</label>
+            <label style="display:flex;gap:5px;align-items:center;font-size:12.5px;flex:0 0 auto"><input type="checkbox" name="recibe_muestras" style="flex:0 0 auto"> Recibe muestras (laboratorio)</label>
             <button class="primary">Agregar</button>
           </form>
         </section>
@@ -1733,8 +1735,9 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 
 // ===== Redes, centros y roles (Pasos 8 y 9 de SUPABASE-SQL.md: tablas redes, centros_salud, perfiles_usuario) =====
 // Sin esas tablas, o sin sesión, el sistema funciona como siempre (un solo centro).
-const ROLES = { centro: 'Centro de salud', gestor: 'Gestor de red', oncologico: 'Oncológico / laboratorio', colposcopia: 'Colposcopia 2º nivel', admin: 'Administrador' };
-const TIPOS_CENTRO = { primer_nivel: 'Centro de salud (1er nivel)', segundo_nivel: 'Hospital 2º nivel (colposcopia)', oncologico: 'Oncológico / laboratorio' };
+const ROLES = { centro: 'Centro de salud', gestor: 'Gestor de red', oncologico: 'Laboratorio de citología', colposcopia: 'Colposcopia', admin: 'Administrador' };
+// Nivel de atención. Los servicios (colposcopia, recibir muestras) se habilitan aparte en cada establecimiento.
+const TIPOS_CENTRO = { primer_nivel: '1er nivel · centro de salud', segundo_nivel: '2º nivel · hospital básico', tercer_nivel: '3er nivel · hospital general', oncologico: '4º nivel · oncológico' };
 // Pantallas de cada rol (null = todas las del centro). El administrador puro no ve datos clínicos.
 const VISTAS_ROL = { centro: null, gestor: ['list', 'segpap', 'segvph', 'balance', 'map', 'panel', 'metodos'], oncologico: ['portal'], colposcopia: ['portal'], admin: [] };
 const VISTAS_CENTRO = ['form', 'list', 'segpap', 'segvph', 'balance', 'map', 'panel', 'metodos', 'trash'];
@@ -1845,11 +1848,13 @@ async function loadAdmin() {
   redes = r.data || []; centros = c.data || []; admPerfiles = p.data || [];
   const nCentros = id => centros.filter(x => String(x.red_id) === String(id)).length;
   document.getElementById('admRedes').innerHTML = redes.map(x => `<tr><td><b>${esc(x.nombre)}</b></td><td>${esc(x.municipio) || '—'}</td><td>${nCentros(x.id)}</td></tr>`).join('') || '<tr><td colspan="3">Todavía no hay redes.</td></tr>';
-  document.getElementById('admCentros').innerHTML = centros.map(x => `<tr style="${x.activo === false ? 'opacity:.5' : ''}"><td><b>${esc(x.nombre)}</b></td><td>${esc(redNombre(x.red_id)) || '—'}</td><td>${esc(TIPOS_CENTRO[x.tipo] || x.tipo || '')}</td><td>${esc(x.codigo) || '—'}</td>
-    <td><button class="rowBtn" data-centro-act="${x.id}">${x.activo === false ? 'Activar' : 'Desactivar'}</button></td></tr>`).join('') || '<tr><td colspan="5">Todavía no hay establecimientos.</td></tr>';
+  document.getElementById('admCentros').innerHTML = centros.map(x => `<tr style="${x.activo === false ? 'opacity:.5' : ''}"><td><b>${esc(x.nombre)}</b>${x.codigo ? `<div class="loteCod">${esc(x.codigo)}</div>` : ''}</td><td>${esc(redNombre(x.red_id)) || '<span style="color:var(--ink-soft)">departamental</span>'}</td><td>${esc(TIPOS_CENTRO[x.tipo] || x.tipo || '')}</td>
+    <td style="text-align:center"><input type="checkbox" data-servicio="hace_colposcopia" data-centro="${x.id}"${x.hace_colposcopia ? ' checked' : ''}></td>
+    <td style="text-align:center"><input type="checkbox" data-servicio="recibe_muestras" data-centro="${x.id}"${x.recibe_muestras ? ' checked' : ''}></td>
+    <td><button class="rowBtn" data-centro-act="${x.id}">${x.activo === false ? 'Activar' : 'Desactivar'}</button></td></tr>`).join('') || '<tr><td colspan="6">Todavía no hay establecimientos.</td></tr>';
   const optRedes = redes.map(x => `<option value="${x.id}">${esc(x.nombre)}</option>`).join('');
   const fc = document.getElementById('admCentroForm');
-  fc.red_id.innerHTML = '<option value="">Red…</option>' + optRedes;
+  fc.red_id.innerHTML = '<option value="">Sin red (departamental)</option>' + optRedes;
   fc.tipo.innerHTML = Object.entries(TIPOS_CENTRO).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
   const fu = document.getElementById('admUsuarioForm');
   fu.rol.innerHTML = Object.entries(ROLES).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
@@ -1872,10 +1877,11 @@ async function loadAdmin() {
 function admLugarOpciones(sel, rol, actual) {
   if (rol === 'admin') { sel.innerHTML = '<option value="">— (toda la configuración)</option>'; sel.disabled = true; return; }
   sel.disabled = false;
-  const tipo = { centro: 'primer_nivel', oncologico: 'oncologico', colposcopia: 'segundo_nivel' }[rol];
+  // Laboratorio: solo donde se reciben muestras; colposcopia: solo donde está habilitada; centro: cualquier establecimiento.
+  const sirve = { oncologico: x => x.recibe_muestras, colposcopia: x => x.hace_colposcopia }[rol] || (() => true);
   sel.innerHTML = rol === 'gestor'
     ? '<option value="">Red…</option>' + redes.map(x => `<option value="r${x.id}">${esc(x.nombre)}</option>`).join('')
-    : '<option value="">Establecimiento…</option>' + centros.filter(x => x.activo !== false && (!tipo || x.tipo === tipo)).map(x => `<option value="c${x.id}">${esc(x.nombre)}</option>`).join('');
+    : '<option value="">Establecimiento…</option>' + centros.filter(x => x.activo !== false && sirve(x)).map(x => `<option value="c${x.id}">${esc(x.nombre)}</option>`).join('');
   sel.value = actual || '';
 }
 function admLugarAFila(rol, lugar) {
@@ -1892,10 +1898,17 @@ document.getElementById('admRedForm').addEventListener('submit', async e => {
 });
 document.getElementById('admCentroForm').addEventListener('submit', async e => {
   e.preventDefault();
-  const f = e.target, row = { nombre: f.nombre.value.trim(), red_id: f.red_id.value || null, red: redNombre(f.red_id.value) || null, tipo: f.tipo.value, codigo: f.codigo.value.trim() || null };
+  const f = e.target, row = { nombre: f.nombre.value.trim(), red_id: f.red_id.value || null, red: redNombre(f.red_id.value) || null, tipo: f.tipo.value, codigo: f.codigo.value.trim() || null, hace_colposcopia: f.hace_colposcopia.checked, recibe_muestras: f.recibe_muestras.checked };
   const { error } = await sb.from('centros_salud').insert([row]);
   if (error) return showToast('No se pudo agregar: ' + esc(error.message), 'err');
   f.reset(); showToast('Establecimiento agregado ✔', 'ok'); loadAdmin();
+});
+document.getElementById('admCentros').addEventListener('change', async e => {
+  const k = e.target.dataset.servicio; if (!k) return;
+  const { error } = await sb.from('centros_salud').update({ [k]: e.target.checked }).eq('id', e.target.dataset.centro);
+  if (error) { e.target.checked = !e.target.checked; return showToast('Error: ' + esc(error.message) + (/column/.test(error.message) ? ' — ejecutar el Paso 11 del SQL.' : ''), 'err'); }
+  const c = centros.find(x => String(x.id) === e.target.dataset.centro); if (c) c[k] = e.target.checked;
+  showToast(centroNombre(e.target.dataset.centro) + ': ' + (k === 'hace_colposcopia' ? 'colposcopia' : 'recibe muestras') + (e.target.checked ? ' habilitado' : ' deshabilitado') + ' ✔', 'ok');
 });
 document.getElementById('admCentros').addEventListener('click', async e => {
   const b = e.target.closest('[data-centro-act]'); if (!b) return;
@@ -2071,10 +2084,10 @@ function lotesOk() {
   if (!lotesTablaPromise) lotesTablaPromise = sb.from('lotes').select('id').limit(1).then(({ error }) => !error, () => false);
   return lotesTablaPromise;
 }
-function destinosLote() { return centros.filter(c => c.tipo === 'oncologico' && c.activo !== false); }
+function destinosLote() { return centros.filter(c => (c.recibe_muestras || (c.recibe_muestras === undefined && c.tipo === 'oncologico')) && c.activo !== false); }
 function loteBarraHTML() {
   const dest = destinosLote();
-  if (!dest.length) return `<div class="segNote">Para armar lotes hay que agregar el <b>oncológico / laboratorio</b> como establecimiento${perfil.es_admin ? ' en <b>Admin → Establecimientos</b> (tipo "Oncológico / laboratorio")' : ': pedíselo al administrador'}.</div>`;
+  if (!dest.length) return `<div class="segNote">Para armar lotes hace falta un establecimiento que <b>recibe muestras</b> (el oncológico)${perfil.es_admin ? ': en <b>Admin → Establecimientos</b> marcá la casilla "Recibe muestras"' : ': pedíselo al administrador'}.</div>`;
   let ult = {}; try { ult = JSON.parse(localStorage.getItem('sivec_lote_ult') || '{}'); } catch (e) {}
   return `<div class="balLote lote2"><b id="balSel" style="align-self:center">0 marcadas</b>
     <label>Destino<select id="loteDestino">${dest.map(c => `<option value="${c.id}"${String(c.id) === ult.destino ? ' selected' : ''}>${esc(c.nombre)}</option>`).join('')}</select></label>
