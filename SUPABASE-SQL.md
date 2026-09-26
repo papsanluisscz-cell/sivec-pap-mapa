@@ -1521,3 +1521,78 @@ create policy "Solo usuarias con sesión - pacientes" on pacientes for all to au
 create policy "Solo usuarias con sesión - colposcopias" on colposcopias for all to authenticated using (true) with check (true);
 create policy "Solo usuarias con sesión - consultas" on consultas for all to authenticated using (true) with check (true);
 ```
+
+
+---
+
+## Paso 23 — Línea de tiempo completa: de la toma al tratamiento (requiere los Pasos 10, 12, 13 y 22)
+
+La ficha de la paciente muestra cada paso como un evento propio: toma → muestra enviada (lote) → recibida o rechazada en el laboratorio →
+informe firmado → resultado entregado → derivada a colposcopia → cita → colposcopia → biopsia → contrarreferencia → derivada a tratamiento → tratamiento realizado.
+La parte del propio centro ya estaba guardada; este paso agrega el mismo recorrido cuando la mujer se atendió en **otro** establecimiento
+(solo lectura, y cada consulta queda en `historial_accesos`).
+
+```sql
+-- PASO 23 · Línea de tiempo completa: envío, laboratorio, derivación, colposcopia, biopsia, tratamiento y contrarreferencia
+-- A) Lo que el centro ve de otros establecimientos ahora incluye el recorrido de cada toma (sigue siendo solo lectura y queda registrado)
+create or replace function sivec_linea_tiempo(p_carnet text, p_nombre text, p_nac date) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare
+  v_ci text := sivec_norm_ci(p_carnet);
+  v_nom text := sivec_norm(p_nombre);
+  v jsonb;
+begin
+  if sivec_rol() not in ('centro', 'gestor', 'admin') then return '[]'::jsonb; end if;
+  if v_ci is not null and (length(v_ci) < 5 or v_ci ~ '^0+$') then v_ci := null; end if;
+  if v_ci is null and (v_nom = '' or p_nac is null) then return '[]'::jsonb; end if;
+  select coalesce(jsonb_agg(jsonb_build_object(
+           'id', p.id, 'centro_id', p.centro_id, 'centro', c.nombre, 'fecha_toma', p.fecha_toma, 'tipo_examen', p.tipo_examen,
+           'estado_pap', p.estado_pap, 'resultado_pap', p.resultado_pap, 'resultado_vph', p.resultado_vph, 'vph_genotipo', p.vph_genotipo,
+           'recibio_resultado', p.recibio_resultado, 'fecha_recibio_resultado', p.fecha_recibio_resultado,
+           'derivacion_pap', p.derivacion_pap, 'seg_etapa', p.seg_etapa, 'doctora', p.doctora,
+           -- recorrido de la muestra
+           'fecha_envio', p.fecha_envio, 'lote_envio', p.lote_envio, 'laboratorio', lab.nombre,
+           'fecha_recepcion_muestra', p.fecha_recepcion_muestra, 'muestra_estado', p.muestra_estado, 'muestra_rechazo', p.muestra_rechazo,
+           'fecha_informe', p.fecha_informe, 'informado_por', p.informado_por,
+           -- derivaciones a colposcopia y su contrarreferencia
+           'derivaciones', (select coalesce(jsonb_agg(jsonb_build_object(
+                'destino', dc.nombre, 'fecha_derivacion', d.fecha_derivacion, 'motivo', d.motivo, 'indicacion', d.indicacion,
+                'prioridad', d.prioridad, 'estado', d.estado, 'fecha_cita', d.fecha_cita, 'fecha_atencion', d.fecha_atencion,
+                'atendido_por', d.atendido_por, 'colposcopia', d.colposcopia, 'biopsia_tomada', d.biopsia_tomada,
+                'biopsia_resultado', d.biopsia_resultado, 'fecha_biopsia_resultado', d.fecha_biopsia_resultado,
+                'tratamiento', d.tratamiento, 'contrarreferencia', d.contrarreferencia, 'proximo_control', d.proximo_control,
+                'fecha_contrarreferencia', d.fecha_contrarreferencia) order by d.created_at), '[]'::jsonb)
+              from derivaciones d left join centros_salud dc on dc.id = d.destino_id
+             where d.paciente_id = p.id and d.estado <> 'cancelada')
+         ) order by p.fecha_toma), '[]'::jsonb)
+    into v
+    from pacientes p
+    left join centros_salud c on c.id = p.centro_id
+    left join lotes l on l.id = p.lote_id
+    left join centros_salud lab on lab.id = l.destino_id
+   where p.deleted_at is null and not sivec_ve_centro(p.centro_id)
+     and ((v_ci is not null and sivec_norm_ci(p.carnet) = v_ci)
+       or (p_nac is not null and v_nom <> '' and p.fecha_nacimiento = p_nac and sivec_norm(p.nombre) = v_nom));
+  if jsonb_array_length(v) > 0 then
+    insert into historial_accesos (centro_id, carnet, nombre, encontrados) values (sivec_centro(), p_carnet, p_nombre, jsonb_array_length(v));
+  end if;
+  return v;
+end $$;
+revoke execute on function sivec_linea_tiempo(text, text, date) from public, anon;
+grant execute on function sivec_linea_tiempo(text, text, date) to authenticated;
+
+-- B) El centro puede leer los lotes que envió (para mostrar a qué laboratorio fue cada muestra)
+grant select on lotes to authenticated;
+
+-- C) Para que la ficha abra rápido
+create index if not exists pacientes_lote_idx on pacientes (lote_id);
+create index if not exists colposcopias_paciente_idx on colposcopias (paciente_id);
+
+notify pgrst, 'reload schema';
+
+-- Resultado: debe decir "listo"
+select case when pg_get_functiondef('sivec_linea_tiempo(text, text, date)'::regprocedure) like '%derivaciones%' then 'listo' else 'revisar' end as paso_23;
+```
+
+### Deshacer el Paso 23
+Volver a ejecutar solo la parte **D)** del Paso 22 (la función `sivec_linea_tiempo` anterior). Los índices pueden quedar.

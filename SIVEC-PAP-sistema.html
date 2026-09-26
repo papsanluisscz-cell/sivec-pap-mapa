@@ -678,7 +678,7 @@
   .fxEv::before { content: ""; position: absolute; left: 8px; top: 20px; bottom: 0; width: 2px; background: var(--line); }
   .fxEv:last-of-type::before { display: none; }
   .fxEv > i { position: absolute; left: 0; top: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--surface); border: 3px solid currentColor; }
-  .fxEv.soap { color: #0e7490; } .fxEv.alto { color: #dc2626; } .fxEv.bajo { color: #d97706; } .fxEv.neg { color: #16a34a; } .fxEv.pend { color: #2f6fb0; } .fxEv.colpo { color: #7c3aed; } .fxEv.met { color: #9a8690; }
+  .fxEv.soap { color: #0e7490; } .fxEv.alto { color: #dc2626; } .fxEv.bajo { color: #d97706; } .fxEv.neg { color: #16a34a; } .fxEv.pend { color: #2f6fb0; } .fxEv.colpo { color: #7c3aed; } .fxEv.met { color: #9a8690; } .fxEv.lab { color: #64748b; } .fxEv.der { color: #9c3a5f; } .fxEv.trat { color: #0f766e; }
   .fxDate { font-size: 11.5px; color: var(--ink-soft); } .fxTit { font-size: 13.5px; font-weight: 700; color: var(--ink); margin: 1px 0 3px; }
   .fxLine { font-size: 12.5px; color: var(--ink); margin-top: 2px; }
   .fxRes { font-weight: 700; } .fxRes.alto { color: #dc2626; } .fxRes.bajo { color: #b45309; } .fxRes.neg { color: #15803d; } .fxRes.pend { color: #2f6fb0; }
@@ -5919,7 +5919,35 @@ async function guardarSoapDeRegistro(nueva) {
 // ================= Ficha de la paciente (línea de tiempo) =================
 // Base del futuro "Historial" del SIVEC: todas las tomas, resultados, entregas, seguimientos y colposcopias
 // de la misma paciente (agrupadas por carnet o nombre + nacimiento), de la más reciente a la más antigua.
-let fichaPaciente = null, fichaConsultas = [], fichaExt = [];
+let fichaPaciente = null, fichaConsultas = [], fichaExt = [], fichaDerivs = [], fichaLotes = new Map();
+// Recorrido de cada toma en la línea de tiempo: envío, laboratorio, derivación, cita, colposcopia, biopsia y contrarreferencia (Paso 23 del SQL)
+const fxDia = v => v ? String(v).slice(0, 10) : '';
+function fxOrden(a, b) { return String(b.fecha).localeCompare(String(a.fecha)) || (b.ord || 0) - (a.ord || 0); }
+function fichaRecorrido(t, derivs, lab, ext) {
+  const ev = [], tag = ext ? ` <span class="fxExt">🏥 ${esc(String(t.centro || 'otro establecimiento').replace(/^Centro de Salud /, 'C.S. '))}</span>` : '';
+  const add = (fecha, ord, tono, titulo, meta, lineas) => { if (fecha) ev.push({ fecha: fxDia(fecha), ord, tono, ext, titulo: titulo + tag, meta: meta || '', lineas: (lineas || []).filter(Boolean) }); };
+  const hist = /^L-HIST-/.test(t.lote_envio || ''); // tomas cargadas desde el papel: sin fechas reales de envío
+  const rech = t.muestra_estado === 'rechazada';
+  if (t.fecha_envio && !hist) add(t.fecha_envio, 1, 'lab', '📦 Muestra enviada al laboratorio', t.lote_envio ? 'Lote ' + t.lote_envio : '', [lab ? 'Destino: ' + esc(lab) : '']);
+  if (t.fecha_recepcion_muestra && !hist) add(t.fecha_recepcion_muestra, 2, rech ? 'alto' : 'lab', rech ? '⚠ Muestra rechazada por el laboratorio' : '🔬 Muestra recibida en el laboratorio', lab || '', [rech && t.muestra_rechazo ? 'Motivo: ' + esc(t.muestra_rechazo) + ' · repetir la toma' : '']);
+  if (t.fecha_informe && !hist && !rech) {
+    const bet = bethesdaDe(t), nivel = bet && BETHESDA_BY_CODE[bet] && BETHESDA_BY_CODE[bet].nivel;
+    add(t.fecha_informe, 3, 'lab', '🧾 Informe del laboratorio', t.informado_por ? 'Firmó ' + t.informado_por : '', [
+      bet ? `<span class="fxRes ${nivel}">PAP: ${esc(bet)}</span>` : t.muestra_estado === 'insatisfactoria' ? '<span class="fxWarn">Muestra insatisfactoria: repetir la toma</span>' : '',
+      t.resultado_vph ? `<span class="fxRes ${t.resultado_vph === 'Positiva' ? 'alto' : 'neg'}">VPH: ${esc(t.resultado_vph)}${t.vph_genotipo ? ' · genotipo ' + esc(t.vph_genotipo) : ''}</span>` : '']);
+  }
+  if (t.recibio_resultado && t.fecha_recibio_resultado) add(t.fecha_recibio_resultado, 4, 'neg', '✅ Resultado entregado a la paciente', '', []);
+  (derivs || []).forEach(d => {
+    const dest = d.destino || centroNombre(d.destino_id) || 'hospital', trat = /tratamiento/i.test(d.indicacion || '');
+    add(d.fecha_derivacion, 5, 'der', trat ? '🩺 Derivada a tratamiento' : '🩺 Derivada a colposcopia', dest, [esc([d.motivo, d.indicacion].filter(Boolean).join(' · ')) + (d.prioridad === 'urgente' ? ' · <b>URGENTE</b>' : ''), d.derivado_por ? '<span class="fxMut">Derivó: ' + esc(d.derivado_por) + '</span>' : '']);
+    if (d.fecha_cita) add(d.fecha_cita, 6, 'der', trat ? '📅 Cita para tratamiento' : '📅 Cita de colposcopia', dest, []);
+    if (d.estado === 'no_asistio') add(d.fecha_contrarreferencia, 7, 'alto', '✗ No asistió a la colposcopia', dest, ['<span class="fxWarn">Buscarla y volver a citar</span>']);
+    if (d.fecha_atencion) add(d.fecha_atencion, 7, trat && d.tratamiento ? 'trat' : 'colpo', trat && d.tratamiento ? '💊 Tratamiento realizado: ' + esc(d.tratamiento) : 'Colposcopia', dest + (d.atendido_por ? ' · ' + d.atendido_por : ''), [esc(derResumenColpo(d.colposcopia)), d.biopsia_tomada && !d.biopsia_resultado ? 'Biopsia tomada · resultado pendiente' : '', d.tratamiento && !trat ? '💊 Tratamiento: ' + esc(d.tratamiento) : '']);
+    if (d.biopsia_resultado) add(d.fecha_biopsia_resultado || d.fecha_atencion, 8, /^Negativo/.test(d.biopsia_resultado) ? 'neg' : 'alto', '🧫 Biopsia: ' + esc(d.biopsia_resultado), dest, []);
+    if (d.estado === 'contrarreferida') add(d.fecha_contrarreferencia, 9, 'trat', '↩️ Contrarreferencia al centro', dest, [d.tratamiento ? '💊 Tratamiento: ' + esc(d.tratamiento) : '', d.proximo_control ? '📅 Próximo control: ' + esc(d.proximo_control) : '', d.contrarreferencia ? '<span class="fxMut">' + esc(d.contrarreferencia) + '</span>' : '']);
+  });
+  return ev;
+}
 // Tomas de la misma mujer en OTROS establecimientos (Paso 22): solo el resumen, sin editar.
 function fichaEventosExt(lista) {
   return (lista || []).map(x => {
@@ -5932,8 +5960,9 @@ function fichaEventosExt(lista) {
     if (x.derivacion_pap) lineas.push(`➡️ Derivada a: ${esc(x.derivacion_pap)}`);
     const tono = nivel === 'alto' || x.resultado_vph === 'Positiva' || x.estado_pap === 'Positivo' ? 'alto' : nivel === 'bajo' ? 'bajo' : conRes ? 'neg' : 'pend';
     const lugar = String(x.centro || 'otro establecimiento').replace(/^Centro de Salud /, 'C.S. ');
-    return { fecha: x.fecha_toma || '', tono, ext: true, titulo: (soloVph ? 'Prueba de VPH' : 'Toma de PAP') + ` <span class="fxExt">🏥 ${esc(lugar)}</span>`, meta: 'Otro establecimiento', lineas };
-  });
+    return [{ fecha: x.fecha_toma || '', tono, ext: true, titulo: (soloVph ? 'Prueba de VPH' : 'Toma de PAP') + ` <span class="fxExt">🏥 ${esc(lugar)}</span>`, meta: 'Otro establecimiento', lineas }]
+      .concat(fichaRecorrido(x, x.derivaciones, x.laboratorio, true));
+  }).flat();
 }
 function fichaEl() {
   let d = document.getElementById('fichaDrawer');
@@ -5974,13 +6003,17 @@ function fichaEventos(grupo, colpos) {
     if (ctrl && p.recibio_resultado) lineas.push(`<span class="fxMut">📅 Próximo control: ${fmtFecha(ctrl)}</span>`);
     const tono = nivel === 'alto' || p.resultado_vph === 'Positiva' || p.estado_pap === 'Positivo' ? 'alto' : nivel === 'bajo' ? 'bajo' : conRes ? 'neg' : 'pend';
     ev.push({ fecha: p.fecha_toma || '', tono, titulo: tipo, meta: [p.doctora, p.numero_folio_pap ? 'N° ' + p.numero_folio_pap : ''].filter(Boolean).join(' · '), lineas, id: p.id });
+    const lote = p.lote_id && fichaLotes.get(String(p.lote_id));
+    ev.push(...fichaRecorrido(p, fichaDerivs.filter(d => String(d.paciente_id) === String(p.id)), lote ? centroNombre(lote.destino_id) : '', false));
     if (p.anticonceptivo_metodo && p.anticonceptivo_fecha_inicio) ev.push({ fecha: p.anticonceptivo_fecha_inicio, tono: 'met', titulo: 'Método anticonceptivo: ' + esc(p.anticonceptivo_metodo), meta: '', lineas: p.anticonceptivo_proximo_control ? [`<span class="fxMut">Próximo control: ${fmtFecha(p.anticonceptivo_proximo_control)}</span>`] : [] });
   });
   (fichaConsultas || []).filter(c => grupo.some(g => String(g.id) === String(c.paciente_id))).forEach(c => ev.push({ fecha: c.fecha || '', tono: 'soap', titulo: 'Consulta (SOAP)', meta: [c.doctora, c.especialidad && c.codigo_esp ? c.especialidad + ' · ' + c.codigo_esp : c.especialidad].filter(Boolean).join(' · '), lineas: [
     c.subjetivo ? '<b>S:</b> ' + esc(c.subjetivo) : '', c.analisis ? '<b>A:</b> ' + esc(c.analisis) : '',
     (Array.isArray(c.plan) && c.plan.length) || c.plan_texto ? '<b>P:</b> ' + esc([...(Array.isArray(c.plan) ? c.plan : []), c.plan_texto].filter(Boolean).join('. ')) : '', c.derivacion ? '➡️ Derivación: ' + esc(c.derivacion) : ''].filter(Boolean) }));
-  (colpos || []).forEach(c => ev.push({ fecha: c.fecha || '', tono: 'colpo', titulo: 'Colposcopia', meta: '', lineas: [c.lesion ? 'Lesión: ' + esc(c.lesion) : '', c.zona_afectada ? 'Zona: ' + esc(c.zona_afectada) : '', c.prueba_schiller ? 'Schiller: ' + esc(c.prueba_schiller) : '', c.cuello_mapa && cuelloTexto(c.cuello_mapa) ? '🕐 ' + esc(cuelloTexto(c.cuello_mapa)) : ''].filter(Boolean) }));
-  return ev.sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
+  // La colposcopia que el hospital registra al atender la derivación ya aparece con su detalle: no repetirla
+  const yaDer = c => fichaDerivs.some(d => d.fecha_atencion && String(d.fecha_atencion) === String(c.fecha) && String(d.paciente_id) === String(c.paciente_id));
+  (colpos || []).filter(c => !yaDer(c)).forEach(c => ev.push({ fecha: c.fecha || '', tono: 'colpo', titulo: 'Colposcopia', meta: '', lineas: [c.lesion ? 'Lesión: ' + esc(c.lesion) : '', c.zona_afectada ? 'Zona: ' + esc(c.zona_afectada) : '', c.prueba_schiller ? 'Schiller: ' + esc(c.prueba_schiller) : '', c.cuello_mapa && cuelloTexto(c.cuello_mapa) ? '🕐 ' + esc(cuelloTexto(c.cuello_mapa)) : ''].filter(Boolean) }));
+  return ev.sort(fxOrden);
 }
 async function openFicha(p) {
   fichaPaciente = p;
@@ -5991,7 +6024,7 @@ async function openFicha(p) {
   const ini = String(p.nombre || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(s => s[0]).join('').toUpperCase();
   const gen = grupo.map(x => x.vph_genotipo).filter(Boolean).pop();
   const render = colpos => {
-    const ev = fichaEventos(grupo, colpos).concat(fichaEventosExt(fichaExt)).sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
+    const ev = fichaEventos(grupo, colpos).concat(fichaEventosExt(fichaExt)).sort(fxOrden);
     const otros = [...new Set((fichaExt || []).map(x => String(x.centro || '').replace(/^Centro de Salud /, 'C.S. ')))].filter(Boolean);
     panel.innerHTML = `
       <div class="fxHead">
@@ -6010,7 +6043,7 @@ async function openFicha(p) {
       </div>
       <div class="fxFoot"><button type="button" class="fxBtn primary" data-act="edit">Editar</button><button type="button" class="fxBtn" data-act="soap">📝 Consulta</button><button type="button" class="fxBtn" data-act="print">Imprimir</button><button type="button" class="fxBtn" data-act="nueva">+ Nueva toma</button></div>`;
   };
-  fichaExt = [];
+  fichaExt = []; fichaDerivs = []; fichaLotes = new Map();
   render(null);
   d.classList.add('open');
   panel.scrollTop = 0;
@@ -6023,13 +6056,17 @@ async function openFicha(p) {
     if (b.dataset.act === 'soap') openConsulta(ultima);
     if (b.dataset.act === 'nueva') { closeFicha(); nuevaTomaDe(ultima); }
   };
-  const [{ data }, cons, lt] = await Promise.all([
+  const [{ data }, cons, lt, dv, lts] = await Promise.all([
     sb.from('colposcopias').select('*').in('paciente_id', grupo.map(x => x.id)).order('fecha', { ascending: false }),
     consultasOk().then(ok => ok ? sb.from('consultas').select('*').in('paciente_id', grupo.map(x => String(x.id))) : { data: [] }),
     conRoles() ? sb.rpc('sivec_linea_tiempo', { p_carnet: ultima.carnet || null, p_nombre: ultima.nombre || null, p_nac: ultima.fecha_nacimiento || null }).then(r => r, () => ({})) : Promise.resolve({}),
+    conRoles() ? derivOk().then(ok => ok ? sb.from('derivaciones').select('*').in('paciente_id', grupo.map(x => x.id)).neq('estado', 'cancelada') : {}, () => ({})) : Promise.resolve({}),
+    grupo.some(x => x.lote_id) ? lotesOk().then(ok => ok ? sb.from('lotes').select('id,destino_id').in('id', [...new Set(grupo.map(x => x.lote_id).filter(Boolean))]) : {}, () => ({})) : Promise.resolve({}),
   ]);
   fichaConsultas = ((cons && cons.data) || []).map(consultaSoloFecha);
   fichaExt = lt && !lt.error && Array.isArray(lt.data) ? lt.data : [];
+  fichaDerivs = dv && !dv.error && Array.isArray(dv.data) ? dv.data : [];
+  fichaLotes = new Map(((lts && !lts.error && lts.data) || []).map(l => [String(l.id), l]));
   if (fichaPaciente === p) render(data || []);
 }
 // "+ Nueva toma": abre Registrar con los datos personales ya completados.
