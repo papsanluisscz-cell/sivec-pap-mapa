@@ -385,7 +385,7 @@ notify pgrst, 'reload schema';
 
 El oncológico no pertenece a una red: es **4º nivel, departamental**, recibe las muestras de todas las redes y también hace colposcopia.
 La colposcopia no depende del nivel: en **Admin → Establecimientos** se marca en cada uno si **hace colposcopia** y si **recibe muestras**.
-Los centros que ya registraron colposcopias en el SIVEC quedan habilitados solos.
+Los demás establecimientos quedan **sin** colposcopia hasta que se marque la casilla (tener colposcopias registradas no significa que el centro las haga: pueden ser resultados de la contrarreferencia).
 
 ```sql
 -- Servicios de cada establecimiento (independientes del nivel)
@@ -395,10 +395,6 @@ alter table centros_salud add column if not exists recibe_muestras boolean not n
 -- El oncológico: 4º nivel, departamental (sin red), recibe las muestras y hace colposcopia
 update centros_salud set tipo = 'oncologico', red_id = null, red = null, recibe_muestras = true, hace_colposcopia = true
   where tipo = 'oncologico' or nombre ilike '%oncol%';
-
--- Los centros que ya registraron colposcopias en el SIVEC quedan habilitados para colposcopia
-update centros_salud set hace_colposcopia = true
-  where id in (select p.centro_id from colposcopias c join pacientes p on p.id = c.paciente_id where p.centro_id is not null);
 
 notify pgrst, 'reload schema';
 
