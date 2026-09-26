@@ -9,8 +9,9 @@
 -- =====================================================================================
 
 -- SEGURO: si este proyecto ya tiene pacientes (la base REAL), el script se detiene sin cambiar nada.
-do $$ begin
-  if to_regclass('public.pacientes') is not null and exists (select 1 from pacientes limit 1) then
+do $$ declare hay boolean := false; begin
+  if to_regclass('public.pacientes') is not null then execute 'select exists (select 1 from pacientes)' into hay; end if;
+  if hay then
     raise exception 'ALTO: este proyecto ya tiene pacientes. El script DEMO es solo para un proyecto NUEVO y vacío. No se cambió nada.';
   end if;
 end $$;
