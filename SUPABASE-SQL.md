@@ -1377,3 +1377,35 @@ alter table centros_salud add column if not exists lng double precision;
 notify pgrst, 'reload schema';
 select nombre, lat, lng from centros_salud order by nombre;
 ```
+
+## Paso 21 — Dirección de cada establecimiento (Red Centro precargada) y ubicación del Oncológico
+
+Con la dirección, el botón 🛰 **Buscar ubicaciones** del Mapa (administrador) ubica cada establecimiento de forma aproximada; después se ajusta arrastrando el ícono.
+
+```sql
+-- PASO 21 · Dirección de cada establecimiento (para ubicarlo en el mapa) + direcciones de la Red Centro
+alter table centros_salud add column if not exists direccion text;
+alter table centros_salud add column if not exists lat double precision;
+alter table centros_salud add column if not exists lng double precision;
+
+update centros_salud c set direccion = v.dir
+  from (values
+    ('%elvira%',        'Av. Trompillo, a 2 cuadras del 2do anillo (C. Yacuiba)'),
+    ('%perpetuo%',      'Barrio Los Chinos, entre Av. Busch y Av. Roca y Coronado'),
+    ('%roque%',         'C. Santiago Vaca Guzmán #319, esq. pasillo 1, barrio Mac Donald'),
+    ('%san carlos%',    'C. Sor Estéfana Cámara, radial 27, entre 3er y 4to anillo'),
+    ('%san luis%',      'Barrio Bibosi'),
+    ('%santa rosita%',  'C. Mataral, barrio Santa Rosita, UV-30'),
+    ('%cotoca%',        'C. San Pedro'),
+    ('%f_tima%',        'Villa Fátima, Av. Pilcomayo, entre 2do y 3er anillo'),
+    ('%lemaitre%',      'C. 7 Oeste'),
+    ('%oncol%',         'Av. Noel Kempff Mercado #890, 3er anillo interno')) v(patron, dir)
+ where c.nombre ilike v.patron and c.direccion is null;
+
+-- El Oncológico ya con su ubicación (Google Maps)
+update centros_salud set lat = -17.763879, lng = -63.194321
+ where nombre ilike '%oncol%' and lat is null;
+
+notify pgrst, 'reload schema';
+select nombre, direccion, lat, lng from centros_salud order by nombre;
+```

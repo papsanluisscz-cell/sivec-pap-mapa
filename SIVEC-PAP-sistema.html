@@ -426,10 +426,67 @@
   .estPin { border-radius: 10px; background: var(--c); border: 2.5px solid #fff; box-shadow: 0 3px 10px rgba(0,0,0,.35), 0 0 0 4px color-mix(in srgb, var(--c) 30%, transparent); display: grid; place-items: center; transform: rotate(45deg); }
   .estLeyenda { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; line-height: 1.7; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
   .estLeyenda i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; transform: rotate(45deg); margin-right: 7px; vertical-align: -1px; }
+  .estLeyenda .lgI { display: inline-block; width: 16px; height: 19px; vertical-align: -5px; margin-right: 6px; } .estLeyenda .lgI svg { width: 100%; height: 100%; }
+  .estPin2 { position: relative; filter: drop-shadow(0 5px 6px rgba(0,0,0,.35)); transition: transform .15s; transform-origin: 50% 100%; }
+  .estPin2:hover { transform: scale(1.12); }
+  .estPin2 svg { width: 100%; height: 100%; display: block; position: relative; z-index: 1; }
+  .estPin2::after { content: ""; position: absolute; left: 50%; bottom: -2px; width: 60%; height: 10px; transform: translateX(-50%); border-radius: 50%; background: color-mix(in srgb, var(--c) 45%, transparent); }
+  .estPin2.big::after { animation: estOnda 2.2s ease-out infinite; }
+  @keyframes estOnda { 0% { width: 40%; opacity: .9; } 100% { width: 160%; height: 26px; bottom: -10px; opacity: 0; } }
   .estLeyenda .w { color: #b45309; font-weight: 700; }
   .estPin svg { width: 62%; height: 62%; transform: rotate(-45deg); }
   .estPin.big { animation: estPulse 2.6s ease-in-out infinite; }
   @keyframes estPulse { 50% { box-shadow: 0 3px 10px rgba(0,0,0,.35), 0 0 0 10px color-mix(in srgb, var(--c) 12%, transparent); } }
+  /* ===== Centro de comando (administrador) ===== */
+  body.comando { background: #0a0510; }
+  body.comando #app { background: transparent; }
+  body.comando::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background: radial-gradient(900px 500px at 85% -10%, rgba(156,58,95,.45), transparent 60%), radial-gradient(700px 500px at -10% 110%, rgba(124,58,237,.28), transparent 60%),
+      linear-gradient(rgba(241,167,195,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(241,167,195,.045) 1px, transparent 1px), #0a0510;
+    background-size: auto, auto, 40px 40px, 40px 40px, auto; }
+  body.comando header { background: linear-gradient(120deg, #12060d 0%, #3a0f25 55%, #6d2142 100%); box-shadow: 0 1px 0 rgba(241,167,195,.35), 0 10px 40px rgba(0,0,0,.5); }
+  body.comando header::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: linear-gradient(90deg, transparent, #f1a7c3, #a78bfa, transparent); background-size: 200% 100%; animation: cmdLine 6s linear infinite; }
+  @keyframes cmdLine { to { background-position: -200% 0; } }
+  body.comando nav button.active { background: linear-gradient(135deg, #f1a7c3, #d9678f); color: #1c0a13; box-shadow: 0 0 22px rgba(241,167,195,.55); }
+  .cmdHead { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 18px; }
+  .cmdEye { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: #f1a7c3; }
+  .cmdEye i, .cmdOn i { width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 10px #34d399; animation: cmdBlink 1.6s ease-in-out infinite; display: inline-block; }
+  @keyframes cmdBlink { 50% { opacity: .35; } }
+  body.comando #adminView h2 { font-size: 34px; margin: 6px 0 6px; background: linear-gradient(90deg, #fff, #f1a7c3 60%, #c4b5fd); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  body.comando #adminView > .cmdHead .hint { max-width: 760px; color: #b596a3; }
+  .cmdClock { display: none; text-align: right; font-variant-numeric: tabular-nums; }
+  body.comando .cmdClock { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; min-width: 190px; padding: 12px 16px; border-radius: 14px; border: 1px solid rgba(241,167,195,.2); background: rgba(255,255,255,.03); }
+  .cmdClock b { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 26px; color: #fff; text-shadow: 0 0 18px rgba(241,167,195,.5); }
+  .cmdClock span { font-size: 12px; color: #b596a3; text-transform: capitalize; } .cmdOn { display: flex; align-items: center; gap: 6px; color: #6ee7b7 !important; text-transform: none !important; }
+  .cmdKpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .cmdKpi { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); animation: lgIn .45s both; position: relative; overflow: hidden; }
+  body.comando .cmdKpi { background: linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.015)); border-color: rgba(241,167,195,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.06); }
+  body.comando .cmdKpi::after { content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; background: linear-gradient(90deg, transparent, rgba(241,167,195,.08), transparent); animation: cmdScan 5s ease-in-out infinite; }
+  @keyframes cmdScan { 0%, 60% { left: -60%; } 100% { left: 130%; } }
+  .cmdKpi .ic { font-size: 20px; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; background: rgba(241,167,195,.12); flex: 0 0 auto; }
+  .cmdKpi .l { font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+  .cmdKpi .v { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 30px; font-weight: 800; line-height: 1.15; }
+  body.comando .cmdKpi .v { color: #fff; text-shadow: 0 0 16px rgba(241,167,195,.45); }
+  .cmdKpi.warn .v { color: #fbbf24 !important; text-shadow: 0 0 16px rgba(251,191,36,.4) !important; } .cmdKpi.ok .v { color: #6ee7b7 !important; text-shadow: 0 0 16px rgba(52,211,153,.4) !important; }
+  .cmdKpi .s { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; line-height: 1.35; }
+  body.comando .admCard { background: linear-gradient(170deg, rgba(255,255,255,.055), rgba(255,255,255,.015)); border: 1px solid rgba(241,167,195,.18); border-radius: 18px; padding: 18px 20px; box-shadow: 0 20px 50px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05); position: relative; }
+  body.comando .admCard::before { content: ""; position: absolute; left: 18px; top: -1px; width: 70px; height: 2px; background: linear-gradient(90deg, #f1a7c3, #a78bfa); border-radius: 2px; box-shadow: 0 0 12px #f1a7c3; }
+  body.comando .admCard h3 { color: #fff; font-size: 16px; letter-spacing: .02em; }
+  body.comando .admCard table, body.comando .admCard thead, body.comando .admCard tr { background: transparent; }
+  body.comando .admCard th { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #b596a3; border-bottom: 1px solid rgba(241,167,195,.18); }
+  body.comando .admCard td { border-bottom: 1px solid rgba(255,255,255,.05); color: #f3e9ed; }
+  body.comando .admCard tbody tr { transition: background .15s; } body.comando .admCard tbody tr:hover { background: rgba(241,167,195,.06); }
+  body.comando .admCard input, body.comando .admCard select { background: rgba(0,0,0,.35); border-color: rgba(241,167,195,.22); color: #fff; border-radius: 8px; }
+  body.comando .admCard input:focus, body.comando .admCard select:focus { outline: none; border-color: #f1a7c3; box-shadow: 0 0 0 3px rgba(241,167,195,.18); }
+  body.comando .admCard .rowBtn { background: rgba(255,255,255,.05); border-color: rgba(241,167,195,.25); color: #f3e9ed; }
+  body.comando .admCard .rowBtn:hover { border-color: #f1a7c3; box-shadow: 0 0 12px rgba(241,167,195,.3); }
+  body.comando .admCard .primary { background: linear-gradient(135deg, #f1a7c3, #d9678f); color: #1c0a13; font-weight: 800; box-shadow: 0 0 20px rgba(241,167,195,.35); border: none; }
+  body.comando input[type=checkbox] { accent-color: #f1a7c3; }
+  .admEditRow { background: rgba(241,167,195,.08) !important; } .admEditRow input, .admEditRow select { min-width: 0; }
+  .admEditCampos { display: grid; gap: 5px; min-width: 280px; } .admEditCampos input { width: 100%; box-sizing: border-box; }
+  .admOk { font-weight: 800; } .admDel:hover { border-color: #f87171 !important; }
+  body.comando #redView .pnCard, body.comando #redView .redCard { background: linear-gradient(170deg, rgba(255,255,255,.055), rgba(255,255,255,.015)); border-color: rgba(241,167,195,.18); }
+  @media (max-width: 760px) { .cmdHead { flex-direction: column; } body.comando .cmdClock { align-items: flex-start; } }
   /* Antesala de entrada */
   #loginOverlay { position: fixed; inset: 0; z-index: 900; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 24px 16px; overflow: auto; color: #fff;
     background: radial-gradient(120% 90% at 15% 10%, #9c3a5f 0%, #5a1834 45%, #1c0a13 100%); }
@@ -492,7 +549,7 @@
   @media (max-width: 900px) { #rolBadge { display: none; } }
   #adminView, #portalView { padding: 24px 32px; overflow-y: auto; }
   @media (max-width: 700px) { #adminView, #portalView { padding: 16px 12px; } }
-  .admGrid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 16px; margin-bottom: 16px; }
+  .admGrid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-bottom: 16px; }
   @media (max-width: 900px) { .admGrid { grid-template-columns: 1fr; } }
   .admCard { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
   .admCard h3 { margin: 0 0 10px; font-size: 15px; color: var(--teal-900); }
@@ -1263,6 +1320,7 @@
         <div class="fGroup" id="mapCentroGrp" style="display:none"><span>Centro</span>
           <select id="mapCentroSel" class="fSel" title="Ver las pacientes de un establecimiento o de todos juntos"><option value="">Todos los centros</option></select>
           <select id="mapUbicarSel" class="fSel" title="Marcar en el mapa dónde queda cada establecimiento" style="display:none"><option value="">📍 Ubicar establecimiento…</option></select>
+          <button type="button" id="mapAutoBtn" class="chip" style="display:none;--c:#7c3aed" title="Busca en el mapa la ubicación aproximada de cada establecimiento por su nombre y dirección">🛰 Buscar ubicaciones</button>
         </div>
         <div class="fGroup"><span>Filtro</span>
           <select id="mapFiltDoctora" class="fSel"><option value="">Todas las doctoras</option></select>
@@ -1343,12 +1401,16 @@
 
     <!-- ADMINISTRACIÓN (redes, centros, usuarios) -->
     <div id="adminView" class="view">
-      <h2>Administración</h2>
-      <p class="hint">Redes, establecimientos y usuarios. Cada persona entra con su propio correo y ve solo lo que le toca: el centro ve sus pacientes, el gestor ve todos los centros de su red (sin editar), el administrador configura pero no ve datos clínicos.</p>
+      <div class="cmdHead">
+        <div><div class="cmdEye"><i></i>SIVEC · Centro de comando</div><h2>Administración</h2>
+          <p class="hint">Redes, establecimientos, servicios y usuarios de todo el sistema. Cada persona entra con su correo y ve solo lo que le toca: el centro, sus pacientes; el gestor, su red; el administrador, todo.</p></div>
+        <div class="cmdClock"><b id="cmdHora">--:--</b><span id="cmdFecha"></span><span class="cmdOn"><i></i>Sistema en línea</span></div>
+      </div>
+      <div class="cmdKpis" id="cmdKpis"></div>
       <div class="admGrid">
         <section class="admCard">
           <h3>Redes de salud</h3>
-          <table><thead><tr><th>Red</th><th>Municipio</th><th>Establecimientos</th></tr></thead><tbody id="admRedes"></tbody></table>
+          <table><thead><tr><th>Red</th><th>Municipio</th><th>Establecimientos</th><th></th></tr></thead><tbody id="admRedes"></tbody></table>
           <form id="admRedForm" class="admForm">
             <input name="nombre" placeholder="Nombre de la red (ej: Red Norte)" required>
             <input name="municipio" placeholder="Municipio">
@@ -2101,6 +2163,11 @@ function aplicarRol() {
   else document.getElementById('claveBtn').style.display = 'none';
   document.querySelectorAll('nav button[data-view]').forEach(b => { b.style.display = permitidas.includes(b.dataset.view) ? '' : 'none'; });
   document.body.classList.toggle('soloLectura', !!(conRoles() && perfil.rol === 'gestor'));
+  // El administrador trabaja siempre en el "centro de comando" (oscuro, tecnológico).
+  const comando = !!(conRoles() && perfil.rol === 'admin');
+  document.body.classList.toggle('comando', comando);
+  if (comando) document.body.classList.add('dark');
+  document.getElementById('darkModeBtn').style.display = comando ? 'none' : '';
   if (!conRoles()) { box.style.display = 'none'; centroActivo = ''; }
   else {
     box.style.display = 'flex';
@@ -2331,13 +2398,26 @@ async function loadAdmin() {
   const err = r.error || c.error || p.error;
   if (err) { document.getElementById('admUsuarios').innerHTML = `<tr><td colspan="6">Error: ${esc(err.message)} — ¿ya ejecutaste el Paso 8 del SQL?</td></tr>`; return; }
   redes = r.data || []; centros = c.data || []; admPerfiles = p.data || [];
+  admRender();
+}
+let admEdit = ''; // 'r<id>' red en edición, 'c<id>' establecimiento en edición
+function admRender() {
   const nCentros = id => centros.filter(x => String(x.red_id) === String(id)).length;
-  document.getElementById('admRedes').innerHTML = redes.map(x => `<tr><td><b>${esc(x.nombre)}</b></td><td>${esc(x.municipio) || '—'}</td><td>${nCentros(x.id)}</td></tr>`).join('') || '<tr><td colspan="3">Todavía no hay redes.</td></tr>';
-  document.getElementById('admCentros').innerHTML = centros.map(x => `<tr style="${x.activo === false ? 'opacity:.5' : ''}"><td><b>${esc(x.nombre)}</b>${x.codigo ? `<div class="loteCod">${esc(x.codigo)}</div>` : ''}</td><td>${esc(redNombre(x.red_id)) || '<span style="color:var(--ink-soft)">departamental</span>'}</td><td>${esc(TIPOS_CENTRO[x.tipo] || x.tipo || '')}</td>
+  document.getElementById('admRedes').innerHTML = redes.map(x => admEdit === 'r' + x.id
+    ? `<tr class="admEditRow" data-red="${x.id}"><td><input data-e="nombre" value="${esc(x.nombre)}" style="width:100%"></td><td><input data-e="municipio" value="${esc(x.municipio || '')}" placeholder="Municipio" style="width:100%"></td><td>${nCentros(x.id)}</td>
+        <td style="white-space:nowrap"><button class="rowBtn admOk" data-red-guardar="${x.id}">✓ Guardar</button> <button class="rowBtn" data-cancelar>✕</button>${nCentros(x.id) ? '' : ` <button class="rowBtn admDel" data-red-borrar="${x.id}" title="Solo si no tiene establecimientos">🗑</button>`}</td></tr>`
+    : `<tr><td><b>${esc(x.nombre)}</b></td><td>${esc(x.municipio) || '—'}</td><td>${nCentros(x.id)}</td><td><button class="rowBtn" data-red-editar="${x.id}" title="Corregir nombre o municipio">✏️</button></td></tr>`).join('') || '<tr><td colspan="4">Todavía no hay redes.</td></tr>';
+  const optRedesE = sel => '<option value="">Sin red (departamental)</option>' + redes.map(r => `<option value="${r.id}"${String(r.id) === String(sel) ? ' selected' : ''}>${esc(r.nombre)}</option>`).join('');
+  const optTipos = sel => Object.entries(TIPOS_CENTRO).map(([k, v]) => `<option value="${k}"${k === sel ? ' selected' : ''}>${v}</option>`).join('');
+  document.getElementById('admCentros').innerHTML = centros.map(x => admEdit === 'c' + x.id
+    ? `<tr class="admEditRow" data-centro="${x.id}"><td><div class="admEditCampos"><input data-e="nombre" value="${esc(x.nombre)}" placeholder="Nombre"><input data-e="direccion" value="${esc(x.direccion || '')}" placeholder="Dirección (ayuda a ubicarlo en el mapa)"><input data-e="codigo" value="${esc(x.codigo || '')}" placeholder="Código (opcional)"></div></td>
+        <td><select data-e="red_id">${optRedesE(x.red_id)}</select></td><td><select data-e="tipo">${optTipos(x.tipo)}</select></td><td colspan="3"></td>
+        <td style="white-space:nowrap"><button class="rowBtn admOk" data-centro-guardar="${x.id}">✓ Guardar</button> <button class="rowBtn" data-cancelar>✕</button></td></tr>`
+    : `<tr style="${x.activo === false ? 'opacity:.5' : ''}"><td><b>${esc(x.nombre)}</b>${x.codigo ? `<div class="loteCod">${esc(x.codigo)}</div>` : ''}${x.direccion ? `<div style="font-size:11px;color:var(--ink-soft)">${esc(x.direccion)}</div>` : ''}</td><td>${esc(redNombre(x.red_id)) || '<span style="color:var(--ink-soft)">departamental</span>'}</td><td>${esc(TIPOS_CENTRO[x.tipo] || x.tipo || '')}</td>
     <td style="text-align:center"><input type="checkbox" data-servicio="hace_colposcopia" data-centro="${x.id}"${x.hace_colposcopia ? ' checked' : ''}></td>
     <td style="text-align:center"><input type="checkbox" data-servicio="recibe_muestras" data-centro="${x.id}"${x.recibe_muestras ? ' checked' : ''}></td>
     <td><button class="rowBtn" data-centro-prof="${x.id}" title="${esc((x.profesionales || []).join(', '))}">👩‍⚕️ ${(x.profesionales || []).length || 'Cargar'}</button></td>
-    <td style="white-space:nowrap"><button class="rowBtn" data-centro-ubicar="${x.id}" title="${x.lat != null ? 'Ubicado · cambiar en el mapa' : 'Marcar en el mapa dónde queda'}">${x.lat != null ? '📍 ✓' : '📍 Ubicar'}</button> <button class="rowBtn" data-centro-act="${x.id}">${x.activo === false ? 'Activar' : 'Desactivar'}</button></td></tr>`).join('') || '<tr><td colspan="7">Todavía no hay establecimientos.</td></tr>';
+    <td style="white-space:nowrap"><button class="rowBtn" data-centro-editar="${x.id}" title="Corregir nombre, red, nivel, código o dirección">✏️</button> <button class="rowBtn" data-centro-ubicar="${x.id}" title="${x.lat != null ? 'Ubicado · cambiar en el mapa' : 'Marcar en el mapa dónde queda'}">${x.lat != null ? '📍 ✓' : '📍 Ubicar'}</button> <button class="rowBtn" data-centro-act="${x.id}">${x.activo === false ? 'Activar' : 'Desactivar'}</button></td></tr>`).join('') || '<tr><td colspan="7">Todavía no hay establecimientos.</td></tr>';
   const optRedes = redes.map(x => `<option value="${x.id}">${esc(x.nombre)}</option>`).join('');
   const fc = document.getElementById('admCentroForm');
   fc.red_id.innerHTML = '<option value="">Sin red (departamental)</option>' + optRedes;
@@ -2360,6 +2440,7 @@ async function loadAdmin() {
     admLugarOpciones(lugar, rol.value, lugar.dataset.actual);
     rol.addEventListener('change', () => admLugarOpciones(lugar, rol.value, ''));
   });
+  admKpis();
 }
 // Lugar según el rol: el gestor elige una red; el centro/oncológico/colposcopia, un establecimiento; el admin, nada.
 function admLugarOpciones(sel, rol, actual) {
@@ -2376,6 +2457,59 @@ function admLugarAFila(rol, lugar) {
   return { centro_id: v[0] === 'c' ? v.slice(1) : null, red_id: v[0] === 'r' ? v.slice(1) : null, faltaLugar: rol !== 'admin' && !v };
 }
 
+// ---- Centro de comando: indicadores del sistema ----
+function admKpis() {
+  const act = centros.filter(c => c.activo !== false), us = admPerfiles.filter(u => u.activo !== false);
+  const k = [
+    ['🕸', 'Redes', redes.length, redes.map(r => r.nombre).join(' · ') || 'Agregá la primera red'],
+    ['🏥', 'Establecimientos', act.length, Object.entries(TIPOS_CENTRO).map(([t, n]) => { const c = act.filter(x => x.tipo === t).length; return c ? c + ' ' + n.split(' · ')[0] : ''; }).filter(Boolean).join(' · ')],
+    ['👩‍⚕️', 'Usuarios activos', us.length, ['centro', 'gestor', 'admin'].map(r => { const c = us.filter(u => (ROLES_VIEJOS[u.rol] ? 'centro' : u.rol) === r).length; return c ? c + ' ' + (ROLES[r] || r).toLowerCase() : ''; }).filter(Boolean).join(' · ')],
+    ['🔬', 'Laboratorios', act.filter(c => c.recibe_muestras).length, 'reciben lotes e informan'],
+    ['🩺', 'Con colposcopia', act.filter(c => c.hace_colposcopia).length, 'reciben derivaciones'],
+    ['📍', 'Sin ubicar', act.filter(c => c.lat == null).length, act.filter(c => c.lat == null).length ? 'marcalos en el mapa' : 'todos en el mapa ✓', act.filter(c => c.lat == null).length ? 'warn' : 'ok'],
+  ];
+  document.getElementById('cmdKpis').innerHTML = k.map(([ic, l, v, sub, tono], i) => `<div class="cmdKpi ${tono || ''}" style="animation-delay:${i * 70}ms"><div class="ic">${ic}</div><div><div class="l">${l}</div><div class="v" data-n="${v}">0</div><div class="s">${esc(sub)}</div></div></div>`).join('');
+  document.querySelectorAll('#cmdKpis .v').forEach(el => { const n = Number(el.dataset.n), t0 = performance.now(); const f = t => { const p = Math.min(1, (t - t0) / 700); el.textContent = Math.round(n * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(f); }; requestAnimationFrame(f); });
+}
+setInterval(() => {
+  if (!document.body.classList.contains('comando')) return;
+  const d = new Date(), h = document.getElementById('cmdHora'); if (!h) return;
+  h.textContent = d.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  document.getElementById('cmdFecha').textContent = d.toLocaleDateString('es-BO', { weekday: 'long', day: 'numeric', month: 'long' });
+}, 1000);
+
+// ---- Editar redes y establecimientos ----
+document.getElementById('adminView').addEventListener('click', async e => {
+  const t = e.target.closest('button'); if (!t) return;
+  const d = t.dataset;
+  if (d.redEditar) { admEdit = 'r' + d.redEditar; return admRender(); }
+  if (d.centroEditar) { admEdit = 'c' + d.centroEditar; return admRender(); }
+  if ('cancelar' in d) { admEdit = ''; return admRender(); }
+  if (d.redGuardar) {
+    const tr = t.closest('tr'), nombre = tr.querySelector('[data-e=nombre]').value.trim(), municipio = tr.querySelector('[data-e=municipio]').value.trim() || null;
+    if (!nombre) return showToast('La red necesita un nombre.', 'err');
+    const { error } = await sb.from('redes').update({ nombre, municipio }).eq('id', d.redGuardar);
+    if (error) return showToast('No se pudo guardar: ' + esc(error.message), 'err');
+    await sb.from('centros_salud').update({ red: nombre }).eq('red_id', d.redGuardar); // el nombre viejo guardado en cada centro
+    admEdit = ''; showToast('Red actualizada ✔', 'ok'); return loadAdmin();
+  }
+  if (d.redBorrar) {
+    const r = redes.find(x => String(x.id) === d.redBorrar);
+    if (!confirm('¿Eliminar la red "' + (r ? r.nombre : '') + '"? No tiene establecimientos.')) return;
+    const { error } = await sb.from('redes').delete().eq('id', d.redBorrar);
+    if (error) return showToast('No se pudo eliminar: ' + esc(error.message) + (/foreign|referenc/i.test(error.message) ? ' — hay usuarios (gestores) asignados a esta red.' : ''), 'err');
+    admEdit = ''; showToast('Red eliminada ✔', 'ok'); return loadAdmin();
+  }
+  if (d.centroGuardar) {
+    const tr = t.closest('tr'), v = k => tr.querySelector(`[data-e=${k}]`).value.trim();
+    const row = { nombre: v('nombre'), red_id: v('red_id') || null, red: redNombre(v('red_id')) || null, tipo: v('tipo'), codigo: v('codigo') || null, direccion: v('direccion') || null };
+    if (!row.nombre) return showToast('El establecimiento necesita un nombre.', 'err');
+    let { error } = await sb.from('centros_salud').update(row).eq('id', d.centroGuardar);
+    if (error && /direccion/.test(error.message)) { delete row.direccion; ({ error } = await sb.from('centros_salud').update(row).eq('id', d.centroGuardar)); if (!error) showToast('Guardado sin la dirección — ejecutar el Paso 21 del SQL.', 'err'); }
+    if (error) return showToast('No se pudo guardar: ' + esc(error.message), 'err');
+    admEdit = ''; showToast('Establecimiento actualizado ✔', 'ok'); return loadAdmin();
+  }
+});
 document.getElementById('admRedForm').addEventListener('submit', async e => {
   e.preventDefault();
   const f = e.target, row = { nombre: f.nombre.value.trim(), municipio: f.municipio.value.trim() || null };
@@ -4760,15 +4894,28 @@ function mapPrepararCentros(data) {
   ubi.style.display = perfil.rol === 'admin' ? '' : 'none';
   if (perfil.rol === 'admin') {
     const sinUb = mapEstVisibles().filter(c => c.lat == null);
+    const ab = document.getElementById('mapAutoBtn'); ab.style.display = sinUb.length ? '' : 'none'; ab.textContent = `🛰 Buscar ubicaciones (${sinUb.length})`;
     ubi.innerHTML = `<option value="">📍 Ubicar establecimiento… ${sinUb.length ? '(' + sinUb.length + ' sin ubicar)' : ''}</option>` + mapEstVisibles().map(c => `<option value="${c.id}">${c.lat == null ? '⚠ ' : '✓ '}${esc(c.nombre)}</option>`).join('');
   }
   if (mapUbicarPend && perfil.rol === 'admin') { const id = mapUbicarPend; mapUbicarPend = null; ubi.value = id; setTimeout(() => mapPonerEst(id), 0); }
   return sel.value ? data.filter(p => String(p.centro_id) === sel.value) : data;
 }
+// Ícono de establecimiento: un hospalito en el pin; más grande cuanto mayor el nivel.
+const EST_TAM = { primer_nivel: [34, 40], segundo_nivel: [44, 51], tercer_nivel: [50, 58], oncologico: [56, 65] };
+function estSvg(tipo, col) {
+  const pin = `<path d="M24 2C12.4 2 3 11.2 3 22.6 3 37 24 54 24 54s21-17 21-31.4C45 11.2 35.6 2 24 2Z" fill="${col}" stroke="#fff" stroke-width="2.5"/>`;
+  const cruz = (x, y) => `<rect x="${x - 2.5}" y="${y - 5.5}" width="5" height="11" rx="1" fill="${col}"/><rect x="${x - 5.5}" y="${y - 2.5}" width="11" height="5" rx="1" fill="${col}"/>`;
+  let b;
+  if (tipo === 'oncologico') b = `<rect x="11" y="11" width="26" height="23" rx="3" fill="#fff"/><path d="M24 14.5c-2.3 0-3.8 1.7-3.8 3.7 0 2.4 1.8 4.9 3.8 7.2 2-2.3 3.8-4.8 3.8-7.2 0-2-1.5-3.7-3.8-3.7Z" fill="none" stroke="${col}" stroke-width="2.2"/><path d="M21.7 23.4 18.2 30.6M26.3 23.4l3.5 7.2" stroke="${col}" stroke-width="2.2" stroke-linecap="round"/>`;
+  else if (tipo === 'primer_nivel') b = `<path d="M12.5 32V21.5L24 13l11.5 8.5V32Z" fill="#fff"/>${cruz(24, 25)}`;
+  else b = (tipo === 'tercer_nivel' ? `<rect x="6.5" y="19" width="7" height="15" rx="1.5" fill="#fff" opacity=".85"/><rect x="34.5" y="19" width="7" height="15" rx="1.5" fill="#fff" opacity=".85"/>` : '')
+    + `<rect x="12" y="11" width="24" height="23" rx="2.5" fill="#fff"/>${cruz(24, 19.5)}<rect x="15" y="28" width="4" height="3.4" rx=".6" fill="${col}" opacity=".55"/><rect x="22" y="28" width="4" height="3.4" rx=".6" fill="${col}" opacity=".55"/><rect x="29" y="28" width="4" height="3.4" rx=".6" fill="${col}" opacity=".55"/>`;
+  return `<svg viewBox="0 0 48 56" xmlns="http://www.w3.org/2000/svg">${pin}${b}</svg>`;
+}
 function estIcon(c, grande) {
-  const col = EST_COLOR[c.tipo] || '#7d2a4c', z = grande ? 38 : 30;
-  return L.divIcon({ className: '', iconSize: [z, z], iconAnchor: [z / 2, z / 2],
-    html: `<div class="estPin${grande ? ' big' : ''}" style="--c:${col};width:${z}px;height:${z}px"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v8M8 10h8"/></svg></div>` });
+  const col = EST_COLOR[c.tipo] || '#7d2a4c', [w0, h0] = EST_TAM[c.tipo] || EST_TAM.primer_nivel, k = grande ? 1.2 : 1, w = Math.round(w0 * k), h = Math.round(h0 * k);
+  return L.divIcon({ className: '', iconSize: [w, h], iconAnchor: [w / 2, h - 2], tooltipAnchor: [0, -h + 8],
+    html: `<div class="estPin2${grande ? ' big' : ''}" style="--c:${col};width:${w}px;height:${h}px">${estSvg(c.tipo, col)}</div>` });
 }
 function mapDibujarEstablecimientos(data) {
   if (mapEstLayer) mapInstance.removeLayer(mapEstLayer);
@@ -4791,7 +4938,7 @@ function mapDibujarEstablecimientos(data) {
     const grande = c.tipo !== 'primer_nivel' || String(c.id) === sel || (!adm && perfil.rol === 'centro');
     const m = L.marker([Number(c.lat), Number(c.lng)], { icon: estIcon(c, grande), draggable: adm, zIndexOffset: 1000 });
     const serv = [c.hace_colposcopia && 'colposcopia', c.recibe_muestras && 'recibe muestras'].filter(Boolean).join(' · ');
-    m.bindTooltip(`<b>${esc(c.nombre)}</b><br>${esc(TIPOS_CENTRO[c.tipo] || '')}${c.red_id ? ' · ' + esc(redNombre(c.red_id)) : ' · departamental'}${serv ? '<br>' + serv : ''}${n[c.id] ? `<br>${n[c.id]} pacientes en este mapa` : ''}${adm ? '<br><i>Arrastrá el ícono para corregir la ubicación</i>' : ''}`, { direction: 'top', offset: [0, -14] });
+    m.bindTooltip(`<b>${esc(c.nombre)}</b>${c.direccion ? '<br>' + esc(c.direccion) : ''}<br>${esc(TIPOS_CENTRO[c.tipo] || '')}${c.red_id ? ' · ' + esc(redNombre(c.red_id)) : ' · departamental'}${serv ? '<br>' + serv : ''}${n[c.id] ? `<br>${n[c.id]} pacientes en este mapa` : ''}${adm ? '<br><i>Arrastrá el ícono para corregir la ubicación</i>' : ''}`, { direction: 'top' });
     if (adm) m.on('dragend', () => mapGuardarEst(c.id, m.getLatLng()));
     if (conRoles() && ['gestor', 'admin'].includes(perfil.rol) && c.tipo === 'primer_nivel') m.on('click', () => { const s = document.getElementById('mapCentroSel'); if ([...s.options].some(o => o.value === String(c.id))) { s.value = s.value === String(c.id) ? '' : String(c.id); loadMap(); } });
     mapEstLayer.addLayer(m); pts.push([Number(c.lat), Number(c.lng)]);
@@ -4803,7 +4950,7 @@ function mapDibujarEstablecimientos(data) {
     mapEstLeyenda.onAdd = () => { const d = L.DomUtil.create('div', 'estLeyenda');
       const tipos = [...new Set(ests.map(c => c.tipo))].filter(t => EST_COLOR[t]);
       const sinUb = ests.filter(c => c.lat == null).length;
-      d.innerHTML = tipos.map(t => `<div><i style="background:${EST_COLOR[t]}"></i>${esc(TIPOS_CENTRO[t])}</div>`).join('') + (adm ? '<div><i style="background:none;border:2px dashed #d97706"></i>Área de cada red</div>' : '') + (sinUb ? `<div class="w">${sinUb} sin ubicar${adm ? ' · usá 📍 Ubicar' : ' · avisale al administrador'}</div>` : '');
+      d.innerHTML = tipos.map(t => `<div><span class="lgI">${estSvg(t, EST_COLOR[t])}</span>${esc(TIPOS_CENTRO[t])}</div>`).join('') + (adm ? '<div><i style="background:none;border:2px dashed #d97706"></i>Área de cada red</div>' : '') + (sinUb ? `<div class="w">${sinUb} sin ubicar${adm ? ' · usá 📍 Ubicar' : ' · avisale al administrador'}</div>` : '');
       L.DomEvent.disableClickPropagation(d); return d; };
     mapEstLeyenda.addTo(mapInstance);
   }
@@ -4833,6 +4980,30 @@ async function mapGuardarEst(id, ll) {
   showToast(esc(centroNombre(id)) + ': ubicación guardada ✔', 'ok'); loadMap();
 }
 document.getElementById('mapCentroSel').addEventListener('change', () => loadMap());
+// Búsqueda automática: por el nombre del establecimiento y, si no, por su dirección. Queda aproximada: el administrador arrastra el ícono para ajustarla.
+document.getElementById('mapAutoBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('mapAutoBtn'), hint = document.getElementById('mapPlacingHint');
+  const lista = mapEstVisibles().filter(c => c.lat == null), state = {}, ok = [], no = [];
+  btn.disabled = true;
+  for (const [i, c] of lista.entries()) {
+    hint.innerHTML = `🛰 Buscando ${i + 1} de ${lista.length}: <b>${esc(c.nombre)}</b>…`; hint.style.display = 'block';
+    const corto = c.nombre.replace(/^Centro de Salud /i, 'C.S. ');
+    const qs = [{ text: c.nombre + ', Santa Cruz de la Sierra', scope: 'scz', kind: 'poi', prec: 'nombre' }, { text: corto + ', Santa Cruz de la Sierra', scope: 'scz', kind: 'poi', prec: 'nombre' }];
+    if (c.direccion) qs.push({ text: c.direccion + ', Santa Cruz de la Sierra', scope: 'scz', kind: 'calle', prec: 'direccion' });
+    let loc = null;
+    for (const prov of ['google', 'photon', 'nominatim']) {
+      for (const q of qs) { if (loc || state[prov + 'Off']) break; loc = await geoProviders[prov](q, state); await new Promise(r => setTimeout(r, GEO_DELAY[prov])); }
+      if (loc) break;
+    }
+    if (!loc) { no.push(c.nombre); continue; }
+    const { error } = await sb.from('centros_salud').update({ lat: loc.lat, lng: loc.lng }).eq('id', c.id);
+    if (error) { no.push(c.nombre); continue; }
+    c.lat = loc.lat; c.lng = loc.lng; ok.push(c.nombre);
+  }
+  btn.disabled = false; hint.style.display = 'none';
+  showToast(`🛰 Ubicados ${ok.length} de ${lista.length}. Revisá cada ícono y arrastralo si quedó corrido.${no.length ? '<br>Sin encontrar: ' + no.map(esc).join(', ') + ' → usá 📍 Ubicar.' : ''}`, ok.length ? 'ok' : 'err');
+  loadMap();
+});
 document.getElementById('mapUbicarSel').addEventListener('change', e => mapPonerEst(e.target.value));
 
 function saveGmapsKey() {
