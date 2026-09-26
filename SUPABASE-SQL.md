@@ -389,6 +389,7 @@ Los demás establecimientos quedan **sin** colposcopia hasta que se marque la ca
 
 ```sql
 -- Servicios de cada establecimiento (independientes del nivel)
+alter table centros_salud alter column red drop not null;  -- el oncológico y otros de 4º nivel no tienen red
 alter table centros_salud add column if not exists hace_colposcopia boolean not null default false;
 alter table centros_salud add column if not exists recibe_muestras boolean not null default false;
 
