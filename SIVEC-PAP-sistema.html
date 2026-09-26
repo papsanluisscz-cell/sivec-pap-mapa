@@ -2337,7 +2337,7 @@ async function loadAdmin() {
     <td style="text-align:center"><input type="checkbox" data-servicio="hace_colposcopia" data-centro="${x.id}"${x.hace_colposcopia ? ' checked' : ''}></td>
     <td style="text-align:center"><input type="checkbox" data-servicio="recibe_muestras" data-centro="${x.id}"${x.recibe_muestras ? ' checked' : ''}></td>
     <td><button class="rowBtn" data-centro-prof="${x.id}" title="${esc((x.profesionales || []).join(', '))}">👩‍⚕️ ${(x.profesionales || []).length || 'Cargar'}</button></td>
-    <td><button class="rowBtn" data-centro-act="${x.id}">${x.activo === false ? 'Activar' : 'Desactivar'}</button></td></tr>`).join('') || '<tr><td colspan="7">Todavía no hay establecimientos.</td></tr>';
+    <td style="white-space:nowrap"><button class="rowBtn" data-centro-ubicar="${x.id}" title="${x.lat != null ? 'Ubicado · cambiar en el mapa' : 'Marcar en el mapa dónde queda'}">${x.lat != null ? '📍 ✓' : '📍 Ubicar'}</button> <button class="rowBtn" data-centro-act="${x.id}">${x.activo === false ? 'Activar' : 'Desactivar'}</button></td></tr>`).join('') || '<tr><td colspan="7">Todavía no hay establecimientos.</td></tr>';
   const optRedes = redes.map(x => `<option value="${x.id}">${esc(x.nombre)}</option>`).join('');
   const fc = document.getElementById('admCentroForm');
   fc.red_id.innerHTML = '<option value="">Sin red (departamental)</option>' + optRedes;
@@ -2398,6 +2398,8 @@ document.getElementById('admCentros').addEventListener('change', async e => {
   showToast(centroNombre(e.target.dataset.centro) + ': ' + (k === 'hace_colposcopia' ? 'colposcopia' : 'recibe muestras') + (e.target.checked ? ' habilitado' : ' deshabilitado') + ' ✔', 'ok');
 });
 document.getElementById('admCentros').addEventListener('click', async e => {
+  const bu = e.target.closest('[data-centro-ubicar]');
+  if (bu) { mapUbicarPend = bu.dataset.centroUbicar; switchView('map'); return; }
   const bp = e.target.closest('[data-centro-prof]');
   if (bp) {
     const c = centros.find(x => String(x.id) === bp.dataset.centroProf); if (!c) return;
@@ -4733,7 +4735,7 @@ async function loadMap() {
 }
 
 // ---- Establecimientos en el mapa: centro = el propio (punto de partida); gestor = los de su red; administrador = todos + las redes ----
-let mapEstLayer = null, mapPlacingEst = null, mapEstLeyenda = null;
+let mapEstLayer = null, mapPlacingEst = null, mapEstLeyenda = null, mapUbicarPend = null;
 const EST_COLOR = { primer_nivel: '#7d2a4c', segundo_nivel: '#2563eb', tercer_nivel: '#0f766e', oncologico: '#7c3aed' };
 const RED_COLORES = ['#d97706', '#0891b2', '#65a30d', '#db2777', '#4f46e5', '#b45309', '#059669', '#9333ea'];
 function mapEditable() { return !conRoles() || perfil.rol === 'centro'; }
@@ -4760,6 +4762,7 @@ function mapPrepararCentros(data) {
     const sinUb = mapEstVisibles().filter(c => c.lat == null);
     ubi.innerHTML = `<option value="">📍 Ubicar establecimiento… ${sinUb.length ? '(' + sinUb.length + ' sin ubicar)' : ''}</option>` + mapEstVisibles().map(c => `<option value="${c.id}">${c.lat == null ? '⚠ ' : '✓ '}${esc(c.nombre)}</option>`).join('');
   }
+  if (mapUbicarPend && perfil.rol === 'admin') { const id = mapUbicarPend; mapUbicarPend = null; ubi.value = id; setTimeout(() => mapPonerEst(id), 0); }
   return sel.value ? data.filter(p => String(p.centro_id) === sel.value) : data;
 }
 function estIcon(c, grande) {
