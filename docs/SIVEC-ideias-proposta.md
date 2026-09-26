@@ -819,3 +819,9 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - Tela **Admin**: redes, estabelecimentos (1er nivel / 2º nivel colposcopia / oncológico), usuários (cria a conta com senha provisória ou usa a existente; desativar, nunca apagar).
 - Com o Paso 8 feito, o login passa a ser obrigatório. Testado com Postgres local (permissões por papel) e no navegador com cada papel.
 - Pendente para o passo 5 (painel do gestor): gestor ver números sem nomes, salvo positivos sem tratar.
+
+### [26/09/2026] SIVEC PAP · Passo 2 PROGRAMADO — lote de envio ao oncológico
+- SQL **Paso 10**: tabela `lotes` (código L-AAAA-NNNN, centro, destino, transporte, entrega, nº de amostras, estado enviado/recebido, quem recebeu), código de cada lâmina `M-AA-NNNNNN` em `pacientes`, função `sivec_armar_lote` (tudo num passo só). O oncológico vê e recebe só os lotes enviados a ele; o centro não altera um lote já recebido.
+- No **Balance**: marcar tomas → destino, data, transporte, quem entrega → **📦 Armar lote** → imprimir **etiquetas** (código de barras Code 128 por lâmina) e **hoja de remisión** (2 cópias, assinatura de entrega e recepção). Lista "Últimos lotes enviados" com "em caminho · N dias" / "recebido".
+- Consertos no Supabase do piloto: `consultas.fecha` é timestamp (mostrar/reabrir), `consultas_paciente_id_fkey` apontava para `pacientes_generales` (Paso 7b), regra `perfiles_usuario_rol_check` antiga.
+- Imagens: `docs/pap-real/` (telas do sistema real com dados de teste).

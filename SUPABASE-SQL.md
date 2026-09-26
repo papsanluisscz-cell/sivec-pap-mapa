@@ -305,6 +305,82 @@ create policy "Solo usuarias con sesión - consultas" on consultas for all to au
 
 ---
 
+## Paso 10 — Lote de envío al oncológico (código de cada lámina + hoja de remisión)
+
+Desde el **Balance**, el centro marca las tomas y toca **📦 Armar lote**: se crea el lote (ej. `L-2026-0042`) con su destino,
+cada lámina recibe su código (`M-26-000123`), y se imprimen las **etiquetas** con código de barras y la **hoja de remisión**
+(firma de entrega y de recepción). Abajo del Balance quedan los últimos lotes: "en camino · N días" o "recibido".
+Requiere los Pasos 8 y 4, y el oncológico cargado en **Admin → Establecimientos** (tipo "Oncológico / laboratorio").
+
+```sql
+-- 1) Lotes de envío (centro → oncológico) y código de cada muestra
+create sequence if not exists lote_seq;
+create sequence if not exists muestra_seq;
+create table if not exists lotes (
+  id uuid primary key default gen_random_uuid(),
+  codigo text not null unique,
+  centro_id uuid not null,
+  destino_id uuid,
+  fecha_envio date not null default current_date,
+  transporte text,
+  entregado_por text,
+  n_muestras int not null default 0,
+  estado text not null default 'enviado',          -- enviado · recibido
+  recibido_por text,
+  fecha_recepcion timestamptz,
+  observaciones text,
+  creado_por uuid default auth.uid(),
+  created_at timestamptz not null default now()
+);
+create index if not exists lotes_centro_idx on lotes (centro_id);
+create index if not exists lotes_destino_idx on lotes (destino_id);
+alter table pacientes add column if not exists lote_id uuid references lotes(id);
+alter table pacientes add column if not exists codigo_muestra text;
+alter table pacientes add column if not exists muestra_estado text;    -- enviada · recibida · rechazada
+alter table pacientes add column if not exists muestra_rechazo text;
+create unique index if not exists pacientes_codigo_muestra_uq on pacientes (codigo_muestra) where codigo_muestra is not null;
+
+-- 2) Quién ve cada lote: el centro que lo mandó, el gestor de su red y el oncológico que lo recibe
+create or replace function sivec_ve_lote(c uuid, d uuid) returns boolean language sql stable security definer set search_path = public as $$
+  select sivec_ve_centro(c) or (sivec_rol() = 'oncologico' and d = sivec_centro()) $$;
+alter table lotes enable row level security;
+drop policy if exists "ver lotes" on lotes;
+drop policy if exists "centro arma lotes" on lotes;
+drop policy if exists "centro corrige lotes" on lotes;
+drop policy if exists "oncologico recibe lotes" on lotes;
+create policy "ver lotes" on lotes for select to authenticated using (sivec_ve_lote(centro_id, destino_id));
+create policy "centro arma lotes" on lotes for insert to authenticated with check (sivec_edita_centro(centro_id));
+create policy "centro corrige lotes" on lotes for update to authenticated using (sivec_edita_centro(centro_id) and estado = 'enviado') with check (sivec_edita_centro(centro_id));
+create policy "oncologico recibe lotes" on lotes for update to authenticated using (sivec_rol() = 'oncologico' and destino_id = sivec_centro()) with check (sivec_rol() = 'oncologico' and destino_id = sivec_centro());
+grant select, insert, update on lotes to authenticated;
+grant usage on sequence lote_seq, muestra_seq to authenticated;
+
+-- 3) Armar un lote en un solo paso: crea el lote, da un código a cada muestra y las marca como enviadas
+create or replace function sivec_armar_lote(p_ids uuid[], p_destino uuid, p_fecha date, p_transporte text, p_entregado text)
+returns lotes language plpgsql security invoker set search_path = public as $$
+declare v_centro uuid; v_lote lotes; v_n int;
+begin
+  select min(centro_id::text)::uuid, count(*) into v_centro, v_n from pacientes where id = any(p_ids) and lote_id is null and deleted_at is null;
+  if v_n = 0 then raise exception 'Ninguna de las muestras marcadas está libre (ya estaban en otro lote).'; end if;
+  if (select count(distinct centro_id) from pacientes where id = any(p_ids) and lote_id is null) > 1 then raise exception 'Todas las muestras de un lote tienen que ser del mismo centro.'; end if;
+  insert into lotes (codigo, centro_id, destino_id, fecha_envio, transporte, entregado_por, n_muestras)
+    values ('L-' || to_char(coalesce(p_fecha, current_date), 'YYYY') || '-' || lpad(nextval('lote_seq')::text, 4, '0'),
+            v_centro, p_destino, coalesce(p_fecha, current_date), nullif(trim(p_transporte), ''), nullif(trim(p_entregado), ''), v_n)
+    returning * into v_lote;
+  update pacientes p set lote_id = v_lote.id, lote_envio = v_lote.codigo, fecha_envio = v_lote.fecha_envio, muestra_estado = 'enviada',
+         codigo_muestra = coalesce(p.codigo_muestra, 'M-' || to_char(coalesce(p_fecha, current_date), 'YY') || '-' || lpad(nextval('muestra_seq')::text, 6, '0'))
+   where p.id = any(p_ids) and p.lote_id is null and p.deleted_at is null;
+  get diagnostics v_n = row_count;
+  if v_n <> v_lote.n_muestras then raise exception 'No se pudieron marcar todas las muestras (permisos del centro).'; end if;
+  return v_lote;
+end $$;
+grant execute on function sivec_armar_lote(uuid[], uuid, date, text, text) to authenticated;
+
+notify pgrst, 'reload schema';
+```
+
+---
+
 ## Paso 3 — Proteger los datos de las pacientes (IMPORTANTE)
 
 Hoy cualquiera que tenga la URL y la clave *anon* de Supabase puede leer todos los datos.

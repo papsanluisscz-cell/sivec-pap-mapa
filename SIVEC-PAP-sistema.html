@@ -612,6 +612,21 @@
   .balBtn2 { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; cursor: pointer; font-family: inherit; }
   .balPill { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
   .balPill.ok { background: #dcf5e9; color: #0d6b47; } .balPill.no { background: #fff4d6; color: #8a5300; }
+  .balLote select { border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; background: var(--surface); color: var(--ink); }
+  .balLote.lote2 { display: grid; grid-template-columns: auto repeat(4, minmax(120px, 1fr)) auto; }
+  @media (max-width: 1100px) { .balLote.lote2 { grid-template-columns: 1fr 1fr; } }
+  .balLote label { display: flex; flex-direction: column; gap: 3px; font-size: 11px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .3px; }
+  .loteCod { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; color: var(--ink-soft); }
+  #lotesBox { margin: 6px 0 22px; }
+  #lotesBox h3 { font-size: 14px; margin: 0 0 8px; }
+  #lotesBox table { font-size: 12.5px; }
+  .balPill.camino { background: #fff4d6; color: #8a5300; } .balPill.rec { background: #dcf5e9; color: #0d6b47; }
+  #loteOverlay { position: fixed; inset: 0; background: rgba(30,10,20,.45); z-index: 960; display: none; align-items: center; justify-content: center; padding: 16px; }
+  #loteOverlay.open { display: flex; }
+  #loteBox { background: var(--surface); color: var(--ink); border-radius: 14px; padding: 22px 24px; width: 460px; max-width: 100%; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
+  #loteBox h2 { margin: 0 0 4px; font-size: 18px; }
+  #loteBox .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  #loteBox svg { display: block; margin: 12px auto 4px; max-width: 100%; }
   tr.balSent td { background: color-mix(in srgb, #16a34a 5%, transparent); }
   @media print { .noPrint { display: none !important; } }
   /* ===== Seguimiento por etapas ===== */
@@ -813,6 +828,9 @@
     </form>
   </div>
 </div>
+
+<div id="loteOverlay"><div id="loteBox"></div></div>
+<iframe id="printFrame" title="Impresión" style="position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden"></iframe>
 
 <div id="sinRolOverlay">
   <div class="sinRolBox">
@@ -1055,6 +1073,7 @@
       <button id="balanceBuscarBtn" class="primary" style="margin:10px 0 20px">Buscar</button>
       <button id="balanceImprimirBtn" class="rowBtn" style="margin:10px 0 20px 10px; display:none">🖶 Imprimir lista</button>
       <button id="balancePdfBtn" class="rowBtn" style="margin:10px 0 20px 10px; display:none">💾 Salvar PDF</button>
+      <div id="lotesBox"></div>
       <div id="balanceResultado"></div>
     </div>
 
@@ -1943,6 +1962,7 @@ function switchView(name) {
   if (name === 'panel') loadPanel();
   if (name === 'trash') loadTrash();
   if (name === 'metodos') loadMetodos();
+  if (name === 'balance') loadLotes();
   if (name === 'admin') loadAdmin();
   if (name === 'portal') loadPortal();
 }
@@ -2042,6 +2062,122 @@ function toggleDarkMode() {
   }
 }
 
+// ================= Lote de envío al oncológico (Paso 10 del SQL) =================
+// El centro arma el lote desde el Balance: cada lámina recibe su código (M-26-000123), el lote su código (L-2026-0042)
+// y se imprimen la hoja de remisión (firma de entrega y recepción) y las etiquetas con código de barras.
+let lotesTablaPromise = null;
+function lotesOk() {
+  if (!sb) return Promise.resolve(false);
+  if (!lotesTablaPromise) lotesTablaPromise = sb.from('lotes').select('id').limit(1).then(({ error }) => !error, () => false);
+  return lotesTablaPromise;
+}
+function destinosLote() { return centros.filter(c => c.tipo === 'oncologico' && c.activo !== false); }
+function loteBarraHTML() {
+  const dest = destinosLote();
+  if (!dest.length) return `<div class="segNote">Para armar lotes hay que agregar el <b>oncológico / laboratorio</b> como establecimiento${perfil.es_admin ? ' en <b>Admin → Establecimientos</b> (tipo "Oncológico / laboratorio")' : ': pedíselo al administrador'}.</div>`;
+  let ult = {}; try { ult = JSON.parse(localStorage.getItem('sivec_lote_ult') || '{}'); } catch (e) {}
+  return `<div class="balLote lote2"><b id="balSel" style="align-self:center">0 marcadas</b>
+    <label>Destino<select id="loteDestino">${dest.map(c => `<option value="${c.id}"${String(c.id) === ult.destino ? ' selected' : ''}>${esc(c.nombre)}</option>`).join('')}</select></label>
+    <label>Fecha de envío<input type="date" id="balFechaEnvio" value="${hoyISO()}"></label>
+    <label>Transporte<input id="loteTransporte" value="${esc(ult.transporte || 'Mensajero de la red')}"></label>
+    <label>Entrega<input id="loteEntrega" value="${esc(ult.entrega || perfil.nombre_completo || '')}"></label>
+    <span style="display:flex;gap:6px;align-self:end"><button type="button" class="balBtn2" id="balSinEnviar">Marcar las que faltan</button><button type="button" class="balBtn" id="balArmar">📦 Armar lote</button></span></div>`;
+}
+async function loteArmar(data, ids) {
+  if (!ids.length) { alert('Marcá al menos una muestra.'); return; }
+  const g = id => document.getElementById(id).value.trim();
+  const destino = g('loteDestino'), fecha = g('balFechaEnvio');
+  if (!fecha) { alert('Elegí la fecha de envío.'); return; }
+  const nombreDest = centroNombre(destino);
+  if (!confirm(`¿Armar un lote con ${ids.length} muestra${ids.length > 1 ? 's' : ''} para ${nombreDest}, enviado el ${fmtFecha(fecha)}?\n\nCada lámina recibe su código y después se imprimen la hoja de remisión y las etiquetas.`)) return;
+  try { localStorage.setItem('sivec_lote_ult', JSON.stringify({ destino, transporte: g('loteTransporte'), entrega: g('loteEntrega') })); } catch (e) {}
+  const idVals = data.filter(p => ids.includes(String(p.id))).map(p => p.id);
+  const { data: lote, error } = await sb.rpc('sivec_armar_lote', { p_ids: idVals, p_destino: destino || null, p_fecha: fecha, p_transporte: g('loteTransporte'), p_entregado: g('loteEntrega') });
+  if (error) { alert('No se pudo armar el lote: ' + error.message); return; }
+  const l = Array.isArray(lote) ? lote[0] : lote;
+  showToast(`Lote ${l.codigo} armado: ${l.n_muestras} muestra${l.n_muestras > 1 ? 's' : ''} ✔`, 'ok');
+  loadBalance(); loadLotes();
+  loteMostrar(l);
+}
+function loteMostrar(l) {
+  const ov = document.getElementById('loteOverlay'), box = document.getElementById('loteBox');
+  box.innerHTML = `<h2>📦 Lote ${esc(l.codigo)}</h2>
+    <p class="hint" style="margin:0">${l.n_muestras} muestra${l.n_muestras > 1 ? 's' : ''} · ${esc(centroNombre(l.centro_id))} → <b>${esc(centroNombre(l.destino_id) || 'sin destino')}</b> · ${fmtFecha(l.fecha_envio)}</p>
+    ${code128SVG(l.codigo, 44, 2)}
+    <p class="hint" style="margin:6px 0 0">1) Imprimí las <b>etiquetas</b> y pegá cada una en su lámina. 2) Imprimí la <b>hoja de remisión</b> (2 copias): una viaja con el lote y el oncológico la firma al recibir.</p>
+    <div class="acts"><button type="button" class="primary" data-lp="etiq">🏷 Imprimir etiquetas</button><button type="button" class="primary" data-lp="hoja">🖨 Imprimir hoja de remisión</button><button type="button" class="rowBtn" data-lp="cerrar" style="margin-left:auto">Cerrar</button></div>`;
+  box.onclick = e => {
+    const b = e.target.closest('[data-lp]'); if (!b) return;
+    if (b.dataset.lp === 'cerrar') ov.classList.remove('open'); else loteImprimir(l, b.dataset.lp);
+  };
+  ov.classList.add('open');
+}
+async function loadLotes() {
+  const box = document.getElementById('lotesBox');
+  if (!box || !conRoles() || !(await lotesOk())) { if (box) box.innerHTML = ''; return; }
+  let q = sb.from('lotes').select('*').order('created_at', { ascending: false }).limit(15);
+  if (perfil.rol === 'centro') q = q.eq('centro_id', perfil.centro_id);
+  else if (centroActivo) q = q.eq('centro_id', centroActivo);
+  const { data, error } = await q;
+  if (error) { box.innerHTML = `<p class="hint">Lotes: ${esc(error.message)}</p>`; return; }
+  if (!data.length) { box.innerHTML = perfil.rol === 'centro' ? '<p class="hint">Todavía no se armó ningún lote. Buscá las tomas de la semana, marcalas y tocá <b>📦 Armar lote</b>.</p>' : ''; return; }
+  const hoy = new Date(hoyISO() + 'T12:00:00');
+  box.innerHTML = `<h3>📦 Últimos lotes enviados</h3><table><thead><tr><th>Lote</th><th>Enviado</th><th>Centro → destino</th><th>Muestras</th><th>Estado</th><th></th></tr></thead><tbody>${data.map(l => {
+    const dias = Math.round((hoy - new Date(l.fecha_envio + 'T12:00:00')) / 86400000);
+    const est = l.estado === 'recibido' ? `<span class="balPill rec">✓ recibido${l.fecha_recepcion ? ' ' + fmtFecha(String(l.fecha_recepcion).slice(0, 10)) : ''}${l.recibido_por ? ' · ' + esc(l.recibido_por) : ''}</span>` : `<span class="balPill camino">en camino · ${dias} día${dias === 1 ? '' : 's'}</span>`;
+    return `<tr><td><b>${esc(l.codigo)}</b></td><td>${fmtFecha(l.fecha_envio)}${l.transporte ? `<div class="loteCod">${esc(l.transporte)}</div>` : ''}</td><td>${esc(centroNombre(l.centro_id))} → ${esc(centroNombre(l.destino_id) || '—')}</td><td>${l.n_muestras}</td><td>${est}</td>
+      <td><button class="rowBtn" data-lote="${l.id}" data-lp="etiq">🏷 Etiquetas</button><button class="rowBtn" data-lote="${l.id}" data-lp="hoja">🖨 Hoja</button></td></tr>`;
+  }).join('')}</tbody></table>`;
+  box.onclick = e => { const b = e.target.closest('[data-lote]'); if (!b) return; const l = data.find(x => String(x.id) === b.dataset.lote); if (l) loteImprimir(l, b.dataset.lp); };
+}
+
+// Código de barras Code 128 (juego B): lo leen los lectores comunes de laboratorio.
+const C128 = '212222 222122 222221 121223 121322 131222 122213 122312 132212 221213 221312 231212 112232 122132 122231 113222 123122 123221 223211 221132 221231 213212 223112 312131 311222 321122 321221 312212 322112 322211 212123 212321 232121 111323 131123 131321 112313 132113 132311 211313 231113 231311 112133 112331 132131 113123 113321 133121 313121 211331 231131 213113 213311 213131 311123 311321 331121 312113 312311 332111 314111 221411 431111 111224 111422 121124 121421 141122 141221 112214 112412 122114 122411 142112 142211 241211 221114 413111 241112 134111 111242 121142 121241 114212 124112 124211 411212 421112 421211 212141 214121 412121 111143 111341 131141 114113 114311 411113 411311 113141 114131 311141 411131 211412 211214 211232 2331112'.split(' ');
+function code128SVG(txt, alto, modulo) {
+  const t = String(txt).replace(/[^\x20-\x7e]/g, '');
+  const vals = [104, ...[...t].map(ch => ch.charCodeAt(0) - 32)];
+  vals.push(vals.slice(1).reduce((s, v, i) => s + v * (i + 1), 104) % 103, 106);
+  const m = modulo || 2, q = 10 * m; let x = q, rects = '';
+  vals.forEach(v => [...C128[v]].forEach((w, i) => { const a = +w * m; if (i % 2 === 0) rects += `<rect x="${x}" y="0" width="${a}" height="${alto}"/>`; x += a; }));
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${x + q}" height="${alto}" viewBox="0 0 ${x + q} ${alto}" role="img" aria-label="${esc(t)}"><rect width="100%" height="100%" fill="#fff"/><g fill="#000">${rects}</g></svg>`;
+}
+function tipoMuestra(p) { return p.tipo_examen === 'VPH' && !p.estado_pap ? 'VPH' : (p.hizo_prueba_vph || (p.tipo_examen || '').includes('VPH') ? 'PAP + VPH' : 'PAP'); }
+
+async function loteImprimir(l, que) {
+  const { data, error } = await sb.from('pacientes').select('*').eq('lote_id', l.id).order('codigo_muestra', { ascending: true });
+  if (error) { alert('No se pudieron leer las muestras del lote: ' + error.message); return; }
+  const ps = data || [], origen = centroNombre(l.centro_id), destino = centroNombre(l.destino_id) || '—';
+  const red = (() => { const c = centros.find(x => String(x.id) === String(l.centro_id)); return c ? redNombre(c.red_id) || c.red || '' : ''; })();
+  const css = `@page { size: A4; margin: 10mm; } * { box-sizing: border-box; } body { font-family: Arial, sans-serif; color: #111; margin: 0; }
+    h1 { font-size: 16pt; margin: 0; } .sub { font-size: 9.5pt; color: #444; }
+    .head { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #7d2a4c; padding-bottom: 6px; margin-bottom: 8px; }
+    .datos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 14px; font-size: 9.5pt; margin-bottom: 8px; } .datos b { display: block; font-size: 8pt; color: #555; text-transform: uppercase; }
+    table { width: 100%; border-collapse: collapse; font-size: 9pt; } th, td { border: 1px solid #999; padding: 4px 5px; text-align: left; vertical-align: middle; } th { background: #f1e6ea; font-size: 8pt; }
+    td.bc svg { height: 22px; width: auto; display: block; } .chk { width: 13mm; text-align: center; } .firmas { display: grid; grid-template-columns: 1fr 1fr; gap: 20mm; margin-top: 16mm; font-size: 9pt; }
+    .firmas div { border-top: 1px solid #000; padding-top: 4px; } .lotebc { text-align: center; font-family: monospace; font-size: 10pt; } .lotebc svg { height: 40px; width: auto; }
+    .etqs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; } .etq { border: 1px dashed #999; border-radius: 2mm; padding: 2.5mm 3mm; height: 34mm; overflow: hidden; break-inside: avoid; font-size: 8pt; line-height: 1.25; }
+    .etq svg { height: 11mm; width: 100%; display: block; margin-bottom: 1mm; } .etq .cod { font-family: monospace; font-weight: bold; font-size: 10pt; text-align: center; } .etq .nm { font-weight: bold; font-size: 8.5pt; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .etq .mut { color: #444; } .nota { font-size: 8pt; color: #555; margin-top: 6px; }`;
+  let body;
+  if (que === 'etiq') {
+    body = `<div class="etqs">${ps.map(p => `<div class="etq">${code128SVG(p.codigo_muestra || '', 40, 1)}<div class="cod">${esc(p.codigo_muestra || '')}</div>
+      <div class="nm">${esc(p.nombre || '')}</div><div class="mut">CI ${esc(p.carnet || '—')} · ${edadDe(p.fecha_nacimiento) ?? '—'} años</div>
+      <div class="mut">${tipoMuestra(p)} · toma ${fmtFecha(p.fecha_toma)} · ${esc(l.codigo)}</div></div>`).join('')}</div>`;
+  } else {
+    body = `<div class="head"><div><h1>Hoja de remisión de muestras — PAP / VPH</h1><div class="sub">SIVEC · Sistema Integral de Vigilancia y Enlace Clínico</div></div>
+      <div class="lotebc">${code128SVG(l.codigo, 40, 2)}<div><b>${esc(l.codigo)}</b></div></div></div>
+      <div class="datos"><div><b>Establecimiento que envía</b>${esc(origen)}${red ? ' · ' + esc(red) : ''}</div><div><b>Destino</b>${esc(destino)}</div><div><b>Fecha de envío</b>${fmtFecha(l.fecha_envio)}</div>
+        <div><b>Transporte</b>${esc(l.transporte || '—')}</div><div><b>Entrega</b>${esc(l.entregado_por || '—')}</div><div><b>Total de muestras</b>${ps.length}</div></div>
+      <table><thead><tr><th>#</th><th>Código de muestra</th><th>Paciente</th><th>CI</th><th>Edad</th><th>Toma</th><th>Tipo</th><th>Profesional</th><th class="chk">Recibida</th><th>Observación</th></tr></thead>
+      <tbody>${ps.map((p, i) => `<tr><td>${i + 1}</td><td class="bc">${code128SVG(p.codigo_muestra || '', 30, 1)}<span style="font-family:monospace">${esc(p.codigo_muestra || '')}</span></td><td>${esc(p.nombre || '')}</td><td>${esc(p.carnet || '—')}</td><td>${edadDe(p.fecha_nacimiento) ?? '—'}</td><td>${fmtFecha(p.fecha_toma)}</td><td>${tipoMuestra(p)}</td><td>${esc(p.doctora || '—')}</td><td class="chk">☐</td><td></td></tr>`).join('')}</tbody></table>
+      <div class="firmas"><div>Entregado por: ${esc(l.entregado_por || '')}<br>Firma y fecha/hora</div><div>Recibido por (${esc(destino)})<br>Firma, sello y fecha/hora</div></div>
+      <p class="nota">Si una muestra no llega o no se puede procesar, anotar el motivo en "Observación" (lámina rota, sin identificar, datos no coinciden, fijación inadecuada, muestra insuficiente). Pronto el oncológico lo registrará directo en el SIVEC.</p>`;
+  }
+  const fr = document.getElementById('printFrame'), d = fr.contentDocument;
+  d.open(); d.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${esc(l.codigo)} — ${que === 'etiq' ? 'Etiquetas' : 'Hoja de remisión'}</title><style>${css}</style></head><body>${body}</body></html>`); d.close();
+  setTimeout(() => { fr.contentWindow.focus(); fr.contentWindow.print(); }, 250);
+}
+
 let lastBalanceData = [];
 let lastBalanceRange = { inicio: '', fin: '' };
 
@@ -2069,6 +2205,7 @@ async function loadBalance() {
   lastBalanceData = data;
   lastBalanceRange = { inicio, fin };
   const envioOk = await columnOk('fecha_envio');
+  const lotesSi = conRoles() && perfil.rol === 'centro' && await lotesOk();
   const enviadas = data.filter(p => p.fecha_envio).length;
   const porDoc = {}; data.forEach(p => { const d = p.doctora || 'Sin doctora'; porDoc[d] = (porDoc[d] || 0) + 1; });
   const resumen = `<div class="balTiles">
@@ -2077,7 +2214,7 @@ async function loadBalance() {
       <div class="balTile"><div class="v" style="color:${data.length - enviadas ? '#d97706' : '#16a34a'}">${data.length - enviadas}</div><div class="l">Falta enviar</div></div>` : ''}
       <div class="balTile"><div class="l" style="margin-bottom:4px">Por doctora</div><div class="balDocs">${Object.entries(porDoc).sort((a, b) => b[1] - a[1]).map(([d, n]) => `${esc(d)} <b>${n}</b>`).join(' · ')}</div></div>
     </div>
-    ${envioOk ? `<div class="balLote"><b id="balSel">0 marcadas</b> → <span>Fecha de envío</span> <input type="date" id="balFechaEnvio" value="${hoyISO()}"> <span>Lote</span> <input id="balLote" value="L-${hoyISO().slice(0, 4)}-${String(Math.ceil((new Date() - new Date(new Date().getFullYear(), 0, 1)) / 604800000)).padStart(2, '0')}" style="width:110px">
+    ${envioOk && lotesSi ? loteBarraHTML() : envioOk ? `<div class="balLote"><b id="balSel">0 marcadas</b> → <span>Fecha de envío</span> <input type="date" id="balFechaEnvio" value="${hoyISO()}"> <span>Lote</span> <input id="balLote" value="L-${hoyISO().slice(0, 4)}-${String(Math.ceil((new Date() - new Date(new Date().getFullYear(), 0, 1)) / 604800000)).padStart(2, '0')}" style="width:110px">
       <button type="button" class="balBtn" id="balMarcar">Marcar como enviadas</button> <button type="button" class="balBtn2" id="balSinEnviar">Marcar todas las que faltan</button></div>`
       : '<div class="segNote">Para registrar qué muestras se enviaron al laboratorio (y medir cuánto tarda el resultado), ejecutá el <b>Paso 4</b> de SUPABASE-SQL.md.</div>'}`;
   const filas = data.map((p, i) => `
@@ -2094,7 +2231,7 @@ async function loadBalance() {
       <td>${esc(p.doctora) || '—'}</td>
       <td>${esc(p.estado_pap) || 'Pendiente'}</td>
       <td>${esc(p.resultado_pap) || '—'}</td>
-      ${envioOk ? `<td>${p.fecha_envio ? `<span class="balPill ok">✓ ${fmtFecha(p.fecha_envio)}${p.lote_envio ? ' · ' + esc(p.lote_envio) : ''}</span>` : '<span class="balPill no">Falta enviar</span>'}</td>` : ''}
+      ${envioOk ? `<td>${p.fecha_envio ? `<span class="balPill ok">✓ ${fmtFecha(p.fecha_envio)}${p.lote_envio ? ' · ' + esc(p.lote_envio) : ''}</span>${p.codigo_muestra ? `<div class="loteCod">${esc(p.codigo_muestra)}</div>` : ''}` : '<span class="balPill no">Falta enviar</span>'}</td>` : ''}
     </tr>`).join('');
   cont.innerHTML = resumen + `
     <div id="balancePrintArea">
@@ -2115,6 +2252,7 @@ async function loadBalance() {
     const upd = () => { cont.querySelector('#balSel').textContent = chks().filter(c => c.checked).length + ' marcadas'; };
     cont.onchange = e => { if (e.target.id === 'balChkAll') chks().forEach(c => c.checked = e.target.checked); if (cont.querySelector('#balSel')) upd(); };
     cont.querySelector('#balSinEnviar').onclick = () => { chks().forEach(c => c.checked = true); upd(); };
+    if (lotesSi) { cont.querySelector('#balArmar').onclick = () => loteArmar(data, chks().filter(c => c.checked).map(c => c.value)); return; }
     cont.querySelector('#balMarcar').onclick = async () => {
       const ids = chks().filter(c => c.checked).map(c => c.value);
       const fecha = cont.querySelector('#balFechaEnvio').value, lote = cont.querySelector('#balLote').value.trim();
@@ -5208,7 +5346,7 @@ function formPropioHTML(tipo, ctx) {
       <div class="grid" style="grid-template-columns:2.2fr 1.2fr .6fr .6fr">${fpCell('Nombres', nom)}${fpCell('Cédula de identidad', ci)}${fpCell('Edad', esc(edad))}${fpCell('Sexo', 'F', 'nr')}
         ${fpCell('Fecha de solicitud', fecha, 'nb')}${fpCell('Diagnóstico clínico principal', 'Prevención de cáncer de cérvix', 'nb nr', 'grid-column:2/5')}</div>
       <div class="sec"><div class="secT">Solicitado</div><div style="display:flex;gap:10px">
-        ${big(pap, 'Tinción PAP (citología cervical)', 'Muestra: exocérvix + endocérvix' + (p.lote_envio ? ' · Lote de envío ' + esc(p.lote_envio) : ''))}
+        ${big(pap, 'Tinción PAP (citología cervical)', 'Muestra: exocérvix + endocérvix' + (p.lote_envio ? ' · Lote de envío ' + esc(p.lote_envio) : '') + (p.codigo_muestra ? ' · Muestra ' + esc(p.codigo_muestra) : ''))}
         ${big(vph, 'Prueba de VPH (ADN alto riesgo)', vph ? 'Toma convencional' : 'No solicitada')}</div></div>
       <div class="sec"><div class="secT">Laboratorio — otros</div><div class="cols3">${otros.map(o => fpChk(o, false)).join('')}</div></div>
       <div class="sec"><div class="secT">Imagenología / gabinete</div><div class="grid" style="grid-template-columns:1fr 1fr">${fpCell('Ecografía')}${fpCell('Rayos X', null, 'nr')}${fpCell('TAC', null, 'nb')}${fpCell('Endoscopía', null, 'nb nr')}</div></div>
