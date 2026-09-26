@@ -492,6 +492,9 @@
   .admOk { font-weight: 800; } .admDel:hover { border-color: #f87171 !important; }
   body.comando #redView .pnCard, body.comando #redView .redCard { background: linear-gradient(170deg, rgba(255,255,255,.055), rgba(255,255,255,.015)); border-color: rgba(241,167,195,.18); }
   @media (max-width: 760px) { .cmdHead { flex-direction: column; } body.comando .cmdClock { align-items: flex-start; } }
+  #demoFranja { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 2000; pointer-events: none; font-size: 12px; letter-spacing: .04em; color: #fff;
+    background: linear-gradient(90deg, #b45309, #d97706); padding: 6px 16px; border-radius: 999px; box-shadow: 0 6px 20px rgba(0,0,0,.25); white-space: nowrap; }
+  #demoFranja b { letter-spacing: .14em; }
   /* Antesala de entrada */
   #loginOverlay { position: fixed; inset: 0; z-index: 900; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 24px 16px; overflow: auto; color: #fff;
     background: radial-gradient(120% 90% at 15% 10%, #9c3a5f 0%, #5a1834 45%, #1c0a13 100%); }
@@ -2001,9 +2004,25 @@ async function init() {
     document.querySelector('#blocker p').textContent = e.message;
     return;
   }
+  await detectarDemo();
   // El login se activa desde Configuración cuando las cuentas ya estén creadas en Supabase (ver SUPABASE-SQL.md).
   if (localStorage.getItem('sivec_require_login') === '1') await checkAuth();
   await cargarPerfil();
+}
+
+// Base de demostración (tabla sivec_meta con modo = demo): franja "DEMO" y cuentas de prueba en la entrada.
+const DEMO_CUENTAS = { admin: 'admin@demo.sivec.bo', red: 'gestor.centro@demo.sivec.bo', centro: 'sanluis@demo.sivec.bo', hospital: 'frances@demo.sivec.bo' };
+let modoDemo = false;
+async function detectarDemo() {
+  try { const { data, error } = await sb.from('sivec_meta').select('valor').eq('clave', 'modo').maybeSingle(); modoDemo = !error && data && data.valor === 'demo'; } catch (_) { modoDemo = false; }
+  document.body.classList.toggle('modoDemo', !!modoDemo);
+  if (modoDemo && !document.getElementById('demoFranja')) {
+    const f = document.createElement('div'); f.id = 'demoFranja';
+    f.innerHTML = '<b>DEMOSTRACIÓN</b> · datos ficticios · ninguna paciente es real';
+    document.body.appendChild(f);
+    const n = document.querySelector('.lgNota');
+    if (n) n.innerHTML = '🎬 <b>Base de demostración:</b> cada botón ya trae su usuario de prueba. Contraseña para todos: <b>Demo-2026</b>';
+  }
 }
 
 async function checkAuth() {
@@ -2028,6 +2047,7 @@ function lgMostrar(acceso) {
   const t = document.querySelector(`.lgTile[data-acceso="${acceso}"]`);
   document.getElementById('lgSel').innerHTML = `<span class="lgIc">${t.querySelector('.lgIc').innerHTML}</span><div><b>${ACCESOS[acceso]}</b><small>${t.querySelector('small').textContent}</small></div>`;
   let mail = ''; try { mail = localStorage.getItem('sivec_login_' + acceso) || ''; } catch (_) {}
+  if (modoDemo) { mail = DEMO_CUENTAS[acceso] || mail; setTimeout(() => { const pw = document.getElementById('loginPassword'); if (!pw.value) pw.placeholder = 'Demo-2026'; }, 0); }
   const em = document.getElementById('loginEmail'); em.value = mail;
   document.getElementById('loginMsg').style.display = 'none';
   setTimeout(() => (mail ? document.getElementById('loginPassword') : em).focus(), 50);
