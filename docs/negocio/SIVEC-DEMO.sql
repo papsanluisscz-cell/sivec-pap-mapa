@@ -7,6 +7,14 @@
 --    admin@demo.sivec.bo · gestor.centro@demo.sivec.bo · gestor.norte@demo.sivec.bo
 --    sanluis@demo.sivec.bo · santarosita@demo.sivec.bo · frances@demo.sivec.bo · laboratorio@demo.sivec.bo
 -- =====================================================================================
+
+-- SEGURO: si este proyecto ya tiene pacientes (la base REAL), el script se detiene sin cambiar nada.
+do $$ begin
+  if to_regclass('public.pacientes') is not null and exists (select 1 from pacientes limit 1) then
+    raise exception 'ALTO: este proyecto ya tiene pacientes. El script DEMO es solo para un proyecto NUEVO y vacío. No se cambió nada.';
+  end if;
+end $$;
+
 -- 0) Tablas base del SIVEC PAP (como el Supabase del piloto antes de los pasos)
 create table if not exists centros_salud (id uuid primary key default gen_random_uuid(), nombre text, red text, direccion text, activo boolean default true, created_at timestamptz default now());
 create table if not exists perfiles_usuario (id uuid primary key, nombre_completo text, centro_id uuid references centros_salud(id), rol text, created_at timestamptz default now());
