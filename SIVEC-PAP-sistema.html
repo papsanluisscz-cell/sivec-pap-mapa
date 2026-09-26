@@ -1250,12 +1250,14 @@
       </div>
       <section class="admCard">
         <h3>Usuarios</h3>
-        <table><thead><tr><th>Persona</th><th>Rol</th><th>Establecimiento / red</th><th>Administra</th><th>Activo</th><th></th></tr></thead><tbody id="admUsuarios"></tbody></table>
+        <table><thead><tr><th>Persona</th><th>Rol</th><th>Establecimiento / red</th><th title="Recibe lotes e informa PAP/VPH (el establecimiento tiene que recibir muestras)">Laboratorio</th><th title="Recibe derivaciones de colposcopia (el establecimiento tiene que tener colposcopia)">Colposcopia</th><th>Administra</th><th>Activo</th><th></th></tr></thead><tbody id="admUsuarios"></tbody></table>
         <form id="admUsuarioForm" class="admForm">
           <input name="correo" type="email" placeholder="Correo" required>
           <input name="nombre" placeholder="Nombre (ej: Dra. Ortuño)" required>
           <select name="rol"></select>
           <select name="lugar"></select>
+          <label style="display:flex;gap:5px;align-items:center;font-size:12.5px;flex:0 0 auto"><input type="checkbox" name="puede_laboratorio" style="flex:0 0 auto"> Laboratorio</label>
+          <label style="display:flex;gap:5px;align-items:center;font-size:12.5px;flex:0 0 auto"><input type="checkbox" name="puede_colposcopia" style="flex:0 0 auto"> Colposcopia</label>
           <input name="clave" type="text" placeholder="Contraseña provisoria (si no tiene cuenta)" autocomplete="off">
           <button class="primary">Agregar usuario</button>
         </form>
@@ -1267,6 +1269,7 @@
     <div id="portalView" class="view">
       <h2 id="portalTitulo">Portal</h2>
       <p class="hint" id="portalTexto"></p>
+      <div class="labTabs" id="portalSwitch" style="display:none"><button type="button" data-ps="lab" class="on">🔬 Laboratorio</button><button type="button" data-ps="colpo">🩺 Colposcopia</button></div>
       <div id="portalLab" style="display:none">
         <div class="labTabs"><button type="button" data-lt="rec" class="on">📥 Recepción <b id="labNRec"></b></button><button type="button" data-lt="leer">🔬 Por leer <b id="labNLeer"></b></button><button type="button" data-lt="inf">✅ Informadas</button></div>
         <div id="labPane"></div>
@@ -1820,7 +1823,13 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 
 // ===== Redes, centros y roles (Pasos 8 y 9 de SUPABASE-SQL.md: tablas redes, centros_salud, perfiles_usuario) =====
 // Sin esas tablas, o sin sesión, el sistema funciona como siempre (un solo centro).
-const ROLES = { centro: 'Centro de salud', gestor: 'Gestor de red', oncologico: 'Laboratorio de citología', colposcopia: 'Colposcopia', admin: 'Administrador' };
+// Rol = qué ve la persona. "Profesional de salud" registra tomas en su establecimiento y, si el establecimiento
+// tiene el servicio, además puede tener permiso de Laboratorio y/o Colposcopia (un solo usuario por persona).
+const ROLES = { centro: 'Profesional de salud', gestor: 'Gestor de red', admin: 'Administrador' };
+const ROLES_VIEJOS = { oncologico: 'Laboratorio de citología', colposcopia: 'Colposcopia' };
+function miCentro() { return perfil && centros.find(c => String(c.id) === String(perfil.centro_id)); }
+function esLab() { const c = miCentro(); return !!(conRoles() && (perfil.puede_laboratorio || perfil.rol === 'oncologico') && c && (c.recibe_muestras || (c.recibe_muestras === undefined && c.tipo === 'oncologico'))); }
+function esColpo() { const c = miCentro(); return !!(conRoles() && (perfil.puede_colposcopia || perfil.rol === 'colposcopia') && c && c.hace_colposcopia); }
 // Nivel de atención. Los servicios (colposcopia, recibir muestras) se habilitan aparte en cada establecimiento.
 const TIPOS_CENTRO = { primer_nivel: '1er nivel · centro de salud', segundo_nivel: '2º nivel · hospital básico', tercer_nivel: '3er nivel · hospital general', oncologico: '4º nivel · oncológico' };
 // Pantallas de cada rol (null = todas las del centro). El administrador puro no ve datos clínicos.
@@ -1854,6 +1863,7 @@ function vistasPermitidas() {
   if (!conRoles()) return VISTAS_CENTRO.slice();
   const v = VISTAS_ROL[perfil.rol];
   const base = v === null || v === undefined ? VISTAS_CENTRO.slice() : v.slice();
+  if ((esLab() || esColpo()) && !base.includes('portal')) base.push('portal');
   if (perfil.es_admin || perfil.rol === 'admin') base.push('admin');
   return base;
 }
@@ -1892,9 +1902,9 @@ function aplicarRol() {
   else {
     box.style.display = 'flex';
     const lugar = perfil.rol === 'gestor' ? redNombre(perfil.red_id) || centroNombre(perfil.centro_id) : centroNombre(perfil.centro_id);
-    document.getElementById('rolBadge').innerHTML = `<b>${esc(perfil.nombre_completo || perfil.correo || '')}</b><span>${esc(ROLES[perfil.rol] || perfil.rol)}${lugar ? ' · ' + esc(lugar) : ''}${perfil.es_admin && perfil.rol !== 'admin' ? ' · admin' : ''}</span>`;
+    document.getElementById('rolBadge').innerHTML = `<b>${esc(perfil.nombre_completo || perfil.correo || '')}</b><span>${esc(ROLES[perfil.rol] || ROLES_VIEJOS[perfil.rol] || perfil.rol)}${lugar ? ' · ' + esc(lugar) : ''}${esLab() && perfil.rol !== 'oncologico' ? ' · laboratorio' : ''}${esColpo() && perfil.rol !== 'colposcopia' ? ' · colposcopia' : ''}${perfil.es_admin && perfil.rol !== 'admin' ? ' · admin' : ''}</span>`;
     const vis = centrosVisibles();
-    if (perfil.rol === 'centro') { centroActivo = perfil.centro_id ? String(perfil.centro_id) : ''; sel.style.display = 'none'; }
+    if (['centro', 'oncologico', 'colposcopia'].includes(perfil.rol)) { centroActivo = perfil.centro_id ? String(perfil.centro_id) : ''; sel.style.display = 'none'; }
     else if (perfil.rol === 'gestor') {
       let guardado = ''; try { guardado = localStorage.getItem('sivec_centro_sel') || ''; } catch (e) {}
       centroActivo = vis.some(c => String(c.id) === guardado) ? guardado : '';
@@ -1916,17 +1926,25 @@ document.getElementById('centroSel').addEventListener('change', e => {
   if (activa) switchView(activa.dataset.view);
 });
 
+let portalModo = '';
 function loadPortal() {
-  const onco = perfil && perfil.rol === 'oncologico', colpo = perfil && perfil.rol === 'colposcopia';
-  document.getElementById('portalLab').style.display = onco ? '' : 'none';
-  document.getElementById('portalColpo').style.display = colpo ? '' : 'none';
-  document.getElementById('portalTitulo').textContent = onco ? '🔬 Portal del laboratorio — ' + (centroNombre(perfil.centro_id) || '') : 'Portal de colposcopia';
-  document.getElementById('portalTexto').innerHTML = onco
+  const lab = esLab(), colpo = esColpo();
+  if (!portalModo || (portalModo === 'lab' && !lab) || (portalModo === 'colpo' && !colpo)) portalModo = lab ? 'lab' : 'colpo';
+  document.getElementById('portalSwitch').style.display = lab && colpo ? '' : 'none';
+  document.querySelectorAll('#portalSwitch button').forEach(b => b.classList.toggle('on', b.dataset.ps === portalModo));
+  const esL = portalModo === 'lab' && lab, esC = portalModo === 'colpo' && colpo;
+  document.getElementById('portalLab').style.display = esL ? '' : 'none';
+  document.getElementById('portalColpo').style.display = esC ? '' : 'none';
+  const lugar = centroNombre(perfil && perfil.centro_id) || '';
+  document.getElementById('portalTitulo').textContent = esL ? '🔬 Portal del laboratorio — ' + lugar : esC ? '🩺 Portal de colposcopia — ' + lugar : 'Portal';
+  document.getElementById('portalTexto').innerHTML = esL
     ? 'Recibí los lotes que mandan los centros, informá PAP (Bethesda) y VPH, y firmá: el resultado <b>aparece solo en la ficha del centro</b>, sin papel. Solo se ven las muestras enviadas a este establecimiento.'
-    : 'Pacientes derivadas por los centros: dale la cita, registrá la colposcopia, la biopsia y el tratamiento, y mandá la <b>contrarreferencia</b>: llega sola a la ficha del centro. Solo se ven las pacientes derivadas a este establecimiento.';
-  if (onco) labCargar();
-  if (colpo) { document.getElementById('portalTitulo').textContent = '🩺 Portal de colposcopia — ' + (centroNombre(perfil.centro_id) || ''); colCargar(); }
+    : esC ? 'Pacientes derivadas por los centros: dale la cita, cobrá en caja si no tiene SUS, registrá la colposcopia, la biopsia y el tratamiento, y mandá la <b>contrarreferencia</b>: llega sola a la ficha del centro. Solo se ven las pacientes derivadas a este establecimiento.'
+    : 'Tu usuario no tiene permiso de laboratorio ni de colposcopia en este establecimiento.';
+  if (esL) labCargar();
+  if (esC) colCargar();
 }
+document.getElementById('portalSwitch').addEventListener('click', e => { const b = e.target.closest('[data-ps]'); if (b) { portalModo = b.dataset.ps; loadPortal(); } });
 
 // ================= Portal del laboratorio (Paso 12 del SQL) =================
 // El oncológico no lee la tabla de pacientes: usa funciones del banco que devuelven solo sus muestras.
@@ -2119,11 +2137,13 @@ async function loadAdmin() {
   const lugarDe = u => u.rol === 'gestor' ? (u.red_id ? 'r' + u.red_id : '') : (u.centro_id ? 'c' + u.centro_id : '');
   document.getElementById('admUsuarios').innerHTML = admPerfiles.map(u => `<tr data-uid="${u.id}" style="${u.activo === false ? 'opacity:.55' : ''}">
       <td><b>${esc(u.nombre_completo || '—')}</b><br><span style="color:var(--ink-soft);font-size:11.5px">${esc(u.correo || '')}</span></td>
-      <td><select data-f="rol">${Object.entries(ROLES).map(([k, v]) => `<option value="${k}"${u.rol === k ? ' selected' : ''}>${v}</option>`).join('')}</select></td>
+      <td><select data-f="rol">${Object.entries(ROLES).map(([k, v]) => `<option value="${k}"${(ROLES_VIEJOS[u.rol] ? 'centro' : u.rol) === k ? ' selected' : ''}>${v}</option>`).join('')}</select></td>
       <td><select data-f="lugar" data-actual="${lugarDe(u)}"></select></td>
+      <td style="text-align:center"><input type="checkbox" data-f="puede_laboratorio"${u.puede_laboratorio || u.rol === 'oncologico' ? ' checked' : ''}></td>
+      <td style="text-align:center"><input type="checkbox" data-f="puede_colposcopia"${u.puede_colposcopia || u.rol === 'colposcopia' ? ' checked' : ''}></td>
       <td style="text-align:center"><input type="checkbox" data-f="es_admin"${u.es_admin ? ' checked' : ''}></td>
       <td style="text-align:center"><input type="checkbox" data-f="activo"${u.activo !== false ? ' checked' : ''}></td>
-      <td><button class="rowBtn" data-guardar-usuario>Guardar</button></td></tr>`).join('') || '<tr><td colspan="6">Todavía no hay usuarios con perfil.</td></tr>';
+      <td><button class="rowBtn" data-guardar-usuario>Guardar</button></td></tr>`).join('') || '<tr><td colspan="8">Todavía no hay usuarios con perfil.</td></tr>';
   document.querySelectorAll('#admUsuarios tr[data-uid]').forEach(tr => {
     const rol = tr.querySelector('[data-f=rol]'), lugar = tr.querySelector('[data-f=lugar]');
     admLugarOpciones(lugar, rol.value, lugar.dataset.actual);
@@ -2134,8 +2154,7 @@ async function loadAdmin() {
 function admLugarOpciones(sel, rol, actual) {
   if (rol === 'admin') { sel.innerHTML = '<option value="">— (toda la configuración)</option>'; sel.disabled = true; return; }
   sel.disabled = false;
-  // Laboratorio: solo donde se reciben muestras; colposcopia: solo donde está habilitada; centro: cualquier establecimiento.
-  const sirve = { oncologico: x => x.recibe_muestras, colposcopia: x => x.hace_colposcopia }[rol] || (() => true);
+  const sirve = () => true; // cualquier establecimiento; los permisos de laboratorio/colposcopia dependen de sus servicios
   sel.innerHTML = rol === 'gestor'
     ? '<option value="">Red…</option>' + redes.map(x => `<option value="r${x.id}">${esc(x.nombre)}</option>`).join('')
     : '<option value="">Establecimiento…</option>' + centros.filter(x => x.activo !== false && sirve(x)).map(x => `<option value="c${x.id}">${esc(x.nombre)}</option>`).join('');
@@ -2183,7 +2202,11 @@ document.getElementById('admUsuarios').addEventListener('click', async e => {
   if (tr.dataset.uid === (perfil && perfil.id) && !(g('es_admin').checked || rol === 'admin')) {
     if (!confirm('Te estás sacando el permiso de administrador. ¿Seguro?')) return;
   }
-  const { error } = await sb.from('perfiles_usuario').update({ rol, centro_id: lugar.centro_id, red_id: lugar.red_id, es_admin: g('es_admin').checked, activo: g('activo').checked }).eq('id', tr.dataset.uid);
+  const lab = g('puede_laboratorio').checked, col = g('puede_colposcopia').checked;
+  const cen = centros.find(x => String(x.id) === String(lugar.centro_id));
+  if (lab && !(cen && cen.recibe_muestras)) return showToast('Ese establecimiento no recibe muestras: marcá "Recibe muestras" en Establecimientos o quitá el permiso de Laboratorio.', 'err');
+  if (col && !(cen && cen.hace_colposcopia)) return showToast('Ese establecimiento no tiene colposcopia habilitada: marcala en Establecimientos o quitá el permiso.', 'err');
+  const { error } = await sb.from('perfiles_usuario').update({ rol, centro_id: lugar.centro_id, red_id: lugar.red_id, es_admin: g('es_admin').checked, activo: g('activo').checked, puede_laboratorio: lab, puede_colposcopia: col }).eq('id', tr.dataset.uid);
   if (error) return showToast('Error: ' + esc(error.message), 'err');
   showToast('Usuario guardado ✔', 'ok');
   if (tr.dataset.uid === (perfil && perfil.id)) await cargarPerfil();
@@ -2210,7 +2233,9 @@ document.getElementById('admUsuarioForm').addEventListener('submit', async e => 
       if (!uid) throw new Error('Supabase no devolvió la cuenta nueva.');
       if (!data.session) aviso = ' Supabase pide confirmar el correo: Authentication → Users → la cuenta → Confirm.';
     }
-    const { error } = await sb.from('perfiles_usuario').upsert([{ id: uid, correo, nombre_completo: f.nombre.value.trim(), rol, centro_id: lugar.centro_id, red_id: lugar.red_id, activo: true }], { onConflict: 'id' });
+    const cen = centros.find(x => String(x.id) === String(lugar.centro_id));
+    const permisos = { puede_laboratorio: f.puede_laboratorio.checked && !!(cen && cen.recibe_muestras), puede_colposcopia: f.puede_colposcopia.checked && !!(cen && cen.hace_colposcopia) };
+    const { error } = await sb.from('perfiles_usuario').upsert([Object.assign({ id: uid, correo, nombre_completo: f.nombre.value.trim(), rol, centro_id: lugar.centro_id, red_id: lugar.red_id, activo: true }, permisos)], { onConflict: 'id' });
     if (error) throw error;
     f.reset(); admLugarOpciones(f.lugar, f.rol.value, '');
     showToast('Usuario agregado ✔' + aviso, 'ok');
@@ -2489,13 +2514,15 @@ function derFormulario(p) {
   const box = document.getElementById('derBox');
   if (!dest.length) { alert('Todavía no hay establecimientos con colposcopia habilitada: el administrador los marca en Admin → Establecimientos.'); return; }
   const bet = bethesdaDe(p), alto = bet && (BETHESDA_BY_CODE[bet] || {}).nivel === 'alto';
-  let st = { indicacion: 'Colposcopia + biopsia', prioridad: alto || /16|18/.test(p.vph_genotipo || '') ? 'urgente' : 'normal' };
+  let st = { indicacion: 'Colposcopia + biopsia', prioridad: alto || /16|18/.test(p.vph_genotipo || '') ? 'urgente' : 'normal', cobertura: p.cobertura || '' };
   const pinta = () => {
     box.innerHTML = `<h2>🩺 Derivar a colposcopia</h2><p class="hint" style="margin:0">${esc(p.nombre)} · CI ${esc(p.carnet || '—')} · ${edadDe(p.fecha_nacimiento) ?? '—'} años · toma ${fmtFecha(p.fecha_toma)}</p>
       <div class="labSec">Destino (establecimientos con colposcopia)</div><select id="derDestino">${dest.map(c => `<option value="${c.id}">${esc(c.nombre)} · ${esc(TIPOS_CENTRO[c.tipo] || '')}</option>`).join('')}</select>
       <div class="labSec">Motivo</div><input type="text" id="derMotivo" value="${esc(derMotivoSugerido(p))}" placeholder="Ej: HSIL, ASC-H, LSIL persistente, VPH 16/18">
       <div class="labSec">Indicación</div><div class="labChips">${['Colposcopia', 'Colposcopia + biopsia', 'Tratamiento (LEEP / cono)'].map(v => `<button type="button" class="labChip${st.indicacion === v ? ' on' : ''}" data-dg="indicacion" data-v="${v}">${v}</button>`).join('')}</div>
       <div class="labSec">Prioridad</div><div class="labChips">${[['normal', 'Normal'], ['urgente', 'Urgente']].map(([k, v]) => `<button type="button" class="labChip${k === 'urgente' ? ' alto' : ''}${st.prioridad === k ? ' on' : ''}" data-dg="prioridad" data-v="${k}">${v}</button>`).join('')}</div>
+      <div class="labSec">Cobertura</div><div class="labChips">${[['SUS', 'SUS (gratis)'], ['Sin SUS', 'Sin SUS · paga en caja']].map(([k, v]) => `<button type="button" class="labChip${st.cobertura === k ? ' on' : ''}" data-dg="cobertura" data-v="${k}">${v}</button>`).join('')}
+        <span style="display:${st.cobertura === 'Sin SUS' ? 'inline-flex' : 'none'};align-items:center;gap:5px;font-size:13px">Bs <input type="text" id="derMonto" value="30" style="width:70px"></span></div>
       <div class="labSec">Notas para el hospital (opcional)</div><textarea id="derNotas" rows="2" placeholder="Antecedentes, embarazo, dificultades para asistir…"></textarea>
       <div class="acts"><button type="button" class="primary" data-da="enviar">📤 Derivar</button><button type="button" class="rowBtn" data-da="cerrar" style="margin-left:auto">Cancelar</button></div>
       <p class="hint" style="margin:8px 0 0">El hospital la ve en su portal, le da cita y devuelve la <b>contrarreferencia</b> (colposcopia, biopsia, tratamiento) directo a esta ficha.</p>`;
@@ -2503,13 +2530,16 @@ function derFormulario(p) {
   pinta();
   box.onclick = async e => {
     const c = e.target.closest('[data-dg]');
-    if (c) { const keep = { d: g('derDestino'), m: g('derMotivo'), n: g('derNotas') }; st[c.dataset.dg] = c.dataset.v; pinta(); document.getElementById('derDestino').value = keep.d; document.getElementById('derMotivo').value = keep.m; document.getElementById('derNotas').value = keep.n; return; }
+    if (c) { const keep = { d: g('derDestino'), m: g('derMotivo'), n: g('derNotas'), b: g('derMonto') }; st[c.dataset.dg] = c.dataset.v; pinta(); document.getElementById('derDestino').value = keep.d; document.getElementById('derMotivo').value = keep.m; document.getElementById('derNotas').value = keep.n; if (keep.b) document.getElementById('derMonto').value = keep.b; return; }
     const a = e.target.closest('[data-da]'); if (!a) return;
     if (a.dataset.da === 'cerrar') return derCerrar();
     const destino = g('derDestino');
-    const { data, error } = await sb.rpc('sivec_derivar', { p_paciente: p.id, p_destino: destino, p_motivo: g('derMotivo'), p_indicacion: st.indicacion, p_prioridad: st.prioridad, p_notas: g('derNotas'), p_por: perfil.nombre_completo || perfil.correo || '' });
+    if (!st.cobertura) { alert('Indicá si la paciente tiene SUS (gratis) o no (paga en la caja del hospital).'); return; }
+    const monto = st.cobertura === 'Sin SUS' ? Number(String(g('derMonto')).replace(',', '.')) || null : null;
+    const { data, error } = await sb.rpc('sivec_derivar', { p_paciente: p.id, p_destino: destino, p_motivo: g('derMotivo'), p_indicacion: st.indicacion, p_prioridad: st.prioridad, p_notas: g('derNotas'), p_por: perfil.nombre_completo || perfil.correo || '', p_cobertura: st.cobertura, p_monto: monto });
     if (error) { alert('No se pudo derivar: ' + error.message); return; }
     const d = Array.isArray(data) ? data[0] : data;
+    p.cobertura = st.cobertura;
     showToast(`${esc(p.nombre)} derivada a ${esc(centroNombre(destino))} ✔`, 'ok');
     derivMap.set(String(p.id), d); p.derivacion_pap = centroNombre(destino);
     renderBanners(allPatientsData); applyListFilters(true);
@@ -2530,6 +2560,7 @@ function derDetalle(p, d, recien) {
     <p class="hint" style="margin:0">${esc(p.nombre)} · CI ${esc(p.carnet || '—')} · ${esc(dest)}</p>
     <div class="derDato">${fila('Derivada', fmtFecha(d.fecha_derivacion) + (d.derivado_por ? ' · ' + esc(d.derivado_por) : ''))}${fila('Motivo', esc(d.motivo || '—') + ' · ' + esc(d.indicacion || '') + (d.prioridad === 'urgente' ? ' <span class="urg">URGENTE</span>' : ''))}
       ${fila('Estado', esc(DER_ESTADO[d.estado] || d.estado) + (d.fecha_cita ? ' · cita ' + fmtFecha(d.fecha_cita) : ''))}
+      ${fila('Cobertura', d.cobertura === 'Sin SUS' ? 'Sin SUS · paga Bs ' + esc(d.monto || '—') + ' en la caja del hospital' + (d.pago_recibo ? ' · pagado (' + esc(d.pago_recibo) + ')' : '') : d.cobertura ? 'SUS (gratis)' : '')}
       ${vuelta ? fila('Atendida', (d.fecha_atencion ? fmtFecha(d.fecha_atencion) : '') + (d.atendido_por ? ' · ' + esc(d.atendido_por) : '')) + fila('Colposcopia', esc(derResumenColpo(d.colposcopia))) + fila('Biopsia', d.biopsia_tomada ? (d.biopsia_resultado ? '<b style="color:#991b1b">' + esc(d.biopsia_resultado) + '</b>' : 'tomada · resultado pendiente') : (d.colposcopia ? 'no se tomó' : '')) + fila('Tratamiento', esc(d.tratamiento || '')) + fila('Próximo control', esc(d.proximo_control || '')) + fila('Indicaciones', esc(d.contrarreferencia || '')) : ''}</div>
     <div class="acts">${derEsNueva(d) ? '<button type="button" class="primary" data-dd="visto">✓ Visto</button>' : ''}
       <button type="button" class="rowBtn" data-dd="boleta">🖨 Boleta de referencia</button>
@@ -2570,7 +2601,8 @@ function derBoleta(p, d) {
   const body = `<div class="head"><div><h1>Boleta de referencia — Colposcopia${d.indicacion && /biopsia/i.test(d.indicacion) ? ' y biopsia' : ''}</h1><div class="sub">SIVEC PAP/VPH · Sistema Integral de Vigilancia y Enlace Clínico</div></div><div style="text-align:right">${fmtFecha(d.fecha_derivacion)}${d.prioridad === 'urgente' ? '<div class="urg">URGENTE</div>' : ''}</div></div>
     <div class="g"><div><b>Establecimiento que refiere</b>${esc(org)}</div><div><b>Establecimiento de destino</b>${esc(dest)}</div>
       <div><b>Paciente</b>${esc(p.nombre || '')}</div><div><b>CI · edad</b>${esc(p.carnet || '—')} · ${edadDe(p.fecha_nacimiento) ?? '—'} años</div>
-      <div><b>Celular</b>${esc(p.celular || '—')}</div><div><b>Dirección</b>${esc(p.direccion || '—')}</div></div>
+      <div><b>Celular</b>${esc(p.celular || '—')}</div><div><b>Dirección</b>${esc(p.direccion || '—')}</div>
+      <div><b>Cobertura</b>${d.cobertura === 'Sin SUS' ? 'Sin SUS · paga Bs ' + esc(d.monto || '—') + ' en caja del hospital' : d.cobertura === 'SUS' ? 'SUS — sin costo' : '—'}</div></div>
     <div class="box"><h3>Motivo de la referencia</h3>${esc(d.motivo || '—')} · ${esc(d.indicacion || '')}<br>PAP ${fmtFecha(p.fecha_toma)}: ${esc(p.resultado_pap || 'pendiente')}${p.resultado_vph ? ' · VPH ' + esc(p.resultado_vph) + (p.vph_genotipo ? ' ' + esc(p.vph_genotipo) : '') : ''}${d.notas ? '<br>Notas: ' + esc(d.notas) : ''}</div>
     <div class="firma">${esc(d.derivado_por || '')}<br>Firma y sello</div>
     <div class="box" style="margin-top:14mm;min-height:60mm"><h3>Contrarreferencia (para el hospital, si no usa el SIVEC)</h3>Colposcopia: ______________________________________________<br><br>Biopsia: ______________ Resultado: ______________<br><br>Tratamiento: _____________________ Próximo control: _____________<br><br>Firma y sello: ______________________</div>`;
@@ -2602,7 +2634,7 @@ function colRender() {
   const pane = document.getElementById('colPane');
   pane.innerHTML = `<div class="labCard"><table><thead><tr><th>Paciente</th><th>Centro que deriva</th><th>Motivo</th><th>Derivada</th><th>${colTab === 'citadas' ? 'Cita' : 'Estado'}</th></tr></thead><tbody>${lista.map(d => {
     const dias = Math.round((hoy - new Date(d.fecha_derivacion + 'T12:00:00')) / 86400000);
-    return `<tr class="colFila${d.id === colSel ? ' on' : ''}" data-col="${d.id}"><td><b>${esc(d.nombre)}</b>${d.prioridad === 'urgente' ? '<span class="urg">URGENTE</span>' : ''}<div class="loteCod">CI ${esc(d.carnet || '—')} · ${edadDe(d.fecha_nacimiento) ?? '—'} a · ☎ ${esc(d.celular || '—')}</div></td>
+    return `<tr class="colFila${d.id === colSel ? ' on' : ''}" data-col="${d.id}"><td><b>${esc(d.nombre)}</b>${d.prioridad === 'urgente' ? '<span class="urg">URGENTE</span>' : ''}${d.cobertura === 'Sin SUS' ? `<span class="urg" style="background:${d.pago_recibo ? '#15803d' : '#b45309'}">💵 ${d.pago_recibo ? 'pagó' : 'Bs ' + esc(d.monto || '')}</span>` : ''}<div class="loteCod">CI ${esc(d.carnet || '—')} · ${edadDe(d.fecha_nacimiento) ?? '—'} a · ☎ ${esc(d.celular || '—')}</div></td>
       <td>${esc(centroNombre(d.centro_origen))}</td><td>${esc(d.motivo || '—')}<div class="loteCod">${esc(d.indicacion || '')}</div></td><td>${fmtFecha(d.fecha_derivacion)}<div class="loteCod">${dias} día${dias === 1 ? '' : 's'}</div></td>
       <td>${d.estado === 'citada' ? fmtFecha(d.fecha_cita) : d.estado === 'no_asistio' ? '<span class="balPill no">no asistió</span>' : d.estado === 'contrarreferida' ? '<span class="balPill rec">contrarreferida</span>' : esc(DER_ESTADO[d.estado] || d.estado)}${d.biopsia_tomada ? `<div class="loteCod">biopsia: ${esc(d.biopsia_resultado || 'pendiente')}</div>` : ''}</td></tr>`;
   }).join('') || '<tr><td colspan="5">No hay pacientes en esta lista.</td></tr>'}</tbody></table></div><div id="colDet" style="margin-top:14px"></div>`;
@@ -2616,7 +2648,8 @@ function colDetalle(d) {
   const chip = (g, v, on, extra) => `<button type="button" class="labChip ${extra || ''}${on ? ' on' : ''}" data-cg="${g}" data-v="${esc(v)}">${esc(v)}</button>`;
   const yaAtendida = ['atendida', 'contrarreferida'].includes(d.estado);
   box.innerHTML = `<div class="labCard"><div class="labHead">${esc(d.nombre)} · ${edadDe(d.fecha_nacimiento) ?? '—'} a<span>CI ${esc(d.carnet || '—')} · ☎ ${esc(d.celular || '—')} · ${esc(d.direccion || '')} · deriva ${esc(centroNombre(d.centro_origen))}${d.derivado_por ? ' (' + esc(d.derivado_por) + ')' : ''}</span></div>
-    <div class="derDato"><b>Motivo</b><span>${esc(d.motivo || '—')} · ${esc(d.indicacion || '')}${d.prioridad === 'urgente' ? ' <span class="urg">URGENTE</span>' : ''}</span><b>Antecedentes PAP/VPH</b><span>${esc(d.antecedentes || '—')}</span>${d.notas ? `<b>Notas del centro</b><span>${esc(d.notas)}</span>` : ''}</div>
+    <div class="derDato"><b>Motivo</b><span>${esc(d.motivo || '—')} · ${esc(d.indicacion || '')}${d.prioridad === 'urgente' ? ' <span class="urg">URGENTE</span>' : ''}</span><b>Antecedentes PAP/VPH</b><span>${esc(d.antecedentes || '—')}</span>${d.notas ? `<b>Notas del centro</b><span>${esc(d.notas)}</span>` : ''}
+      <b>Cobertura</b><span>${d.cobertura === 'Sin SUS' ? `<b style="color:#b45309">Sin SUS · cobrar Bs ${esc(d.monto || '—')} en caja</b>${d.pago_recibo ? ' · ✓ pagado (' + esc(d.pago_recibo) + ')' : ` <input type="text" id="colRecibo" placeholder="N° de recibo de caja" style="width:170px;display:inline-block;margin-left:6px"> <button type="button" class="rowBtn" data-ca="pago">💵 Registrar pago</button>`}` : d.cobertura === 'SUS' ? 'SUS — sin costo' : '—'}</span></div>
     ${!yaAtendida ? `<div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin:6px 0 4px"><label style="font-size:12px;font-weight:700;color:var(--ink-soft)">FECHA DE CITA<input type="date" id="colCita" value="${esc(d.fecha_cita || '')}" style="display:block;margin-top:3px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--surface);color:var(--ink)"></label><button type="button" class="rowBtn" data-ca="cita">📅 Guardar cita</button>${d.estado === 'citada' ? '<button type="button" class="rowBtn" data-ca="noasistio">✗ No asistió</button>' : ''}</div>` : ''}
     ${colTab === 'biopsia' || (yaAtendida && d.biopsia_tomada) ? `<div class="labSec">Resultado de la biopsia</div><div class="labChips">${COL_BIOPSIA.map(v => `<button type="button" class="labChip ${v.startsWith('Negativo') ? 'neg' : /CIN 1/.test(v) ? '' : 'alto'}${d.biopsia_resultado === v ? ' on' : ''}" data-biop="${esc(v)}">${esc(v)}</button>`).join('')}</div><p class="hint" style="margin:6px 0 0">Al guardarlo, el centro recibe el resultado como contrarreferencia nueva.</p>` : ''}
     <div class="labCols" style="margin-top:6px"><div>
@@ -2663,6 +2696,13 @@ function colDetalle(d) {
       const { error } = await sb.rpc('sivec_colpo_cita', { p_id: d.id, p_fecha: fe });
       if (error) return alert(error.message);
       showToast('Cita guardada ✔ — el centro la ve en la ficha', 'ok'); colTab = 'citadas'; return colCargar();
+    }
+    if (k === 'pago') {
+      const r = (document.getElementById('colRecibo') || {}).value || '';
+      if (!r.trim()) return alert('Escribí el número de recibo de caja.');
+      const { error } = await sb.rpc('sivec_colpo_pago', { p_id: d.id, p_recibo: r.trim() });
+      if (error) return alert(error.message);
+      showToast('Pago registrado ✔', 'ok'); return colCargar();
     }
     if (k === 'noasistio') {
       if (!confirm('¿Marcar que la paciente no asistió? El centro recibe el aviso para buscarla.')) return;
