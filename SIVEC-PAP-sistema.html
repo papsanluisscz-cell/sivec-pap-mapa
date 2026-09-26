@@ -810,6 +810,7 @@
   .pnLegend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
   .pnHb { display: grid; gap: 8px; }
   .pnHrow { display: grid; grid-template-columns: 112px 1fr 44px; gap: 8px; align-items: center; font-size: 12.5px; }
+  #redProf .pnHrow { grid-template-columns: minmax(120px, 280px) 1fr 44px; }
   .pnHrow > div:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pnHrow .t { height: 14px; background: var(--pn-grid); border-radius: 4px; overflow: hidden; }
   .pnHrow .f { height: 100%; width: 0; border-radius: 0 4px 4px 0; transition: width 1.1s cubic-bezier(.2,.7,.2,1); }
@@ -957,6 +958,7 @@
       <button id="helpBtn" title="Ayuda" aria-label="Ayuda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></button>
       <button id="settingsBtn" title="Configuración" aria-label="Configuración"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.2 2h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7V4a2 2 0 0 0-2-2Z"/><circle cx="12" cy="12" r="3"/></svg></button>
       <button id="logoutBtn" title="Cerrar sesión" aria-label="Cerrar sesión" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg></button>
+      <button id="claveBtn" title="Cambiar mi contraseña" aria-label="Cambiar mi contraseña" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.3-9.3"/><path d="m16 7 3 3"/><path d="m18.5 4.5 2 2"/></svg></button>
     </div>
   </header>
 
@@ -973,7 +975,7 @@
           <div class="field"><label>N° Registro D8<span class="helpTip" data-tip="Número de folio impreso en el formulario físico D8 (solicitud de exámenes). Si no lo tenés a mano, podés dejarlo en blanco.">ⓘ</span></label><input name="numero_folio_d8" placeholder="Ej: 0056476"></div>
           <div class="field"><label>N° Registro PAP<span class="helpTip" data-tip="Número de folio impreso en el formulario físico de PAP. Si no lo tenés a mano, podés dejarlo en blanco.">ⓘ</span></label><input name="numero_folio_pap" placeholder="Ej: 0056476"></div>
           <div class="field"><label>Doctora responsable</label>
-            <select name="doctora">
+            <select name="doctora" class="docSel">
               <option>Dra. Ortuño</option><option>Dra. Aguilera</option>
               <option>Dra. Delina</option><option>Dr. Tola</option>
             </select>
@@ -1275,7 +1277,7 @@
         </section>
         <section class="admCard">
           <h3>Establecimientos</h3>
-          <table><thead><tr><th>Establecimiento</th><th>Red</th><th>Nivel</th><th title="Se le pueden derivar pacientes para colposcopia">Colposcopia</th><th title="Recibe los lotes de láminas e informa PAP/VPH">Recibe muestras</th><th></th></tr></thead><tbody id="admCentros"></tbody></table>
+          <table><thead><tr><th>Establecimiento</th><th>Red</th><th>Nivel</th><th title="Se le pueden derivar pacientes para colposcopia">Colposcopia</th><th title="Recibe los lotes de láminas e informa PAP/VPH">Recibe muestras</th><th title="Profesionales que toman PAP/VPH en el establecimiento (aparecen en el formulario y en el tablero)">Profesionales</th><th></th></tr></thead><tbody id="admCentros"></tbody></table>
           <form id="admCentroForm" class="admForm">
             <input name="nombre" placeholder="Nombre (ej: C.S. Villa 1ro de Mayo)" required>
             <select name="red_id"></select>
@@ -1332,6 +1334,7 @@
         <div class="pnCard"><h3>Cobertura</h3><div class="pnCap" id="redCobCap"></div><div class="pnStack" id="redStackCob"></div><div class="pnLegend" id="redLegCob"></div>
           <h3 style="margin-top:20px">Días del laboratorio</h3><div class="pnCap">Del envío al informe digital, por mes</div><div class="pnHb" id="redLab"></div></div>
       </div>
+      <div class="pnCard" style="margin-top:14px" id="redProfCard"><h3>Tomas por profesional</h3><div class="pnCap" id="redProfCap">Quién tomó cada PAP/VPH en el período · pasá el mouse para ver positivas y entregas</div><div class="pnHb" id="redProf"></div></div>
       <div class="redCard" style="margin-top:14px"><h3>Por establecimiento</h3><div id="redTabla"></div><p class="hint" style="margin:8px 0 0" id="redTablaNota"></p></div>
       <div class="redCard" id="redPend"></div>
     </div>
@@ -1565,7 +1568,7 @@
       </div>
       <div class="row2">
         <div class="field"><label>Doctora responsable</label>
-          <select name="doctora"><option>Dra. Ortuño</option><option>Dra. Aguilera</option><option>Dra. Delina</option><option>Dr. Tola</option></select>
+          <select name="doctora" class="docSel"><option>Dra. Ortuño</option><option>Dra. Aguilera</option><option>Dra. Delina</option><option>Dr. Tola</option></select>
         </div>
         <div class="field"><label>Fecha de toma</label><input type="date" name="fecha_toma"></div>
       </div>
@@ -1889,11 +1892,22 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   await cargarPerfil();
 });
 
+// Cambiar la contraseña provisoria por una propia.
+document.getElementById('claveBtn').addEventListener('click', async () => {
+  const n1 = prompt('Nueva contraseña (mínimo 8 caracteres):'); if (n1 === null) return;
+  if (n1.length < 8) return showToast('La contraseña tiene que tener al menos 8 caracteres.', 'err');
+  const n2 = prompt('Repetí la nueva contraseña:'); if (n2 === null) return;
+  if (n1 !== n2) return showToast('Las contraseñas no coinciden.', 'err');
+  const { error } = await sb.auth.updateUser({ password: n1 });
+  if (error) return showToast('No se pudo cambiar: ' + esc(error.message), 'err');
+  showToast('Contraseña cambiada ✔ La próxima vez entrá con la nueva.', 'ok');
+});
 document.getElementById('logoutBtn').addEventListener('click', async () => {
   await sb.auth.signOut();
   document.getElementById('loginOverlay').style.display = 'flex';
   document.getElementById('logoutBtn').style.display = 'none';
   perfil = null; aplicarRol();
+  location.reload(); // que no quede nada de la cuenta anterior en pantalla
 });
 
 // ===== Redes, centros y roles (Pasos 8 y 9 de SUPABASE-SQL.md: tablas redes, centros_salud, perfiles_usuario) =====
@@ -1973,6 +1987,10 @@ function aplicarRol() {
     sinRol.style.display = 'flex';
   }
   const permitidas = vistasPermitidas();
+  llenarDoctoras();
+  // Con sesión iniciada: salir y cambiar la contraseña siempre a mano (hay varias cuentas).
+  if (perfil) { document.getElementById('logoutBtn').style.display = 'inline-block'; document.getElementById('claveBtn').style.display = conRoles() ? 'inline-block' : 'none'; }
+  else document.getElementById('claveBtn').style.display = 'none';
   document.querySelectorAll('nav button[data-view]').forEach(b => { b.style.display = permitidas.includes(b.dataset.view) ? '' : 'none'; });
   document.body.classList.toggle('soloLectura', !!(conRoles() && perfil.rol === 'gestor'));
   if (!conRoles()) { box.style.display = 'none'; centroActivo = ''; }
@@ -2210,7 +2228,8 @@ async function loadAdmin() {
   document.getElementById('admCentros').innerHTML = centros.map(x => `<tr style="${x.activo === false ? 'opacity:.5' : ''}"><td><b>${esc(x.nombre)}</b>${x.codigo ? `<div class="loteCod">${esc(x.codigo)}</div>` : ''}</td><td>${esc(redNombre(x.red_id)) || '<span style="color:var(--ink-soft)">departamental</span>'}</td><td>${esc(TIPOS_CENTRO[x.tipo] || x.tipo || '')}</td>
     <td style="text-align:center"><input type="checkbox" data-servicio="hace_colposcopia" data-centro="${x.id}"${x.hace_colposcopia ? ' checked' : ''}></td>
     <td style="text-align:center"><input type="checkbox" data-servicio="recibe_muestras" data-centro="${x.id}"${x.recibe_muestras ? ' checked' : ''}></td>
-    <td><button class="rowBtn" data-centro-act="${x.id}">${x.activo === false ? 'Activar' : 'Desactivar'}</button></td></tr>`).join('') || '<tr><td colspan="6">Todavía no hay establecimientos.</td></tr>';
+    <td><button class="rowBtn" data-centro-prof="${x.id}" title="${esc((x.profesionales || []).join(', '))}">👩‍⚕️ ${(x.profesionales || []).length || 'Cargar'}</button></td>
+    <td><button class="rowBtn" data-centro-act="${x.id}">${x.activo === false ? 'Activar' : 'Desactivar'}</button></td></tr>`).join('') || '<tr><td colspan="7">Todavía no hay establecimientos.</td></tr>';
   const optRedes = redes.map(x => `<option value="${x.id}">${esc(x.nombre)}</option>`).join('');
   const fc = document.getElementById('admCentroForm');
   fc.red_id.innerHTML = '<option value="">Sin red (departamental)</option>' + optRedes;
@@ -2271,6 +2290,16 @@ document.getElementById('admCentros').addEventListener('change', async e => {
   showToast(centroNombre(e.target.dataset.centro) + ': ' + (k === 'hace_colposcopia' ? 'colposcopia' : 'recibe muestras') + (e.target.checked ? ' habilitado' : ' deshabilitado') + ' ✔', 'ok');
 });
 document.getElementById('admCentros').addEventListener('click', async e => {
+  const bp = e.target.closest('[data-centro-prof]');
+  if (bp) {
+    const c = centros.find(x => String(x.id) === bp.dataset.centroProf); if (!c) return;
+    const txt = prompt('Profesionales de ' + c.nombre + ' que toman PAP/VPH (separados por coma).\nEj: Dra. Ortuño, Dra. Aguilera, Dr. Tola', (c.profesionales || []).join(', '));
+    if (txt === null) return;
+    const lista = [...new Set(txt.split(/[,;\n]/).map(t => t.trim()).filter(Boolean))];
+    const { error } = await sb.from('centros_salud').update({ profesionales: lista }).eq('id', c.id);
+    if (error) return showToast('Error: ' + esc(error.message) + (/column/.test(error.message) ? ' — ejecutar el Paso 19 del SQL.' : ''), 'err');
+    c.profesionales = lista; showToast(c.nombre + ': ' + lista.length + ' profesionales ✔', 'ok'); loadAdmin(); return;
+  }
   const b = e.target.closest('[data-centro-act]'); if (!b) return;
   const c = centros.find(x => String(x.id) === b.dataset.centroAct); if (!c) return;
   const { error } = await sb.from('centros_salud').update({ activo: c.activo === false }).eq('id', c.id);
@@ -2861,30 +2890,39 @@ async function loadRed(silencioso) {
   const [desde, hasta] = redRango();
   const cSel = document.getElementById('redCentro'), centro = cSel.value || null;
   const red = perfil && perfil.rol === 'gestor' ? redNombre(perfil.red_id) : '';
-  document.getElementById('redTitulo').textContent = red ? 'Tablero de la ' + red : 'Tablero de las redes';
-  const [r, m, dt, act, pe] = await Promise.all([
+  document.getElementById('redTitulo').textContent = red ? 'Tablero de la ' + red : redes.length > 1 ? 'Tablero general · todas las redes' : 'Tablero general';
+  const [r, m, dt, act, pe, pf] = await Promise.all([
     sb.rpc('sivec_red_resumen', { p_desde: desde, p_hasta: hasta }),
     sb.rpc('sivec_red_mensual', { p_desde: redPeriodo === 0 ? '2000-01-01' : (() => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - 11); return d.toISOString().slice(0, 10); })(), p_hasta: hasta, p_centro: centro }),
     sb.rpc('sivec_red_detalle', { p_desde: desde, p_hasta: hasta, p_centro: centro }),
     sb.rpc('sivec_red_actividad', { p_centro: centro }),
-    sb.rpc('sivec_red_pendientes')]);
+    sb.rpc('sivec_red_pendientes'),
+    sb.rpc('sivec_red_profesionales', { p_desde: desde, p_hasta: hasta, p_centro: centro })]);
   const err = r.error || m.error || dt.error || act.error || pe.error;
   if (err) { document.getElementById('redKpis').innerHTML = `<div class="pnCard">Error: ${esc(err.message)}${/function/.test(err.message) ? ' — ¿ya se ejecutaron los Pasos 16 y 17 del SQL?' : ''}</div>`; return; }
   const todos = (r.data || []).filter(c => Number(c.tomas) > 0 || centros.some(x => String(x.id) === String(c.centro_id) && x.tipo === 'primer_nivel'));
   if (cSel.options.length <= 1 || cSel.dataset.n !== String(todos.length)) {
-    const cur = cSel.value; cSel.innerHTML = '<option value="">Todos los establecimientos</option>' + todos.map(c => `<option value="${c.centro_id}">${esc(c.centro)}</option>`).join(''); cSel.value = cur; cSel.dataset.n = todos.length;
+    const cur = cSel.value, redDe = c => (centros.find(x => String(x.id) === String(c.centro_id)) || {}).red_id;
+    const grupos = [...new Set(todos.map(c => String(redDe(c) || '')))];
+    const opt = c => `<option value="${c.centro_id}">${esc(c.centro)}</option>`;
+    cSel.innerHTML = '<option value="">Todos los establecimientos</option>' + (grupos.length > 1
+      ? grupos.map(g => `<optgroup label="${esc(g ? redNombre(g) : 'Departamentales')}">${todos.filter(c => String(redDe(c) || '') === g).map(opt).join('')}</optgroup>`).join('')
+      : todos.map(opt).join(''));
+    cSel.value = cur; cSel.dataset.n = todos.length;
   }
   redData = todos.filter(c => !centro || String(c.centro_id) === String(centro));
   redPend = (pe.data || []).filter(x => !centro || String(x.centro_id) === String(centro));
   const D = dt.data || {}, meses = (m.data || []), eventos = act.data || [];
+  redProf = pf.error ? null : (pf.data || []); // null = falta el Paso 19 del SQL
   redUlt = Date.now();
   if (!redTimer) redTimer = setInterval(redTick, 1000);
-  const firma = JSON.stringify([redData, D, meses, redPend.length]);
+  const firma = JSON.stringify([redData, D, meses, redPend.length, redProf]);
   const cambio = firma !== redFirma; redFirma = firma;
   redRender(D, meses, desde, hasta, silencioso && !cambio ? 'kpi' : silencioso ? 'suave' : 'todo');
   redFeed(eventos, silencioso);
   document.getElementById('redExcel').onclick = () => redExcel(desde, hasta);
 }
+let redProf = null;
 function redMetaPer(c, desde, hasta) {
   const dias = Math.max(1, Math.round((new Date(hasta + 'T12:00:00') - new Date(desde + 'T12:00:00')) / 86400000) + 1);
   return c.meta_pap_anual ? Math.round(c.meta_pap_anual * Math.min(dias, 365) / 365) : null;
@@ -3001,6 +3039,15 @@ function redRender(D, meses, desde, hasta, modo) {
   hb('redEdad', grupos.map(g => { const [a, b] = g === '< 25' ? [0, 24] : g === '65 +' ? [65, 200] : g.split('–').map(Number); return [g, Number(Ed[g] || 0), a >= clinCfg.papEdadMin && b <= clinCfg.papEdadMax]; }), a => a[2] ? 'var(--pn-one)' : 'var(--pn-mute)');
   hb('redLab', ms.map((mm, i) => [mm.label, labMes[i] || 0, null, labMes[i] != null ? labMes[i] + ' d' : '—']).filter(a => a[1] || a[3] !== '—'), a => a[1] > 30 ? 'var(--pn-crit)' : a[1] > 15 ? 'var(--pn-warn)' : 'var(--pn-good)');
 
+  // Tomas por profesional (Paso 19): el administrador ve a todos los profesionales de todas las redes.
+  const pc = document.getElementById('redProfCard');
+  pc.style.display = redProf ? '' : 'none';
+  if (redProf) {
+    const varios = new Set(redProf.map(x => x.centro_id)).size > 1, cn = id => centroNombre(id).replace(/^Centro de Salud /, 'C.S. ');
+    hb('redProf', redProf.map(x => [x.profesional + (varios ? ' · ' + cn(x.centro_id) : ''), Number(x.tomas), null, null, x]).sort((a, b) => b[1] - a[1]).slice(0, 30),
+      a => a[4].profesional === 'Sin profesional' ? 'var(--pn-mute)' : 'var(--pn-one)', null,
+      a => `<b>${esc(a[4].profesional)}</b><br>${esc(cn(a[4].centro_id))}<br>${a[1]} tomas · ${a[4].positivas} positivas · ${a[4].entregadas} resultados entregados`);
+  }
   redTablaRender(desde, hasta);
   redPendRender();
 }
@@ -4654,7 +4701,8 @@ function openEdit(p) {
   const form = document.getElementById('editForm');
   form.nombre.value = p.nombre || '';
   form.carnet.value = p.carnet || '';
-  form.doctora.value = p.doctora || 'Dra. Ortuño';
+  llenarDoctoras(p.doctora);
+  form.doctora.value = p.doctora || doctorasBase()[0];
   form.fecha_toma.value = p.fecha_toma || '';
   form.fecha_nacimiento.value = p.fecha_nacimiento || '';
   form.celular.value = p.celular || '';
@@ -5291,7 +5339,7 @@ function consultaModalEl() {
   ov = document.createElement('div'); ov.id = 'consultaOverlay';
   ov.innerHTML = `<div id="consultaModal"><h2>📝 Consulta — <span id="consultaNombre"></span></h2>
     <form id="consultaForm"><div class="cHead"><div class="field"><label>Fecha</label><input type="date" data-s="fecha" required></div>
-      <div class="field"><label>Profesional</label><select data-s="doctora">${DOCTORAS_BASE.map(d => `<option>${esc(d)}</option>`).join('')}</select></div></div>
+      <div class="field"><label>Profesional</label><select data-s="doctora">${doctorasBase().map(d => `<option>${esc(d)}</option>`).join('')}</select></div></div>
       ${soapCamposHTML()}
       <div class="actions"><button type="button" class="cancelBtn" id="consultaCancel">Cancelar</button><button type="submit" class="saveBtn">Guardar consulta</button></div>
     </form></div>`;
@@ -5328,9 +5376,9 @@ async function openConsulta(p) {
   if (prev && confirm(`${p.nombre} ya tiene una consulta del ${fmtFecha(prev.fecha) || '—'} para esta toma.\n\nAceptar = modificar esa consulta · Cancelar = crear una nueva`)) {
     consultaEditId = prev.id; soapEscribir(form, prev);
     form.querySelector('[data-s="fecha"]').value = prev.fecha || hoyISO();
-    form.querySelector('[data-s="doctora"]').value = prev.doctora || p.doctora || DOCTORAS_BASE[0];
+    form.querySelector('[data-s="doctora"]').value = prev.doctora || p.doctora || doctorasBase()[0];
   } else {
-    const doctora = p.doctora || DOCTORAS_BASE[0];
+    const doctora = p.doctora || doctorasBase()[0];
     const ant = await ultimaConsultaDelGrupo(p);
     soapEscribir(form, null, { esp: espPorDoctora(doctora), gineco: ant && ant.detalle.gineco });
     form.querySelector('[data-s="fecha"]').value = hoyISO();
@@ -5495,7 +5543,13 @@ document.getElementById('tableBody').addEventListener('click', e => {
 // ================= Panel =================
 let pnData = [];
 let pnPeriodo = 12;
-const DOCTORAS_BASE = ['Dra. Ortuño', 'Dra. Aguilera', 'Dra. Delina', 'Dr. Tola'];
+const DOCTORAS_FIJAS = ['Dra. Ortuño', 'Dra. Aguilera', 'Dra. Delina', 'Dr. Tola'];
+// Profesionales del establecimiento (los carga el administrador en Admin → Establecimientos); si no hay, la lista de siempre.
+function doctorasBase() { const c = typeof miCentro === 'function' && miCentro(); return c && Array.isArray(c.profesionales) && c.profesionales.length ? c.profesionales.slice() : DOCTORAS_FIJAS.slice(); }
+function llenarDoctoras(extra) {
+  const base = doctorasBase(); if (extra && !base.includes(extra)) base.push(extra);
+  document.querySelectorAll('select.docSel').forEach(sel => { const v = sel.value; sel.innerHTML = base.map(d => `<option>${esc(d)}</option>`).join(''); if (base.includes(v)) sel.value = v; });
+}
 const pnTip = (() => { const t = document.createElement('div'); t.id = 'pnTip'; document.body.appendChild(t); return t; })();
 function pnHover(el, html) {
   el.addEventListener('mousemove', e => { pnTip.innerHTML = html; pnTip.style.opacity = 1; pnTip.style.left = Math.min(e.clientX + 14, innerWidth - 220) + 'px'; pnTip.style.top = (e.clientY - 10) + 'px'; });
@@ -5518,7 +5572,7 @@ async function loadPanel() {
   pnData = data;
   tomasIndex = buildTomasIndex(data); // "Para hacer hoy" usa la toma más reciente de cada paciente
   const sel = document.getElementById('pnDoctora'), cur = sel.value;
-  const docs = [...new Set([...DOCTORAS_BASE, ...data.filter(p => !sinDoctora(p)).map(p => p.doctora)])];
+  const docs = [...new Set([...doctorasBase(), ...data.filter(p => !sinDoctora(p)).map(p => p.doctora)])];
   sel.innerHTML = '<option value="">Todas las doctoras</option>' + docs.map(d => `<option${d === cur ? ' selected' : ''}>${esc(d)}</option>`).join('');
   renderPanel(true);
 }
@@ -5689,7 +5743,7 @@ document.getElementById('pnAlerts').addEventListener('click', e => {
 // ================= Asignar doctora (tomas sin doctora registrada) =================
 function openAsignarDoctora() {
   const pend = pnData.filter(sinDoctora).sort((a, b) => String(a.fecha_toma || '').localeCompare(String(b.fecha_toma || '')));
-  const docs = [...new Set([...DOCTORAS_BASE, ...pnData.filter(p => !sinDoctora(p)).map(p => p.doctora)])];
+  const docs = [...new Set([...doctorasBase(), ...pnData.filter(p => !sinDoctora(p)).map(p => p.doctora)])];
   let ov = document.getElementById('asigOverlay');
   if (!ov) { ov = document.createElement('div'); ov.id = 'asigOverlay'; document.body.appendChild(ov); }
   ov.innerHTML = `<div id="asigBox">

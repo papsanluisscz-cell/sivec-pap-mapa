@@ -1289,3 +1289,79 @@ update pacientes p set fecha_envio = r.fecha_envio, lote_id = r.lote_id, lote_en
   from respaldo_envios_2026_09 r where r.id = p.id;
 delete from lotes where codigo like 'L-HIST-%';
 ```
+
+## Paso 19 — Cada uno en su función (administrador general, gestor de red, médico del centro) + profesionales por establecimiento
+
+El administrador queda sin centro ni red: ve el tablero general de todas las redes (con tomas por profesional) y la administración.
+Las contraseñas provisorias NO se guardan en este archivo: reemplazar `<clave>` al ejecutar. Cada uno la cambia con el botón 🔑 del encabezado.
+
+```sql
+-- PASO 19 · Cada uno en su función: administrador general, gestor de la Red Centro y médico de San Luis
+-- A) Profesionales de cada establecimiento (los carga el administrador)
+alter table centros_salud add column if not exists profesionales text[] not null default '{}';
+update centros_salud set profesionales = array['Dra. Ortuño', 'Dra. Aguilera', 'Dra. Delina', 'Dr. Tola']
+ where id = sivec_san_luis() and profesionales = '{}';
+
+-- B) Tomas por profesional para el tablero (gestor: su red; administrador: todas)
+create or replace function sivec_red_profesionales(p_desde date, p_hasta date, p_centro uuid default null)
+returns table (centro_id uuid, profesional text, tomas bigint, positivas bigint, entregadas bigint)
+language sql stable security definer set search_path = public as $$
+  select p.centro_id, coalesce(nullif(trim(p.doctora), ''), 'Sin profesional'), count(*),
+         count(*) filter (where p.estado_pap = 'Positivo' or p.resultado_vph = 'Positiva'),
+         count(*) filter (where p.recibio_resultado)
+    from pacientes p
+   where p.deleted_at is null and p.fecha_toma between p_desde and p_hasta
+     and p.centro_id in (select sivec_centros_tablero()) and (p_centro is null or p.centro_id = p_centro)
+   group by 1, 2 $$;
+revoke execute on function sivec_red_profesionales(date, date, uuid) from public, anon;
+grant execute on function sivec_red_profesionales(date, date, uuid) to authenticated;
+
+-- C) Cuentas: una para cada función
+do $$
+declare
+  u record;
+  v_uid uuid;
+  v_red uuid := (select id from redes where nombre ilike '%centro%' order by created_at nulls last limit 1);
+begin
+  -- Administrador general: sin centro ni red (ve todo, configura todo). Conserva su contraseña.
+  update perfiles_usuario set rol = 'admin', es_admin = true, centro_id = null, red_id = null, activo = true,
+         puede_laboratorio = false, puede_colposcopia = false
+   where id in (select id from auth.users where lower(email) = 'rferreiramedicine@gmail.com');
+  -- Nadie más administra "de costado": el administrador es un perfil propio.
+  update perfiles_usuario set es_admin = false
+   where rol <> 'admin' and id not in (select id from auth.users where lower(email) = 'rferreiramedicine@gmail.com');
+
+  for u in select * from (values
+      ('medico.sanluis@sivec.bo',  '<clave>', 'Médico · C.S. San Luis',  'centro'),
+      ('gestor.redcentro@sivec.bo', '<clave>',  'Gestor · Red Centro',     'gestor')) t(correo, clave, nombre, rol)
+  loop
+    select id into v_uid from auth.users where lower(email) = u.correo;
+    if v_uid is null then
+      v_uid := gen_random_uuid();
+      insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+        raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+        confirmation_token, email_change, email_change_token_new, recovery_token)
+      values ('00000000-0000-0000-0000-000000000000', v_uid, 'authenticated', 'authenticated', u.correo,
+        extensions.crypt(u.clave, extensions.gen_salt('bf')), now(),
+        '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', '');
+      insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+      values (gen_random_uuid(), v_uid, v_uid::text, jsonb_build_object('sub', v_uid::text, 'email', u.correo, 'email_verified', true),
+        'email', now(), now(), now());
+    end if;
+    insert into perfiles_usuario (id, correo, nombre_completo, rol, activo)
+      select v_uid, u.correo, u.nombre, u.rol, true where not exists (select 1 from perfiles_usuario where id = v_uid);
+    update perfiles_usuario set rol = u.rol, nombre_completo = u.nombre, activo = true, es_admin = false,
+           centro_id = case when u.rol = 'centro' then sivec_san_luis() end,
+           red_id = case when u.rol = 'gestor' then v_red end
+     where id = v_uid;
+  end loop;
+end $$;
+
+notify pgrst, 'reload schema';
+
+-- Resultado
+select coalesce(nombre_completo, '') as nombre, correo, rol,
+       coalesce((select nombre from centros_salud c where c.id = centro_id), (select nombre from redes r where r.id = red_id), 'Todas las redes') as lugar,
+       es_admin, activo
+  from perfiles_usuario order by rol, correo;
+```
