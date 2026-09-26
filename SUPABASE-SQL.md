@@ -876,6 +876,89 @@ notify pgrst, 'reload schema';
 
 ---
 
+## Paso 16 — Tablero de la red (gestor y administración)
+
+Botón **Red**: tomas, % de la meta, enviadas al laboratorio, resultados atrasados, positivas sin tratar, días del laboratorio y
+cobro sin SUS, por establecimiento y por mes, con descarga en Excel. El **gestor de red** ve solo este tablero (números de su red,
+sin fichas de pacientes); la única lista con nombres es la de **positivas sin tratar**, para coordinar la búsqueda activa.
+Los administradores ven todas las redes y cargan la **meta anual de PAP** de cada establecimiento en la misma tabla.
+
+```sql
+-- 1) Meta anual de PAP de cada establecimiento (la carga el administrador)
+alter table centros_salud add column if not exists meta_pap_anual int;
+
+-- 2) Quién puede ver el tablero de la red: gestor (su red) y administradores (todas)
+create or replace function sivec_ve_tablero() returns boolean language sql stable security definer set search_path = public as $$
+  select sivec_rol() in ('gestor', 'admin') or sivec_es_admin() $$;
+
+create or replace function sivec_centros_tablero() returns setof uuid language sql stable security definer set search_path = public as $$
+  select c.id from centros_salud c
+   where sivec_ve_tablero() and (sivec_rol() <> 'gestor' or c.red_id = sivec_red()) $$;
+
+-- Una toma es "positiva sin tratar" si el PAP o el VPH salió alterado y todavía no tiene derivación ni colposcopia/tratamiento/alta.
+create or replace function sivec_pos_sin_tratar(p pacientes) returns boolean language sql immutable as $$
+  select (p.estado_pap = 'Positivo' or p.resultado_vph = 'Positiva')
+     and coalesce(p.derivacion_pap, '') = '' and coalesce(p.recibio_tratamiento_vph, false) = false
+     and coalesce(p.seg_etapa, '') not in ('colpo_agendada', 'colpo_realizada', 'tratamiento', 'alta') $$;
+
+-- 3) Resumen por establecimiento (solo números)
+create or replace function sivec_red_resumen(p_desde date, p_hasta date)
+returns table (centro_id uuid, centro text, red text, meta_pap_anual int, tomas bigint, mujeres bigint, enviadas bigint, con_resultado bigint,
+  pendientes bigint, atrasadas bigint, positivas bigint, pos_sin_tratar bigint, derivadas bigint, contrarreferidas bigint,
+  entregadas bigint, rechazadas bigint, dias_lab numeric, sin_sus bigint, cobrado numeric)
+language sql stable security definer set search_path = public as $$
+  select c.id, c.nombre, (select r.nombre from redes r where r.id = c.red_id), c.meta_pap_anual,
+    count(p.id),
+    count(distinct coalesce(nullif(p.carnet, ''), p.id::text)),
+    count(p.id) filter (where p.fecha_envio is not null),
+    count(p.id) filter (where p.estado_pap in ('Positivo', 'Negativo') or coalesce(p.resultado_vph, '') <> ''),
+    count(p.id) filter (where coalesce(p.estado_pap, 'Pendiente') = 'Pendiente' and coalesce(p.tipo_examen, '') <> 'VPH'),
+    count(p.id) filter (where coalesce(p.estado_pap, 'Pendiente') = 'Pendiente' and coalesce(p.tipo_examen, '') <> 'VPH'
+                          and coalesce(p.fecha_estimada, p.fecha_toma + 90) < current_date),
+    count(p.id) filter (where p.estado_pap = 'Positivo' or p.resultado_vph = 'Positiva'),
+    count(p.id) filter (where sivec_pos_sin_tratar(p)),
+    (select count(*) from derivaciones d join pacientes q on q.id = d.paciente_id
+      where d.centro_origen = c.id and d.estado <> 'cancelada' and q.fecha_toma between p_desde and p_hasta),
+    (select count(*) from derivaciones d join pacientes q on q.id = d.paciente_id
+      where d.centro_origen = c.id and d.estado = 'contrarreferida' and q.fecha_toma between p_desde and p_hasta),
+    count(p.id) filter (where p.recibio_resultado),
+    count(p.id) filter (where p.muestra_estado in ('rechazada', 'insatisfactoria') or p.resultado_pap ilike '%insatisf%'),
+    round(avg(extract(epoch from (p.fecha_informe - p.fecha_envio::timestamptz)) / 86400) filter (where p.fecha_informe is not null and p.fecha_envio is not null)::numeric, 1),
+    count(p.id) filter (where p.cobertura = 'Sin SUS'),
+    coalesce(sum(p.monto_pago) filter (where p.cobertura = 'Sin SUS'), 0)
+  from centros_salud c
+  left join pacientes p on p.centro_id = c.id and p.deleted_at is null and p.fecha_toma between p_desde and p_hasta
+  where c.id in (select sivec_centros_tablero()) and c.activo is not false
+  group by c.id
+  order by c.nombre $$;
+
+-- 4) Tomas por mes (toda la red)
+create or replace function sivec_red_mensual(p_desde date, p_hasta date)
+returns table (mes date, centro_id uuid, tomas bigint)
+language sql stable security definer set search_path = public as $$
+  select date_trunc('month', p.fecha_toma)::date, p.centro_id, count(*)
+  from pacientes p
+  where p.deleted_at is null and p.fecha_toma between p_desde and p_hasta and p.centro_id in (select sivec_centros_tablero())
+  group by 1, 2 order by 1 $$;
+
+-- 5) Positivas sin tratar: la única lista con nombres (para coordinar la búsqueda activa)
+create or replace function sivec_red_pendientes()
+returns table (id uuid, centro_id uuid, nombre text, carnet text, celular text, fecha_toma date, resultado_pap text, resultado_vph text,
+  vph_genotipo text, fecha_resultado date, seg_etapa text, notificada boolean)
+language sql stable security definer set search_path = public as $$
+  select p.id, p.centro_id, p.nombre, p.carnet, p.celular, p.fecha_toma, p.resultado_pap, p.resultado_vph, p.vph_genotipo,
+    coalesce(p.fecha_informe::date, p.fecha_toma), p.seg_etapa, coalesce(p.recibio_resultado, false)
+  from pacientes p
+  where p.deleted_at is null and sivec_pos_sin_tratar(p) and p.centro_id in (select sivec_centros_tablero())
+  order by p.fecha_toma $$;
+
+revoke execute on function sivec_ve_tablero(), sivec_centros_tablero(), sivec_red_resumen(date, date), sivec_red_mensual(date, date), sivec_red_pendientes() from public, anon;
+grant execute on function sivec_ve_tablero(), sivec_centros_tablero(), sivec_red_resumen(date, date), sivec_red_mensual(date, date), sivec_red_pendientes() to authenticated;
+notify pgrst, 'reload schema';
+```
+
+---
+
 ## Paso 3 — Proteger los datos de las pacientes (IMPORTANTE)
 
 Hoy cualquiera que tenga la URL y la clave *anon* de Supabase puede leer todos los datos.

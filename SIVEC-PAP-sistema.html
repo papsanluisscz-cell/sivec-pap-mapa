@@ -495,6 +495,27 @@
   body.dark #contrarrefBanner { background: #251d33; border-color: #4a3a66; color: #ddd0fb; }
   .colFila { cursor: pointer; } .colFila:hover td { background: color-mix(in srgb, var(--teal-700) 5%, transparent); } .colFila.on td { background: color-mix(in srgb, var(--teal-700) 10%, transparent); }
   .urg { font-size: 10.5px; font-weight: 800; color: #fff; background: #dc2626; border-radius: 5px; padding: 1px 6px; margin-left: 4px; }
+  /* Tablero de la red */
+  #redView { padding: 24px 32px; overflow-y: auto; }
+  @media (max-width: 700px) { #redView { padding: 16px 12px; } }
+  .redFiltros { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 6px 0 14px; font-size: 13px; }
+  .redFiltros input { border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; background: var(--surface); color: var(--ink); margin-left: 4px; }
+  .redKpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .redKpi { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .redKpi .v { font-size: 26px; font-weight: 800; line-height: 1.1; color: var(--ink); }
+  .redKpi .l { font-size: 12px; color: var(--ink-soft); margin-top: 3px; }
+  .redKpi .s { font-size: 11.5px; margin-top: 4px; font-weight: 700; }
+  .redKpi .s.mal { color: #b91c1c; } .redKpi .s.ojo { color: #b45309; } .redKpi .s.bien { color: #15803d; }
+  .redCard { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; overflow-x: auto; }
+  .redCard h3 { margin: 0 0 10px; font-size: 15px; }
+  .redCard table { font-size: 12.5px; } .redCard td, .redCard th { padding: 7px 8px; white-space: nowrap; }
+  .redCard th[data-ord] { cursor: pointer; } .redCard th[data-ord]:hover { color: var(--ink); }
+  .redCard td.num, .redCard th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .metaBar { display: inline-block; width: 90px; height: 8px; border-radius: 4px; background: var(--line); vertical-align: middle; margin-right: 6px; overflow: hidden; }
+  .metaBar i { display: block; height: 100%; border-radius: 4px; background: var(--teal-700); }
+  .sem { font-weight: 700; } .sem.mal { color: #b91c1c; } .sem.ojo { color: #b45309; }
+  .redMeta { width: 70px; border: 1px solid var(--line); border-radius: 6px; padding: 3px 5px; background: var(--surface); color: var(--ink); text-align: right; }
+  #redTip { position: fixed; pointer-events: none; background: #2b1d24; color: #fff; font-size: 12px; padding: 6px 9px; border-radius: 7px; display: none; z-index: 999; }
   .rolTag { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 8px; background: #f3e5ea; color: #7d2a4c; }
   body.dark .rolTag { background: #3a2530; color: #f1a7c3; }
   .sinRolBox { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 32px; width: 380px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -719,7 +740,7 @@
   .metChip { display: block; width: 100%; text-align: left; border: none; border-radius: 6px; padding: 2px 5px; margin-bottom: 3px; font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; font-family: inherit; }
   .metChip.venc { background: #fee2e2; color: #991b1b; } .metChip.prox { background: #fff4d6; color: #8a5300; } .metChip.fut { background: var(--paper); color: var(--ink-soft); border: 1px solid var(--line); }
   .metMore { font-size: 10.5px; color: var(--ink-soft); }
-  #metodosView .pnSeg button.on { background: var(--teal-700); color: #fff; font-weight: 600; }
+  #metodosView .pnSeg button.on, #redView .pnSeg button.on { background: var(--teal-700); color: #fff; font-weight: 600; }
   @media (max-width: 700px) { .metCal { grid-template-columns: repeat(2, 1fr); } .metCal.mes { grid-template-columns: repeat(7, 1fr); } .metCal.mes .metChip { font-size: 0; padding: 0; height: 6px; } }
   /* ===== Panel ===== */
   #panelView { --pn-grid: color-mix(in srgb, var(--line) 70%, transparent); --pn-one: #7d2a4c; --pn-good: #16a34a; --pn-warn: #d97706; --pn-crit: #dc2626; --pn-mute: #9a8690; }
@@ -914,6 +935,7 @@
       <button data-view="metodos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span class="navLabel">Métodos</span></button>
       <button data-view="trash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span class="navLabel">Papelera</span></button>
       <button data-view="portal" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/></svg><span class="navLabel">Portal</span></button>
+      <button data-view="red" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v4M12 11.5 6.5 17M12 11.5l5.5 5.5"/></svg><span class="navLabel">Red</span></button>
       <button data-view="admin" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg><span class="navLabel">Admin</span></button>
     </nav>
     <div class="headerActions">
@@ -1267,6 +1289,16 @@
         </form>
         <p class="hint" style="margin:8px 0 0">Si la persona ya tiene cuenta en Supabase, basta el correo. Si no, escribí una contraseña provisoria y el sistema le crea la cuenta (si Supabase pide confirmar el correo: Authentication → Users → la cuenta → <i>Confirm</i>). Nunca se borra un usuario: se desactiva.</p>
       </section>
+    </div>
+
+    <!-- TABLERO DE LA RED (gestor / administración): paso 5 -->
+    <div id="redView" class="view">
+      <h2 id="redTitulo">Tablero de la red</h2>
+      <p class="hint">Números por establecimiento, sin datos de pacientes (salvo la lista de <b>positivas sin tratar</b>, para coordinar la búsqueda activa). Se actualiza solo con lo que cargan los centros, el laboratorio y la colposcopia.</p>
+      <div class="redFiltros"><span class="pnSeg" id="redPeriodo"><button type="button" data-p="anio" class="on">Este año</button><button type="button" data-p="12m">Últimos 12 meses</button><button type="button" data-p="mes">Este mes</button><button type="button" data-p="todo">Todo</button></span>
+        <label>Desde <input type="date" id="redDesde"></label><label>Hasta <input type="date" id="redHasta"></label>
+        <button type="button" class="rowBtn" id="redExcel">📊 Descargar Excel</button></div>
+      <div id="redBody"><p class="hint">Cargando…</p></div>
     </div>
 
     <!-- PORTAL (oncológico / colposcopia): pasos 3 y 4 -->
@@ -1841,7 +1873,8 @@ function esColpo() { const c = miCentro(); return !!(conRoles() && (perfil.puede
 // Nivel de atención. Los servicios (colposcopia, recibir muestras) se habilitan aparte en cada establecimiento.
 const TIPOS_CENTRO = { primer_nivel: '1er nivel · centro de salud', segundo_nivel: '2º nivel · hospital básico', tercer_nivel: '3er nivel · hospital general', oncologico: '4º nivel · oncológico' };
 // Pantallas de cada rol (null = todas las del centro). El administrador puro no ve datos clínicos.
-const VISTAS_ROL = { centro: null, gestor: ['list', 'segpap', 'segvph', 'balance', 'map', 'panel', 'metodos'], oncologico: ['portal'], colposcopia: ['portal'], admin: [] };
+// El gestor ve solo números (tablero de la red), no las fichas de las pacientes.
+const VISTAS_ROL = { centro: null, gestor: ['red'], oncologico: ['portal'], colposcopia: ['portal'], admin: ['red'] };
 const VISTAS_CENTRO = ['form', 'list', 'segpap', 'segvph', 'balance', 'map', 'panel', 'metodos', 'trash'];
 let perfil = null, redes = [], centros = [], centroActivo = '';
 
@@ -1872,6 +1905,7 @@ function vistasPermitidas() {
   const v = VISTAS_ROL[perfil.rol];
   const base = v === null || v === undefined ? VISTAS_CENTRO.slice() : v.slice();
   if ((esLab() || esColpo()) && !base.includes('portal')) base.push('portal');
+  if (perfil.es_admin && !base.includes('red')) base.push('red');
   if (perfil.es_admin || perfil.rol === 'admin') base.push('admin');
   return base;
 }
@@ -1913,12 +1947,8 @@ function aplicarRol() {
     document.getElementById('rolBadge').innerHTML = `<b>${esc(perfil.nombre_completo || perfil.correo || '')}</b><span>${esc(ROLES[perfil.rol] || ROLES_VIEJOS[perfil.rol] || perfil.rol)}${lugar ? ' · ' + esc(lugar) : ''}${esLab() && perfil.rol !== 'oncologico' ? ' · laboratorio' : ''}${esColpo() && perfil.rol !== 'colposcopia' ? ' · colposcopia' : ''}${perfil.es_admin && perfil.rol !== 'admin' ? ' · admin' : ''}</span>`;
     const vis = centrosVisibles();
     if (['centro', 'oncologico', 'colposcopia'].includes(perfil.rol)) { centroActivo = perfil.centro_id ? String(perfil.centro_id) : ''; sel.style.display = 'none'; }
-    else if (perfil.rol === 'gestor') {
-      let guardado = ''; try { guardado = localStorage.getItem('sivec_centro_sel') || ''; } catch (e) {}
-      centroActivo = vis.some(c => String(c.id) === guardado) ? guardado : '';
-      sel.innerHTML = `<option value="">Todos los centros de la red (${vis.length})</option>` + vis.map(c => `<option value="${c.id}">${esc(c.nombre)}</option>`).join('');
-      sel.value = centroActivo; sel.style.display = '';
-    } else { centroActivo = ''; sel.style.display = 'none'; }
+    // El gestor ya no elige centro: ve el tablero de toda su red (solo números).
+    else { centroActivo = ''; sel.style.display = 'none'; }
   }
   const activa = document.querySelector('nav button.active');
   const actual = activa && activa.dataset.view;
@@ -2267,6 +2297,7 @@ function switchView(name) {
   if (name === 'metodos') loadMetodos();
   if (name === 'balance') loadLotes();
   if (name === 'admin') loadAdmin();
+  if (name === 'red') loadRed();
   if (name === 'portal') loadPortal();
 }
 
@@ -2744,6 +2775,117 @@ function colDetalle(d) {
       colTab = f.biopsia && k === 'enviar' ? 'biopsia' : 'hechas'; colSel = null; colForm = null; return colCargar();
     }
   };
+}
+
+// ================= Tablero de la red (Paso 16 del SQL) =================
+let redPeriodo = 'anio', redData = [], redOrden = { k: 'centro', asc: true };
+function redRango() {
+  const hoy = hoyISO(), y = hoy.slice(0, 4);
+  if (redPeriodo === 'anio') return [y + '-01-01', hoy];
+  if (redPeriodo === 'mes') return [hoy.slice(0, 8) + '01', hoy];
+  if (redPeriodo === '12m') { const d = new Date(hoy + 'T12:00:00'); d.setFullYear(d.getFullYear() - 1); d.setDate(d.getDate() + 1); return [d.toISOString().slice(0, 10), hoy]; }
+  if (redPeriodo === 'todo') return ['2000-01-01', hoy];
+  return [document.getElementById('redDesde').value || y + '-01-01', document.getElementById('redHasta').value || hoy];
+}
+document.getElementById('redPeriodo').addEventListener('click', e => { const b = e.target.closest('[data-p]'); if (!b) return; redPeriodo = b.dataset.p; loadRed(); });
+['redDesde', 'redHasta'].forEach(id => document.getElementById(id).addEventListener('change', () => { redPeriodo = 'custom'; loadRed(); }));
+const redPct = (a, b) => b ? Math.round(100 * a / b) : null;
+async function loadRed() {
+  const body = document.getElementById('redBody');
+  const [desde, hasta] = redRango();
+  document.getElementById('redDesde').value = desde; document.getElementById('redHasta').value = hasta;
+  document.querySelectorAll('#redPeriodo button').forEach(b => b.classList.toggle('on', b.dataset.p === redPeriodo));
+  const red = perfil && perfil.rol === 'gestor' ? redNombre(perfil.red_id) : '';
+  document.getElementById('redTitulo').textContent = red ? 'Tablero de la ' + red : 'Tablero de las redes';
+  body.innerHTML = '<p class="hint">Cargando…</p>';
+  const [r, m, pe] = await Promise.all([sb.rpc('sivec_red_resumen', { p_desde: desde, p_hasta: hasta }), sb.rpc('sivec_red_mensual', { p_desde: desde, p_hasta: hasta }), sb.rpc('sivec_red_pendientes')]);
+  const err = r.error || m.error || pe.error;
+  if (err) { body.innerHTML = `<div class="redCard">Error: ${esc(err.message)}${/function/.test(err.message) ? ' — ¿ya se ejecutó el Paso 16 del SQL?' : ''}</div>`; return; }
+  redData = (r.data || []).filter(c => Number(c.tomas) > 0 || centros.some(x => String(x.id) === String(c.centro_id) && x.tipo === 'primer_nivel'));
+  const dias = Math.max(1, Math.round((new Date(hasta + 'T12:00:00') - new Date(desde + 'T12:00:00')) / 86400000) + 1);
+  const T = k => redData.reduce((a, c) => a + (Number(c[k]) || 0), 0);
+  const metaPer = c => c.meta_pap_anual ? Math.round(c.meta_pap_anual * Math.min(dias, 365) / 365) : null;
+  const metaTot = redData.reduce((a, c) => a + (metaPer(c) || 0), 0);
+  const labs = redData.filter(c => c.dias_lab != null), diasLab = labs.length ? (labs.reduce((a, c) => a + Number(c.dias_lab) * Number(c.enviadas || 1), 0) / labs.reduce((a, c) => a + Number(c.enviadas || 1), 0)).toFixed(1) : null;
+  const tomas = T('tomas'), pctMeta = redPct(tomas, metaTot);
+  const kpi = (v, l, s, cls) => `<div class="redKpi"><div class="v">${v}</div><div class="l">${l}</div>${s ? `<div class="s ${cls || ''}">${s}</div>` : ''}</div>`;
+  const pend = pe.data || [];
+  const hoy = new Date(hoyISO() + 'T12:00:00');
+  body.innerHTML = `<div class="redKpis">
+      ${kpi(tomas.toLocaleString('es-BO'), 'Tomas en el período', metaTot ? `${pctMeta}% de la meta (${metaTot.toLocaleString('es-BO')})` : 'sin meta cargada', metaTot ? (pctMeta >= 90 ? 'bien' : pctMeta >= 60 ? 'ojo' : 'mal') : '')}
+      ${kpi(T('mujeres').toLocaleString('es-BO'), 'Mujeres distintas')}
+      ${kpi((redPct(T('enviadas'), tomas) ?? '—') + '%', 'Enviadas al laboratorio', T('tomas') - T('enviadas') ? (T('tomas') - T('enviadas')) + ' sin enviar' : '✓ todas enviadas', T('tomas') - T('enviadas') ? 'ojo' : 'bien')}
+      ${kpi(T('atrasadas'), 'Resultado atrasado (> 90 días)', T('atrasadas') ? '⚠ buscar el resultado' : '✓ ninguno', T('atrasadas') ? 'mal' : 'bien')}
+      ${kpi(pend.length, 'Positivas sin tratar', pend.length ? '● búsqueda activa (lista abajo)' : '✓ ninguna', pend.length ? 'mal' : 'bien')}
+      ${kpi(diasLab ? diasLab + ' d' : '—', 'Días del laboratorio', 'del envío al informe digital')}
+      ${kpi(T('sin_sus') ? 'Bs ' + T('cobrado').toLocaleString('es-BO') : '—', 'Cobrado en caja', T('sin_sus') ? T('sin_sus') + ' tomas sin SUS' : 'todas con SUS')}
+    </div>
+    <div class="redCard"><h3>Tomas por mes</h3><div id="redChart"></div></div>
+    <div class="redCard"><h3>Por establecimiento</h3><div id="redTabla"></div><p class="hint" style="margin:8px 0 0">Tocá el título de una columna para ordenar. La meta es anual; en el período se prorratea.${perfil && perfil.es_admin ? ' Como administrador podés cargar la meta acá mismo.' : ''}</p></div>
+    <div class="redCard"><h3>● Positivas sin tratar · ${pend.length}</h3>${pend.length ? `<table><thead><tr><th>Establecimiento</th><th>Paciente</th><th>CI</th><th>Celular</th><th>Toma</th><th>Resultado</th><th class="num">Días</th><th>Informada</th></tr></thead><tbody>${pend.map(x => {
+      const d = Math.round((hoy - new Date(String(x.fecha_resultado || x.fecha_toma) + 'T12:00:00')) / 86400000);
+      return `<tr><td>${esc(centroNombre(x.centro_id))}</td><td><b>${esc(x.nombre)}</b></td><td>${esc(x.carnet || '—')}</td><td>${esc(x.celular || '—')}</td><td>${fmtFecha(x.fecha_toma)}</td>
+        <td>${esc(x.resultado_pap || '')}${x.resultado_vph === 'Positiva' ? ' · VPH+' + (x.vph_genotipo ? ' ' + esc(x.vph_genotipo) : '') : ''}</td><td class="num"><span class="sem ${d > 30 ? 'mal' : d > 15 ? 'ojo' : ''}">${d}</span></td><td>${x.notificada ? '✓ sí' : '<span class="sem mal">✗ no</span>'}</td></tr>`;
+    }).join('')}</tbody></table><p class="hint" style="margin:8px 0 0">PAP o VPH alterado sin derivación, colposcopia ni tratamiento registrado. Salen de la lista cuando el centro deriva o registra el seguimiento.</p>` : '<p class="hint" style="margin:0">Ninguna. 🎉</p>'}</div>`;
+  redTablaRender(metaPer);
+  redGrafico(m.data || [], desde, hasta);
+  document.getElementById('redExcel').onclick = () => redExcel(metaPer, pend, desde, hasta);
+}
+function redTablaRender(metaPer) {
+  const cols = [['centro', 'Establecimiento'], ['tomas', 'Tomas'], ['meta', 'Meta período'], ['pmeta', '% meta'], ['enviadas', 'Enviadas'], ['con_resultado', 'Con resultado'], ['atrasadas', 'Atrasadas'], ['positivas', 'Positivas'], ['pos_sin_tratar', 'Sin tratar'], ['derivadas', 'Derivadas'], ['contrarreferidas', 'Contrarref.'], ['entregadas', 'Entregadas'], ['rechazadas', 'Rechaz./insat.'], ['dias_lab', 'Días lab.'], ['sin_sus', 'Sin SUS']];
+  const val = (c, k) => k === 'meta' ? metaPer(c) : k === 'pmeta' ? redPct(Number(c.tomas), metaPer(c)) : k === 'centro' ? c.centro : c[k] == null ? null : Number(c[k]);
+  const filas = redData.slice().sort((a, b) => { const x = val(a, redOrden.k), y = val(b, redOrden.k); const r = x == null ? 1 : y == null ? -1 : typeof x === 'string' ? x.localeCompare(y) : x - y; return redOrden.asc ? r : -r; });
+  const esAdm = perfil && (perfil.es_admin || perfil.rol === 'admin');
+  const box = document.getElementById('redTabla');
+  box.innerHTML = `<table><thead><tr>${cols.map(([k, t]) => `<th data-ord="${k}" class="${k === 'centro' ? '' : 'num'}">${t}${redOrden.k === k ? (redOrden.asc ? ' ▲' : ' ▼') : ''}</th>`).join('')}</tr></thead><tbody>${filas.map(c => {
+    const pm = val(c, 'pmeta');
+    return `<tr><td><b>${esc(c.centro)}</b></td><td class="num">${c.tomas}</td>
+      <td class="num">${esAdm ? `<input class="redMeta" type="number" min="0" data-meta="${c.centro_id}" value="${c.meta_pap_anual ?? ''}" placeholder="anual" title="Meta anual de PAP">` + (metaPer(c) ? `<div class="loteCod">${metaPer(c)} en el período</div>` : '') : (metaPer(c) ?? '—')}</td>
+      <td class="num">${pm == null ? '—' : `<span class="metaBar"><i style="width:${Math.min(100, pm)}%"></i></span>${pm}%`}</td>
+      <td class="num">${c.enviadas}</td><td class="num">${c.con_resultado}</td>
+      <td class="num">${Number(c.atrasadas) ? `<span class="sem mal">⚠ ${c.atrasadas}</span>` : '0'}</td><td class="num">${c.positivas}</td>
+      <td class="num">${Number(c.pos_sin_tratar) ? `<span class="sem mal">● ${c.pos_sin_tratar}</span>` : '0'}</td>
+      <td class="num">${c.derivadas}</td><td class="num">${c.contrarreferidas}</td><td class="num">${c.entregadas}</td>
+      <td class="num">${Number(c.rechazadas) ? `<span class="sem ojo">${c.rechazadas}</span>` : '0'}</td><td class="num">${c.dias_lab ?? '—'}</td>
+      <td class="num">${Number(c.sin_sus) ? `${c.sin_sus} · Bs ${Number(c.cobrado).toLocaleString('es-BO')}` : '0'}</td></tr>`;
+  }).join('') || '<tr><td colspan="15">Sin establecimientos.</td></tr>'}</tbody></table>`;
+  box.onclick = e => { const th = e.target.closest('[data-ord]'); if (!th) return; redOrden = { k: th.dataset.ord, asc: redOrden.k === th.dataset.ord ? !redOrden.asc : th.dataset.ord === 'centro' }; redTablaRender(metaPer); };
+  box.onchange = async e => {
+    const i = e.target.closest('[data-meta]'); if (!i) return;
+    const v = i.value === '' ? null : Math.max(0, parseInt(i.value, 10) || 0);
+    const { error } = await sb.from('centros_salud').update({ meta_pap_anual: v }).eq('id', i.dataset.meta);
+    if (error) return showToast('No se pudo guardar la meta: ' + esc(error.message), 'err');
+    showToast('Meta guardada ✔', 'ok'); loadRed();
+  };
+}
+function redGrafico(rows, desde, hasta) {
+  const box = document.getElementById('redChart');
+  const meses = []; const d = new Date(desde.slice(0, 7) + '-01T12:00:00'), fin = new Date(hasta.slice(0, 7) + '-01T12:00:00');
+  if (redPeriodo === 'todo') { const min = rows.reduce((a, r) => r.mes < a ? r.mes : a, hasta.slice(0, 7) + '-01'); d.setTime(new Date(min.slice(0, 7) + '-01T12:00:00').getTime()); }
+  while (d <= fin && meses.length < 60) { meses.push(d.toISOString().slice(0, 7)); d.setMonth(d.getMonth() + 1); }
+  const tot = meses.map(mm => rows.filter(r => String(r.mes).slice(0, 7) === mm).reduce((a, r) => a + Number(r.tomas), 0));
+  const porCentro = mm => rows.filter(r => String(r.mes).slice(0, 7) === mm).map(r => [centroNombre(r.centro_id), Number(r.tomas)]).sort((a, b) => b[1] - a[1]);
+  const max = Math.max(1, ...tot), W = Math.max(320, box.clientWidth || 900), H = 190, pl = 34, pb = 26, pt = 10, bw = (W - pl - 8) / Math.max(1, meses.length);
+  const MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  const paso = Math.max(1, Math.ceil(max / 4 / 5) * 5), ymax = Math.ceil(max / paso) * paso, ticks = []; for (let t = 0; t <= ymax; t += paso) ticks.push(t);
+  const yy = v => pt + (H - pt - pb) * (1 - v / ymax);
+  box.innerHTML = `<svg width="${W}" height="${H}" role="img" aria-label="Tomas por mes">
+    ${ticks.map(t => `<line x1="${pl}" x2="${W - 4}" y1="${yy(t)}" y2="${yy(t)}" stroke="var(--line)" stroke-width="1"/><text x="${pl - 6}" y="${yy(t) + 4}" text-anchor="end" font-size="10.5" fill="var(--ink-soft)">${t}</text>`).join('')}
+    ${meses.map((mm, i) => { const x = pl + i * bw + Math.max(2, bw * 0.18), w = Math.max(3, bw * 0.64), h = Math.max(0, yy(0) - yy(tot[i]));
+      return `<g class="redBar" data-i="${i}"><rect x="${pl + i * bw}" y="${pt}" width="${bw}" height="${H - pt - pb}" fill="transparent"/>${tot[i] ? `<path d="M${x},${yy(0)} v${-(h - 4)} q0,-4 4,-4 h${w - 8} q4,0 4,4 v${h - 4} z" fill="var(--teal-700)"/>` : ''}
+        ${meses.length <= 14 || i % Math.ceil(meses.length / 12) === 0 ? `<text x="${pl + i * bw + bw / 2}" y="${H - 8}" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">${MES[+mm.slice(5, 7) - 1]}${mm.slice(5, 7) === '01' || i === 0 ? ' ' + mm.slice(2, 4) : ''}</text>` : ''}</g>`; }).join('')}
+  </svg>`;
+  let tip = document.getElementById('redTip'); if (!tip) { tip = document.createElement('div'); tip.id = 'redTip'; document.body.appendChild(tip); }
+  box.onmousemove = e => { const g = e.target.closest('.redBar'); if (!g) { tip.style.display = 'none'; return; } const i = +g.dataset.i, mm = meses[i];
+    tip.innerHTML = `<b>${MES[+mm.slice(5, 7) - 1]} ${mm.slice(0, 4)} · ${tot[i]} tomas</b>${porCentro(mm).slice(0, 8).map(([n, v]) => `<br>${esc(n)}: ${v}`).join('')}`;
+    tip.style.display = 'block'; tip.style.left = Math.min(e.clientX + 12, innerWidth - 260) + 'px'; tip.style.top = (e.clientY + 12) + 'px'; };
+  box.onmouseleave = () => { tip.style.display = 'none'; };
+}
+function redExcel(metaPer, pend, desde, hasta) {
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(redData.map(c => ({ 'Establecimiento': c.centro, 'Red': c.red || 'departamental', 'Tomas': Number(c.tomas), 'Mujeres': Number(c.mujeres), 'Meta anual': c.meta_pap_anual, 'Meta período': metaPer(c), '% meta': redPct(Number(c.tomas), metaPer(c)), 'Enviadas': Number(c.enviadas), 'Con resultado': Number(c.con_resultado), 'Pendientes': Number(c.pendientes), 'Atrasadas (>90 d)': Number(c.atrasadas), 'Positivas': Number(c.positivas), 'Positivas sin tratar': Number(c.pos_sin_tratar), 'Derivadas': Number(c.derivadas), 'Contrarreferidas': Number(c.contrarreferidas), 'Resultado entregado': Number(c.entregadas), 'Rechazadas/insatisfactorias': Number(c.rechazadas), 'Días laboratorio': c.dias_lab, 'Sin SUS': Number(c.sin_sus), 'Cobrado Bs': Number(c.cobrado) }))), 'Por establecimiento');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(pend.map(x => ({ 'Establecimiento': centroNombre(x.centro_id), 'Paciente': x.nombre, 'CI': x.carnet, 'Celular': x.celular, 'Toma': x.fecha_toma, 'Resultado PAP': x.resultado_pap, 'VPH': x.resultado_vph, 'Genotipo': x.vph_genotipo, 'Informada': x.notificada ? 'Sí' : 'No' }))), 'Positivas sin tratar');
+  XLSX.writeFile(wb, `SIVEC-PAP_tablero_${desde}_${hasta}.xlsx`);
 }
 
 let lastBalanceData = [];
