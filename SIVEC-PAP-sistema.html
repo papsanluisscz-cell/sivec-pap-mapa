@@ -979,6 +979,7 @@
     body.printingBalance #balancePrintArea tr { page-break-inside: avoid; break-inside: avoid; }
     body.printingBalance #balancePrintArea th, body.printingBalance #balancePrintArea td { border: 1px solid #999; padding: 3px 4px; color: #000; background: #fff; }
   }
+body:not(.cobroOn) .cobroCampo { display: none !important; }
 </style>
 </head>
 <body>
@@ -1148,7 +1149,7 @@
           <div class="field"><label>Tipo de examen<span class="helpTip" data-tip="Elegí VPH si la paciente vino solo para el test de VPH, sin toma de PAP. Así no queda marcada como Pendiente de un PAP que nunca se hizo.">ⓘ</span></label>
             <select name="tipo_examen"><option>Papanicolau</option><option>Colposcopia</option><option>VPH</option></select>
           </div>
-          <div class="field"><label>Cobertura<span class="helpTip" data-tip="Con SUS la toma de PAP es gratis. Sin SUS se paga en la caja del hospital (por defecto Bs 30): anotá el número de recibo.">ⓘ</span></label>
+          <div class="field cobroCampo"><label>Cobertura<span class="helpTip" data-tip="Con SUS la toma de PAP es gratis. Sin SUS se paga en la caja del hospital (por defecto Bs 30): anotá el número de recibo.">ⓘ</span></label>
             <select name="cobertura" class="cobSel"><option value="">— Sin dato —</option><option value="SUS">SUS (gratis)</option><option value="Sin SUS">Sin SUS · paga en caja</option></select>
             <div class="cobPago" style="display:none;margin-top:6px;gap:6px"><input name="monto_pago" placeholder="Bs" value="30" style="width:80px"><input name="recibo_caja" placeholder="N° de recibo de caja" style="flex:1"></div>
           </div>
@@ -1481,8 +1482,8 @@
         <div class="pnCard"><h3>Resultados del PAP</h3><div class="pnCap" id="redPapCap"></div><div class="pnStack" id="redStackPap"></div><div class="pnLegend" id="redLegPap"></div>
           <h3 style="margin-top:20px">VPH</h3><div class="pnCap" id="redVphCap"></div><div class="pnStack" id="redStackVph"></div><div class="pnLegend" id="redLegVph"></div></div>
         <div class="pnCard"><h3>Mujeres por edad</h3><div class="pnCap" id="redEdadCap"></div><div class="pnHb" id="redEdad"></div></div>
-        <div class="pnCard"><h3>Cobertura</h3><div class="pnCap" id="redCobCap"></div><div class="pnStack" id="redStackCob"></div><div class="pnLegend" id="redLegCob"></div>
-          <h3 style="margin-top:20px">Días del laboratorio</h3><div class="pnCap">Del envío al informe digital, por mes</div><div class="pnHb" id="redLab"></div></div>
+        <div class="pnCard"><div class="cobroCampo" style="margin-bottom:20px"><h3>Cobertura</h3><div class="pnCap" id="redCobCap"></div><div class="pnStack" id="redStackCob"></div><div class="pnLegend" id="redLegCob"></div></div>
+          <h3>Días del laboratorio</h3><div class="pnCap">Del envío al informe digital, por mes</div><div class="pnHb" id="redLab"></div></div>
       </div>
       <div class="pnCard" style="margin-top:14px" id="redProfCard"><h3>Tomas por profesional</h3><div class="pnCap" id="redProfCap">Quién tomó cada PAP/VPH en el período · pasá el mouse para ver positivas y entregas</div><div class="pnHb" id="redProf"></div></div>
       <div class="redCard" style="margin-top:14px"><h3>Por establecimiento</h3><div id="redTabla"></div><p class="hint" style="margin:8px 0 0" id="redTablaNota"></p></div>
@@ -1748,7 +1749,7 @@
         <div class="field"><label>N° Registro D8</label><input name="numero_folio_d8" placeholder="Ej: 0056476"></div>
       </div>
       <div class="field"><label>N° Registro PAP</label><input name="numero_folio_pap" placeholder="Ej: 0056476"></div>
-      <div class="field"><label>Cobertura<span class="helpTip" data-tip="Con SUS la toma de PAP es gratis. Sin SUS se paga en la caja del hospital (por defecto Bs 30): anotá el número de recibo.">ⓘ</span></label>
+      <div class="field cobroCampo"><label>Cobertura<span class="helpTip" data-tip="Con SUS la toma de PAP es gratis. Sin SUS se paga en la caja del hospital (por defecto Bs 30): anotá el número de recibo.">ⓘ</span></label>
             <select name="cobertura" class="cobSel"><option value="">— Sin dato —</option><option value="SUS">SUS (gratis)</option><option value="Sin SUS">Sin SUS · paga en caja</option></select>
             <div class="cobPago" style="display:none;margin-top:6px;gap:6px"><input name="monto_pago" placeholder="Bs" value="30" style="width:80px"><input name="recibo_caja" placeholder="N° de recibo de caja" style="flex:1"></div>
           </div>
@@ -2171,6 +2172,9 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 // Sin esas tablas, o sin sesión, el sistema funciona como siempre (un solo centro).
 // Rol = qué ve la persona. "Profesional de salud" registra tomas en su establecimiento y, si el establecimiento
 // tiene el servicio, además puede tener permiso de Laboratorio y/o Colposcopia (un solo usuario por persona).
+// Cobro de la toma / colposcopia sin SUS (Paso 15). Apagado por ahora: los datos ya guardados se conservan; poner true para volver a mostrarlo.
+const COBRO_ACTIVO = false;
+if (COBRO_ACTIVO) document.body.classList.add('cobroOn');
 const ROLES = { centro: 'Profesional de salud', gestor: 'Gestor de red', admin: 'Administrador' };
 const ROLES_VIEJOS = { oncologico: 'Laboratorio de citología', colposcopia: 'Colposcopia' };
 function miCentro() { return perfil && centros.find(c => String(c.id) === String(perfil.centro_id)); }
@@ -2292,7 +2296,7 @@ function loadPortal() {
   document.getElementById('portalTitulo').textContent = esL ? '🔬 Portal del laboratorio — ' + lugar : esC ? '🩺 Portal de colposcopia — ' + lugar : 'Portal';
   document.getElementById('portalTexto').innerHTML = esL
     ? 'Recibí los lotes que mandan los centros, informá PAP (Bethesda) y VPH, y firmá: el resultado <b>aparece solo en la ficha del centro</b>, sin papel. Solo se ven las muestras enviadas a este establecimiento.'
-    : esC ? 'Pacientes derivadas por los centros: dale la cita, cobrá en caja si no tiene SUS, registrá la colposcopia, la biopsia y el tratamiento, y mandá la <b>contrarreferencia</b>: llega sola a la ficha del centro. Solo se ven las pacientes derivadas a este establecimiento.'
+    : esC ? 'Pacientes derivadas por los centros: dale la cita, ' + (COBRO_ACTIVO ? 'cobrá en caja si no tiene SUS, ' : '') + 'registrá la colposcopia, la biopsia y el tratamiento, y mandá la <b>contrarreferencia</b>: llega sola a la ficha del centro. Solo se ven las pacientes derivadas a este establecimiento.'
     : 'Tu usuario no tiene permiso de laboratorio ni de colposcopia en este establecimiento.';
   if (esL) labCargar();
   if (esC) colCargar();
@@ -2732,6 +2736,7 @@ function calcVencimientoMetodo(metodo, fechaInicio) {
 
 // Cobertura de la toma: con SUS gratis; sin SUS se paga en caja (Paso 15 del SQL: monto y recibo).
 async function limpiarCobertura(data) {
+  if (!COBRO_ACTIVO) { for (const k of ['cobertura', 'monto_pago', 'recibo_caja']) delete data[k]; return; }
   if (data.cobertura !== 'Sin SUS') { data.monto_pago = null; data.recibo_caja = null; }
   else { data.monto_pago = Number(String(data.monto_pago || '').replace(',', '.')) || null; data.recibo_caja = (data.recibo_caja || '').trim() || null; }
   if (!data.cobertura) data.cobertura = null;
@@ -2980,7 +2985,7 @@ function derFormulario(p) {
       <div class="labSec">Motivo</div><input type="text" id="derMotivo" value="${esc(derMotivoSugerido(p))}" placeholder="Ej: HSIL, ASC-H, LSIL persistente, VPH 16/18">
       <div class="labSec">Indicación</div><div class="labChips">${['Colposcopia', 'Colposcopia + biopsia', 'Tratamiento (LEEP / cono)'].map(v => `<button type="button" class="labChip${st.indicacion === v ? ' on' : ''}" data-dg="indicacion" data-v="${v}">${v}</button>`).join('')}</div>
       <div class="labSec">Prioridad</div><div class="labChips">${[['normal', 'Normal'], ['urgente', 'Urgente']].map(([k, v]) => `<button type="button" class="labChip${k === 'urgente' ? ' alto' : ''}${st.prioridad === k ? ' on' : ''}" data-dg="prioridad" data-v="${k}">${v}</button>`).join('')}</div>
-      <div class="labSec">Cobertura</div><div class="labChips">${[['SUS', 'SUS'], ['Sin SUS', 'Sin SUS']].map(([k, v]) => `<button type="button" class="labChip${st.cobertura === k ? ' on' : ''}" data-dg="cobertura" data-v="${k}">${v}</button>`).join('')}
+      <div class="labSec cobroCampo">Cobertura</div><div class="labChips cobroCampo">${[['SUS', 'SUS'], ['Sin SUS', 'Sin SUS']].map(([k, v]) => `<button type="button" class="labChip${st.cobertura === k ? ' on' : ''}" data-dg="cobertura" data-v="${k}">${v}</button>`).join('')}
         <span style="display:${st.cobertura === 'Sin SUS' ? 'inline-flex' : 'none'};align-items:center;gap:5px;font-size:13px">Bs <input type="text" id="derMonto" value="" placeholder="si cobran" style="width:90px"></span></div>
       <div class="labSec">Notas para el hospital (opcional)</div><textarea id="derNotas" rows="2" placeholder="Antecedentes, embarazo, dificultades para asistir…"></textarea>
       <div class="acts"><button type="button" class="primary" data-da="enviar">📤 Derivar</button><button type="button" class="rowBtn" data-da="cerrar" style="margin-left:auto">Cancelar</button></div>
@@ -2993,12 +2998,12 @@ function derFormulario(p) {
     const a = e.target.closest('[data-da]'); if (!a) return;
     if (a.dataset.da === 'cerrar') return derCerrar();
     const destino = g('derDestino');
-    if (!st.cobertura) { alert('Indicá si la paciente tiene SUS o no.'); return; }
-    const monto = st.cobertura === 'Sin SUS' ? Number(String(g('derMonto')).replace(',', '.')) || null : null;
-    const { data, error } = await sb.rpc('sivec_derivar', { p_paciente: p.id, p_destino: destino, p_motivo: g('derMotivo'), p_indicacion: st.indicacion, p_prioridad: st.prioridad, p_notas: g('derNotas'), p_por: perfil.nombre_completo || perfil.correo || '', p_cobertura: st.cobertura, p_monto: monto });
+    if (COBRO_ACTIVO && !st.cobertura) { alert('Indicá si la paciente tiene SUS o no.'); return; }
+    const monto = COBRO_ACTIVO && st.cobertura === 'Sin SUS' ? Number(String(g('derMonto')).replace(',', '.')) || null : null;
+    const { data, error } = await sb.rpc('sivec_derivar', { p_paciente: p.id, p_destino: destino, p_motivo: g('derMotivo'), p_indicacion: st.indicacion, p_prioridad: st.prioridad, p_notas: g('derNotas'), p_por: perfil.nombre_completo || perfil.correo || '', p_cobertura: COBRO_ACTIVO ? st.cobertura : null, p_monto: monto });
     if (error) { alert('No se pudo derivar: ' + error.message); return; }
     const d = Array.isArray(data) ? data[0] : data;
-    p.cobertura = st.cobertura;
+    if (COBRO_ACTIVO) p.cobertura = st.cobertura;
     showToast(`${esc(p.nombre)} derivada a ${esc(centroNombre(destino))} ✔`, 'ok');
     derivMap.set(String(p.id), d); p.derivacion_pap = centroNombre(destino);
     renderBanners(allPatientsData); applyListFilters(true);
@@ -3019,7 +3024,7 @@ function derDetalle(p, d, recien) {
     <p class="hint" style="margin:0">${esc(p.nombre)} · CI ${esc(p.carnet || '—')} · ${esc(dest)}</p>
     <div class="derDato">${fila('Derivada', fmtFecha(d.fecha_derivacion) + (d.derivado_por ? ' · ' + esc(d.derivado_por) : ''))}${fila('Motivo', esc(d.motivo || '—') + ' · ' + esc(d.indicacion || '') + (d.prioridad === 'urgente' ? ' <span class="urg">URGENTE</span>' : ''))}
       ${fila('Estado', esc(DER_ESTADO[d.estado] || d.estado) + (d.fecha_cita ? ' · cita ' + fmtFecha(d.fecha_cita) : ''))}
-      ${fila('Cobertura', d.cobertura === 'Sin SUS' ? 'Sin SUS' + (d.monto ? ' · Bs ' + esc(d.monto) + ' en la caja del hospital' : '') + (d.pago_recibo ? ' · pagado (' + esc(d.pago_recibo) + ')' : '') : d.cobertura ? 'SUS' : '')}
+      ${fila('Cobertura', !COBRO_ACTIVO ? '' : d.cobertura === 'Sin SUS' ? 'Sin SUS' + (d.monto ? ' · Bs ' + esc(d.monto) + ' en la caja del hospital' : '') + (d.pago_recibo ? ' · pagado (' + esc(d.pago_recibo) + ')' : '') : d.cobertura ? 'SUS' : '')}
       ${vuelta ? fila('Atendida', (d.fecha_atencion ? fmtFecha(d.fecha_atencion) : '') + (d.atendido_por ? ' · ' + esc(d.atendido_por) : '')) + fila('Colposcopia', esc(derResumenColpo(d.colposcopia))) + fila('Biopsia', d.biopsia_tomada ? (d.biopsia_resultado ? '<b style="color:#991b1b">' + esc(d.biopsia_resultado) + '</b>' : 'tomada · resultado pendiente') : (d.colposcopia ? 'no se tomó' : '')) + fila('Tratamiento', esc(d.tratamiento || '')) + fila('Próximo control', esc(d.proximo_control || '')) + fila('Indicaciones', esc(d.contrarreferencia || '')) : ''}</div>
     <div class="acts">${derEsNueva(d) ? '<button type="button" class="primary" data-dd="visto">✓ Visto</button>' : ''}
       <button type="button" class="rowBtn" data-dd="boleta">🖨 Boleta de referencia</button>
@@ -3061,7 +3066,7 @@ function derBoleta(p, d) {
     <div class="g"><div><b>Establecimiento que refiere</b>${esc(org)}</div><div><b>Establecimiento de destino</b>${esc(dest)}</div>
       <div><b>Paciente</b>${esc(p.nombre || '')}</div><div><b>CI · edad</b>${esc(p.carnet || '—')} · ${edadDe(p.fecha_nacimiento) ?? '—'} años</div>
       <div><b>Celular</b>${esc(p.celular || '—')}</div><div><b>Dirección</b>${esc(p.direccion || '—')}</div>
-      <div><b>Cobertura</b>${d.cobertura === 'Sin SUS' ? 'Sin SUS' + (d.monto ? ' · Bs ' + esc(d.monto) + ' en caja del hospital' : '') : d.cobertura === 'SUS' ? 'SUS' : '—'}</div></div>
+      ${COBRO_ACTIVO ? `<div><b>Cobertura</b>${d.cobertura === 'Sin SUS' ? 'Sin SUS' + (d.monto ? ' · Bs ' + esc(d.monto) + ' en caja del hospital' : '') : d.cobertura === 'SUS' ? 'SUS' : '—'}</div>` : ''}</div>
     <div class="box"><h3>Motivo de la referencia</h3>${esc(d.motivo || '—')} · ${esc(d.indicacion || '')}<br>PAP ${fmtFecha(p.fecha_toma)}: ${esc(p.resultado_pap || 'pendiente')}${p.resultado_vph ? ' · VPH ' + esc(p.resultado_vph) + (p.vph_genotipo ? ' ' + esc(p.vph_genotipo) : '') : ''}${d.notas ? '<br>Notas: ' + esc(d.notas) : ''}</div>
     <div class="firma">${esc(d.derivado_por || '')}<br>Firma y sello</div>
     <div class="box" style="margin-top:14mm;min-height:60mm"><h3>Contrarreferencia (para el hospital, si no usa el SIVEC)</h3>Colposcopia: ______________________________________________<br><br>Biopsia: ______________ Resultado: ______________<br><br>Tratamiento: _____________________ Próximo control: _____________<br><br>Firma y sello: ______________________</div>`;
@@ -3093,7 +3098,7 @@ function colRender() {
   const pane = document.getElementById('colPane');
   pane.innerHTML = `<div class="labCard"><table><thead><tr><th>Paciente</th><th>Centro que deriva</th><th>Motivo</th><th>Derivada</th><th>${colTab === 'citadas' ? 'Cita' : 'Estado'}</th></tr></thead><tbody>${lista.map(d => {
     const dias = Math.round((hoy - new Date(d.fecha_derivacion + 'T12:00:00')) / 86400000);
-    return `<tr class="colFila${d.id === colSel ? ' on' : ''}" data-col="${d.id}"><td><b>${esc(d.nombre)}</b>${d.prioridad === 'urgente' ? '<span class="urg">URGENTE</span>' : ''}${d.cobertura === 'Sin SUS' ? `<span class="urg" style="background:${d.pago_recibo ? '#15803d' : '#b45309'}">💵 ${d.pago_recibo ? 'pagó' : 'sin SUS' + (d.monto ? ' · Bs ' + esc(d.monto) : '')}</span>` : ''}<div class="loteCod">CI ${esc(d.carnet || '—')} · ${edadDe(d.fecha_nacimiento) ?? '—'} a · ☎ ${esc(d.celular || '—')}</div></td>
+    return `<tr class="colFila${d.id === colSel ? ' on' : ''}" data-col="${d.id}"><td><b>${esc(d.nombre)}</b>${d.prioridad === 'urgente' ? '<span class="urg">URGENTE</span>' : ''}${COBRO_ACTIVO && d.cobertura === 'Sin SUS' ? `<span class="urg" style="background:${d.pago_recibo ? '#15803d' : '#b45309'}">💵 ${d.pago_recibo ? 'pagó' : 'sin SUS' + (d.monto ? ' · Bs ' + esc(d.monto) : '')}</span>` : ''}<div class="loteCod">CI ${esc(d.carnet || '—')} · ${edadDe(d.fecha_nacimiento) ?? '—'} a · ☎ ${esc(d.celular || '—')}</div></td>
       <td>${esc(centroNombre(d.centro_origen))}</td><td>${esc(d.motivo || '—')}<div class="loteCod">${esc(d.indicacion || '')}</div></td><td>${fmtFecha(d.fecha_derivacion)}<div class="loteCod">${dias} día${dias === 1 ? '' : 's'}</div></td>
       <td>${d.estado === 'citada' ? fmtFecha(d.fecha_cita) : d.estado === 'no_asistio' ? '<span class="balPill no">no asistió</span>' : d.estado === 'contrarreferida' ? '<span class="balPill rec">contrarreferida</span>' : esc(DER_ESTADO[d.estado] || d.estado)}${d.biopsia_tomada ? `<div class="loteCod">biopsia: ${esc(d.biopsia_resultado || 'pendiente')}</div>` : ''}</td></tr>`;
   }).join('') || '<tr><td colspan="5">No hay pacientes en esta lista.</td></tr>'}</tbody></table></div><div id="colDet" style="margin-top:14px"></div>`;
@@ -3108,7 +3113,7 @@ function colDetalle(d) {
   const yaAtendida = ['atendida', 'contrarreferida'].includes(d.estado);
   box.innerHTML = `<div class="labCard"><div class="labHead">${esc(d.nombre)} · ${edadDe(d.fecha_nacimiento) ?? '—'} a<span>CI ${esc(d.carnet || '—')} · ☎ ${esc(d.celular || '—')} · ${esc(d.direccion || '')} · deriva ${esc(centroNombre(d.centro_origen))}${d.derivado_por ? ' (' + esc(d.derivado_por) + ')' : ''}</span></div>
     <div class="derDato"><b>Motivo</b><span>${esc(d.motivo || '—')} · ${esc(d.indicacion || '')}${d.prioridad === 'urgente' ? ' <span class="urg">URGENTE</span>' : ''}</span><b>Antecedentes PAP/VPH</b><span>${esc(d.antecedentes || '—')}</span>${d.notas ? `<b>Notas del centro</b><span>${esc(d.notas)}</span>` : ''}
-      <b>Cobertura</b><span>${d.cobertura === 'Sin SUS' ? `<b style="color:#b45309">Sin SUS${d.monto ? ' · cobrar Bs ' + esc(d.monto) + ' en caja' : ' · cobrar según tarifa del hospital'}</b>${d.pago_recibo ? ' · ✓ pagado (' + esc(d.pago_recibo) + ')' : ` <input type="text" id="colRecibo" placeholder="N° de recibo de caja" style="width:170px;display:inline-block;margin-left:6px"> <button type="button" class="rowBtn" data-ca="pago">💵 Registrar pago</button>`}` : d.cobertura === 'SUS' ? 'SUS — sin costo' : '—'}</span></div>
+      ${COBRO_ACTIVO ? `<b>Cobertura</b><span>${d.cobertura === 'Sin SUS' ? `<b style="color:#b45309">Sin SUS${d.monto ? ' · cobrar Bs ' + esc(d.monto) + ' en caja' : ' · cobrar según tarifa del hospital'}</b>${d.pago_recibo ? ' · ✓ pagado (' + esc(d.pago_recibo) + ')' : ` <input type="text" id="colRecibo" placeholder="N° de recibo de caja" style="width:170px;display:inline-block;margin-left:6px"> <button type="button" class="rowBtn" data-ca="pago">💵 Registrar pago</button>`}` : d.cobertura === 'SUS' ? 'SUS — sin costo' : '—'}</span>` : ''}</div>
     ${!yaAtendida ? `<div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin:6px 0 4px"><label style="font-size:12px;font-weight:700;color:var(--ink-soft)">FECHA DE CITA<input type="date" id="colCita" value="${esc(d.fecha_cita || '')}" style="display:block;margin-top:3px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--surface);color:var(--ink)"></label><button type="button" class="rowBtn" data-ca="cita">📅 Guardar cita</button>${d.estado === 'citada' ? '<button type="button" class="rowBtn" data-ca="noasistio">✗ No asistió</button>' : ''}</div>` : ''}
     ${colTab === 'biopsia' || (yaAtendida && d.biopsia_tomada) ? `<div class="labSec">Resultado de la biopsia</div><div class="labChips">${COL_BIOPSIA.map(v => `<button type="button" class="labChip ${v.startsWith('Negativo') ? 'neg' : /CIN 1/.test(v) ? '' : 'alto'}${d.biopsia_resultado === v ? ' on' : ''}" data-biop="${esc(v)}">${esc(v)}</button>`).join('')}</div><p class="hint" style="margin:6px 0 0">Al guardarlo, el centro recibe el resultado como contrarreferencia nueva.</p>` : ''}
     <div class="labCols" style="margin-top:6px"><div>
@@ -3404,7 +3409,7 @@ function redFeed(eventos, silencioso) {
 }
 function redTablaRender(desde, hasta) {
   const metaPer = c => redMetaPer(c, desde, hasta);
-  const cols = [['centro', 'Establecimiento'], ['tomas', 'Tomas'], ['meta', 'Meta período'], ['pmeta', '% meta'], ['enviadas', 'Enviadas'], ['con_resultado', 'Con resultado'], ['atrasadas', 'Atrasadas'], ['positivas', 'Positivas'], ['pos_sin_tratar', 'Sin tratar'], ['derivadas', 'Derivadas'], ['contrarreferidas', 'Contrarref.'], ['entregadas', 'Entregadas'], ['rechazadas', 'Rechaz./insat.'], ['dias_lab', 'Días lab.'], ['sin_sus', 'Sin SUS']];
+  const cols = [['centro', 'Establecimiento'], ['tomas', 'Tomas'], ['meta', 'Meta período'], ['pmeta', '% meta'], ['enviadas', 'Enviadas'], ['con_resultado', 'Con resultado'], ['atrasadas', 'Atrasadas'], ['positivas', 'Positivas'], ['pos_sin_tratar', 'Sin tratar'], ['derivadas', 'Derivadas'], ['contrarreferidas', 'Contrarref.'], ['entregadas', 'Entregadas'], ['rechazadas', 'Rechaz./insat.'], ['dias_lab', 'Días lab.'], ['sin_sus', 'Sin SUS']].filter(([k]) => COBRO_ACTIVO || k !== 'sin_sus');
   const val = (c, k) => k === 'meta' ? metaPer(c) : k === 'pmeta' ? (metaPer(c) ? redPct(Number(c.tomas), metaPer(c)) : null) : k === 'centro' ? c.centro : c[k] == null ? null : Number(c[k]);
   const filas = redData.slice().sort((a, b) => { const x = val(a, redOrden.k), y = val(b, redOrden.k); const r = x == null ? 1 : y == null ? -1 : typeof x === 'string' ? x.localeCompare(y) : x - y; return x == null || y == null ? r : (redOrden.asc ? r : -r); });
   const esAdm = perfil && (perfil.es_admin || perfil.rol === 'admin');
@@ -3419,8 +3424,8 @@ function redTablaRender(desde, hasta) {
       <td class="num">${Number(c.pos_sin_tratar) ? `<span class="sem mal">● ${c.pos_sin_tratar}</span>` : '0'}</td>
       <td class="num">${c.derivadas}</td><td class="num">${c.contrarreferidas}</td><td class="num">${c.entregadas}</td>
       <td class="num">${Number(c.rechazadas) ? `<span class="sem ojo">${c.rechazadas}</span>` : '0'}</td><td class="num">${c.dias_lab ?? '—'}</td>
-      <td class="num">${Number(c.sin_sus) ? `${c.sin_sus} · Bs ${Number(c.cobrado).toLocaleString('es-BO')}` : '0'}</td></tr>`;
-  }).join('') || '<tr><td colspan="15">Sin establecimientos.</td></tr>'}</tbody></table>`;
+      ${COBRO_ACTIVO ? `<td class="num">${Number(c.sin_sus) ? `${c.sin_sus} · Bs ${Number(c.cobrado).toLocaleString('es-BO')}` : '0'}</td>` : ''}</tr>`;
+  }).join('') || '<tr><td colspan="${cols.length}">Sin establecimientos.</td></tr>'}</tbody></table>`;
   document.getElementById('redTablaNota').textContent = 'Tocá el título de una columna para ordenar. La meta es anual; en el período se prorratea.' + (esAdm ? ' Como administrador podés cargar la meta acá mismo.' : '');
   box.onclick = e => { const th = e.target.closest('[data-ord]'); if (!th) return; redOrden = { k: th.dataset.ord, asc: redOrden.k === th.dataset.ord ? !redOrden.asc : th.dataset.ord === 'centro' }; redTablaRender(desde, hasta); };
   box.onchange = async e => {
@@ -3442,7 +3447,7 @@ function redPendRender() {
 function redExcel(desde, hasta) {
   const metaPer = c => redMetaPer(c, desde, hasta);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(redData.map(c => ({ 'Establecimiento': c.centro, 'Red': c.red || 'departamental', 'Tomas': Number(c.tomas), 'Mujeres': Number(c.mujeres), 'Meta anual': c.meta_pap_anual, 'Meta período': metaPer(c), '% meta': metaPer(c) ? redPct(Number(c.tomas), metaPer(c)) : null, 'Enviadas': Number(c.enviadas), 'Con resultado': Number(c.con_resultado), 'Pendientes': Number(c.pendientes), 'Atrasadas (>90 d)': Number(c.atrasadas), 'Positivas': Number(c.positivas), 'Positivas sin tratar': Number(c.pos_sin_tratar), 'Derivadas': Number(c.derivadas), 'Contrarreferidas': Number(c.contrarreferidas), 'Resultado entregado': Number(c.entregadas), 'Rechazadas/insatisfactorias': Number(c.rechazadas), 'Días laboratorio': c.dias_lab, 'Sin SUS': Number(c.sin_sus), 'Cobrado Bs': Number(c.cobrado) }))), 'Por establecimiento');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(redData.map(c => ({ 'Establecimiento': c.centro, 'Red': c.red || 'departamental', 'Tomas': Number(c.tomas), 'Mujeres': Number(c.mujeres), 'Meta anual': c.meta_pap_anual, 'Meta período': metaPer(c), '% meta': metaPer(c) ? redPct(Number(c.tomas), metaPer(c)) : null, 'Enviadas': Number(c.enviadas), 'Con resultado': Number(c.con_resultado), 'Pendientes': Number(c.pendientes), 'Atrasadas (>90 d)': Number(c.atrasadas), 'Positivas': Number(c.positivas), 'Positivas sin tratar': Number(c.pos_sin_tratar), 'Derivadas': Number(c.derivadas), 'Contrarreferidas': Number(c.contrarreferidas), 'Resultado entregado': Number(c.entregadas), 'Rechazadas/insatisfactorias': Number(c.rechazadas), 'Días laboratorio': c.dias_lab, ...(COBRO_ACTIVO ? { 'Sin SUS': Number(c.sin_sus), 'Cobrado Bs': Number(c.cobrado) } : {}) }))), 'Por establecimiento');
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(redPend.map(x => ({ 'Establecimiento': centroNombre(x.centro_id), 'Paciente': x.nombre, 'CI': x.carnet, 'Celular': x.celular, 'Toma': x.fecha_toma, 'Resultado PAP': x.resultado_pap, 'VPH': x.resultado_vph, 'Genotipo': x.vph_genotipo, 'Informada': x.notificada ? 'Sí' : 'No' }))), 'Positivas sin tratar');
   XLSX.writeFile(wb, `SIVEC-PAP_tablero_${desde}_${hasta}.xlsx`);
 }
@@ -3481,7 +3486,7 @@ async function loadBalance() {
       <div class="balTile"><div class="v">${data.length}</div><div class="l">Tomas en el período</div></div>
       ${envioOk ? `<div class="balTile"><div class="v" style="color:#16a34a">${enviadas}</div><div class="l">Enviadas al laboratorio</div></div>
       <div class="balTile"><div class="v" style="color:${data.length - enviadas ? '#d97706' : '#16a34a'}">${data.length - enviadas}</div><div class="l">Falta enviar</div></div>` : ''}
-      ${data.some(p => p.cobertura) ? (() => { const sin = data.filter(p => p.cobertura === 'Sin SUS'); const bs = sin.reduce((a, p) => a + (Number(p.monto_pago) || 0), 0); return `<div class="balTile"><div class="v">${data.filter(p => p.cobertura === 'SUS').length} <span style="font-size:14px;color:var(--ink-soft)">SUS</span> · ${sin.length} <span style="font-size:14px;color:var(--ink-soft)">sin SUS</span></div><div class="l">Cobrado en caja: Bs ${bs.toLocaleString('es-BO')}${sin.some(p => !p.recibo_caja) ? ' · ' + sin.filter(p => !p.recibo_caja).length + ' sin recibo' : ''}</div></div>`; })() : ''}
+      ${COBRO_ACTIVO && data.some(p => p.cobertura) ? (() => { const sin = data.filter(p => p.cobertura === 'Sin SUS'); const bs = sin.reduce((a, p) => a + (Number(p.monto_pago) || 0), 0); return `<div class="balTile"><div class="v">${data.filter(p => p.cobertura === 'SUS').length} <span style="font-size:14px;color:var(--ink-soft)">SUS</span> · ${sin.length} <span style="font-size:14px;color:var(--ink-soft)">sin SUS</span></div><div class="l">Cobrado en caja: Bs ${bs.toLocaleString('es-BO')}${sin.some(p => !p.recibo_caja) ? ' · ' + sin.filter(p => !p.recibo_caja).length + ' sin recibo' : ''}</div></div>`; })() : ''}
       <div class="balTile"><div class="l" style="margin-bottom:4px">Por doctora</div><div class="balDocs">${Object.entries(porDoc).sort((a, b) => b[1] - a[1]).map(([d, n]) => `${esc(d)} <b>${n}</b>`).join(' · ')}</div></div>
     </div>
     ${envioOk && lotesSi ? loteBarraHTML() : envioOk ? `<div class="balLote"><b id="balSel">0 marcadas</b> → <span>Fecha de envío</span> <input type="date" id="balFechaEnvio" value="${hoyISO()}"> <span>Lote</span> <input id="balLote" value="L-${hoyISO().slice(0, 4)}-${String(Math.ceil((new Date() - new Date(new Date().getFullYear(), 0, 1)) / 604800000)).padStart(2, '0')}" style="width:110px">
