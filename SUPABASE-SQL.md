@@ -213,15 +213,15 @@ grant select, insert, update, delete on redes, centros_salud, perfiles_usuario t
 grant select on perfiles_usuario to anon;  -- no ve ninguna fila: solo sirve para que el sistema sepa que ya hay roles y pida iniciar sesión
 
 -- 4) El piloto: Red Centro y C.S. San Luis (si ya hay un centro "San Luis", se usa ese)
-insert into redes (nombre, municipio) values ('Red Centro', 'Santa Cruz de la Sierra') on conflict (nombre) do nothing;
-insert into redes (nombre) select distinct trim(red) from centros_salud where coalesce(trim(red), '') <> '' on conflict (nombre) do nothing;
-update centros_salud c set red_id = r.id from redes r where c.red_id is null and r.nombre = trim(c.red);
+insert into redes (nombre, municipio) select 'Red Centro', 'Santa Cruz de la Sierra' where not exists (select 1 from redes where nombre ilike 'red centro') and not exists (select 1 from centros_salud where trim(red) ilike 'red centro');
+insert into redes (nombre) select distinct on (lower(trim(red))) trim(red) from centros_salud where coalesce(trim(red), '') <> '' and not exists (select 1 from redes r where lower(r.nombre) = lower(trim(red)));
+update centros_salud c set red_id = r.id from redes r where c.red_id is null and lower(r.nombre) = lower(trim(c.red));
 insert into centros_salud (nombre, red, red_id, tipo, activo)
-  select 'C.S. San Luis', 'Red Centro', (select id from redes where nombre = 'Red Centro'), 'primer_nivel', true
+  select 'C.S. San Luis', 'Red Centro', (select id from redes where nombre ilike 'red centro' limit 1), 'primer_nivel', true
   where not exists (select 1 from centros_salud where nombre ilike '%san luis%');
 create or replace function sivec_san_luis() returns uuid language sql stable as $$
   select id from centros_salud where nombre ilike '%san luis%' order by created_at nulls last, nombre limit 1 $$;
-update centros_salud set red_id = coalesce(red_id, (select id from redes where nombre = 'Red Centro')) where id = sivec_san_luis();
+update centros_salud set red_id = coalesce(red_id, (select id from redes where nombre ilike 'red centro' limit 1)) where id = sivec_san_luis();
 
 -- 5) Cada paciente pertenece a un centro: las de hoy (sin centro) son de San Luis; las nuevas, del centro de quien las registra
 update pacientes set centro_id = sivec_san_luis() where centro_id is null;
