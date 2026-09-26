@@ -1060,6 +1060,86 @@ notify pgrst, 'reload schema';
 
 ---
 
+## Paso 18 — Tablero: contar como "enviada" también la toma que ya tiene resultado
+
+Antes del lote digital las láminas se llevaban en papel y no se marcaba la fecha de envío: sin esto el tablero mostraba "0% enviadas".
+
+```sql
+-- Una toma cuenta como enviada al laboratorio si tiene fecha de envío o si ya tiene resultado
+-- (antes del lote digital las láminas se llevaban en papel y no se marcaba el envío).
+create or replace function sivec_enviada(p pacientes) returns boolean language sql immutable as $$
+  select p.fecha_envio is not null or p.estado_pap in ('Positivo', 'Negativo')
+      or coalesce(p.resultado_pap, '') <> '' or coalesce(p.resultado_vph, '') <> '' $$;
+
+create or replace function sivec_red_resumen(p_desde date, p_hasta date)
+returns table (centro_id uuid, centro text, red text, meta_pap_anual int, tomas bigint, mujeres bigint, enviadas bigint, con_resultado bigint,
+  pendientes bigint, atrasadas bigint, positivas bigint, pos_sin_tratar bigint, derivadas bigint, contrarreferidas bigint,
+  entregadas bigint, rechazadas bigint, dias_lab numeric, sin_sus bigint, cobrado numeric)
+language sql stable security definer set search_path = public as $$
+  select c.id, c.nombre, (select r.nombre from redes r where r.id = c.red_id), c.meta_pap_anual,
+    count(p.id),
+    count(distinct coalesce(nullif(p.carnet, ''), p.id::text)),
+    count(p.id) filter (where sivec_enviada(p)),
+    count(p.id) filter (where p.estado_pap in ('Positivo', 'Negativo') or coalesce(p.resultado_vph, '') <> ''),
+    count(p.id) filter (where coalesce(p.estado_pap, 'Pendiente') = 'Pendiente' and coalesce(p.tipo_examen, '') <> 'VPH'),
+    count(p.id) filter (where coalesce(p.estado_pap, 'Pendiente') = 'Pendiente' and coalesce(p.tipo_examen, '') <> 'VPH'
+                          and coalesce(p.fecha_estimada, p.fecha_toma + 90) < current_date),
+    count(p.id) filter (where p.estado_pap = 'Positivo' or p.resultado_vph = 'Positiva'),
+    count(p.id) filter (where sivec_pos_sin_tratar(p)),
+    (select count(*) from derivaciones d join pacientes q on q.id = d.paciente_id
+      where d.centro_origen = c.id and d.estado <> 'cancelada' and q.fecha_toma between p_desde and p_hasta),
+    (select count(*) from derivaciones d join pacientes q on q.id = d.paciente_id
+      where d.centro_origen = c.id and d.estado = 'contrarreferida' and q.fecha_toma between p_desde and p_hasta),
+    count(p.id) filter (where p.recibio_resultado),
+    count(p.id) filter (where p.muestra_estado in ('rechazada', 'insatisfactoria') or p.resultado_pap ilike '%insatisf%'),
+    round(avg(extract(epoch from (p.fecha_informe - p.fecha_envio::timestamptz)) / 86400) filter (where p.fecha_informe is not null and p.fecha_envio is not null)::numeric, 1),
+    count(p.id) filter (where p.cobertura = 'Sin SUS'),
+    coalesce(sum(p.monto_pago) filter (where p.cobertura = 'Sin SUS'), 0)
+  from centros_salud c
+  left join pacientes p on p.centro_id = c.id and p.deleted_at is null and p.fecha_toma between p_desde and p_hasta
+  where c.id in (select sivec_centros_tablero()) and c.activo is not false
+  group by c.id
+  order by c.nombre $$;
+
+create or replace function sivec_red_detalle(p_desde date, p_hasta date, p_centro uuid default null) returns jsonb
+language sql stable security definer set search_path = public as $$
+  with p as (
+    select * from pacientes
+     where deleted_at is null and fecha_toma between p_desde and p_hasta
+       and centro_id in (select sivec_centros_tablero()) and (p_centro is null or centro_id = p_centro)),
+  d as (select dv.* from derivaciones dv join p on p.id = dv.paciente_id where dv.estado <> 'cancelada')
+  select jsonb_build_object(
+    'estado', jsonb_build_object(
+       'Negativo', (select count(*) from p where estado_pap = 'Negativo'),
+       'Pendiente', (select count(*) from p where coalesce(estado_pap, 'Pendiente') = 'Pendiente' and coalesce(tipo_examen, '') <> 'VPH'),
+       'Positivo', (select count(*) from p where estado_pap = 'Positivo')),
+    'vph', jsonb_build_object('Negativa', (select count(*) from p where resultado_vph = 'Negativa'), 'Positiva', (select count(*) from p where resultado_vph = 'Positiva'),
+       'g16', (select count(*) from p where resultado_vph = 'Positiva' and vph_genotipo ~ '16'), 'g18', (select count(*) from p where resultado_vph = 'Positiva' and vph_genotipo ~ '18')),
+    'bethesda', (select coalesce(jsonb_object_agg(b, n), '{}'::jsonb) from (select sivec_bethesda(resultado_pap) b, count(*) n from p where sivec_bethesda(resultado_pap) is not null group by 1) x),
+    'edad', (select coalesce(jsonb_object_agg(g, n), '{}'::jsonb) from (
+       select case when e < 25 then '< 25' when e < 35 then '25–34' when e < 45 then '35–44' when e < 55 then '45–54' when e < 65 then '55–64' else '65 +' end g, count(*) n
+         from (select extract(year from age(fecha_toma, fecha_nacimiento))::int e from p where fecha_nacimiento is not null) y group by 1) x),
+    'cobertura', jsonb_build_object('SUS', (select count(*) from p where cobertura = 'SUS'), 'Sin SUS', (select count(*) from p where cobertura = 'Sin SUS'), 'Sin dato', (select count(*) from p where cobertura is null)),
+    'embudo', jsonb_build_object(
+       'tomas', (select count(*) from p),
+       'enviadas', (select count(*) from p where sivec_enviada(p)),
+       'con_resultado', (select count(*) from p where estado_pap in ('Positivo', 'Negativo') or coalesce(resultado_vph, '') <> ''),
+       'entregadas', (select count(*) from p where recibio_resultado),
+       'positivas', (select count(*) from p where estado_pap = 'Positivo' or resultado_vph = 'Positiva'),
+       'con_conducta', (select count(*) from p where (estado_pap = 'Positivo' or resultado_vph = 'Positiva') and not sivec_pos_sin_tratar(p)),
+       'derivadas', (select count(*) from d),
+       'atendidas', (select count(*) from d where estado in ('atendida', 'contrarreferida')),
+       'tratadas', (select count(*) from d where coalesce(tratamiento, '') not in ('', 'Ninguno (control)'))),
+    'lab_mes', (select coalesce(jsonb_agg(jsonb_build_object('mes', m, 'dias', dias) order by m), '[]'::jsonb) from (
+       select to_char(date_trunc('month', fecha_toma), 'YYYY-MM') m, round(avg(extract(epoch from (fecha_informe - fecha_envio::timestamptz)) / 86400)::numeric, 1) dias
+         from p where fecha_informe is not null and fecha_envio is not null group by 1) x)
+  ) where sivec_ve_tablero() $$;
+
+notify pgrst, 'reload schema';
+```
+
+---
+
 ## Paso 3 — Proteger los datos de las pacientes (IMPORTANTE)
 
 Hoy cualquiera que tenga la URL y la clave *anon* de Supabase puede leer todos los datos.
