@@ -1554,6 +1554,10 @@
   <label style="display:flex;gap:8px;align-items:center;font-weight:600"><input type="checkbox" id="requireLoginChk" style="width:auto"> Exigir inicio de sesión</label>
   <p class="hint" style="margin-top:4px">Activalo recién cuando las cuentas de cada doctora estén creadas en Supabase (Authentication → Users). Para que los datos queden realmente protegidos, hay que activar también las reglas RLS (instrucciones en SUPABASE-SQL.md).</p>
 
+  <label style="margin-top:24px">Presentaciones</label>
+  <label style="display:flex;gap:8px;align-items:center;font-weight:600"><input type="checkbox" id="presentarChk" style="width:auto"> Modo presentación</label>
+  <p class="hint" style="margin-top:4px">Para mostrar el sistema con los números reales sin exponer a las pacientes: los nombres, carnets, celulares y direcciones se ven cambiados y no se guarda ningún cambio. Solo afecta a esta computadora.</p>
+
   <label style="margin-top:24px">Clave de Google Maps (opcional)</label>
   <p class="hint" style="margin-top:0">Sin clave, el mapa busca las direcciones con OpenStreetMap (gratis). Con una clave de Google Maps (API "Maps JavaScript" + "Geocoding" activadas) las direcciones se buscan con Google, igual que en Google Maps.</p>
   <input id="gmapsKeyInput" placeholder="AIza...">
@@ -1878,6 +1882,55 @@ const COLORS = { Positivo: '#7c3aed', 'Positivo VPH': '#dc2626', Negativo: '#ea8
 const COLORS_PAP = { Positivo: '#7c3aed', Negativo: '#ea8c2e', Pendiente: '#2f6fb0', SinPap: '#9ca3af' };
 const COLORS_VPH = { Positiva: '#dc2626', Negativa: '#16a34a' };
 // Supabase devuelve como máximo 1000 filas por consulta: esto trae todo, de a 1000.
+// ================= Modo presentación =================
+// Números reales, personas irreconocibles: se reemplazan nombre, carnet, celular y dirección al LEER, y no se escribe nada.
+let modoPresentacion = false;
+try { modoPresentacion = localStorage.getItem('sivec_presentacion') === '1'; } catch (_) {}
+const PR_NOM = ['María','Ana','Rosa','Carmen','Juana','Lucía','Patricia','Silvia','Elena','Martha','Gladys','Sonia','Norma','Carla','Paola','Daniela','Mónica','Verónica','Claudia','Roxana','Ximena','Lidia','Teresa','Isabel','Beatriz','Julia','Sandra','Miriam','Noelia','Karina','Mariela','Yolanda','Susana','Luz','Pamela','Ruth'];
+const PR_APE = ['Vaca','Rojas','Suárez','Justiniano','Flores','Mamani','Quispe','Choque','Gutiérrez','Vargas','Pérez','Arteaga','Roca','Chávez','Salvatierra','Aguilera','Montaño','Cuéllar','Méndez','Terrazas','Ribera','Paz','Soliz','Añez','Hurtado','Zeballos','Parada','Rivero','Antelo','Céspedes','Moreno','Callaú','Peña','Camacho','Durán','Saucedo'];
+const PR_BAR = ['Los Tajibos','El Trompillo','Las Pampitas','Guapurú','Los Mangales','Villa Esperanza','Las Palmas','El Bajío','Los Pinos','Santa Fe','San Martín','La Cuchilla'];
+function prHash(t) { let h = 2166136261; for (const ch of String(t)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+function prMascara(r) {
+  if (!r || typeof r !== 'object' || !('nombre' in r) || !('carnet' in r || 'fecha_toma' in r || 'fecha_nacimiento' in r)) return r;
+  // Semilla = la persona (carnet, o nombre + nacimiento): las tomas de la misma mujer siguen agrupadas.
+  const ci = normTxt(r.carnet).replace(/[^a-z0-9]/g, ''), sem = ci.length >= 4 ? 'c' + ci : 'n' + normTxt(r.nombre) + (r.fecha_nacimiento || '');
+  const h = prHash(sem), h2 = prHash(sem + '#');
+  const o = Object.assign({}, r);
+  o.nombre = PR_NOM[h % PR_NOM.length] + ' ' + PR_APE[(h >>> 8) % PR_APE.length] + ' ' + PR_APE[(h2 >>> 4) % PR_APE.length];
+  if (r.carnet) o.carnet = String(4000000 + (h2 % 5999999));
+  if (r.celular) o.celular = '7' + String(h % 10000000).padStart(7, '0');
+  if (r.direccion) o.direccion = 'B. ' + PR_BAR[(h2 >>> 9) % PR_BAR.length];
+  return o;
+}
+function prMascaraRes(res) {
+  if (!res || res.error || res.data == null) return res;
+  const m = x => Array.isArray(x) ? x.map(prMascara) : prMascara(x);
+  return Object.assign({}, res, { data: m(res.data) });
+}
+const PR_NO_GUARDA = { data: null, error: { message: 'Modo presentación: no se guardan cambios (desactivalo en Configuración).' } };
+function prBloqueado() {
+  const p = new Proxy(function () {}, { get: (t, k) => k === 'then' ? (ok, ko) => Promise.resolve(PR_NO_GUARDA).then(ok, ko) : () => p, apply: () => p });
+  return p;
+}
+function prEnvolverLectura(b) {
+  if (!b || typeof b.then !== 'function') return b;
+  const th = b.then.bind(b);
+  b.then = (ok, ko) => th(r => (ok ? ok(prMascaraRes(r)) : prMascaraRes(r)), ko);
+  return b;
+}
+const PR_RPC_ESCRIBE = /armar|recibir|informar|derivar|cita|atender|biopsia|no_asistio|pago|etapa|visto|cancelar/;
+function clientePresentacion(c) {
+  const from = c.from.bind(c), rpc = c.rpc.bind(c);
+  c.from = t => {
+    const q = from(t), sel = q.select.bind(q);
+    q.select = (...a) => prEnvolverLectura(sel(...a));
+    ['insert', 'update', 'upsert', 'delete'].forEach(k => { q[k] = () => prBloqueado(); });
+    return q;
+  };
+  c.rpc = (fn, args) => PR_RPC_ESCRIBE.test(fn) ? prBloqueado() : prEnvolverLectura(rpc(fn, args));
+  return c;
+}
+
 async function selectAll(buildQuery) {
   const PAGE = 1000;
   let all = [];
@@ -1983,6 +2036,9 @@ async function init() {
   document.getElementById('gmapsKeyInput').value = localStorage.getItem('sivec_gmaps_key') || '';
   [['cfgSegDias', 'segDias'], ['cfgPapAnios', 'papNegAnios'], ['cfgVphAnios', 'vphNegAnios'], ['cfgPapMin', 'papEdadMin'], ['cfgPapMax', 'papEdadMax'], ['cfgVphMin', 'vphEdadMin'], ['cfgVphMax', 'vphEdadMax']]
     .forEach(([id, k]) => { document.getElementById(id).value = clinCfg[k]; });
+  const preChk = document.getElementById('presentarChk');
+  preChk.checked = modoPresentacion;
+  preChk.addEventListener('change', () => { try { localStorage.setItem('sivec_presentacion', preChk.checked ? '1' : '0'); } catch (_) {} location.reload(); });
   const reqChk = document.getElementById('requireLoginChk');
   reqChk.checked = localStorage.getItem('sivec_require_login') === '1';
   reqChk.addEventListener('change', () => {
@@ -1999,6 +2055,7 @@ async function init() {
   try {
     if (!window.supabase) throw new Error('La librería de Supabase no cargó (revisá tu conexión a internet).');
     sb = window.supabase.createClient(url, key);
+    if (modoPresentacion) sb = clientePresentacion(sb);
   } catch (e) {
     document.getElementById('blocker').style.display = 'flex';
     document.querySelector('#blocker p').textContent = e.message;
@@ -2016,6 +2073,11 @@ let modoDemo = false;
 async function detectarDemo() {
   try { const { data, error } = await sb.from('sivec_meta').select('valor').eq('clave', 'modo').maybeSingle(); modoDemo = !error && data && data.valor === 'demo'; } catch (_) { modoDemo = false; }
   document.body.classList.toggle('modoDemo', !!modoDemo);
+  if (modoPresentacion && !document.getElementById('demoFranja')) {
+    const f = document.createElement('div'); f.id = 'demoFranja';
+    f.innerHTML = '<b>MODO PRESENTACIÓN</b> · números reales · nombres y datos personales cambiados · no se guarda nada';
+    document.body.appendChild(f);
+  }
   if (modoDemo && !document.getElementById('demoFranja')) {
     const f = document.createElement('div'); f.id = 'demoFranja';
     f.innerHTML = '<b>DEMOSTRACIÓN</b> · datos ficticios · ninguna paciente es real';
