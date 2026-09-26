@@ -1365,3 +1365,15 @@ select coalesce(nombre_completo, '') as nombre, correo, rol,
        es_admin, activo
   from perfiles_usuario order by rol, correo;
 ```
+
+## Paso 20 — Ubicación de cada establecimiento en el mapa
+
+El administrador marca en el Mapa (📍 Ubicar establecimiento…) dónde queda cada centro, hospital y el oncológico.
+El centro ve su ícono como punto de partida; el gestor, los de su red; el administrador, todos más el área de cada red.
+
+```sql
+alter table centros_salud add column if not exists lat double precision;
+alter table centros_salud add column if not exists lng double precision;
+notify pgrst, 'reload schema';
+select nombre, lat, lng from centros_salud order by nombre;
+```
