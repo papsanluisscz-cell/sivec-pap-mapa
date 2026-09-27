@@ -106,7 +106,7 @@ Comente com o advogado.
 VOCÊ (pessoa)  ── dono do SIVEC (código, marca, desenhos)
       │  contrato de LICENÇA exclusiva (renovável, com royalty)
       ▼
-EMPRESA S.R.L. ── usa, vende, implanta e dá suporte
+FERREIRA SALUD DIGITAL S.R.L. ── usa, vende, implanta e dá suporte
       │  contratos de serviço
       ▼
 ESTADO (município / SEDES / Ministério) ── usa o serviço; os DADOS são dele e dos pacientes
