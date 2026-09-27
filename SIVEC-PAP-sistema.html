@@ -1007,6 +1007,67 @@ body:not(.cobroOn) .cobroCampo { display: none !important; }
 #entradaLoader .eTxt { font:700 22px/1.3 -apple-system, "Segoe UI", Arial, sans-serif; letter-spacing:.01em; text-align:center; }
 #entradaLoader .eSub { font:500 14px/1.4 -apple-system, "Segoe UI", Arial, sans-serif; color:#d9b3c3; letter-spacing:.18em; text-transform:uppercase; }
 @media (prefers-reduced-motion: reduce) { #entradaLoader .eInf { transition:none; } }
+/* ===== Soporte: botón flotante, WhatsApp y chat con el equipo del SIVEC ===== */
+#spBtn { position: fixed; right: 16px; bottom: 16px; z-index: 2500; width: 56px; height: 56px; border-radius: 50%; border: 0; cursor: pointer; color: #fff;
+  background: linear-gradient(135deg, #9c3a5f, #7c3aed); box-shadow: 0 8px 22px rgba(125,42,76,.38); display: flex; align-items: center; justify-content: center; transition: transform .2s ease; }
+#spBtn:hover { transform: translateY(-2px) scale(1.05); }
+#spBtn svg { width: 26px; height: 26px; }
+#spBtn .spDot { position: absolute; top: -2px; right: -2px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; background: #dc2626; color: #fff; font: 700 11px/20px -apple-system, "Segoe UI", Arial, sans-serif; border: 2px solid #fff; display: none; }
+#spBtn.conAviso .spDot { display: block; }
+#spBtn.conAviso { animation: spLatido 2.4s ease-in-out infinite; }
+@keyframes spLatido { 0%, 100% { box-shadow: 0 8px 22px rgba(125,42,76,.38); } 50% { box-shadow: 0 8px 22px rgba(125,42,76,.38), 0 0 0 10px rgba(124,58,237,.18); } }
+#spPanel { position: fixed; right: 16px; bottom: 84px; z-index: 2600; width: 380px; max-width: calc(100vw - 32px); height: 560px; max-height: calc(100vh - 110px);
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 18px 50px rgba(28,10,19,.28);
+  display: none; flex-direction: column; overflow: hidden; }
+#spPanel.abierto { display: flex; animation: spEntra .22s ease-out; }
+@keyframes spEntra { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+#spPanel .spHead { background: var(--header-grad); color: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 10px; }
+#spPanel .spHead b { display: block; font-size: 15px; }
+#spPanel .spHead small { opacity: .85; font-size: 12px; }
+#spPanel .spHead button { margin-left: auto; background: rgba(255,255,255,.18); border: 0; color: #fff; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-size: 18px; line-height: 1; }
+#spPanel .spHead .spAtras { margin-left: 0; }
+#spPanel .spBody { flex: 1; overflow: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+#spPanel .spAcc { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--ink); text-decoration: none; cursor: pointer; text-align: left; font: inherit; width: 100%; }
+#spPanel .spAcc:hover { border-color: var(--teal-500); }
+#spPanel .spAcc i { font-style: normal; font-size: 20px; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--surface); flex: none; }
+#spPanel .spAcc b { display: block; font-size: 14px; }
+#spPanel .spAcc small { color: var(--ink-soft); font-size: 12px; }
+#spPanel h4 { margin: 6px 0 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+#spPanel .spTk { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; background: var(--surface); }
+#spPanel .spTk:hover { border-color: var(--teal-500); }
+#spPanel .spTk .t { flex: 1; min-width: 0; }
+#spPanel .spTk .t b { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#spPanel .spTk .t small { color: var(--ink-soft); font-size: 11.5px; }
+#spPanel .spEst { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #e0f2fe; color: #075985; white-space: nowrap; }
+#spPanel .spEst.en_curso { background: #fef3c7; color: #92400e; }
+#spPanel .spEst.resuelto { background: #dcfce7; color: #166534; }
+#spPanel .spEst.urg { background: #fee2e2; color: #991b1b; }
+#spPanel .spNuevo { width: 8px; height: 8px; border-radius: 50%; background: #dc2626; flex: none; }
+#spPanel .spChips { display: flex; flex-wrap: wrap; gap: 6px; }
+#spPanel .spChips button { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 999px; padding: 6px 11px; font-size: 12.5px; cursor: pointer; }
+#spPanel .spChips button.on { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
+#spPanel textarea { width: 100%; min-height: 96px; resize: vertical; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font: inherit; font-size: 14px; background: var(--surface); color: var(--ink); box-sizing: border-box; }
+#spPanel .spCtx { font-size: 11.5px; color: var(--ink-soft); background: var(--paper); border-radius: 10px; padding: 8px 10px; }
+#spPanel .spCtx summary { cursor: pointer; }
+#spPanel .spMsgs { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+#spPanel .spM { max-width: 84%; padding: 8px 11px; border-radius: 14px; font-size: 13.5px; line-height: 1.4; white-space: pre-wrap; word-wrap: break-word; }
+#spPanel .spM small { display: block; font-size: 10.5px; opacity: .7; margin-top: 3px; }
+#spPanel .spM.yo { align-self: flex-end; background: var(--teal-700); color: #fff; border-bottom-right-radius: 4px; }
+#spPanel .spM.otro { align-self: flex-start; background: var(--paper); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+#spPanel .spM.sis { align-self: center; background: transparent; color: var(--ink-soft); font-size: 12px; text-align: center; }
+#spPanel .spFoot { border-top: 1px solid var(--line); padding: 10px; display: flex; gap: 8px; align-items: flex-end; background: var(--surface); }
+#spPanel .spFoot textarea { min-height: 42px; max-height: 120px; }
+#spPanel .spEnviar { background: var(--teal-700); color: #fff; border: 0; border-radius: 10px; padding: 10px 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+#spPanel .spEnviar:disabled { opacity: .5; cursor: default; }
+#spPanel .spNota { font-size: 12px; color: var(--ink-soft); text-align: center; }
+body.dark #spPanel .spEst { background: #0c4a6e; color: #bae6fd; }
+body.dark #spPanel .spEst.en_curso { background: #78350f; color: #fde68a; }
+body.dark #spPanel .spEst.resuelto { background: #14532d; color: #bbf7d0; }
+body.dark #spPanel .spEst.urg { background: #7f1d1d; color: #fecaca; }
+@media (max-width: 520px) { #spPanel { right: 8px; left: 8px; width: auto; max-width: none; bottom: 80px; height: calc(100vh - 100px); } }
+@media (max-width: 760px) { body::after { content: ''; display: block; height: 80px; } }  /* que el botón 💬 no tape el último botón de la página */
+@media print { #spBtn, #spPanel { display: none !important; } }
+@media (prefers-reduced-motion: reduce) { #spBtn, #spPanel.abierto { animation: none; } }
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#7d2a4c">
@@ -7726,7 +7787,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.5.2 · 27/09/2026';
+const SIVEC_VERSION = '1.6.0 · 27/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -7737,9 +7798,242 @@ const TERMINOS_VERSION = '2026-09';
   d.innerHTML = `<b>🆘 Soporte del SIVEC</b><div class="hint" style="margin:4px 0 8px">${wa ? 'Escribinos por WhatsApp con una captura de pantalla de lo que pasa.' : 'El número de soporte se configura en config.js.'}</div>
     ${wa ? `<a class="primary" style="display:inline-block;text-decoration:none;padding:8px 14px;border-radius:10px" href="https://wa.me/${wa}?text=${encodeURIComponent('Hola, necesito ayuda con el SIVEC (' + SIVEC_VERSION + ')')}" target="_blank" rel="noopener">WhatsApp ${esc(sp.whatsapp)}</a>` : ''}
     ${sp.correo ? `<div class="hint" style="margin-top:6px">Correo: ${esc(sp.correo)}</div>` : ''}
+    <div style="margin-top:8px"><button type="button" class="primary" style="margin-top:0" onclick="spAbrir(true)">💬 Abrir el chat de soporte</button></div>
     <div class="hint" style="margin-top:8px">Versión ${SIVEC_VERSION} · <a href="terminos.html" target="_blank" rel="noopener">Términos de uso</a> · <a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a></div>`;
   const h = panel.querySelector('h2'); if (h) h.after(d); else panel.prepend(d);
 })();
+
+// ===== Soporte dentro del sistema: botón flotante, WhatsApp, llamada y chat con el equipo del SIVEC (Paso 28) =====
+// El usuario escribe desde cualquier pantalla; el mensaje lleva la versión, la pantalla y el último error (nunca datos de pacientes).
+// El equipo de soporte (perfiles con es_soporte) ve todas las consultas en la misma ventana y responde.
+const spErrores = [];
+function spAnotarError(t) { spErrores.push(String(t).slice(0, 180)); if (spErrores.length > 5) spErrores.shift(); }
+window.addEventListener('error', e => spAnotarError((e.message || 'error') + (e.filename ? ' · ' + e.filename.split('/').pop() + ':' + e.lineno : '')));
+window.addEventListener('unhandledrejection', e => spAnotarError('promesa: ' + ((e.reason && e.reason.message) || e.reason)));
+const SP_CATEGORIAS = [['error', 'Algo no funciona'], ['acceso', 'No puedo entrar / contraseña'], ['uso', 'Cómo se hace…'], ['datos', 'Un dato está mal'], ['sugerencia', 'Sugerencia']];
+const SP_ESTADOS = { abierto: 'Abierta', en_curso: 'En curso', resuelto: 'Resuelta' };
+let spVista = 'inicio', spTicketId = null, spTablaOk = true, spTickets = [], spMsgTimer = null, spCat = 'error';
+function spEsSoporte() { return !!(perfil && perfil.es_soporte); }
+function spPuedeChat() { return !!(sb && conRoles() && spTablaOk && !modoDemo); }
+function spConfig() {
+  const sp = (window.SIVEC_CONFIG || {}).soporte || {};
+  const wa = /x/i.test(sp.whatsapp || '') ? '' : String(sp.whatsapp || '').replace(/\D/g, '');
+  return { wa, tel: String(sp.telefono || '').replace(/[^\d+]/g, '') || (wa ? '+' + wa : ''), correo: sp.correo || '', horario: sp.horario || 'Lunes a sábado, de 8:00 a 20:00' };
+}
+function spNavegador() {
+  const u = navigator.userAgent, m = /Edg\/(\d+)/.exec(u) || /OPR\/(\d+)/.exec(u) || /Chrome\/(\d+)/.exec(u) || /Firefox\/(\d+)/.exec(u) || /Version\/(\d+).*Safari/.exec(u);
+  const n = /Edg\//.test(u) ? 'Edge' : /OPR\//.test(u) ? 'Opera' : /Chrome\//.test(u) ? 'Chrome' : /Firefox\//.test(u) ? 'Firefox' : /Safari/.test(u) ? 'Safari' : 'Navegador';
+  return n + (m ? ' ' + m[1] : '') + (/Mobi|Android|iPhone/.test(u) ? ' · celular' : ' · computadora');
+}
+function spContexto() {
+  const lo = document.getElementById('loginOverlay');
+  const vista = lo && lo.style.display === 'flex' ? 'inicio de sesión' : ((document.querySelector('nav button.active') || {}).textContent || '').trim();
+  let cola = 0; try { cola = (JSON.parse(localStorage.getItem('sivec_cola_sin_internet') || '[]') || []).length; } catch (_) {}
+  return {
+    version: SIVEC_VERSION, pantalla: vista, rol: perfil && !perfil.sinPerfil ? (perfil.rol || '') + (perfil.es_admin ? ' · admin' : '') : 'sin sesión',
+    establecimiento: perfil && perfil.centro_id ? centroNombre(perfil.centro_id) : (perfil && perfil.red_id ? redNombre(perfil.red_id) : ''),
+    conexion: navigator.onLine ? 'con internet' : 'sin internet', pendientes_sin_internet: cola,
+    navegador: spNavegador(), tamano: innerWidth + '×' + innerHeight, errores: spErrores.slice(-3)
+  };
+}
+function spContextoTexto(c) {
+  return [`Versión ${c.version}`, c.pantalla && `Pantalla: ${c.pantalla}`, `Usuario: ${c.rol}${c.establecimiento ? ' · ' + c.establecimiento : ''}`,
+    `Conexión: ${c.conexion}${c.pendientes_sin_internet ? ` (${c.pendientes_sin_internet} tomas esperando internet)` : ''}`, `Equipo: ${c.navegador} · ${c.tamano}`,
+    c.errores.length ? 'Último error: ' + c.errores[c.errores.length - 1] : 'Sin errores registrados'].filter(Boolean).join('\n');
+}
+function spWhatsappUrl(texto) {
+  const { wa } = spConfig(); if (!wa) return '';
+  const quien = perfil && !perfil.sinPerfil ? (perfil.nombre_completo || perfil.correo || '') : '';
+  const msg = `Hola, necesito ayuda con el SIVEC${quien ? '. Soy ' + quien : ''}.\n\n${texto ? texto + '\n\n' : ''}— Datos del sistema —\n${spContextoTexto(spContexto())}`;
+  return `https://wa.me/${wa}?text=${encodeURIComponent(msg)}`;
+}
+function spFecha(t) {
+  const d = new Date(t), hoy = new Date(); if (isNaN(d)) return '';
+  const hh = d.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' });
+  return d.toDateString() === hoy.toDateString() ? hh : d.toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit' }) + ' ' + hh;
+}
+function spNoLeido(t) {
+  const act = new Date(t.actualizado || t.creado).getTime();
+  if (spEsSoporte() && t.usuario !== (perfil && perfil.id)) return !t.ultimo_de_soporte && (!t.leido_soporte || new Date(t.leido_soporte).getTime() < act);
+  return !!t.ultimo_de_soporte && (!t.leido_usuario || new Date(t.leido_usuario).getTime() < act);
+}
+function spTablaFalta(error) { return !!error && /sivec_soporte|does not exist|schema cache|PGRST205|42P01/i.test((error.code || '') + ' ' + (error.message || '')); }
+
+function spMontar() {
+  if (document.getElementById('spBtn')) return;
+  const b = document.createElement('button'); b.id = 'spBtn'; b.type = 'button'; b.title = 'Soporte: hablar con el equipo del SIVEC'; b.setAttribute('aria-label', 'Soporte');
+  b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-13.3 7.9L3 21l1.1-4.7A9 9 0 1 1 21 12Z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/></svg><span class="spDot">0</span>';
+  b.onclick = () => spAbrir(!document.getElementById('spPanel').classList.contains('abierto'));
+  const p = document.createElement('div'); p.id = 'spPanel'; p.setAttribute('role', 'dialog'); p.setAttribute('aria-label', 'Soporte del SIVEC');
+  document.body.append(b, p);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && p.classList.contains('abierto')) spAbrir(false); });
+}
+function spAbrir(si) {
+  const p = document.getElementById('spPanel'); if (!p) return;
+  p.classList.toggle('abierto', si);
+  clearInterval(spMsgTimer); spMsgTimer = null;
+  if (si) { spVista = spTicketId ? 'chat' : 'inicio'; spPintar(); }
+}
+function spCabecera(titulo, sub, atras) {
+  return `<div class="spHead">${atras ? '<button type="button" class="spAtras" data-sp="atras" title="Volver" aria-label="Volver">‹</button>' : ''}<div><b>${esc(titulo)}</b><small>${esc(sub)}</small></div><button type="button" data-sp="cerrar" title="Cerrar" aria-label="Cerrar">×</button></div>`;
+}
+async function spPintar() {
+  const p = document.getElementById('spPanel'); if (!p || !p.classList.contains('abierto')) return;
+  const cfg = spConfig();
+  if (spVista === 'nuevo') return spPintarNuevo(p);
+  if (spVista === 'chat' && spTicketId) return spPintarChat(p);
+  spVista = 'inicio'; spTicketId = null;
+  const soporte = spEsSoporte();
+  let html = spCabecera(soporte ? 'Soporte · bandeja del equipo' : 'Soporte del SIVEC', soporte ? 'Consultas de todos los establecimientos' : cfg.horario, false) + '<div class="spBody">';
+  if (!soporte) {
+    html += `<h4>Hablar ahora</h4>`;
+    if (cfg.wa) html += `<a class="spAcc" href="${spWhatsappUrl('')}" target="_blank" rel="noopener"><i>💬</i><div><b>WhatsApp</b><small>Se abre con los datos del sistema ya escritos</small></div></a>`;
+    if (cfg.tel) html += `<a class="spAcc" href="tel:${esc(cfg.tel)}"><i>📞</i><div><b>Llamar</b><small>${esc(cfg.tel)} · para algo urgente</small></div></a>`;
+    if (spPuedeChat()) html += `<button type="button" class="spAcc" data-sp="nuevo"><i>✍️</i><div><b>Escribir al equipo</b><small>Queda registrado y te respondemos acá mismo</small></div></button>`;
+    if (!cfg.wa && !cfg.tel && !spPuedeChat()) html += `<p class="spNota">El número de soporte se configura en config.js.</p>`;
+    if (cfg.correo) html += `<p class="spNota">Correo: ${esc(cfg.correo)}</p>`;
+  }
+  if (spPuedeChat()) {
+    html += `<h4>${soporte ? 'Consultas' : 'Mis consultas'}</h4><div id="spLista"><p class="spNota">Cargando…</p></div>`;
+  } else if (sb && conRoles() && !spTablaOk && !modoDemo) {
+    html += `<p class="spNota">El chat interno se activa con el Paso 28 del SQL. Mientras tanto, usá WhatsApp o el teléfono.</p>`;
+  } else if (!conRoles()) {
+    html += `<p class="spNota">¿No podés entrar? Escribinos por WhatsApp: te ayudamos a recuperar el acceso.</p>`;
+  }
+  p.innerHTML = html + '</div>';
+  if (spPuedeChat()) spCargarLista();
+}
+async function spCargarLista() {
+  const box = document.getElementById('spLista'); if (!box) return;
+  const { data, error } = await sb.from('sivec_soporte_tickets').select('*').order('actualizado', { ascending: false }).limit(40);
+  if (error) { if (spTablaFalta(error)) { spTablaOk = false; spPintar(); } else box.innerHTML = `<p class="spNota">No se pudo cargar: ${esc(error.message)}</p>`; return; }
+  spTickets = data || []; spMarcarBoton();
+  let lista = spTickets;
+  if (spEsSoporte()) lista = [...lista].sort((a, b) => (a.estado === 'resuelto') - (b.estado === 'resuelto') || (b.urgente === true) - (a.urgente === true) || new Date(b.actualizado) - new Date(a.actualizado));
+  if (!lista.length) { box.innerHTML = `<p class="spNota">${spEsSoporte() ? 'No hay consultas.' : 'Todavía no escribiste ninguna consulta.'}</p>`; return; }
+  box.innerHTML = lista.map(t => {
+    const cat = (SP_CATEGORIAS.find(c => c[0] === t.categoria) || [, 'Consulta'])[1];
+    const quien = spEsSoporte() ? `${esc(t.usuario_nombre || '')}${t.establecimiento ? ' · ' + esc(t.establecimiento) : ''}` : cat;
+    return `<div class="spTk" data-tk="${esc(String(t.id))}" role="button" tabindex="0">${spNoLeido(t) ? '<span class="spNuevo" title="Respuesta nueva"></span>' : ''}
+      <div class="t"><b>${esc(t.asunto || cat)}</b><small>${quien} · ${spFecha(t.actualizado || t.creado)}</small></div>
+      ${t.urgente && t.estado !== 'resuelto' ? '<span class="spEst urg">Urgente</span>' : ''}<span class="spEst ${esc(t.estado || 'abierto')}">${SP_ESTADOS[t.estado] || 'Abierta'}</span></div>`;
+  }).join('');
+  box.querySelectorAll('[data-tk]').forEach(el => { const ir = () => { spTicketId = el.dataset.tk; spVista = 'chat'; spPintar(); }; el.onclick = ir; el.onkeydown = e => { if (e.key === 'Enter') ir(); }; });
+}
+function spPintarNuevo(p) {
+  const ctx = spContexto();
+  p.innerHTML = spCabecera('Escribir al equipo', 'Contanos qué pasó; te respondemos acá', true) + `<div class="spBody">
+    <h4>¿Sobre qué es?</h4>
+    <div class="spChips">${SP_CATEGORIAS.map(([k, t]) => `<button type="button" data-cat="${k}" class="${k === spCat ? 'on' : ''}">${t}</button>`).join('')}</div>
+    <textarea id="spTexto" maxlength="4000" placeholder="Por ejemplo: al guardar la toma aparece un error rojo y no se guarda.\n\nNo escribas nombres ni carnets de pacientes."></textarea>
+    <label style="display:flex;gap:8px;align-items:center;font-size:13px"><input type="checkbox" id="spUrg"> Es urgente: no puedo atender pacientes</label>
+    <details class="spCtx"><summary>Se envía también: versión, pantalla y último error (sin datos de pacientes)</summary><div style="white-space:pre-wrap;margin-top:6px">${esc(spContextoTexto(ctx))}</div></details>
+    <button type="button" class="spEnviar" id="spCrear">Enviar al equipo</button>
+    ${spConfig().wa ? `<p class="spNota">¿Es muy urgente? <a href="${spWhatsappUrl('')}" target="_blank" rel="noopener">Escribinos también por WhatsApp</a>.</p>` : ''}
+  </div>`;
+  p.querySelectorAll('[data-cat]').forEach(b => b.onclick = () => { spCat = b.dataset.cat; p.querySelectorAll('[data-cat]').forEach(x => x.classList.toggle('on', x === b)); });
+  const ta = p.querySelector('#spTexto'); setTimeout(() => ta.focus(), 50);
+  p.querySelector('#spCrear').onclick = spCrear;
+}
+async function spCrear() {
+  const ta = document.getElementById('spTexto'), texto = ta.value.trim(), btn = document.getElementById('spCrear');
+  if (texto.length < 5) { ta.focus(); showToast('Contanos un poco más de lo que pasó.', 'error'); return; }
+  btn.disabled = true; btn.textContent = 'Enviando…';
+  const urg = document.getElementById('spUrg').checked;
+  const asunto = texto.split('\n')[0].slice(0, 80);
+  const ctx = spContexto();
+  const { data, error } = await sb.from('sivec_soporte_tickets').insert([{
+    categoria: spCat, urgente: urg, asunto, contexto: ctx, centro_id: perfil.centro_id || null,
+    usuario_nombre: perfil.nombre_completo || perfil.correo || '', establecimiento: ctx.establecimiento || ''
+  }]).select().single();
+  const tk = Array.isArray(data) ? data[0] : data;
+  if (error || !tk) { btn.disabled = false; btn.textContent = 'Enviar al equipo'; if (spTablaFalta(error)) { spTablaOk = false; spVista = 'inicio'; spPintar(); } showToast('No se pudo enviar: ' + ((error && error.message) || 'sin respuesta') + '. Probá por WhatsApp.', 'error'); return; }
+  const r = await sb.from('sivec_soporte_mensajes').insert([{ ticket_id: tk.id, texto, de_soporte: false }]);
+  if (r.error) { showToast('Se creó la consulta pero no el mensaje: ' + r.error.message, 'error'); }
+  const ahoraTk = new Date().toISOString();
+  spTickets = [Object.assign({ creado: ahoraTk, actualizado: ahoraTk, estado: 'abierto', usuario: perfil.id }, tk), ...spTickets.filter(x => String(x.id) !== String(tk.id))];
+  spTicketId = String(tk.id); spVista = 'chat';
+  showToast(urg ? 'Enviado como urgente ✔ El equipo lo ve ahora.' : 'Enviado ✔ Te avisamos acá cuando respondan.', 'ok');
+  spPintar();
+}
+async function spPintarChat(p) {
+  const t = spTickets.find(x => String(x.id) === String(spTicketId)) || {};
+  const soporte = spEsSoporte() && t.usuario !== perfil.id;
+  const cat = (SP_CATEGORIAS.find(c => c[0] === t.categoria) || [, 'Consulta'])[1];
+  const sub = soporte ? `${t.usuario_nombre || ''}${t.establecimiento ? ' · ' + t.establecimiento : ''}` : `${cat} · ${SP_ESTADOS[t.estado] || 'Abierta'}`;
+  p.innerHTML = spCabecera(t.asunto || 'Consulta', sub, true) + `<div class="spBody"><div class="spMsgs" id="spMsgs"><p class="spNota">Cargando…</p></div></div>
+    <div class="spFoot"><textarea id="spResp" maxlength="4000" placeholder="${soporte ? 'Responder…' : 'Escribí tu mensaje…'}"></textarea><button type="button" class="spEnviar" id="spMandar">Enviar</button></div>
+    <div style="display:flex;gap:6px;justify-content:center;padding:0 10px 10px;background:var(--surface);flex-wrap:wrap">
+      ${soporte ? Object.entries(SP_ESTADOS).map(([k, v]) => `<button type="button" class="spAcc" style="width:auto;padding:5px 10px;font-size:12px" data-est="${k}">${k === t.estado ? '● ' : ''}${v}</button>`).join('') + '<button type="button" class="spAcc" style="width:auto;padding:5px 10px;font-size:12px" data-sp="ctx">Ver datos del sistema</button>'
+        : (t.estado !== 'resuelto' ? '<button type="button" class="spAcc" style="width:auto;padding:5px 10px;font-size:12px" data-est="resuelto">✔ Ya se resolvió</button>' : '')}
+    </div>`;
+  const mandar = p.querySelector('#spMandar'), resp = p.querySelector('#spResp');
+  mandar.onclick = () => spMandar(soporte);
+  resp.onkeydown = e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) spMandar(soporte); };
+  p.querySelectorAll('[data-est]').forEach(b => b.onclick = () => spEstado(b.dataset.est));
+  const bc = p.querySelector('[data-sp="ctx"]'); if (bc) bc.onclick = () => { const c = t.contexto || {}; alert('Datos del sistema al abrir la consulta:\n\n' + spContextoTexto({ version: c.version || '', pantalla: c.pantalla || '', rol: c.rol || '', establecimiento: c.establecimiento || '', conexion: c.conexion || '', pendientes_sin_internet: c.pendientes_sin_internet || 0, navegador: c.navegador || '', tamano: c.tamano || '', errores: c.errores || [] }) + (c.errores && c.errores.length > 1 ? '\n\nErrores anteriores:\n' + c.errores.join('\n') : '')); };
+  await spCargarMensajes(true);
+  clearInterval(spMsgTimer); spMsgTimer = setInterval(() => { if (!document.hidden) spCargarMensajes(false); }, 10000);
+}
+async function spCargarMensajes(primera) {
+  const box = document.getElementById('spMsgs'); if (!box || !spTicketId) { clearInterval(spMsgTimer); return; }
+  const { data, error } = await sb.from('sivec_soporte_mensajes').select('*').eq('ticket_id', spTicketId).order('creado', { ascending: true });
+  if (error) { box.innerHTML = `<p class="spNota">No se pudieron cargar los mensajes: ${esc(error.message)}</p>`; return; }
+  const abajo = box.parentElement.scrollHeight - box.parentElement.scrollTop - box.parentElement.clientHeight < 40;
+  const t = spTickets.find(x => String(x.id) === String(spTicketId)) || {};
+  const yoSoporte = spEsSoporte() && t.usuario !== perfil.id;
+  box.innerHTML = `<div class="spM sis">Consulta abierta el ${spFecha(t.creado)}${t.urgente ? ' · urgente' : ''}</div>` + (data || []).map(m => {
+    const mio = yoSoporte ? m.de_soporte : !m.de_soporte;
+    return `<div class="spM ${mio ? 'yo' : 'otro'}">${esc(m.texto)}<small>${m.de_soporte && !mio ? 'Equipo SIVEC · ' : ''}${spFecha(m.creado)}</small></div>`;
+  }).join('') + (!yoSoporte && (data || []).every(m => !m.de_soporte) ? `<div class="spM sis">Recibimos tu mensaje. Te respondemos acá; ${esc(spConfig().horario.toLowerCase())}.</div>` : '');
+  if (primera || abajo) box.parentElement.scrollTop = box.parentElement.scrollHeight;
+  // Marcar como leído
+  const campo = yoSoporte ? 'leido_soporte' : 'leido_usuario';
+  if (spNoLeido(t) || primera) { const ahora = new Date().toISOString(); t[campo] = ahora; sb.from('sivec_soporte_tickets').update({ [campo]: ahora }).eq('id', spTicketId).then(() => spMarcarBoton()); }
+}
+async function spMandar(comoSoporte) {
+  const ta = document.getElementById('spResp'), btn = document.getElementById('spMandar'), texto = ta.value.trim();
+  if (!texto) return;
+  btn.disabled = true;
+  const { error } = await sb.from('sivec_soporte_mensajes').insert([{ ticket_id: spTicketId, texto, de_soporte: !!comoSoporte }]);
+  btn.disabled = false;
+  if (error) { showToast('No se pudo enviar: ' + error.message, 'error'); return; }
+  ta.value = '';
+  const t = spTickets.find(x => String(x.id) === String(spTicketId));
+  if (t) { t.actualizado = new Date().toISOString(); t.ultimo_de_soporte = !!comoSoporte; }
+  if (t && comoSoporte && t.estado === 'abierto') { await spEstado('en_curso', true); spPintar(); } else spCargarMensajes(true);
+}
+async function spEstado(est, silencioso) {
+  const { error } = await sb.from('sivec_soporte_tickets').update({ estado: est }).eq('id', spTicketId);
+  if (error) { showToast('No se pudo cambiar el estado: ' + error.message, 'error'); return; }
+  const t = spTickets.find(x => String(x.id) === String(spTicketId)); if (t) t.estado = est;
+  if (!silencioso) { showToast(est === 'resuelto' ? 'Consulta marcada como resuelta ✔' : 'Estado: ' + SP_ESTADOS[est], 'ok'); spPintar(); }
+}
+function spMarcarBoton() {
+  const b = document.getElementById('spBtn'); if (!b) return;
+  const n = spTickets.filter(spNoLeido).length;
+  b.classList.toggle('conAviso', n > 0); b.querySelector('.spDot').textContent = n > 9 ? '9+' : n;
+  b.title = n ? `${n} ${n === 1 ? 'respuesta nueva' : 'respuestas nuevas'} de soporte` : 'Soporte: hablar con el equipo del SIVEC';
+}
+async function spRevisar() {
+  if (!spPuedeChat() || document.hidden) return;
+  const { data, error } = await sb.from('sivec_soporte_tickets').select('*').order('actualizado', { ascending: false }).limit(40);
+  if (error) { if (spTablaFalta(error)) spTablaOk = false; return; }
+  const antes = spTickets.filter(spNoLeido).length;
+  spTickets = data || []; spMarcarBoton();
+  const ahora = spTickets.filter(spNoLeido).length;
+  if (ahora > antes && !document.getElementById('spPanel').classList.contains('abierto')) showToast(spEsSoporte() ? '🆘 Nueva consulta de soporte' : '💬 El equipo del SIVEC te respondió', 'ok');
+  if (document.getElementById('spLista')) spCargarLista();
+}
+document.addEventListener('click', e => {
+  const a = e.target.closest('#spPanel [data-sp]'); if (!a) return;
+  if (a.dataset.sp === 'cerrar') spAbrir(false);
+  else if (a.dataset.sp === 'atras') { clearInterval(spMsgTimer); spTicketId = null; spVista = 'inicio'; spPintar(); }
+  else if (a.dataset.sp === 'nuevo') { spVista = 'nuevo'; spPintar(); }
+});
+spMontar();
+setTimeout(spRevisar, 4000);
+setInterval(spRevisar, 60000);
 
 // Términos de uso y política de privacidad: cada persona los acepta una vez por versión (Paso 26 del SQL)
 async function terminosVerificar() {
@@ -7868,7 +8162,7 @@ window.addEventListener('beforeinstallprompt', e => {
   if (document.getElementById('instalarBtn')) return;
   const b = document.createElement('button'); b.id = 'instalarBtn'; b.type = 'button'; b.textContent = '⬇ Instalar SIVEC';
   b.title = 'Crea el ícono del SIVEC en esta computadora o celular';
-  b.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:900;border:0;border-radius:999px;padding:10px 16px;font-weight:700;background:#7d2a4c;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.2);cursor:pointer';
+  b.style.cssText = 'position:fixed;right:84px;bottom:16px;z-index:900;border:0;border-radius:999px;padding:10px 16px;font-weight:700;background:#7d2a4c;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.2);cursor:pointer';
   b.onclick = async () => { if (!instalarEvt) return; instalarEvt.prompt(); await instalarEvt.userChoice.catch(() => {}); instalarEvt = null; b.remove(); };
   document.body.appendChild(b);
 });

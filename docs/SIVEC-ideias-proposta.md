@@ -903,3 +903,9 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - Proposta de slides de impacto (vidas, família, papel) enviada ao autor para validar antes de montar.
 - Apresentação: 5 slides novos depois de "Funcionando con datos reales": "Cada día, 4 o 5", "María, 41 años" (caso ilustrativo), "Lo que el SIVEC evita cada año" (gráfico com véu), "¿Cuánto vale salvarla?" (sem valor em dólares da vida, como o autor decidiu) e "El papel vs el SIVEC" (1,7× só em tratamentos e tempo).
 - Planilha: linha "Tablero da rede" (US$ 250 no slide de preços) em 0 por padrão; o slide "Incluye" diz que o tablero vem incluído — decidir.
+
+## 27/09/2026 · Soporte dentro del sistema (v1.6.0 · Paso 28)
+- Botón redondo 💬 abajo a la derecha en todas las pantallas (también en el inicio de sesión, para "no puedo entrar").
+- WhatsApp con los datos del sistema ya escritos (versión, pantalla, centro, conexión, último error; nunca datos de pacientes), llamada y "Escribir al equipo": chat guardado en Supabase con categoría y marca de urgente.
+- El equipo de soporte (`es_soporte`) ve la bandeja de todas las consultas, responde, cambia el estado y ve los datos del sistema. Aviso con número rojo cuando hay respuesta nueva; revisa cada minuto.
+- Paso 28 probado en la copia local: cada uno ve lo suyo, nadie se hace pasar por soporte, el gestor no ve consultas ajenas.

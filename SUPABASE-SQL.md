@@ -1868,3 +1868,101 @@ select case when exists (select 1 from information_schema.columns where table_na
 
 ### Deshacer el Paso 27
 Volver a ejecutar `sivec_colpo_lista` del Paso 14 (antes: `drop function if exists sivec_colpo_lista();`). La columna `clinica` puede quedar.
+
+---
+
+## Paso 28 — Soporte dentro del sistema (chat con el equipo del SIVEC)
+
+Aparece un botón redondo 💬 abajo a la derecha en todas las pantallas. Desde ahí la persona escribe por **WhatsApp** (con los datos del sistema ya escritos), **llama** o **escribe al equipo** en un chat que queda guardado. Cada consulta lleva la versión, la pantalla, la conexión y el último error del navegador — **nunca datos de pacientes**. Las personas marcadas como **soporte** (`es_soporte`) ven todas las consultas en la misma ventana, responden y cambian el estado (abierta, en curso, resuelta). Cuando hay una respuesta nueva, el botón muestra un número rojo.
+
+```sql
+-- PASO 28 · Soporte: consultas y mensajes entre los usuarios y el equipo del SIVEC
+alter table perfiles_usuario add column if not exists es_soporte boolean not null default false;
+
+create or replace function sivec_es_soporte() returns boolean
+language sql stable security definer set search_path = public as $$
+  select coalesce((select es_soporte from perfiles_usuario where id = auth.uid() and activo), false) $$;
+revoke execute on function sivec_es_soporte() from public, anon;
+grant execute on function sivec_es_soporte() to authenticated;
+
+create table if not exists sivec_soporte_tickets (
+  id bigserial primary key,
+  usuario uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  usuario_nombre text,
+  centro_id uuid,
+  establecimiento text,
+  categoria text not null default 'error',
+  asunto text,
+  urgente boolean not null default false,
+  estado text not null default 'abierto' check (estado in ('abierto', 'en_curso', 'resuelto')),
+  contexto jsonb,
+  ultimo_de_soporte boolean not null default false,
+  leido_usuario timestamptz,
+  leido_soporte timestamptz,
+  creado timestamptz not null default now(),
+  actualizado timestamptz not null default now()
+);
+create table if not exists sivec_soporte_mensajes (
+  id bigserial primary key,
+  ticket_id bigint not null references sivec_soporte_tickets(id) on delete cascade,
+  autor uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  de_soporte boolean not null default false,
+  texto text not null check (length(texto) between 1 and 4000),
+  creado timestamptz not null default now()
+);
+create index if not exists sivec_soporte_mensajes_ticket on sivec_soporte_mensajes (ticket_id, creado);
+create index if not exists sivec_soporte_tickets_usuario on sivec_soporte_tickets (usuario, actualizado desc);
+
+alter table sivec_soporte_tickets enable row level security;
+alter table sivec_soporte_mensajes enable row level security;
+drop policy if exists "ver consultas" on sivec_soporte_tickets;
+drop policy if exists "crear consulta" on sivec_soporte_tickets;
+drop policy if exists "actualizar consulta" on sivec_soporte_tickets;
+drop policy if exists "ver mensajes" on sivec_soporte_mensajes;
+drop policy if exists "escribir mensaje" on sivec_soporte_mensajes;
+-- Cada persona ve sus consultas; el equipo de soporte ve todas
+create policy "ver consultas" on sivec_soporte_tickets for select to authenticated using (usuario = auth.uid() or sivec_es_soporte());
+create policy "crear consulta" on sivec_soporte_tickets for insert to authenticated with check (usuario = auth.uid());
+create policy "actualizar consulta" on sivec_soporte_tickets for update to authenticated
+  using (usuario = auth.uid() or sivec_es_soporte()) with check (usuario = auth.uid() or sivec_es_soporte());
+create policy "ver mensajes" on sivec_soporte_mensajes for select to authenticated
+  using (exists (select 1 from sivec_soporte_tickets t where t.id = ticket_id and (t.usuario = auth.uid() or sivec_es_soporte())));
+-- Solo el equipo de soporte puede escribir como "soporte"
+create policy "escribir mensaje" on sivec_soporte_mensajes for insert to authenticated
+  with check (autor = auth.uid() and (de_soporte = false or sivec_es_soporte())
+    and exists (select 1 from sivec_soporte_tickets t where t.id = ticket_id and (t.usuario = auth.uid() or sivec_es_soporte())));
+grant select, insert, update on sivec_soporte_tickets to authenticated;
+grant select, insert on sivec_soporte_mensajes to authenticated;
+grant usage, select on sequence sivec_soporte_tickets_id_seq, sivec_soporte_mensajes_id_seq to authenticated;
+
+-- Cada mensaje nuevo actualiza la consulta (orden de la lista y aviso de "respuesta nueva")
+create or replace function sivec_soporte_al_mensaje() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  update sivec_soporte_tickets
+     set actualizado = now(), ultimo_de_soporte = new.de_soporte,
+         estado = case when not new.de_soporte and estado = 'resuelto' then 'abierto' else estado end
+   where id = new.ticket_id;
+  return new;
+end $$;
+drop trigger if exists sivec_soporte_al_mensaje on sivec_soporte_mensajes;
+create trigger sivec_soporte_al_mensaje after insert on sivec_soporte_mensajes for each row execute function sivec_soporte_al_mensaje();
+
+notify pgrst, 'reload schema';
+
+-- Quién atiende el soporte: cambiar el correo por el tuyo (y el de cada persona del equipo)
+-- update perfiles_usuario set es_soporte = true where correo = 'TU_CORREO_DEL_SIVEC';
+
+-- Resultado: debe decir "listo"
+select case when to_regclass('public.sivec_soporte_tickets') is not null
+             and to_regclass('public.sivec_soporte_mensajes') is not null
+             and exists (select 1 from information_schema.columns where table_name = 'perfiles_usuario' and column_name = 'es_soporte')
+            then 'listo' else 'revisar' end as paso_28;
+```
+
+Después de "listo", ejecutá la línea del `update … es_soporte = true` con **tu correo** (sin el `--` del comienzo). Solo quien tenga `es_soporte` ve la bandeja de todas las consultas y responde como "Equipo SIVEC".
+
+En `config.js` se completa el contacto que ve cada persona: `soporte: { whatsapp: '591…', telefono: '+591…', correo: '…', horario: 'Lunes a sábado, de 8:00 a 20:00' }`.
+
+### Deshacer el Paso 28
+`drop table if exists sivec_soporte_mensajes; drop table if exists sivec_soporte_tickets; drop function if exists sivec_soporte_al_mensaje(); drop function if exists sivec_es_soporte();` (se pierden las consultas). La columna `es_soporte` puede quedar.
