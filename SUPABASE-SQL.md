@@ -2007,3 +2007,137 @@ Sin el Paso 29 la consulta igual se envía, pero sin la imagen (el sistema avisa
 
 ### Deshacer el Paso 29
 `drop policy if exists "soporte subir captura" on storage.objects; drop policy if exists "soporte ver captura" on storage.objects;` y borrar el espacio **sivec-soporte** desde Supabase → Storage (se pierden las capturas). La columna `adjunto` puede quedar.
+
+---
+
+## Paso 30 — Firma electrónica con PIN (laboratorio, colposcopia, referencia y contrarreferencia)
+
+Cada profesional crea **su PIN de firma de 6 números** (una vez, en ⚙ Configuración o la primera vez que firma). El PIN se pide al **liberar un informe de laboratorio**, al **guardar una colposcopia**, al **enviar una referencia** y al **enviar una contrarreferencia**. Queda registrado quién firmó, cuándo, en qué establecimiento y la **huella SHA-256** del contenido firmado; el documento impreso muestra "Firmado electrónicamente por… · código de verificación". El PIN se guarda cifrado (bcrypt), nadie lo puede leer; 5 intentos fallidos lo bloquean 15 minutos, y el administrador lo puede restablecer si alguien lo olvida. No usa celular ni equipo nuevo. (Firma electrónica con PIN; la firma digital con certificado de la ADSIB/AGETIC y el lector de huella con el SEGIP quedan para el SIVEC completo.)
+
+```sql
+-- PASO 30 · Firma electrónica con PIN personal
+create extension if not exists pgcrypto with schema extensions;
+
+create table if not exists sivec_firma_pin (
+  usuario uuid primary key references auth.users(id) on delete cascade,
+  pin_hash text not null,
+  intentos int not null default 0,
+  bloqueado_hasta timestamptz,
+  actualizado timestamptz not null default now()
+);
+alter table sivec_firma_pin enable row level security;   -- sin políticas: solo la tocan las funciones de abajo
+revoke all on sivec_firma_pin from anon, authenticated;
+
+create table if not exists sivec_firmas (
+  id bigserial primary key,
+  tipo text not null check (tipo in ('referencia', 'contrarreferencia', 'informe_lab', 'colposcopia')),
+  documento text not null,
+  firmante uuid not null references auth.users(id),
+  firmante_nombre text,
+  establecimiento text,
+  huella text not null,
+  codigo text not null unique,
+  creado timestamptz not null default now()
+);
+create index if not exists sivec_firmas_doc on sivec_firmas (tipo, documento, creado desc);
+alter table sivec_firmas enable row level security;
+drop policy if exists "ver firmas" on sivec_firmas;
+create policy "ver firmas" on sivec_firmas for select to authenticated using (true);  -- sin datos de pacientes
+grant select on sivec_firmas to authenticated;
+
+-- ¿Ya tengo PIN?
+create or replace function sivec_pin_estado() returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (select 1 from sivec_firma_pin where usuario = auth.uid()) $$;
+
+-- Crear o cambiar el PIN (para cambiarlo hay que dar el actual)
+create or replace function sivec_pin_definir(p_pin text, p_actual text default null) returns void
+language plpgsql security definer set search_path = public, extensions as $$
+declare v sivec_firma_pin;
+begin
+  if auth.uid() is null then raise exception 'Iniciá sesión.'; end if;
+  if p_pin !~ '^[0-9]{6}$' then raise exception 'El PIN tiene que tener 6 números.'; end if;
+  if p_pin ~ '^(.)\1{5}$' or p_pin in ('123456', '654321', '012345', '543210') then raise exception 'Ese PIN es muy fácil de adivinar. Elegí otro.'; end if;
+  select * into v from sivec_firma_pin where usuario = auth.uid();
+  if found and (p_actual is null or v.pin_hash <> crypt(p_actual, v.pin_hash)) then raise exception 'El PIN actual no es correcto.'; end if;
+  insert into sivec_firma_pin (usuario, pin_hash) values (auth.uid(), crypt(p_pin, gen_salt('bf', 8)))
+  on conflict (usuario) do update set pin_hash = excluded.pin_hash, intentos = 0, bloqueado_hasta = null, actualizado = now();
+end $$;
+
+-- Comprobar el PIN: devuelve 'ok', 'sin_pin', 'bloqueado:HH:MI' o 'incorrecto:N' (N = intentos que quedan)
+create or replace function sivec_pin_verificar(p_pin text) returns text
+language plpgsql security definer set search_path = public, extensions as $$
+declare v sivec_firma_pin;
+begin
+  select * into v from sivec_firma_pin where usuario = auth.uid() for update;
+  if not found then return 'sin_pin'; end if;
+  if v.bloqueado_hasta is not null and v.bloqueado_hasta > now() then
+    return 'bloqueado:' || to_char(v.bloqueado_hasta at time zone 'America/La_Paz', 'HH24:MI'); end if;
+  if v.pin_hash = crypt(coalesce(p_pin, ''), v.pin_hash) then
+    update sivec_firma_pin set intentos = 0, bloqueado_hasta = null where usuario = auth.uid();
+    return 'ok';
+  end if;
+  update sivec_firma_pin set intentos = intentos + 1,
+    bloqueado_hasta = case when intentos + 1 >= 5 then now() + interval '15 minutes' else null end
+   where usuario = auth.uid();
+  if v.intentos + 1 >= 5 then return 'bloqueado:' || to_char((now() + interval '15 minutes') at time zone 'America/La_Paz', 'HH24:MI'); end if;
+  return 'incorrecto:' || (5 - v.intentos - 1);
+end $$;
+
+-- Firmar un documento: comprueba el PIN y que la persona tenga que ver con ese documento
+create or replace function sivec_firmar(p_tipo text, p_documento text, p_huella text, p_pin text) returns jsonb
+language plpgsql security definer set search_path = public, extensions as $$
+declare v_est text; v_ok boolean := false; r sivec_firmas;
+begin
+  v_est := sivec_pin_verificar(p_pin);
+  if v_est <> 'ok' then return jsonb_build_object('ok', false, 'motivo', v_est); end if;
+  if p_huella !~ '^[0-9a-f]{64}$' then return jsonb_build_object('ok', false, 'motivo', 'huella'); end if;
+  if p_tipo = 'referencia' then
+    select true into v_ok from derivaciones d where d.id::text = p_documento and sivec_edita_centro(d.centro_origen);
+  elsif p_tipo = 'contrarreferencia' then
+    select true into v_ok from derivaciones d where d.id::text = p_documento and d.destino_id = sivec_centro() and sivec_es_colpo();
+  elsif p_tipo = 'informe_lab' then
+    select true into v_ok from pacientes p where p.id::text = p_documento and sivec_es_lab();
+  elsif p_tipo = 'colposcopia' then
+    select true into v_ok from colposcopias c join pacientes p on p.id = c.paciente_id where c.id::text = p_documento and sivec_edita_centro(p.centro_id);
+  end if;
+  if not coalesce(v_ok, false) then return jsonb_build_object('ok', false, 'motivo', 'sin_permiso'); end if;
+  insert into sivec_firmas (tipo, documento, firmante, firmante_nombre, establecimiento, huella, codigo)
+  values (p_tipo, p_documento, auth.uid(),
+    (select coalesce(nullif(nombre_completo, ''), correo) from perfiles_usuario where id = auth.uid()),
+    (select c.nombre from perfiles_usuario u join centros_salud c on c.id = u.centro_id where u.id = auth.uid()),
+    p_huella, upper(encode(gen_random_bytes(4), 'hex')))
+  returning * into r;
+  return jsonb_build_object('ok', true, 'codigo', r.codigo, 'creado', r.creado, 'firmante_nombre', r.firmante_nombre, 'establecimiento', r.establecimiento, 'huella', r.huella);
+end $$;
+
+-- Verificar un código impreso en un documento (también sin sesión: no muestra datos de pacientes)
+create or replace function sivec_firma_verificar(p_codigo text)
+returns table (tipo text, firmante_nombre text, establecimiento text, creado timestamptz, huella text)
+language sql stable security definer set search_path = public as $$
+  select f.tipo, f.firmante_nombre, f.establecimiento, f.creado, f.huella from sivec_firmas f
+   where f.codigo = upper(replace(trim(p_codigo), '-', '')) $$;
+
+-- El administrador restablece el PIN de alguien que lo olvidó (la persona crea uno nuevo al firmar)
+create or replace function sivec_pin_restablecer(p_usuario uuid) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if not sivec_es_admin() then raise exception 'Solo el administrador puede restablecer un PIN.'; end if;
+  delete from sivec_firma_pin where usuario = p_usuario;
+end $$;
+
+revoke execute on function sivec_pin_estado(), sivec_pin_definir(text, text), sivec_pin_verificar(text), sivec_firmar(text, text, text, text), sivec_pin_restablecer(uuid) from public, anon;
+grant execute on function sivec_pin_estado(), sivec_pin_definir(text, text), sivec_pin_verificar(text), sivec_firmar(text, text, text, text), sivec_pin_restablecer(uuid) to authenticated;
+revoke execute on function sivec_firma_verificar(text) from public;
+grant execute on function sivec_firma_verificar(text) to anon, authenticated;
+
+notify pgrst, 'reload schema';
+
+-- Resultado: debe decir "listo"
+select case when to_regclass('public.sivec_firmas') is not null and to_regclass('public.sivec_firma_pin') is not null
+             and to_regprocedure('sivec_firmar(text, text, text, text)') is not null
+            then 'listo' else 'revisar' end as paso_30;
+```
+
+### Deshacer el Paso 30
+`drop function if exists sivec_firmar(text, text, text, text), sivec_pin_verificar(text), sivec_pin_definir(text, text), sivec_pin_estado(), sivec_firma_verificar(text), sivec_pin_restablecer(uuid); drop table if exists sivec_firmas; drop table if exists sivec_firma_pin;` (se pierden las firmas registradas; los documentos siguen igual, sin la leyenda de firma).

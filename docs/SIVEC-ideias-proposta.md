@@ -918,3 +918,10 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 ## 27/09/2026 · Presentación: slide "Derivar" con los Formularios Nº 1 y Nº 2 (v1.6.2)
 - El slide 22 ahora muestra la referencia Nº 1 y la contrarreferencia Nº 2 del SIVEC (datos de prueba) en lugar de la hoja de la paciente.
 - Correcciones en los formularios: talla en metros ("1.58 m"), próximo control con fecha DD/MM/AAAA, "Red: —" cuando el establecimiento no tiene red (Oncológico).
+
+## 27/09/2026 · Firma electrónica con PIN (v1.7.0 · Paso 30)
+- Decisión del autor: nada de celular personal (hay médicos mayores sin smartphone). PIN personal de 6 números para firmar: informe de laboratorio (PAP y VPH), colposcopia, referencia y contrarreferencia.
+- La primera vez que firma, la persona crea su PIN; se guarda cifrado (bcrypt), 5 intentos fallidos = bloqueo de 15 min, el administrador lo restablece. PINs fáciles (111111, 123456) rechazados.
+- Cada firma registra quién, cuándo, establecimiento y la huella SHA-256 del contenido; solo firma quien tiene que ver con el documento. Formularios Nº 1 y Nº 2 impresos: "Firmado electrónicamente… · código de verificación XXXX-XXXX · huella". ⚙ Configuración: crear/cambiar PIN, verificar un código, restablecer (admin).
+- Sin el Paso 30 el sistema sigue funcionando como antes (sin firma).
+- SIVEC completo (a futuro): lector de huella en cada computadora (kit opcional en la implantación, ~US$ 40–100 por lector) + convenio con el SEGIP para verificar identidad en línea; firma digital con certificado AGETIC/ADSIB (Bs 70 + token) cuando el SEDES la exija.

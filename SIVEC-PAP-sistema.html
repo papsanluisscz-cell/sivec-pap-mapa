@@ -1079,6 +1079,22 @@ body.dark #spPanel .spEst.urg { background: #7f1d1d; color: #fecaca; }
 #spPanel .spImg { display: block; margin: -2px -4px 6px; cursor: zoom-in; }
 #spPanel .spImg img { display: block; width: 100%; max-width: 260px; min-height: 60px; border-radius: 10px; background: rgba(0,0,0,.06); }
 #spPanel .spEnviar:disabled { background: var(--ink-soft); }
+/* ===== Firma electrónica con PIN ===== */
+#firmaOverlay { position: fixed; inset: 0; z-index: 3500; background: rgba(28,10,19,.55); display: flex; align-items: center; justify-content: center; padding: 16px; }
+#firmaOverlay .fmCard { background: var(--surface); color: var(--ink); border-radius: 18px; width: 400px; max-width: 100%; padding: 20px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+#firmaOverlay .fmHead { display: flex; gap: 12px; align-items: center; }
+#firmaOverlay .fmHead > span { font-size: 24px; width: 44px; height: 44px; border-radius: 12px; background: var(--paper); display: flex; align-items: center; justify-content: center; flex: none; }
+#firmaOverlay .fmHead b { display: block; font-size: 16px; }
+#firmaOverlay .fmHead small { color: var(--ink-soft); font-size: 12.5px; }
+#firmaOverlay .fmDet { background: var(--paper); border-radius: 10px; padding: 10px 12px; font-size: 13px; white-space: pre-wrap; max-height: 160px; overflow: auto; }
+#firmaOverlay label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); }
+#firmaOverlay input { font-size: 26px; letter-spacing: 12px; text-align: center; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); }
+#firmaOverlay .fmMsg { color: #b4233c; font-size: 13px; min-height: 18px; }
+#firmaOverlay .fmNota { font-size: 12.5px; color: var(--ink-soft); margin: 0; }
+#firmaOverlay .fmBtns { display: flex; gap: 8px; justify-content: flex-end; }
+#firmaOverlay .fmBtns button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 10px 16px; font-weight: 600; cursor: pointer; }
+#firmaOverlay .fmBtns .fmSi { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
+#firmaOverlay .fmBtns .fmSi:disabled { opacity: .6; }
 @media (max-width: 520px) { #spPanel { right: 8px; left: 8px; width: auto; max-width: none; bottom: 80px; height: calc(100vh - 100px); } }
 @media (max-width: 760px) { body::after { content: ''; display: block; height: 80px; } }  /* que el botón 💬 no tape el último botón de la página */
 @media print { #spBtn, #spPanel { display: none !important; } }
@@ -2664,23 +2680,28 @@ async function labFirmar(x, f, vph) {
   const texto = insat ? 'Muestra insatisfactoria' + (f.observaciones ? ' — ' + f.observaciones : '') : [beth, ...f.hallazgos].join(' · ');
   const vv = LAB_VPH.find(v => v[0] === f.vph);
   const resumen = `${x.nombre} (${x.codigo_muestra})\nPAP: ${texto}${vv ? '\nVPH: ' + vv[0] : ''}${f.validador ? '\nValidado por: ' + f.validador : ''}\n\n¿Firmar y liberar? El resultado aparece en la ficha del centro.`;
-  if (!confirm(resumen)) return;
+  const pinF = await firmaPedir({ titulo: 'Firmar y liberar el informe', detalle: resumen.replace(/\n\n¿Firmar y liberar\?.*$/s, ''), boton: 'Firmar y liberar' });
+  if (pinF === null || (pinF === FIRMA_SIN && !confirm(resumen))) return;
   const informe = { calidad: f.calidad, zt: f.zt, hemorragica: f.hemorragica, inflamacion: f.inflamacion, bethesda: beth, hallazgos: f.hallazgos, vph: f.vph || null, metodo: f.vph ? (f.metodo || null) : null, observaciones: f.observaciones || null, lector: perfil.nombre_completo || perfil.correo, validador: f.validador || null, laboratorio: centroNombre(perfil.centro_id), fecha: new Date().toISOString() };
   const { error } = await sb.rpc('sivec_lab_informar', { p_id: x.id, p_bethesda: beth, p_texto: texto, p_vph: vv ? vv[1] : null, p_genotipo: vv ? vv[2] : null, p_informe: informe, p_informado_por: perfil.nombre_completo || perfil.correo || '' });
   if (error) { alert('No se pudo liberar: ' + error.message); return; }
   showToast(`${esc(x.codigo_muestra)} liberado ✔ — ya está en la ficha del centro`, 'ok');
+  await firmaRegistrar('informe_lab', x.id, { muestra: x.id, codigo: x.codigo_muestra, bethesda: beth, texto, vph: vv ? vv[1] : null, genotipo: vv ? vv[2] : null, informe }, pinF);
   labForm = null; labSelId = null; await labCargar();
 }
 // Muestra solo de VPH (autotoma o cervical): sin Bethesda; el resultado de VPH va a la ficha del centro
 async function labFirmarVph(x, f) {
   if (!f.vph) { alert('Elegí el resultado del VPH.'); return; }
   const vv = LAB_VPH.find(v => v[0] === f.vph);
-  if (!confirm(`${x.nombre} (${x.codigo_muestra})\nVPH: ${vv[0]}${f.metodo ? '\nPrueba: ' + f.metodo : ''}\n\n¿Firmar y liberar? El resultado aparece en la ficha del centro.`)) return;
+  const detV = `${x.nombre} (${x.codigo_muestra})\nVPH: ${vv[0]}${f.metodo ? '\nPrueba: ' + f.metodo : ''}`;
+  const pinF = await firmaPedir({ titulo: 'Firmar y liberar el informe', detalle: detV, boton: 'Firmar y liberar' });
+  if (pinF === null || (pinF === FIRMA_SIN && !confirm(detV + '\n\n¿Firmar y liberar? El resultado aparece en la ficha del centro.'))) return;
   try { if (f.metodo) localStorage.setItem('sivec_lab_metodo', f.metodo); } catch (e) {}
   const informe = { muestra: labMuestraTipo(x), vph: f.vph, metodo: f.metodo || null, observaciones: f.observaciones || null, lector: perfil.nombre_completo || perfil.correo, laboratorio: centroNombre(perfil.centro_id) };
   const { error } = await sb.rpc('sivec_lab_informar', { p_id: x.id, p_bethesda: null, p_texto: null, p_vph: vv[1], p_genotipo: vv[2], p_informe: informe, p_informado_por: perfil.nombre_completo || perfil.correo || '' });
   if (error) { alert('No se pudo liberar: ' + error.message); return; }
   showToast(`${esc(x.codigo_muestra)} liberado ✔ — ya está en la ficha del centro`, 'ok');
+  await firmaRegistrar('informe_lab', x.id, { muestra: x.id, codigo: x.codigo_muestra, vph: vv[1], genotipo: vv[2], informe }, pinF);
   labForm = null; labSelId = null; await labCargar();
 }
 function labRenderInformadas() {
@@ -3287,6 +3308,8 @@ function derFormulario(p) {
     const destino = g('derDestino');
     if (COBRO_ACTIVO && !st.cobertura) { alert('Indicá si la paciente tiene SUS o no.'); return; }
     const monto = COBRO_ACTIVO && st.cobertura === 'Sin SUS' ? Number(String(g('derMonto')).replace(',', '.')) || null : null;
+    const pinF = await firmaPedir({ titulo: 'Firmar la referencia', detalle: `${p.nombre} → ${centroNombre(destino)}\n${g('derMotivo') || ''}`, boton: 'Firmar y enviar' });
+    if (pinF === null) return;
     const { data, error } = await sb.rpc('sivec_derivar', { p_paciente: p.id, p_destino: destino, p_motivo: g('derMotivo'), p_indicacion: st.indicacion, p_prioridad: st.prioridad, p_notas: g('derNotas'), p_por: perfil.nombre_completo || perfil.correo || '', p_cobertura: COBRO_ACTIVO ? st.cobertura : null, p_monto: monto });
     if (error) { alert('No se pudo derivar: ' + error.message); return; }
     const d = Array.isArray(data) ? data[0] : data;
@@ -3294,6 +3317,7 @@ function derFormulario(p) {
     if (eCl) showToast('La derivación se envió, pero los antecedentes no se guardaron' + (/function|sivec_der_clinica/.test(eCl.message) ? ': ejecutar el Paso 27 del SQL' : ': ' + esc(eCl.message)), 'err'); else d.clinica = cl;
     if (COBRO_ACTIVO) p.cobertura = st.cobertura;
     showToast(`${esc(p.nombre)} derivada a ${esc(centroNombre(destino))} ✔`, 'ok');
+    await firmaRegistrar('referencia', d.id, { derivacion: d.id, paciente: p.carnet || p.id, destino, motivo: g('derMotivo'), indicacion: st.indicacion, prioridad: st.prioridad, notas: g('derNotas'), clinica: cl, por: perfil.nombre_completo || perfil.correo || '' }, pinF);
     derivMap.set(String(p.id), d); p.derivacion_pap = centroNombre(destino);
     renderBanners(allPatientsData); applyListFilters(true);
     derDetalle(p, d, true);
@@ -3388,9 +3412,9 @@ function derDetalle(p, d, recien) {
     const a = e.target.closest('[data-dd]'); if (!a) return;
     const k = a.dataset.dd;
     if (k === 'cerrar') return derCerrar();
-    if (k === 'boleta') return imprimirDocHTML(formReferenciaDoc(p, d));
+    if (k === 'boleta') return imprimirDocHTML(formReferenciaDoc(p, d, await firmaDe('referencia', d.id)));
     if (k === 'hoja') return derHojaPaciente(p, d);
-    if (k === 'contra') return imprimirDocHTML(formContrarrefDoc(p, d));
+    if (k === 'contra') return imprimirDocHTML(formContrarrefDoc(p, d, await firmaDe('contrarreferencia', d.id)));
     if (k === 'nueva') return derFormulario(p);
     if (k === 'visto') {
       const { error } = await sb.rpc('sivec_der_visto', { p_ids: [d.id] });
@@ -3577,8 +3601,8 @@ function colDetalle(d) {
       const t = [derResumenColpo(colColpoDe(f)) + '.', f.biopsia ? 'Se tomó biopsia; el resultado llegará por el SIVEC.' : '', f.tratamiento ? 'Tratamiento: ' + f.tratamiento + '.' : '', f.proximo ? 'Próximo control: ' + f.proximo + '.' : ''].filter(Boolean).join(' ');
       f.contrarref = t; document.getElementById('colContra').value = t; return;
     }
-    if (k === 'imprimir') return imprimirDocHTML(formContrarrefDoc(d, d));
-    if (k === 'refimp') return imprimirDocHTML(formReferenciaDoc(d, d));
+    if (k === 'imprimir') return imprimirDocHTML(formContrarrefDoc(d, d, await firmaDe('contrarreferencia', d.id)));
+    if (k === 'refimp') return imprimirDocHTML(formReferenciaDoc(d, d, await firmaDe('referencia', d.id)));
     if (k === 'cita') {
       const fe = document.getElementById('colCita').value; if (!fe) return alert('Elegí la fecha de la cita.');
       const { error } = await sb.rpc('sivec_colpo_cita', { p_id: d.id, p_fecha: fe });
@@ -3604,9 +3628,12 @@ function colDetalle(d) {
       if (f.biopsia === null) return alert('Indicá si se tomó biopsia.');
       if (k === 'enviar' && !f.contrarref) return alert('Escribí las indicaciones para el centro (o tocá "Armar texto con lo marcado").');
       const colpo = colColpoDe(f);
+      const pinF = k === 'enviar' ? await firmaPedir({ titulo: 'Firmar la contrarreferencia', detalle: `${d.nombre || ''}\n${derResumenColpo(colpo)}`, boton: 'Firmar y enviar' }) : FIRMA_SIN;
+      if (pinF === null) return;
       const { error } = await sb.rpc('sivec_colpo_atender', { p_id: d.id, p_colpo: colpo, p_biopsia: f.biopsia, p_tratamiento: f.tratamiento, p_contrarref: f.contrarref, p_proximo: f.proximo, p_por: perfil.nombre_completo || perfil.correo || '', p_enviar: k === 'enviar' });
       if (error) return alert(error.message);
       showToast(k === 'enviar' ? 'Contrarreferencia enviada al centro ✔' : 'Guardado ✔', 'ok');
+      if (k === 'enviar') await firmaRegistrar('contrarreferencia', d.id, { derivacion: d.id, colposcopia: colpo, biopsia: f.biopsia, tratamiento: f.tratamiento, contrarreferencia: f.contrarref, proximo: f.proximo, por: perfil.nombre_completo || perfil.correo || '' }, pinF);
       colTab = f.biopsia && k === 'enviar' ? 'biopsia' : 'hechas'; colSel = null; colForm = null; return colCargar();
     }
   };
@@ -7052,16 +7079,20 @@ document.getElementById('colpForm').addEventListener('submit', async (e) => {
     derivacion: fd.get('derivacion') || null,
   };
   if (await cuelloOk()) data.cuello_mapa = cuelloVacio(cuelloMapa) ? null : cuelloMapa;
-  let error;
+  const pinF = await firmaPedir({ titulo: 'Firmar la colposcopia', detalle: [data.fecha ? fmtFecha(data.fecha) : '', data.prueba_schiller ? 'Schiller ' + data.prueba_schiller : '', (data.lesion || []).join(', ')].filter(Boolean).join(' · '), boton: 'Firmar y guardar' });
+  if (pinF === null) return;
+  let error, colpId = colpEditingId;
   if (colpEditingId) {
     ({ error } = await sb.from('colposcopias').update(data).eq('id', colpEditingId));
   } else {
-    ({ error } = await sb.from('colposcopias').insert([data]));
+    let ins; ({ data: ins, error } = await sb.from('colposcopias').insert([data]).select('id'));
+    colpId = ins && (Array.isArray(ins) ? (ins[0] || {}).id : ins.id);
   }
   if (error) { showToast('Error al guardar la colposcopia: ' + error.message, 'err'); return; }
   const wasEdit = !!colpEditingId;
   closeColposcopia();
   showToast(wasEdit ? 'Colposcopia actualizada correctamente ✔' : 'Colposcopia guardada correctamente ✔', 'ok');
+  firmaRegistrar('colposcopia', colpId, data, pinF);
 });
 
 async function getLatestColposcopia(pacienteId) {
@@ -7482,7 +7513,7 @@ function formRefPaciente(p) {
     ${fpCell('Nombres y apellidos', esc((p.nombre || '').toUpperCase()))}${fpCell('CI', esc(p.carnet || ''))}${fpCell('Edad', esc(String(edadDe(p.fecha_nacimiento) ?? '')) + ' años')}${fpCell('Sexo', fpChk('F', true) + fpChk('M', false), 'n nr')}
     ${fpCell('Domicilio', esc(p.direccion || ''), 'n nb', 'grid-column:span 2')}${fpCell('Celular', esc(p.celular || ''), 'n nb')}${fpCell('Nacimiento', fmtFecha(p.fecha_nacimiento) || '', 'n nr nb')}</div></div>`;
 }
-function formReferenciaDoc(p, d) {
+function formReferenciaDoc(p, d, firma) {
   const org = centros.find(c => String(c.id) === String(d.centro_origen)) || {}, dest = centros.find(c => String(c.id) === String(d.destino_id)) || {};
   const bet = bethesdaDe(p), vph = p.resultado_vph ? 'VPH ' + p.resultado_vph + (p.vph_genotipo ? ' (genotipo ' + p.vph_genotipo + ')' : '') : '';
   const dx = [bet && bet !== 'NILM' ? bet : '', p.resultado_vph === 'Positiva' ? 'VPH+' : ''].filter(Boolean).join(' · ') || d.motivo || '';
@@ -7520,12 +7551,12 @@ function formReferenciaDoc(p, d) {
       ${fpCell('Tratamiento instaurado', lineas(1), 'n nr nb')}</div></div>
     <div class="sec"><div class="secT">6. Condiciones del traslado</div><div class="grid" style="grid-template-columns:1fr 1fr 1.4fr">
       ${fpCell('Estado de la paciente', fpChk('Estable', true) + fpChk('Inestable', false), 'n nb')}${fpCell('Prioridad', fpChk('Urgente', d.prioridad === 'urgente') + fpChk('Normal', d.prioridad !== 'urgente'), 'n nb')}${fpCell('Acompañada por', fpChk('Sola', false) + fpChk('Familiar', false) + fpChk('Personal de salud', false), 'n nr nb')}</div></div>
-    <div class="firmas"><div><b>${esc(d.derivado_por || '&nbsp;')}</b>Nombre, firma y sello de quien refiere</div><div><b>…… / …… / …… · …… : ……</b>Llegada al establecimiento receptor</div><div><b>&nbsp;</b>Nombre y firma de quien recibe</div></div>
+    <div class="firmas"><div>${firmaLeyenda(firma, 'Nombre, firma y sello de quien refiere', esc(d.derivado_por || ''))}</div><div><b>…… / …… / …… · …… : ……</b>Llegada al establecimiento receptor</div><div><b>&nbsp;</b>Nombre y firma de quien recibe</div></div>
     <div class="sec" style="font-size:12px">Referencia justificada: ${fpChk('Sí', false)}${fpChk('No', false)} <span class="muted">(llena el establecimiento receptor)</span></div>
     ${fpFoot('Referencia a colposcopia')}</section>`;
   return formRefDocHTML('Formulario de Referencia — ' + (p.nombre || ''), body);
 }
-function formContrarrefDoc(p, d) {
+function formContrarrefDoc(p, d, firma) {
   const c = d.colposcopia || {}, org = centros.find(x => String(x.id) === String(d.destino_id)) || {}, dest = centros.find(x => String(x.id) === String(d.centro_origen)) || {};
   const final = [c.impresion ? 'Impresión colposcópica: ' + c.impresion : '', d.biopsia_resultado ? 'Biopsia: ' + d.biopsia_resultado : ''].filter(Boolean).join(' · ');
   const cie = cie10De(d.biopsia_resultado || '') || cie10De(d.motivo || '');
@@ -7547,7 +7578,7 @@ function formContrarrefDoc(p, d) {
       ${fpCell('Resultado de la biopsia', d.biopsia_tomada ? esc(d.biopsia_resultado || 'Pendiente: llega por el SIVEC') : 'No se tomó', 'nr nb')}</div></div>
     <div class="sec"><div class="secT">5. Recomendaciones para el establecimiento de origen</div><div class="grid" style="grid-template-columns:1fr">
       ${fpCell('Indicaciones', esc(d.contrarreferencia || ''), 'n nr')}${fpCell('Próximo control', esc(fechaOTexto(d.proximo_control)), 'nr nb')}</div></div>
-    <div class="firmas" style="grid-template-columns:1fr 1fr;margin-top:22px;margin-bottom:26px"><div><b>${esc(d.atendido_por || '&nbsp;')}</b>Nombre, firma y sello de quien contrarrefiere</div><div><b>&nbsp;</b>Recepción en el establecimiento de origen (fecha y firma)</div></div>
+    <div class="firmas" style="grid-template-columns:1fr 1fr;margin-top:22px;margin-bottom:26px"><div>${firmaLeyenda(firma, 'Nombre, firma y sello de quien contrarrefiere', esc(d.atendido_por || ''))}</div><div><b>&nbsp;</b>Recepción en el establecimiento de origen (fecha y firma)</div></div>
     ${fpFoot('Contrarreferencia de colposcopia')}</section>`;
   return formRefDocHTML('Formulario de Contrarreferencia — ' + (p.nombre || ''), body);
 }
@@ -7804,7 +7835,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.6.2 · 27/09/2026';
+const SIVEC_VERSION = '1.7.0 · 27/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -8161,6 +8192,137 @@ document.addEventListener('click', e => {
 spMontar();
 setTimeout(spRevisar, 4000);
 setInterval(spRevisar, 60000);
+
+// ===== Firma electrónica con PIN (Paso 30): laboratorio, colposcopia, referencia y contrarreferencia =====
+// Cada profesional tiene su PIN de 6 números. Se pide al liberar/enviar; queda quién firmó, cuándo y la huella SHA-256 del contenido.
+const FIRMA_SIN = 'SIN_FIRMA';
+const FIRMA_TIPOS = { referencia: 'Referencia', contrarreferencia: 'Contrarreferencia', informe_lab: 'Informe de laboratorio', colposcopia: 'Colposcopia' };
+function firmaCanon(o) {
+  if (Array.isArray(o)) return '[' + o.map(firmaCanon).join(',') + ']';
+  if (o && typeof o === 'object') return '{' + Object.keys(o).sort().filter(k => o[k] !== undefined).map(k => JSON.stringify(k) + ':' + firmaCanon(o[k])).join(',') + '}';
+  return JSON.stringify(o === undefined ? null : o);
+}
+async function firmaHuella(o) {
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(firmaCanon(o)));
+  return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+function firmaCodigoFmt(c) { c = String(c || ''); return c.length > 4 ? c.slice(0, 4) + '-' + c.slice(4) : c; }
+function firmaFaltaPaso(err) { return !!err && /sivec_pin|sivec_firm|schema cache|PGRST202|42883|does not exist/i.test((err.code || '') + ' ' + (err.message || '')); }
+// Pide el PIN (o lo crea la primera vez). Devuelve el PIN, null si canceló, o FIRMA_SIN si falta el Paso 30.
+async function firmaPedir({ titulo, detalle, boton }) {
+  if (!sb || !conRoles() || modoDemo) return FIRMA_SIN;
+  let est; try { est = await sb.rpc('sivec_pin_estado'); } catch (e) { return FIRMA_SIN; }
+  if (est.error) { if (firmaFaltaPaso(est.error)) return FIRMA_SIN; showToast('No se pudo preparar la firma: ' + est.error.message, 'error'); return null; }
+  return new Promise(resolve => {
+    let modo = est.data ? 'firmar' : 'crear';
+    const ov = document.createElement('div'); ov.id = 'firmaOverlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
+    const fin = v => { ov.remove(); document.removeEventListener('keydown', esc_); resolve(v); };
+    const esc_ = e => { if (e.key === 'Escape') fin(null); };
+    document.addEventListener('keydown', esc_);
+    const pintar = (msg) => {
+      ov.innerHTML = `<div class="fmCard"><div class="fmHead"><span>✍️</span><div><b>${esc(titulo)}</b><small>${modo === 'crear' ? 'Primero creá tu PIN de firma' : 'Firma electrónica con tu PIN personal'}</small></div></div>
+        ${detalle ? `<div class="fmDet">${esc(detalle)}</div>` : ''}
+        ${modo === 'crear' ? `<p class="fmNota">Tu PIN son <b>6 números</b> que solo sabés vos. Vale para firmar informes, colposcopias, referencias y contrarreferencias. No uses tu fecha de nacimiento.</p>
+          <label>Nuevo PIN<input id="fmPin" type="password" inputmode="numeric" autocomplete="new-password" maxlength="6" pattern="[0-9]*"></label>
+          <label>Repetilo<input id="fmPin2" type="password" inputmode="numeric" autocomplete="new-password" maxlength="6" pattern="[0-9]*"></label>`
+        : `<label>Tu PIN de firma<input id="fmPin" type="password" inputmode="numeric" autocomplete="off" maxlength="6" pattern="[0-9]*"></label>`}
+        <div class="fmMsg" role="alert">${msg ? esc(msg) : ''}</div>
+        <div class="fmBtns"><button type="button" class="fmNo">Cancelar</button><button type="button" class="fmSi">${modo === 'crear' ? 'Crear PIN y firmar' : esc(boton || 'Firmar')}</button></div>
+        ${modo === 'firmar' ? '<p class="fmNota" style="text-align:center;margin:0">¿Lo olvidaste? El administrador lo restablece y creás uno nuevo.</p>' : ''}</div>`;
+      const pin = ov.querySelector('#fmPin'), pin2 = ov.querySelector('#fmPin2');
+      [pin, pin2].filter(Boolean).forEach(i => { i.oninput = () => { i.value = i.value.replace(/\D/g, '').slice(0, 6); }; i.onkeydown = e => { if (e.key === 'Enter') ov.querySelector('.fmSi').click(); }; });
+      setTimeout(() => pin.focus(), 30);
+      ov.querySelector('.fmNo').onclick = () => fin(null);
+      ov.querySelector('.fmSi').onclick = async () => {
+        const b = ov.querySelector('.fmSi'), v = pin.value;
+        if (!/^\d{6}$/.test(v)) return pintarMsg('El PIN tiene que tener 6 números.');
+        if (modo === 'crear' && v !== pin2.value) return pintarMsg('Los dos PIN no coinciden.');
+        b.disabled = true; b.textContent = 'Verificando…';
+        if (modo === 'crear') {
+          const r = await sb.rpc('sivec_pin_definir', { p_pin: v });
+          if (r.error) { b.disabled = false; return pintar(r.error.message); }
+          showToast('PIN de firma creado ✔ Guardalo bien: nadie más lo conoce.', 'ok');
+        }
+        const r = await sb.rpc('sivec_pin_verificar', { p_pin: v });
+        if (r.error) { b.disabled = false; return pintar(r.error.message); }
+        const s = String(r.data || '');
+        if (s === 'ok') return fin(v);
+        if (s === 'sin_pin') { modo = 'crear'; return pintar('Todavía no tenés PIN: creá uno.'); }
+        if (s.startsWith('bloqueado')) return pintar(`PIN bloqueado por intentos fallidos hasta las ${s.split(':').slice(1).join(':')}. Si lo olvidaste, pedí al administrador que lo restablezca.`);
+        const quedan = s.split(':')[1];
+        pintar(`PIN incorrecto. ${quedan === '1' ? 'Te queda 1 intento' : 'Te quedan ' + quedan + ' intentos'} antes del bloqueo de 15 minutos.`);
+      };
+    };
+    const pintarMsg = m => { ov.querySelector('.fmMsg').textContent = m; };
+    ov.onclick = e => { if (e.target === ov) fin(null); };
+    document.body.appendChild(ov); pintar('');
+  });
+}
+// Registra la firma de un documento ya guardado. Devuelve la firma o null.
+async function firmaRegistrar(tipo, documento, contenido, pin) {
+  if (!pin || pin === FIRMA_SIN || !documento) return null;
+  let huella;
+  try { huella = await firmaHuella(contenido); } catch (e) { showToast('No se pudo calcular la huella del documento: ' + e.message, 'error'); return null; }
+  const { data, error } = await sb.rpc('sivec_firmar', { p_tipo: tipo, p_documento: String(documento), p_huella: huella, p_pin: pin });
+  if (error || !data || !data.ok) {
+    const m = error ? error.message : data && data.motivo === 'sin_permiso' ? 'no tenés permiso para firmar este documento' : (data && data.motivo) || 'sin respuesta';
+    showToast(`Se guardó, pero la firma no se registró (${m}).`, 'error'); return null;
+  }
+  showToast(`✍️ ${FIRMA_TIPOS[tipo]} firmada · código ${firmaCodigoFmt(data.codigo)}`, 'ok');
+  return data;
+}
+async function firmaDe(tipo, documento) {
+  if (!sb || !documento) return null;
+  const { data, error } = await sb.from('sivec_firmas').select('*').eq('tipo', tipo).eq('documento', String(documento)).order('creado', { ascending: false }).limit(1);
+  return error || !data || !data.length ? null : data[0];
+}
+// Bloque de firma para los formularios impresos
+function firmaLeyenda(f, rotulo, nombre) {
+  if (!f) return `<b>${nombre || '&nbsp;'}</b>${rotulo}`;
+  const t = new Date(f.creado);
+  return `<b>${esc(f.firmante_nombre || nombre || '')}</b>${rotulo.replace(/firma y sello|firma/i, 'firma electrónica')}<br><span style="font-size:10.5px;color:#7d2a4c;font-weight:700">✍ Firmado electrónicamente el ${fmtFecha(t.toISOString().slice(0, 10))} a las ${t.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })}</span><br><span style="font-size:10px">Código de verificación <b>${esc(firmaCodigoFmt(f.codigo))}</b> · huella ${esc(String(f.huella || '').slice(0, 12))}…</span>`;
+}
+// En ⚙ Configuración: crear/cambiar el PIN, verificar un código y (administrador) restablecer el PIN de alguien
+(function firmaEnConfiguracion() {
+  const panel = document.getElementById('settingsPanel'); if (!panel) return;
+  const d = document.createElement('div'); d.id = 'firmaConfig';
+  d.style.cssText = 'margin:0 0 18px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)';
+  d.innerHTML = `<b>✍️ Firma electrónica</b><div class="hint" style="margin:4px 0 8px">Tu PIN de 6 números firma informes, colposcopias, referencias y contrarreferencias.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="primary" style="margin-top:0" data-fc="pin">Crear o cambiar mi PIN</button></div>
+    <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center"><input id="fcCodigo" placeholder="Código, ej. 58F7-B49B" style="flex:1;min-width:150px;padding:7px 9px;border:1px solid var(--line);border-radius:8px"><button type="button" class="primary" style="margin-top:0" data-fc="verificar">Verificar firma</button></div>
+    <div id="fcRes" class="hint" style="margin-top:6px"></div>
+    <div id="fcAdmin" style="display:none;margin-top:10px;gap:6px;flex-wrap:wrap;align-items:center"><input id="fcCorreo" type="email" placeholder="Correo de quien olvidó el PIN" style="flex:1;min-width:150px;padding:7px 9px;border:1px solid var(--line);border-radius:8px"><button type="button" class="primary" style="margin-top:0" data-fc="reset">Restablecer PIN</button></div>`;
+  const sop = panel.querySelector('h2'); (sop && sop.nextElementSibling ? sop.nextElementSibling : panel.firstChild).after(d);
+  const res = d.querySelector('#fcRes');
+  document.getElementById('settingsBtn') && document.getElementById('settingsBtn').addEventListener('click', () => { d.querySelector('#fcAdmin').style.display = perfil && (perfil.es_admin || perfil.rol === 'admin') ? 'flex' : 'none'; });
+  d.onclick = async e => {
+    const b = e.target.closest('[data-fc]'); if (!b || !sb) return;
+    if (b.dataset.fc === 'pin') {
+      const est = await sb.rpc('sivec_pin_estado');
+      if (est.error) { res.textContent = firmaFaltaPaso(est.error) ? 'La firma electrónica se activa con el Paso 30 del SQL.' : est.error.message; return; }
+      if (!est.data) { const p = await firmaPedir({ titulo: 'Crear mi PIN de firma' }); if (p && p !== FIRMA_SIN) res.textContent = 'PIN creado ✔'; return; }
+      const actual = prompt('Escribí tu PIN actual (6 números):'); if (!actual) return;
+      const nuevo = prompt('Nuevo PIN (6 números):'); if (!nuevo) return;
+      if (prompt('Repetí el nuevo PIN:') !== nuevo) { res.textContent = 'Los PIN nuevos no coinciden.'; return; }
+      const r = await sb.rpc('sivec_pin_definir', { p_pin: nuevo, p_actual: actual });
+      res.textContent = r.error ? r.error.message : 'PIN cambiado ✔';
+    } else if (b.dataset.fc === 'verificar') {
+      const c = d.querySelector('#fcCodigo').value.trim(); if (!c) return;
+      const { data, error } = await sb.rpc('sivec_firma_verificar', { p_codigo: c });
+      const f = Array.isArray(data) ? data[0] : data;
+      res.innerHTML = error ? esc(firmaFaltaPaso(error) ? 'La firma electrónica se activa con el Paso 30 del SQL.' : error.message)
+        : f ? `✔ <b>Firma válida</b>: ${esc(FIRMA_TIPOS[f.tipo] || f.tipo)} firmada por <b>${esc(f.firmante_nombre || '')}</b>${f.establecimiento ? ' · ' + esc(f.establecimiento) : ''} el ${fmtFecha(String(f.creado).slice(0, 10))}.`
+        : '✖ <b>No existe ninguna firma con ese código.</b>';
+    } else if (b.dataset.fc === 'reset') {
+      const correo = d.querySelector('#fcCorreo').value.trim(); if (!correo) return;
+      const u = await sb.rpc('sivec_uid_por_correo', { p_correo: correo });
+      if (u.error || !u.data) { res.textContent = 'No se encontró ese correo.'; return; }
+      if (!confirm(`¿Restablecer el PIN de firma de ${correo}? La persona va a crear uno nuevo la próxima vez que firme.`)) return;
+      const r = await sb.rpc('sivec_pin_restablecer', { p_usuario: u.data });
+      res.textContent = r.error ? r.error.message : 'PIN restablecido ✔ Avisale que cree uno nuevo al firmar.';
+    }
+  };
+})();
 
 // Términos de uso y política de privacidad: cada persona los acepta una vez por versión (Paso 26 del SQL)
 async function terminosVerificar() {
