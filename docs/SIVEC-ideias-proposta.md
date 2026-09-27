@@ -980,3 +980,7 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - Resumen del día (una vez, después de las 16:30 si el sistema está abierto): tomas de hoy comparadas con ayer, pacientes que pasaron por la cola, muestras informadas por el laboratorio.
 - Nunca dice nombres de pacientes. El mismo aviso no se repite en 20 s.
 - ⚙ → Sonidos → "Avisos por voz durante el día: Sí / No / ▶ Probar" (por computadora). "Sin voz" también los apaga.
+
+## 27/09/2026 · Nombre de empresa: "Vittatech" (revisado, no recomendado)
+- Vitta (Vitta Tecnologia em Saúde S.A., São Paulo, del grupo Stone) es una healthtech grande: historia clínica, gestión de clínicas, hospital digital; usa @vittatech en Instagram y Facebook y vittatech.com.br está tomado por otra Vitta Tech. También existen Vitta Technologies LLC (EE.UU., vittatech.us) y una farmacia "Vitta Tech".
+- Riesgo: confusión en el mismo rubro (software de salud), redes sociales y dominios ocupados, posible oposición si Vitta registra en la región. Alternativa a evaluar: "Kuyay" (quechua: amar, cuidar) — solo aparece una chocolatería peruana, otro rubro.
