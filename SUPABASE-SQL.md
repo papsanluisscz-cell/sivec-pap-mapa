@@ -1965,4 +1965,45 @@ Después de "listo", ejecutá la línea del `update … es_soporte = true` con *
 En `config.js` se completa el contacto que ve cada persona: `soporte: { whatsapp: '591…', telefono: '+591…', correo: '…', horario: 'Lunes a sábado, de 8:00 a 20:00' }`.
 
 ### Deshacer el Paso 28
-`drop table if exists sivec_soporte_mensajes; drop table if exists sivec_soporte_tickets; drop function if exists sivec_soporte_al_mensaje(); drop function if exists sivec_es_soporte();` (se pierden las consultas). La columna `es_soporte` puede quedar.
+Si hiciste el Paso 29, primero deshacelo. Después: `drop table if exists sivec_soporte_mensajes; drop table if exists sivec_soporte_tickets; drop function if exists sivec_soporte_al_mensaje(); drop function if exists sivec_es_soporte();` (se pierden las consultas). La columna `es_soporte` puede quedar.
+
+---
+
+## Paso 29 — Captura de pantalla en el chat de soporte (requiere el Paso 28)
+
+Al tocar 💬 el sistema saca solo una captura de la pantalla donde estaba la persona (sin el botón ni la ventana de soporte). Para **abrir una consulta la captura es obligatoria**: se puede cambiar por otra imagen (📸 capturar la pantalla en la computadora, 📎 elegir del celular o pegar con Ctrl+V), pero no se puede enviar sin ninguna. En los mensajes siguientes el 📎 es opcional, y el equipo de soporte también puede mandar capturas ("tocá acá"). Las imágenes se guardan en un espacio **privado** de Supabase (Storage): solo las ven la persona que abrió la consulta y el equipo de soporte, con enlaces que vencen en una hora.
+
+```sql
+-- PASO 29 · Capturas de pantalla en el soporte (Supabase Storage, espacio privado "sivec-soporte")
+alter table sivec_soporte_mensajes add column if not exists adjunto text;
+-- Un mensaje puede ser solo la captura, sin texto
+alter table sivec_soporte_mensajes drop constraint if exists sivec_soporte_mensajes_texto_check;
+alter table sivec_soporte_mensajes add constraint sivec_soporte_mensajes_texto_check
+  check (length(texto) <= 4000 and (length(texto) >= 1 or adjunto is not null));
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('sivec-soporte', 'sivec-soporte', false, 5242880, array['image/jpeg', 'image/png', 'image/webp'])
+on conflict (id) do update set public = false, file_size_limit = 5242880, allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp'];
+
+-- Cada captura va en la carpeta de su consulta: <número de consulta>/<archivo>.jpg
+drop policy if exists "soporte subir captura" on storage.objects;
+drop policy if exists "soporte ver captura" on storage.objects;
+create policy "soporte subir captura" on storage.objects for insert to authenticated
+  with check (bucket_id = 'sivec-soporte' and exists (select 1 from public.sivec_soporte_tickets t
+    where t.id::text = (storage.foldername(name))[1] and (t.usuario = auth.uid() or public.sivec_es_soporte())));
+create policy "soporte ver captura" on storage.objects for select to authenticated
+  using (bucket_id = 'sivec-soporte' and exists (select 1 from public.sivec_soporte_tickets t
+    where t.id::text = (storage.foldername(name))[1] and (t.usuario = auth.uid() or public.sivec_es_soporte())));
+
+notify pgrst, 'reload schema';
+
+-- Resultado: debe decir "listo"
+select case when exists (select 1 from information_schema.columns where table_name = 'sivec_soporte_mensajes' and column_name = 'adjunto')
+             and exists (select 1 from storage.buckets where id = 'sivec-soporte' and not public)
+            then 'listo' else 'revisar' end as paso_29;
+```
+
+Sin el Paso 29 la consulta igual se envía, pero sin la imagen (el sistema avisa y sugiere mandarla por WhatsApp).
+
+### Deshacer el Paso 29
+`drop policy if exists "soporte subir captura" on storage.objects; drop policy if exists "soporte ver captura" on storage.objects;` y borrar el espacio **sivec-soporte** desde Supabase → Storage (se pierden las capturas). La columna `adjunto` puede quedar.

@@ -1064,6 +1064,21 @@ body.dark #spPanel .spEst { background: #0c4a6e; color: #bae6fd; }
 body.dark #spPanel .spEst.en_curso { background: #78350f; color: #fde68a; }
 body.dark #spPanel .spEst.resuelto { background: #14532d; color: #bbf7d0; }
 body.dark #spPanel .spEst.urg { background: #7f1d1d; color: #fecaca; }
+#spPanel .spAdjFalta { border: 2px dashed var(--teal-500); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); }
+#spPanel .spAdjFalta b { font-size: 13.5px; }
+#spPanel .spAdjFalta small, #spPanel .spAdjOk small { color: var(--ink-soft); font-size: 12px; display: block; }
+#spPanel .spAdjOk { display: flex; gap: 12px; align-items: center; border: 1px solid var(--line); border-radius: 12px; padding: 8px; background: var(--paper); }
+#spPanel .spAdjOk img { width: 116px; height: 74px; object-fit: cover; object-position: top left; border-radius: 8px; border: 1px solid var(--line); flex: none; }
+#spPanel .spAdjOk b { font-size: 13px; display: block; }
+#spPanel .spAdjBtns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+#spPanel .spAdjBtns button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 6px 10px; font-size: 12.5px; cursor: pointer; }
+#spPanel .spAdjFalta .spAdjBtns button:first-child { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
+#spPanel .spAdjChat:empty { display: none; }
+#spPanel .spAdjChat { padding: 8px 10px 0; background: var(--surface); border-top: 1px solid var(--line); }
+#spPanel .spClip { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; width: 42px; height: 42px; font-size: 18px; cursor: pointer; flex: none; }
+#spPanel .spImg { display: block; margin: -2px -4px 6px; cursor: zoom-in; }
+#spPanel .spImg img { display: block; width: 100%; max-width: 260px; min-height: 60px; border-radius: 10px; background: rgba(0,0,0,.06); }
+#spPanel .spEnviar:disabled { background: var(--ink-soft); }
 @media (max-width: 520px) { #spPanel { right: 8px; left: 8px; width: auto; max-width: none; bottom: 80px; height: calc(100vh - 100px); } }
 @media (max-width: 760px) { body::after { content: ''; display: block; height: 80px; } }  /* que el botón 💬 no tape el último botón de la página */
 @media print { #spBtn, #spPanel { display: none !important; } }
@@ -7787,7 +7802,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.6.0 · 27/09/2026';
+const SIVEC_VERSION = '1.6.1 · 27/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -7872,7 +7887,10 @@ function spAbrir(si) {
   const p = document.getElementById('spPanel'); if (!p) return;
   p.classList.toggle('abierto', si);
   clearInterval(spMsgTimer); spMsgTimer = null;
-  if (si) { spVista = spTicketId ? 'chat' : 'inicio'; spPintar(); }
+  if (si) {
+    if (spPuedeChat() && !spEsSoporte() && !spCaptura) { spCapturaPrevia = spCapturaAutomatica(); spCapturaPrevia.catch(() => {}); }
+    spVista = spTicketId ? 'chat' : 'inicio'; spPintar();
+  }
 }
 function spCabecera(titulo, sub, atras) {
   return `<div class="spHead">${atras ? '<button type="button" class="spAtras" data-sp="atras" title="Volver" aria-label="Volver">‹</button>' : ''}<div><b>${esc(titulo)}</b><small>${esc(sub)}</small></div><button type="button" data-sp="cerrar" title="Cerrar" aria-label="Cerrar">×</button></div>`;
@@ -7889,7 +7907,7 @@ async function spPintar() {
     html += `<h4>Hablar ahora</h4>`;
     if (cfg.wa) html += `<a class="spAcc" href="${spWhatsappUrl('')}" target="_blank" rel="noopener"><i>💬</i><div><b>WhatsApp</b><small>Se abre con los datos del sistema ya escritos</small></div></a>`;
     if (cfg.tel) html += `<a class="spAcc" href="tel:${esc(cfg.tel)}"><i>📞</i><div><b>Llamar</b><small>${esc(cfg.tel)} · para algo urgente</small></div></a>`;
-    if (spPuedeChat()) html += `<button type="button" class="spAcc" data-sp="nuevo"><i>✍️</i><div><b>Escribir al equipo</b><small>Queda registrado y te respondemos acá mismo</small></div></button>`;
+    if (spPuedeChat()) html += `<button type="button" class="spAcc" data-sp="nuevo"><i>✍️</i><div><b>Escribir al equipo</b><small>Con la captura de la pantalla; te respondemos acá</small></div></button>`;
     if (!cfg.wa && !cfg.tel && !spPuedeChat()) html += `<p class="spNota">El número de soporte se configura en config.js.</p>`;
     if (cfg.correo) html += `<p class="spNota">Correo: ${esc(cfg.correo)}</p>`;
   }
@@ -7920,40 +7938,132 @@ async function spCargarLista() {
   }).join('');
   box.querySelectorAll('[data-tk]').forEach(el => { const ir = () => { spTicketId = el.dataset.tk; spVista = 'chat'; spPintar(); }; el.onclick = ir; el.onkeydown = e => { if (e.key === 'Enter') ir(); }; });
 }
+// --- Captura de pantalla: obligatoria al abrir una consulta; opcional en los mensajes siguientes ---
+// Se saca sola al tocar 💬 (el botón y la ventana no salen); la persona puede cambiarla por otra imagen o pegarla con Ctrl+V.
+const SP_BUCKET = 'sivec-soporte';
+const spEsCelular = () => /Mobi|Android|iPhone|iPad/.test(navigator.userAgent);
+let spCaptura = null, spCapturaPrevia = null;
+const spUrls = {};
+function spLimpiarCaptura() { if (spCaptura && spCaptura.url) URL.revokeObjectURL(spCaptura.url); spCaptura = null; }
+function spCargarLib(src, global) {
+  if (window[global]) return Promise.resolve(window[global]);
+  return new Promise((ok, mal) => { const s = document.createElement('script'); s.src = src; s.onload = () => window[global] ? ok(window[global]) : mal(new Error('no cargó')); s.onerror = () => mal(new Error('sin conexión')); document.head.appendChild(s); });
+}
+function spCanvasABlob(cv, max) {
+  const k = Math.min(1, (max || 1600) / Math.max(cv.width, cv.height)); let c = cv;
+  if (k < 1) { c = document.createElement('canvas'); c.width = Math.round(cv.width * k); c.height = Math.round(cv.height * k); c.getContext('2d').drawImage(cv, 0, 0, c.width, c.height); }
+  return new Promise((ok, mal) => c.toBlob(b => b ? ok(b) : mal(new Error('No se pudo convertir la imagen.')), 'image/jpeg', 0.82));
+}
+async function spArchivoABlob(file) {
+  if (!file || !/^image\//.test(file.type)) throw new Error('El archivo no es una imagen.');
+  if (file.size > 15e6) throw new Error('La imagen pesa más de 15 MB.');
+  const bmp = await createImageBitmap(file); const cv = document.createElement('canvas'); cv.width = bmp.width; cv.height = bmp.height; cv.getContext('2d').drawImage(bmp, 0, 0);
+  return spCanvasABlob(cv);
+}
+async function spCapturaAutomatica() {
+  const h2c = await spCargarLib('https://unpkg.com/html2canvas-pro@2.4.5/dist/html2canvas-pro.min.js', 'html2canvas');
+  const fuera = ['spPanel', 'spBtn', 'toastContainer', 'instalarBtn'].map(id => document.getElementById(id)).filter(Boolean);
+  const cv = await h2c(document.body, { x: scrollX, y: scrollY, width: innerWidth, height: innerHeight, windowWidth: innerWidth, windowHeight: innerHeight,
+    scale: Math.min(devicePixelRatio || 1, 1.5), useCORS: true, logging: false, backgroundColor: getComputedStyle(document.body).backgroundColor || '#ffffff', ignoreElements: el => fuera.includes(el) });
+  return spCanvasABlob(cv);
+}
+async function spCapturaCompartida() { // computadora: el navegador pide elegir la pestaña o la pantalla
+  const st = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' }, preferCurrentTab: true, audio: false });
+  const ocultos = ['spPanel', 'spBtn'].map(id => document.getElementById(id)); ocultos.forEach(el => el.style.visibility = 'hidden');
+  try {
+    const v = document.createElement('video'); v.srcObject = st; v.muted = true; await v.play(); await new Promise(r => setTimeout(r, 400));
+    const cv = document.createElement('canvas'); cv.width = v.videoWidth; cv.height = v.videoHeight; cv.getContext('2d').drawImage(v, 0, 0);
+    return await spCanvasABlob(cv);
+  } finally { st.getTracks().forEach(t => t.stop()); ocultos.forEach(el => el.style.visibility = ''); }
+}
+function spPonerCaptura(blob, origen) { spLimpiarCaptura(); spCaptura = { blob, url: URL.createObjectURL(blob), origen }; spPintarAdjunto(); }
+function spPintarAdjunto() {
+  const box = document.getElementById('spAdj'); if (!box) return;
+  const obligatoria = box.dataset.obligatoria === '1', compartir = !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) && !spEsCelular();
+  if (spCaptura) {
+    box.innerHTML = `<div class="spAdjOk"><img src="${spCaptura.url}" alt="Captura de pantalla adjunta"><div><b>${spCaptura.origen === 'auto' ? 'Captura de la pantalla donde estabas' : 'Captura adjunta'}</b><small>Solo la ve el equipo de soporte.</small><div class="spAdjBtns"><button type="button" data-adj="cambiar">Cambiar</button>${obligatoria ? '' : '<button type="button" data-adj="quitar">Quitar</button>'}</div></div></div>`;
+  } else if (obligatoria || box.dataset.abierto === '1') {
+    box.innerHTML = `<div class="spAdjFalta">${obligatoria ? '<b>📷 Falta la captura de pantalla</b><small>Es obligatoria: así vemos el problema tal como aparece.</small>' : ''}
+      <div class="spAdjBtns">${compartir ? '<button type="button" data-adj="pantalla">📸 Capturar la pantalla</button>' : ''}<button type="button" data-adj="archivo">📎 Elegir imagen</button></div>
+      <small>${spEsCelular() ? 'Sacá la captura con los botones del celular y elegila acá.' : 'También podés pegarla con Ctrl+V.'}</small></div>`;
+  } else box.innerHTML = '';
+  const btn = document.getElementById('spCrear');
+  if (btn) { btn.disabled = !spCaptura; btn.textContent = spCaptura ? 'Enviar al equipo' : 'Adjuntá la captura para enviar'; }
+}
+async function spTomarAdjunto(tipo) {
+  try {
+    if (tipo === 'archivo') { let f = document.getElementById('spFile'); if (!f) { f = document.createElement('input'); f.type = 'file'; f.accept = 'image/*'; f.id = 'spFile'; f.hidden = true; f.onchange = async () => { const a = f.files[0]; f.value = ''; if (a) try { spPonerCaptura(await spArchivoABlob(a), 'archivo'); } catch (e) { showToast(e.message, 'error'); } }; document.body.appendChild(f); } f.click(); }
+    else if (tipo === 'pantalla') spPonerCaptura(await spCapturaCompartida(), 'pantalla');
+    else if (tipo === 'quitar' || tipo === 'cambiar') { spLimpiarCaptura(); const box = document.getElementById('spAdj'); if (box) box.dataset.abierto = '1'; spPintarAdjunto(); }
+  } catch (e) { if (e && e.name !== 'NotAllowedError' && e.name !== 'AbortError') showToast('No se pudo tomar la captura: ' + e.message, 'error'); }
+}
+async function spSubirCaptura(ticketId) {
+  const ruta = `${ticketId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+  const { error } = await sb.storage.from(SP_BUCKET).upload(ruta, spCaptura.blob, { contentType: 'image/jpeg', upsert: false });
+  if (error) throw error;
+  return ruta;
+}
+async function spUrlCaptura(ruta) {
+  const c = spUrls[ruta]; if (c && c.hasta > Date.now()) return c.url;
+  const { data, error } = await sb.storage.from(SP_BUCKET).createSignedUrl(ruta, 3600);
+  if (error || !data) return '';
+  spUrls[ruta] = { url: data.signedUrl, hasta: Date.now() + 50 * 60000 }; return data.signedUrl;
+}
+document.addEventListener('paste', e => {
+  const p = document.getElementById('spPanel'); if (!p || !p.classList.contains('abierto') || !document.getElementById('spAdj')) return;
+  const it = [...(e.clipboardData || {}).items || []].find(x => /^image\//.test(x.type)); if (!it) return;
+  e.preventDefault(); spArchivoABlob(it.getAsFile()).then(b => spPonerCaptura(b, 'pegada')).catch(er => showToast(er.message, 'error'));
+});
+document.addEventListener('dragover', e => { if (e.target.closest && e.target.closest('#spPanel') && document.getElementById('spAdj')) e.preventDefault(); });
+document.addEventListener('drop', e => {
+  if (!(e.target.closest && e.target.closest('#spPanel')) || !document.getElementById('spAdj')) return;
+  const f = [...(e.dataTransfer || {}).files || []].find(x => /^image\//.test(x.type)); if (!f) return;
+  e.preventDefault(); spArchivoABlob(f).then(b => spPonerCaptura(b, 'archivo')).catch(er => showToast(er.message, 'error'));
+});
+
 function spPintarNuevo(p) {
   const ctx = spContexto();
   p.innerHTML = spCabecera('Escribir al equipo', 'Contanos qué pasó; te respondemos acá', true) + `<div class="spBody">
+    <div id="spAdj" data-obligatoria="1"><div class="spAdjFalta"><b>📷 Sacando la captura de la pantalla…</b></div></div>
     <h4>¿Sobre qué es?</h4>
     <div class="spChips">${SP_CATEGORIAS.map(([k, t]) => `<button type="button" data-cat="${k}" class="${k === spCat ? 'on' : ''}">${t}</button>`).join('')}</div>
-    <textarea id="spTexto" maxlength="4000" placeholder="Por ejemplo: al guardar la toma aparece un error rojo y no se guarda.\n\nNo escribas nombres ni carnets de pacientes."></textarea>
+    <textarea id="spTexto" maxlength="4000" placeholder="Por ejemplo: al guardar la toma aparece un error rojo y no se guarda."></textarea>
     <label style="display:flex;gap:8px;align-items:center;font-size:13px"><input type="checkbox" id="spUrg"> Es urgente: no puedo atender pacientes</label>
-    <details class="spCtx"><summary>Se envía también: versión, pantalla y último error (sin datos de pacientes)</summary><div style="white-space:pre-wrap;margin-top:6px">${esc(spContextoTexto(ctx))}</div></details>
-    <button type="button" class="spEnviar" id="spCrear">Enviar al equipo</button>
+    <details class="spCtx"><summary>Se envía también: versión, pantalla y último error</summary><div style="white-space:pre-wrap;margin-top:6px">${esc(spContextoTexto(ctx))}</div></details>
+    <button type="button" class="spEnviar" id="spCrear" disabled>Adjuntá la captura para enviar</button>
     ${spConfig().wa ? `<p class="spNota">¿Es muy urgente? <a href="${spWhatsappUrl('')}" target="_blank" rel="noopener">Escribinos también por WhatsApp</a>.</p>` : ''}
   </div>`;
   p.querySelectorAll('[data-cat]').forEach(b => b.onclick = () => { spCat = b.dataset.cat; p.querySelectorAll('[data-cat]').forEach(x => x.classList.toggle('on', x === b)); });
-  const ta = p.querySelector('#spTexto'); setTimeout(() => ta.focus(), 50);
   p.querySelector('#spCrear').onclick = spCrear;
+  // La captura automática se empezó al tocar 💬; si no se pudo, se pide elegirla
+  const previa = spCapturaPrevia; spCapturaPrevia = null;
+  if (spCaptura) spPintarAdjunto();
+  else (previa || spCapturaAutomatica()).then(b => { if (!spCaptura && document.getElementById('spAdj')) spPonerCaptura(b, 'auto'); })
+    .catch(() => { const box = document.getElementById('spAdj'); if (box) { box.dataset.abierto = '1'; spPintarAdjunto(); } });
+  setTimeout(() => { const ta = p.querySelector('#spTexto'); if (ta) ta.focus(); }, 50);
 }
 async function spCrear() {
   const ta = document.getElementById('spTexto'), texto = ta.value.trim(), btn = document.getElementById('spCrear');
+  if (!spCaptura) { showToast('Adjuntá la captura de pantalla: es obligatoria.', 'error'); return; }
   if (texto.length < 5) { ta.focus(); showToast('Contanos un poco más de lo que pasó.', 'error'); return; }
   btn.disabled = true; btn.textContent = 'Enviando…';
   const urg = document.getElementById('spUrg').checked;
-  const asunto = texto.split('\n')[0].slice(0, 80);
   const ctx = spContexto();
   const { data, error } = await sb.from('sivec_soporte_tickets').insert([{
-    categoria: spCat, urgente: urg, asunto, contexto: ctx, centro_id: perfil.centro_id || null,
+    categoria: spCat, urgente: urg, asunto: texto.split('\n')[0].slice(0, 80), contexto: ctx, centro_id: perfil.centro_id || null,
     usuario_nombre: perfil.nombre_completo || perfil.correo || '', establecimiento: ctx.establecimiento || ''
   }]).select().single();
   const tk = Array.isArray(data) ? data[0] : data;
-  if (error || !tk) { btn.disabled = false; btn.textContent = 'Enviar al equipo'; if (spTablaFalta(error)) { spTablaOk = false; spVista = 'inicio'; spPintar(); } showToast('No se pudo enviar: ' + ((error && error.message) || 'sin respuesta') + '. Probá por WhatsApp.', 'error'); return; }
-  const r = await sb.from('sivec_soporte_mensajes').insert([{ ticket_id: tk.id, texto, de_soporte: false }]);
-  if (r.error) { showToast('Se creó la consulta pero no el mensaje: ' + r.error.message, 'error'); }
+  if (error || !tk) { spPintarAdjunto(); if (spTablaFalta(error)) { spTablaOk = false; spVista = 'inicio'; spPintar(); } showToast('No se pudo enviar: ' + ((error && error.message) || 'sin respuesta') + '. Probá por WhatsApp.', 'error'); return; }
+  let adjunto = null, avisoCaptura = '';
+  try { adjunto = await spSubirCaptura(tk.id); } catch (e) { avisoCaptura = '\n\n(No se pudo subir la captura: ' + (e.message || e) + ')'; }
+  const r = await sb.from('sivec_soporte_mensajes').insert([{ ticket_id: tk.id, texto: texto + avisoCaptura, de_soporte: false, adjunto }]);
+  if (r.error) showToast('Se creó la consulta pero no el mensaje: ' + r.error.message, 'error');
+  spLimpiarCaptura();
   const ahoraTk = new Date().toISOString();
   spTickets = [Object.assign({ creado: ahoraTk, actualizado: ahoraTk, estado: 'abierto', usuario: perfil.id }, tk), ...spTickets.filter(x => String(x.id) !== String(tk.id))];
   spTicketId = String(tk.id); spVista = 'chat';
-  showToast(urg ? 'Enviado como urgente ✔ El equipo lo ve ahora.' : 'Enviado ✔ Te avisamos acá cuando respondan.', 'ok');
+  showToast(avisoCaptura ? 'Enviado, pero sin la captura (falta el Paso 29). Mandala por WhatsApp.' : urg ? 'Enviado como urgente ✔ El equipo lo ve ahora.' : 'Enviado ✔ Te avisamos acá cuando respondan.', avisoCaptura ? 'error' : 'ok');
   spPintar();
 }
 async function spPintarChat(p) {
@@ -7961,8 +8071,10 @@ async function spPintarChat(p) {
   const soporte = spEsSoporte() && t.usuario !== perfil.id;
   const cat = (SP_CATEGORIAS.find(c => c[0] === t.categoria) || [, 'Consulta'])[1];
   const sub = soporte ? `${t.usuario_nombre || ''}${t.establecimiento ? ' · ' + t.establecimiento : ''}` : `${cat} · ${SP_ESTADOS[t.estado] || 'Abierta'}`;
+  spLimpiarCaptura();
   p.innerHTML = spCabecera(t.asunto || 'Consulta', sub, true) + `<div class="spBody"><div class="spMsgs" id="spMsgs"><p class="spNota">Cargando…</p></div></div>
-    <div class="spFoot"><textarea id="spResp" maxlength="4000" placeholder="${soporte ? 'Responder…' : 'Escribí tu mensaje…'}"></textarea><button type="button" class="spEnviar" id="spMandar">Enviar</button></div>
+    <div id="spAdj" data-obligatoria="0" class="spAdjChat"></div>
+    <div class="spFoot"><button type="button" class="spClip" data-adj="${!spEsCelular() && navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia ? 'menu' : 'archivo'}" title="Adjuntar captura de pantalla" aria-label="Adjuntar captura">📎</button><textarea id="spResp" maxlength="4000" placeholder="${soporte ? 'Responder…' : 'Escribí tu mensaje…'}"></textarea><button type="button" class="spEnviar" id="spMandar">Enviar</button></div>
     <div style="display:flex;gap:6px;justify-content:center;padding:0 10px 10px;background:var(--surface);flex-wrap:wrap">
       ${soporte ? Object.entries(SP_ESTADOS).map(([k, v]) => `<button type="button" class="spAcc" style="width:auto;padding:5px 10px;font-size:12px" data-est="${k}">${k === t.estado ? '● ' : ''}${v}</button>`).join('') + '<button type="button" class="spAcc" style="width:auto;padding:5px 10px;font-size:12px" data-sp="ctx">Ver datos del sistema</button>'
         : (t.estado !== 'resuelto' ? '<button type="button" class="spAcc" style="width:auto;padding:5px 10px;font-size:12px" data-est="resuelto">✔ Ya se resolvió</button>' : '')}
@@ -7979,26 +8091,34 @@ async function spCargarMensajes(primera) {
   const box = document.getElementById('spMsgs'); if (!box || !spTicketId) { clearInterval(spMsgTimer); return; }
   const { data, error } = await sb.from('sivec_soporte_mensajes').select('*').eq('ticket_id', spTicketId).order('creado', { ascending: true });
   if (error) { box.innerHTML = `<p class="spNota">No se pudieron cargar los mensajes: ${esc(error.message)}</p>`; return; }
-  const abajo = box.parentElement.scrollHeight - box.parentElement.scrollTop - box.parentElement.clientHeight < 40;
   const t = spTickets.find(x => String(x.id) === String(spTicketId)) || {};
   const yoSoporte = spEsSoporte() && t.usuario !== perfil.id;
-  box.innerHTML = `<div class="spM sis">Consulta abierta el ${spFecha(t.creado)}${t.urgente ? ' · urgente' : ''}</div>` + (data || []).map(m => {
-    const mio = yoSoporte ? m.de_soporte : !m.de_soporte;
-    return `<div class="spM ${mio ? 'yo' : 'otro'}">${esc(m.texto)}<small>${m.de_soporte && !mio ? 'Equipo SIVEC · ' : ''}${spFecha(m.creado)}</small></div>`;
-  }).join('') + (!yoSoporte && (data || []).every(m => !m.de_soporte) ? `<div class="spM sis">Recibimos tu mensaje. Te respondemos acá; ${esc(spConfig().horario.toLowerCase())}.</div>` : '');
-  if (primera || abajo) box.parentElement.scrollTop = box.parentElement.scrollHeight;
+  const firma = (data || []).map(m => m.id).join(',');
+  if (primera || box.dataset.firma !== firma) {
+    box.dataset.firma = firma;
+    const abajo = box.parentElement.scrollHeight - box.parentElement.scrollTop - box.parentElement.clientHeight < 40;
+    box.innerHTML = `<div class="spM sis">Consulta abierta el ${spFecha(t.creado)}${t.urgente ? ' · urgente' : ''}</div>` + (data || []).map(m => {
+      const mio = yoSoporte ? m.de_soporte : !m.de_soporte;
+      const img = m.adjunto ? `<a class="spImg" data-ruta="${esc(m.adjunto)}" target="_blank" rel="noopener" title="Ver la captura en grande"><img alt="Captura de pantalla" data-ruta="${esc(m.adjunto)}"></a>` : '';
+      return `<div class="spM ${mio ? 'yo' : 'otro'}">${img}${m.texto ? esc(m.texto) : ''}<small>${m.de_soporte && !mio ? 'Equipo SIVEC · ' : ''}${spFecha(m.creado)}</small></div>`;
+    }).join('') + (!yoSoporte && (data || []).every(m => !m.de_soporte) ? `<div class="spM sis">Recibimos tu mensaje. Te respondemos acá; ${esc(spConfig().horario.toLowerCase())}.</div>` : '');
+    box.querySelectorAll('a.spImg').forEach(async a => { const u = await spUrlCaptura(a.dataset.ruta); if (u) { a.href = u; a.querySelector('img').src = u; a.querySelector('img').onload = () => { if (primera || abajo) box.parentElement.scrollTop = box.parentElement.scrollHeight; }; } else a.outerHTML = '<span class="spNota">(captura no disponible)</span>'; });
+    if (primera || abajo) box.parentElement.scrollTop = box.parentElement.scrollHeight;
+  }
   // Marcar como leído
   const campo = yoSoporte ? 'leido_soporte' : 'leido_usuario';
   if (spNoLeido(t) || primera) { const ahora = new Date().toISOString(); t[campo] = ahora; sb.from('sivec_soporte_tickets').update({ [campo]: ahora }).eq('id', spTicketId).then(() => spMarcarBoton()); }
 }
 async function spMandar(comoSoporte) {
   const ta = document.getElementById('spResp'), btn = document.getElementById('spMandar'), texto = ta.value.trim();
-  if (!texto) return;
-  btn.disabled = true;
-  const { error } = await sb.from('sivec_soporte_mensajes').insert([{ ticket_id: spTicketId, texto, de_soporte: !!comoSoporte }]);
-  btn.disabled = false;
+  if (!texto && !spCaptura) return;
+  btn.disabled = true; btn.textContent = spCaptura ? 'Subiendo…' : 'Enviar';
+  let adjunto = null;
+  if (spCaptura) { try { adjunto = await spSubirCaptura(spTicketId); } catch (e) { btn.disabled = false; btn.textContent = 'Enviar'; showToast('No se pudo subir la captura: ' + (e.message || e), 'error'); return; } }
+  const { error } = await sb.from('sivec_soporte_mensajes').insert([{ ticket_id: spTicketId, texto, de_soporte: !!comoSoporte, adjunto }]);
+  btn.disabled = false; btn.textContent = 'Enviar';
   if (error) { showToast('No se pudo enviar: ' + error.message, 'error'); return; }
-  ta.value = '';
+  ta.value = ''; spLimpiarCaptura(); const box = document.getElementById('spAdj'); if (box) { box.dataset.abierto = '0'; spPintarAdjunto(); }
   const t = spTickets.find(x => String(x.id) === String(spTicketId));
   if (t) { t.actualizado = new Date().toISOString(); t.ultimo_de_soporte = !!comoSoporte; }
   if (t && comoSoporte && t.estado === 'abierto') { await spEstado('en_curso', true); spPintar(); } else spCargarMensajes(true);
@@ -8028,8 +8148,13 @@ async function spRevisar() {
 document.addEventListener('click', e => {
   const a = e.target.closest('#spPanel [data-sp]'); if (!a) return;
   if (a.dataset.sp === 'cerrar') spAbrir(false);
-  else if (a.dataset.sp === 'atras') { clearInterval(spMsgTimer); spTicketId = null; spVista = 'inicio'; spPintar(); }
-  else if (a.dataset.sp === 'nuevo') { spVista = 'nuevo'; spPintar(); }
+  else if (a.dataset.sp === 'atras') { clearInterval(spMsgTimer); spTicketId = null; spLimpiarCaptura(); spVista = 'inicio'; spPintar(); }
+  else if (a.dataset.sp === 'nuevo') { spVista = 'nuevo'; spPintar(); }});
+document.addEventListener('click', e => {
+  const b = e.target.closest('#spPanel [data-adj]'); if (!b) return;
+  const tipo = b.dataset.adj;
+  if (tipo === 'menu') { const box = document.getElementById('spAdj'); if (spCaptura) return; box.dataset.abierto = box.dataset.abierto === '1' ? '0' : '1'; spPintarAdjunto(); return; }
+  spTomarAdjunto(tipo);
 });
 spMontar();
 setTimeout(spRevisar, 4000);

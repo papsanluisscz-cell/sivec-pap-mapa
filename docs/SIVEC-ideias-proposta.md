@@ -909,3 +909,8 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - WhatsApp con los datos del sistema ya escritos (versión, pantalla, centro, conexión, último error; nunca datos de pacientes), llamada y "Escribir al equipo": chat guardado en Supabase con categoría y marca de urgente.
 - El equipo de soporte (`es_soporte`) ve la bandeja de todas las consultas, responde, cambia el estado y ve los datos del sistema. Aviso con número rojo cuando hay respuesta nueva; revisa cada minuto.
 - Paso 28 probado en la copia local: cada uno ve lo suyo, nadie se hace pasar por soporte, el gestor no ve consultas ajenas.
+
+## 27/09/2026 · Captura de pantalla obligatoria en el soporte (v1.6.1 · Paso 29)
+- Al tocar 💬 el sistema saca solo la captura de la pantalla donde estaba la persona (html2canvas-pro, sin el botón ni la ventana).
+- Para abrir una consulta la captura es obligatoria: se puede cambiar (📸 capturar pantalla en computadora, 📎 elegir del celular, pegar con Ctrl+V, arrastrar), pero el botón Enviar queda bloqueado sin imagen.
+- En el chat, 📎 opcional para los dos lados (el equipo también manda capturas). Imágenes en Supabase Storage privado (bucket sivec-soporte), enlaces que vencen en 1 hora.
