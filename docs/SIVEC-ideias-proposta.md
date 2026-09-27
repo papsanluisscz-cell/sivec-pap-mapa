@@ -896,3 +896,8 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - "Tomas por mes" (panel del centro y tablero de la red): curva suave que une la punta de las columnas, con un velo en degradé lila que cae y se desvanece, y un punto brillante en el mes actual. Se dibuja de izquierda a derecha al abrir el panel.
 - Las mini líneas de los indicadores también tienen el relleno en degradé.
 - Presentación: slides "El panel del centro" y "La red en vivo" con capturas nuevas (datos de prueba).
+
+## 27/09/2026 · Planilha de Santa Cruz com os preços novos, papel e vidas
+- `docs/negocio/SIVEC-metrica-SantaCruz.xlsx` refeita: 4 cenários (Red Centro, Município enxuto, Município completo, Município + províncias), equipe, gastos (aluguel, transporte, viagens), caixa necessário.
+- Abas novas: "Papel vs SIVEC" (papel, horas devolvidas, tomas repetidas) e "Vidas e impacto" (lesões tratadas a tempo, cânceres e mortes evitados, órfãos, valor da vida, tratamentos que o SUS deixa de pagar), com fontes.
+- Proposta de slides de impacto (vidas, família, papel) enviada ao autor para validar antes de montar.
