@@ -2141,3 +2141,57 @@ select case when to_regclass('public.sivec_firmas') is not null and to_regclass(
 
 ### Deshacer el Paso 30
 `drop function if exists sivec_firmar(text, text, text, text), sivec_pin_verificar(text), sivec_pin_definir(text, text), sivec_pin_estado(), sivec_firma_verificar(text), sivec_pin_restablecer(uuid); drop table if exists sivec_firmas; drop table if exists sivec_firma_pin;` (se pierden las firmas registradas; los documentos siguen igual, sin la leyenda de firma).
+
+---
+
+## Paso 31 — La firma con PIN en todo el recorrido (requiere el Paso 30)
+
+El mismo PIN firma también: la **consulta** (su firma sale en el D1, el D8, el registro de PAP, el consentimiento y la historia clínica), la **aceptación de la referencia** en el hospital (al dar la cita; sale en "Nombre y firma de quien recibe" del Formulario Nº 1) y la **recepción de la contrarreferencia** en el centro (sale en "Recepción en el establecimiento de origen" del Formulario Nº 2).
+
+```sql
+-- PASO 31 · Más documentos firmados con el PIN: consulta, aceptación de la referencia y recepción de la contrarreferencia
+alter table sivec_firmas drop constraint if exists sivec_firmas_tipo_check;
+alter table sivec_firmas add constraint sivec_firmas_tipo_check check (tipo in
+  ('referencia', 'contrarreferencia', 'informe_lab', 'colposcopia', 'consulta', 'recepcion', 'recepcion_contra'));
+
+create or replace function sivec_firmar(p_tipo text, p_documento text, p_huella text, p_pin text) returns jsonb
+language plpgsql security definer set search_path = public, extensions as $$
+declare v_est text; v_ok boolean := false; r sivec_firmas;
+begin
+  v_est := sivec_pin_verificar(p_pin);
+  if v_est <> 'ok' then return jsonb_build_object('ok', false, 'motivo', v_est); end if;
+  if p_huella !~ '^[0-9a-f]{64}$' then return jsonb_build_object('ok', false, 'motivo', 'huella'); end if;
+  if p_tipo in ('referencia', 'recepcion_contra') then       -- el centro que derivó
+    select true into v_ok from derivaciones d where d.id::text = p_documento and sivec_edita_centro(d.centro_origen);
+  elsif p_tipo in ('contrarreferencia', 'recepcion') then    -- el hospital que recibe
+    select true into v_ok from derivaciones d where d.id::text = p_documento and d.destino_id = sivec_centro() and sivec_es_colpo();
+  elsif p_tipo = 'informe_lab' then
+    select true into v_ok from pacientes p where p.id::text = p_documento and sivec_es_lab();
+  elsif p_tipo = 'colposcopia' then
+    select true into v_ok from colposcopias c join pacientes p on p.id = c.paciente_id where c.id::text = p_documento and sivec_edita_centro(p.centro_id);
+  elsif p_tipo = 'consulta' then
+    select true into v_ok from consultas c left join pacientes p on p.id::text = c.paciente_id::text
+     where c.id::text = p_documento and sivec_edita_centro(coalesce(c.centro_id, p.centro_id));
+  end if;
+  if not coalesce(v_ok, false) then return jsonb_build_object('ok', false, 'motivo', 'sin_permiso'); end if;
+  insert into sivec_firmas (tipo, documento, firmante, firmante_nombre, establecimiento, huella, codigo)
+  values (p_tipo, p_documento, auth.uid(),
+    (select coalesce(nullif(nombre_completo, ''), correo) from perfiles_usuario where id = auth.uid()),
+    (select c.nombre from perfiles_usuario u join centros_salud c on c.id = u.centro_id where u.id = auth.uid()),
+    p_huella, upper(encode(gen_random_bytes(4), 'hex')))
+  returning * into r;
+  return jsonb_build_object('ok', true, 'codigo', r.codigo, 'creado', r.creado, 'firmante_nombre', r.firmante_nombre, 'establecimiento', r.establecimiento, 'huella', r.huella);
+end $$;
+revoke execute on function sivec_firmar(text, text, text, text) from public, anon;
+grant execute on function sivec_firmar(text, text, text, text) to authenticated;
+
+notify pgrst, 'reload schema';
+
+-- Resultado: debe decir "listo"
+select case when pg_get_constraintdef((select oid from pg_constraint where conname = 'sivec_firmas_tipo_check')) like '%recepcion_contra%'
+             and pg_get_functiondef('sivec_firmar(text, text, text, text)'::regprocedure) like '%consultas%'
+            then 'listo' else 'revisar' end as paso_31;
+```
+
+### Deshacer el Paso 31
+Volver a ejecutar el Paso 30 (deja solo los cuatro tipos del comienzo). Si ya hay firmas de consultas o recepciones, antes: `delete from sivec_firmas where tipo in ('consulta', 'recepcion', 'recepcion_contra');`

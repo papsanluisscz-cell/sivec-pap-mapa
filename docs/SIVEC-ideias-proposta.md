@@ -925,3 +925,9 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - Cada firma registra quién, cuándo, establecimiento y la huella SHA-256 del contenido; solo firma quien tiene que ver con el documento. Formularios Nº 1 y Nº 2 impresos: "Firmado electrónicamente… · código de verificación XXXX-XXXX · huella". ⚙ Configuración: crear/cambiar PIN, verificar un código, restablecer (admin).
 - Sin el Paso 30 el sistema sigue funcionando como antes (sin firma).
 - SIVEC completo (a futuro): lector de huella en cada computadora (kit opcional en la implantación, ~US$ 40–100 por lector) + convenio con el SEGIP para verificar identidad en línea; firma digital con certificado AGETIC/ADSIB (Bs 70 + token) cuando el SEDES la exija.
+
+## 27/09/2026 · La firma con PIN en todo el recorrido (v1.7.1 · Paso 31)
+- El PIN lo crea cada profesional (el administrador solo lo restablece). Un solo PIN para todo.
+- Firma también: la consulta (sale en D1, D8, registro de PAP, consentimiento e historia clínica), la aceptación de la referencia en el hospital (al dar la cita) y la recepción de la contrarreferencia en el centro. Las firmas de la paciente siguen a mano.
+- Ventana del PIN rediseñada (6 casillas, tarjeta del documento, sacudida si falla) y bloque "Firma electrónica" en ⚙ Configuración. Slide "Cada profesional firma con su PIN" después de "Derivar".
+- Próximo tema: sonidos en el sistema (propuesta enviada al autor).

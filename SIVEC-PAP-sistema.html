@@ -1080,21 +1080,59 @@ body.dark #spPanel .spEst.urg { background: #7f1d1d; color: #fecaca; }
 #spPanel .spImg img { display: block; width: 100%; max-width: 260px; min-height: 60px; border-radius: 10px; background: rgba(0,0,0,.06); }
 #spPanel .spEnviar:disabled { background: var(--ink-soft); }
 /* ===== Firma electrónica con PIN ===== */
-#firmaOverlay { position: fixed; inset: 0; z-index: 3500; background: rgba(28,10,19,.55); display: flex; align-items: center; justify-content: center; padding: 16px; }
-#firmaOverlay .fmCard { background: var(--surface); color: var(--ink); border-radius: 18px; width: 400px; max-width: 100%; padding: 20px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.35); }
-#firmaOverlay .fmHead { display: flex; gap: 12px; align-items: center; }
-#firmaOverlay .fmHead > span { font-size: 24px; width: 44px; height: 44px; border-radius: 12px; background: var(--paper); display: flex; align-items: center; justify-content: center; flex: none; }
-#firmaOverlay .fmHead b { display: block; font-size: 16px; }
-#firmaOverlay .fmHead small { color: var(--ink-soft); font-size: 12.5px; }
-#firmaOverlay .fmDet { background: var(--paper); border-radius: 10px; padding: 10px 12px; font-size: 13px; white-space: pre-wrap; max-height: 160px; overflow: auto; }
-#firmaOverlay label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); }
-#firmaOverlay input { font-size: 26px; letter-spacing: 12px; text-align: center; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); }
-#firmaOverlay .fmMsg { color: #b4233c; font-size: 13px; min-height: 18px; }
+#firmaOverlay { position: fixed; inset: 0; z-index: 3500; background: rgba(28,10,19,.6); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 16px; animation: fmFondo .2s ease-out; }
+@keyframes fmFondo { from { opacity: 0; } }
+#firmaOverlay .fmCard { background: var(--surface); color: var(--ink); border-radius: 20px; width: 420px; max-width: 100%; max-height: calc(100vh - 32px); overflow: auto; box-shadow: 0 24px 70px rgba(28,10,19,.45); animation: fmEntra .26s cubic-bezier(.2,.8,.2,1); }
+@keyframes fmEntra { from { opacity: 0; transform: translateY(14px) scale(.97); } }
+#firmaOverlay .fmCard.sacude { animation: fmSacude .38s; }
+@keyframes fmSacude { 20%, 60% { transform: translateX(-7px); } 40%, 80% { transform: translateX(7px); } }
+#firmaOverlay .fmHead { background: var(--header-grad); color: #fff; padding: 18px 18px 16px; display: flex; gap: 12px; align-items: center; }
+#firmaOverlay .fmIco { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,.18); display: flex; align-items: center; justify-content: center; flex: none; }
+#firmaOverlay .fmIco svg { width: 24px; height: 24px; }
+#firmaOverlay .fmCard.ok .fmIco { background: #16a34a; transition: background .2s; }
+#firmaOverlay .fmHead b { display: block; font-size: 17px; }
+#firmaOverlay .fmHead small { opacity: .85; font-size: 12.5px; }
+#firmaOverlay .fmX { margin-left: auto; background: rgba(255,255,255,.18); border: 0; color: #fff; width: 32px; height: 32px; border-radius: 9px; font-size: 20px; cursor: pointer; align-self: flex-start; }
+#firmaOverlay .fmBody { padding: 16px 18px 12px; display: flex; flex-direction: column; gap: 12px; }
+#firmaOverlay .fmDoc { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 13px; line-height: 1.45; white-space: pre-wrap; max-height: 140px; overflow: auto; }
+#firmaOverlay .fmTipo { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #fff; background: var(--teal-700); border-radius: 999px; padding: 2px 9px; margin-bottom: 6px; }
 #firmaOverlay .fmNota { font-size: 12.5px; color: var(--ink-soft); margin: 0; }
-#firmaOverlay .fmBtns { display: flex; gap: 8px; justify-content: flex-end; }
-#firmaOverlay .fmBtns button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 10px 16px; font-weight: 600; cursor: pointer; }
-#firmaOverlay .fmBtns .fmSi { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
-#firmaOverlay .fmBtns .fmSi:disabled { opacity: .6; }
+#firmaOverlay .fmCampo label { display: block; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 6px; }
+#firmaOverlay .fmCells { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; cursor: text; }
+#firmaOverlay .fmCells span { height: 50px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--paper); display: flex; align-items: center; justify-content: center; transition: border-color .15s, transform .15s; }
+#firmaOverlay .fmCells span.lleno::after { content: ''; width: 12px; height: 12px; border-radius: 50%; background: var(--teal-700); animation: fmPunto .15s ease-out; }
+@keyframes fmPunto { from { transform: scale(0); } }
+#firmaOverlay .fmCells span.cursor { border-color: var(--teal-500); box-shadow: 0 0 0 3px color-mix(in srgb, var(--teal-500) 20%, transparent); }
+#firmaOverlay .fmCells input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: 0; font-size: 16px; cursor: text; }
+#firmaOverlay .fmMsg { color: #b4233c; font-size: 13px; min-height: 18px; font-weight: 600; }
+#firmaOverlay .fmSi { background: linear-gradient(135deg, #9c3a5f, #7d2a4c); color: #fff; border: 0; border-radius: 12px; padding: 13px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 16px rgba(125,42,76,.3); }
+#firmaOverlay .fmSi:disabled { opacity: .65; cursor: default; }
+#firmaOverlay .fmNo { background: none; border: 0; color: var(--ink-soft); font-size: 13.5px; cursor: pointer; padding: 2px; }
+#firmaOverlay .fmPie { display: flex; justify-content: space-around; gap: 6px; flex-wrap: wrap; border-top: 1px solid var(--line); padding: 10px 14px; font-size: 11.5px; color: var(--ink-soft); background: var(--paper); }
+#firmaOverlay .fmOlv { font-size: 12px; color: var(--ink-soft); text-align: center; margin: 0; padding: 0 14px 12px; background: var(--paper); }
+#firmaConfig { margin: 0 0 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); overflow: hidden; }
+#firmaConfig .fcHead { display: flex; gap: 12px; align-items: center; padding: 12px 14px; background: var(--paper); border-bottom: 1px solid var(--line); }
+#firmaConfig .fcIco { width: 38px; height: 38px; border-radius: 10px; background: var(--header-grad); color: #fff; display: flex; align-items: center; justify-content: center; flex: none; }
+#firmaConfig .fcIco svg { width: 20px; height: 20px; }
+#firmaConfig .fcHead b { display: block; font-size: 14.5px; }
+#firmaConfig .fcHead small { color: var(--ink-soft); font-size: 12px; line-height: 1.35; display: block; }
+#firmaConfig .fcFila { display: flex; gap: 8px; align-items: center; padding: 10px 14px 0; flex-wrap: wrap; }
+#firmaConfig .fcFila input { flex: 1; min-width: 150px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; font-size: 14px; background: var(--surface); color: var(--ink); }
+#firmaConfig .fcEstado { flex: 1; font-size: 13.5px; font-weight: 600; }
+#firmaConfig .fcEstado.si { color: #15803d; }
+#firmaConfig .fcEstado.no { color: #b45309; }
+#firmaConfig .fcBtn { background: var(--teal-700); color: #fff; border: 0; border-radius: 10px; padding: 9px 14px; font-weight: 700; font-size: 13px; cursor: pointer; }
+#firmaConfig .fcBtn.sec { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+#firmaConfig .fcSep { padding: 14px 14px 0; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+#firmaConfig #fcRes { margin: 10px 14px 0; font-size: 13px; }
+#firmaConfig #fcRes:empty { display: none; }
+#firmaConfig #fcRes.ok, #firmaConfig #fcRes.mal { border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+#firmaConfig #fcRes.ok { background: #ecfdf3; border: 1px solid #bbf7d0; color: #14532d; }
+#firmaConfig #fcRes.mal { background: #fef2f2; border: 1px solid #fecaca; color: #7f1d1d; }
+#firmaConfig > :last-child { margin-bottom: 14px; }
+body.dark #firmaConfig #fcRes.ok { background: #052e16; border-color: #14532d; color: #bbf7d0; }
+body.dark #firmaConfig #fcRes.mal { background: #450a0a; border-color: #7f1d1d; color: #fecaca; }
+@media (prefers-reduced-motion: reduce) { #firmaOverlay, #firmaOverlay .fmCard, #firmaOverlay .fmCard.sacude { animation: none; } }
 @media (max-width: 520px) { #spPanel { right: 8px; left: 8px; width: auto; max-width: none; bottom: 80px; height: calc(100vh - 100px); } }
 @media (max-width: 760px) { body::after { content: ''; display: block; height: 80px; } }  /* que el botón 💬 no tape el último botón de la página */
 @media print { #spBtn, #spPanel { display: none !important; } }
@@ -2680,7 +2718,7 @@ async function labFirmar(x, f, vph) {
   const texto = insat ? 'Muestra insatisfactoria' + (f.observaciones ? ' — ' + f.observaciones : '') : [beth, ...f.hallazgos].join(' · ');
   const vv = LAB_VPH.find(v => v[0] === f.vph);
   const resumen = `${x.nombre} (${x.codigo_muestra})\nPAP: ${texto}${vv ? '\nVPH: ' + vv[0] : ''}${f.validador ? '\nValidado por: ' + f.validador : ''}\n\n¿Firmar y liberar? El resultado aparece en la ficha del centro.`;
-  const pinF = await firmaPedir({ titulo: 'Firmar y liberar el informe', detalle: resumen.replace(/\n\n¿Firmar y liberar\?.*$/s, ''), boton: 'Firmar y liberar' });
+  const pinF = await firmaPedir({ tipo: 'informe_lab', titulo: 'Firmar y liberar el informe', detalle: resumen.replace(/\n\n¿Firmar y liberar\?.*$/s, ''), boton: 'Firmar y liberar' });
   if (pinF === null || (pinF === FIRMA_SIN && !confirm(resumen))) return;
   const informe = { calidad: f.calidad, zt: f.zt, hemorragica: f.hemorragica, inflamacion: f.inflamacion, bethesda: beth, hallazgos: f.hallazgos, vph: f.vph || null, metodo: f.vph ? (f.metodo || null) : null, observaciones: f.observaciones || null, lector: perfil.nombre_completo || perfil.correo, validador: f.validador || null, laboratorio: centroNombre(perfil.centro_id), fecha: new Date().toISOString() };
   const { error } = await sb.rpc('sivec_lab_informar', { p_id: x.id, p_bethesda: beth, p_texto: texto, p_vph: vv ? vv[1] : null, p_genotipo: vv ? vv[2] : null, p_informe: informe, p_informado_por: perfil.nombre_completo || perfil.correo || '' });
@@ -2694,7 +2732,7 @@ async function labFirmarVph(x, f) {
   if (!f.vph) { alert('Elegí el resultado del VPH.'); return; }
   const vv = LAB_VPH.find(v => v[0] === f.vph);
   const detV = `${x.nombre} (${x.codigo_muestra})\nVPH: ${vv[0]}${f.metodo ? '\nPrueba: ' + f.metodo : ''}`;
-  const pinF = await firmaPedir({ titulo: 'Firmar y liberar el informe', detalle: detV, boton: 'Firmar y liberar' });
+  const pinF = await firmaPedir({ tipo: 'informe_lab', titulo: 'Firmar y liberar el informe', detalle: detV, boton: 'Firmar y liberar' });
   if (pinF === null || (pinF === FIRMA_SIN && !confirm(detV + '\n\n¿Firmar y liberar? El resultado aparece en la ficha del centro.'))) return;
   try { if (f.metodo) localStorage.setItem('sivec_lab_metodo', f.metodo); } catch (e) {}
   const informe = { muestra: labMuestraTipo(x), vph: f.vph, metodo: f.metodo || null, observaciones: f.observaciones || null, lector: perfil.nombre_completo || perfil.correo, laboratorio: centroNombre(perfil.centro_id) };
@@ -3308,7 +3346,7 @@ function derFormulario(p) {
     const destino = g('derDestino');
     if (COBRO_ACTIVO && !st.cobertura) { alert('Indicá si la paciente tiene SUS o no.'); return; }
     const monto = COBRO_ACTIVO && st.cobertura === 'Sin SUS' ? Number(String(g('derMonto')).replace(',', '.')) || null : null;
-    const pinF = await firmaPedir({ titulo: 'Firmar la referencia', detalle: `${p.nombre} → ${centroNombre(destino)}\n${g('derMotivo') || ''}`, boton: 'Firmar y enviar' });
+    const pinF = await firmaPedir({ tipo: 'referencia', titulo: 'Firmar la referencia', detalle: `${p.nombre} → ${centroNombre(destino)}\n${g('derMotivo') || ''}`, boton: 'Firmar y enviar' });
     if (pinF === null) return;
     const { data, error } = await sb.rpc('sivec_derivar', { p_paciente: p.id, p_destino: destino, p_motivo: g('derMotivo'), p_indicacion: st.indicacion, p_prioridad: st.prioridad, p_notas: g('derNotas'), p_por: perfil.nombre_completo || perfil.correo || '', p_cobertura: COBRO_ACTIVO ? st.cobertura : null, p_monto: monto });
     if (error) { alert('No se pudo derivar: ' + error.message); return; }
@@ -3412,13 +3450,16 @@ function derDetalle(p, d, recien) {
     const a = e.target.closest('[data-dd]'); if (!a) return;
     const k = a.dataset.dd;
     if (k === 'cerrar') return derCerrar();
-    if (k === 'boleta') return imprimirDocHTML(formReferenciaDoc(p, d, await firmaDe('referencia', d.id)));
+    if (k === 'boleta') return imprimirDocHTML(formReferenciaDoc(p, d, await firmaDe('referencia', d.id), await firmaDe('recepcion', d.id)));
     if (k === 'hoja') return derHojaPaciente(p, d);
-    if (k === 'contra') return imprimirDocHTML(formContrarrefDoc(p, d, await firmaDe('contrarreferencia', d.id)));
+    if (k === 'contra') return imprimirDocHTML(formContrarrefDoc(p, d, await firmaDe('contrarreferencia', d.id), await firmaDe('recepcion_contra', d.id)));
     if (k === 'nueva') return derFormulario(p);
     if (k === 'visto') {
+      const pinF = await firmaPedir({ tipo: 'recepcion_contra', titulo: 'Recibir la contrarreferencia', detalle: `${p.nombre || ''}\nDe: ${centroNombre(d.destino_id)}${d.tratamiento ? '\nTratamiento: ' + d.tratamiento : ''}`, boton: 'Recibir y firmar' });
+      if (pinF === null) return;
       const { error } = await sb.rpc('sivec_der_visto', { p_ids: [d.id] });
       if (error) return alert(error.message);
+      await firmaRegistrar('recepcion_contra', d.id, { derivacion: d.id, recibe: perfil.nombre_completo || perfil.correo || '', tratamiento: d.tratamiento || null, contrarreferencia: d.contrarreferencia || null }, pinF);
       d.visto_origen_at = new Date().toISOString(); renderBanners(allPatientsData); applyListFilters(true); derCerrar(); showToast('Contrarreferencia vista ✔', 'ok'); return;
     }
     if (k === 'cancelar') {
@@ -3601,12 +3642,15 @@ function colDetalle(d) {
       const t = [derResumenColpo(colColpoDe(f)) + '.', f.biopsia ? 'Se tomó biopsia; el resultado llegará por el SIVEC.' : '', f.tratamiento ? 'Tratamiento: ' + f.tratamiento + '.' : '', f.proximo ? 'Próximo control: ' + f.proximo + '.' : ''].filter(Boolean).join(' ');
       f.contrarref = t; document.getElementById('colContra').value = t; return;
     }
-    if (k === 'imprimir') return imprimirDocHTML(formContrarrefDoc(d, d, await firmaDe('contrarreferencia', d.id)));
-    if (k === 'refimp') return imprimirDocHTML(formReferenciaDoc(d, d, await firmaDe('referencia', d.id)));
+    if (k === 'imprimir') return imprimirDocHTML(formContrarrefDoc(d, d, await firmaDe('contrarreferencia', d.id), await firmaDe('recepcion_contra', d.id)));
+    if (k === 'refimp') return imprimirDocHTML(formReferenciaDoc(d, d, await firmaDe('referencia', d.id), await firmaDe('recepcion', d.id)));
     if (k === 'cita') {
       const fe = document.getElementById('colCita').value; if (!fe) return alert('Elegí la fecha de la cita.');
+      const pinF = await firmaPedir({ tipo: 'recepcion', titulo: 'Aceptar la referencia', detalle: `${d.nombre || ''} · cita el ${fmtFecha(fe)}\nDe: ${centroNombre(d.centro_origen)}`, boton: 'Aceptar y firmar' });
+      if (pinF === null) return;
       const { error } = await sb.rpc('sivec_colpo_cita', { p_id: d.id, p_fecha: fe });
       if (error) return alert(error.message);
+      await firmaRegistrar('recepcion', d.id, { derivacion: d.id, cita: fe, recibe: perfil.nombre_completo || perfil.correo || '' }, pinF);
       showToast('Cita guardada ✔ — el centro la ve en la ficha', 'ok'); colTab = 'citadas'; return colCargar();
     }
     if (k === 'pago') {
@@ -3628,7 +3672,7 @@ function colDetalle(d) {
       if (f.biopsia === null) return alert('Indicá si se tomó biopsia.');
       if (k === 'enviar' && !f.contrarref) return alert('Escribí las indicaciones para el centro (o tocá "Armar texto con lo marcado").');
       const colpo = colColpoDe(f);
-      const pinF = k === 'enviar' ? await firmaPedir({ titulo: 'Firmar la contrarreferencia', detalle: `${d.nombre || ''}\n${derResumenColpo(colpo)}`, boton: 'Firmar y enviar' }) : FIRMA_SIN;
+      const pinF = k === 'enviar' ? await firmaPedir({ tipo: 'contrarreferencia', titulo: 'Firmar la contrarreferencia', detalle: `${d.nombre || ''}\n${derResumenColpo(colpo)}`, boton: 'Firmar y enviar' }) : FIRMA_SIN;
       if (pinF === null) return;
       const { error } = await sb.rpc('sivec_colpo_atender', { p_id: d.id, p_colpo: colpo, p_biopsia: f.biopsia, p_tratamiento: f.tratamiento, p_contrarref: f.contrarref, p_proximo: f.proximo, p_por: perfil.nombre_completo || perfil.correo || '', p_enviar: k === 'enviar' });
       if (error) return alert(error.message);
@@ -5904,9 +5948,10 @@ const CONS_ETIQ = { subjetivo: 'S', objetivo: 'O', analisis: 'A', plan_texto: 'P
 async function consultaGuardar(row, editId) {
   const r = Object.assign({}, row), faltan = [];
   for (let i = 0; i < 12; i++) {
-    const { error } = editId ? await sb.from('consultas').update(r).eq('id', editId) : await sb.from('consultas').insert([r]);
+    const { data: ins, error } = editId ? await sb.from('consultas').update(r).eq('id', editId) : await sb.from('consultas').insert([r]).select('id');
+    const id = editId || (ins && (Array.isArray(ins) ? (ins[0] || {}).id : ins.id)) || null;
     const m = error && /Could not find the '([^']+)' column/.exec(error.message || '');
-    if (!m || !(m[1] in r)) { if (!error && faltan.length) showToast('Consulta guardada. Faltan columnas en Supabase (' + faltan.join(', ') + '): ejecutar el Paso 7 del SQL.', 'err'); return { error }; }
+    if (!m || !(m[1] in r)) { if (!error && faltan.length) showToast('Consulta guardada. Faltan columnas en Supabase (' + faltan.join(', ') + '): ejecutar el Paso 7 del SQL.', 'err'); return { error, id }; }
     const col = m[1], val = r[col]; delete r[col];
     if (col === 'centro_id') continue; // opcional: solo sirve para separar por centro
     faltan.push(col);
@@ -6323,8 +6368,11 @@ function consultaModalEl() {
     if (soapVacio(v)) { alert('La consulta está vacía.'); return; }
     const doctora = form.querySelector('[data-s="doctora"]').value;
     const row = await consultaFila(Object.assign(v, { paciente_id: String(consultaPaciente.id), centro_id: consultaPaciente.centro_id || undefined, fecha: form.querySelector('[data-s="fecha"]').value || hoyISO(), doctora }));
-    const { error } = await consultaGuardar(row, consultaEditId);
+    const pinF = await firmaPedir({ tipo: 'consulta', titulo: 'Firmar la consulta', detalle: `${consultaPaciente.nombre || ''}\nLa firma va en el D1, el D8, el registro de PAP, el consentimiento y la historia clínica.`, boton: 'Firmar y guardar' });
+    if (pinF === null) return;
+    const { error, id: consId } = await consultaGuardar(row, consultaEditId);
     if (error) { alert('Error al guardar la consulta: ' + error.message); return; }
+    await firmaRegistrar('consulta', consId, row, pinF);
     espRecordar(doctora, espBuscar(v.codigo_esp));
     ov.classList.remove('open');
     const p = consultaPaciente;
@@ -6387,9 +6435,10 @@ async function guardarSoapDeRegistro(nueva) {
   const soloToma = soapVacio(Object.assign({}, v, { objetivo: v.detalle.o_libre || ((v.detalle.o_otros || []).some(x => !x.startsWith('Toma')) ? 'x' : null) }));
   if (soapVacio(v) || soloToma) { soapEscribir(det, null, { esp: espPorDoctora(nueva.doctora), ootros: ['Toma de PAP realizada'] }); return; }
   const row = await consultaFila(Object.assign(v, { paciente_id: String(nueva.id), centro_id: nueva.centro_id || undefined, fecha: nueva.fecha_toma || hoyISO(), doctora: nueva.doctora || null }));
-  const { error } = await consultaGuardar(row, null);
+  const pinF = await firmaPedir({ tipo: 'consulta', titulo: 'Firmar la consulta', detalle: `${nueva.nombre || ''}\nLa firma va en el D1, el D8, el registro de PAP, el consentimiento y la historia clínica.`, boton: 'Firmar y guardar' });
+  const { error, id: consId } = await consultaGuardar(row, null);
   if (error) showToast('La toma se guardó, pero la consulta no: ' + error.message, 'err');
-  else espRecordar(nueva.doctora, espBuscar(v.codigo_esp));
+  else { espRecordar(nueva.doctora, espBuscar(v.codigo_esp)); if (pinF) await firmaRegistrar('consulta', consId, row, pinF); }
   soapEscribir(det, null, { esp: espPorDoctora(nueva.doctora), ootros: ['Toma de PAP realizada'] }); det.open = false;
 }
 
@@ -7079,7 +7128,7 @@ document.getElementById('colpForm').addEventListener('submit', async (e) => {
     derivacion: fd.get('derivacion') || null,
   };
   if (await cuelloOk()) data.cuello_mapa = cuelloVacio(cuelloMapa) ? null : cuelloMapa;
-  const pinF = await firmaPedir({ titulo: 'Firmar la colposcopia', detalle: [data.fecha ? fmtFecha(data.fecha) : '', data.prueba_schiller ? 'Schiller ' + data.prueba_schiller : '', (data.lesion || []).join(', ')].filter(Boolean).join(' · '), boton: 'Firmar y guardar' });
+  const pinF = await firmaPedir({ tipo: 'colposcopia', titulo: 'Firmar la colposcopia', detalle: [data.fecha ? fmtFecha(data.fecha) : '', data.prueba_schiller ? 'Schiller ' + data.prueba_schiller : '', (data.lesion || []).join(', ')].filter(Boolean).join(' · '), boton: 'Firmar y guardar' });
   if (pinF === null) return;
   let error, colpId = colpEditingId;
   if (colpEditingId) {
@@ -7379,7 +7428,7 @@ function croquisHTML(lat, lng) {
 }
 
 function formPropioHTML(tipo, ctx) {
-  const { p, consulta, colp, esp } = ctx;
+  const { p, consulta, colp, esp, firma } = ctx;
   const d = consulta && consulta.detalle;
   const nom = esc((p.nombre || '').toUpperCase()), ci = esc(p.carnet || ''), dom = esc(p.direccion || '');
   const doctora = esc((consulta && consulta.doctora) || p.doctora || '');
@@ -7403,7 +7452,7 @@ function formPropioHTML(tipo, ctx) {
         <table class="t"><thead><tr><th style="width:36%">Medicamento / insumo (nombre genérico, forma, concentración)</th><th>Indicaciones para el paciente</th><th style="width:62px">Recetada</th><th style="width:66px">Dispensada</th><th style="width:58px">Unitario</th><th style="width:52px">Total</th></tr></thead>
         <tbody>${ins}${filas}${vacias}</tbody></table>
         <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:6px;font-size:11.5px;font-weight:700">Costo total: ________ &nbsp; Costo total al usuario: ________</div></div>
-      <div class="firmas"><div><b>${doctora || '&nbsp;'}</b>Recetado por${espTxt ? ' · ' + espTxt : ''}</div><div><b>&nbsp;</b>Dispensado por</div><div><b>&nbsp;</b>Firma paciente / acompañante · C.I.</div></div>
+      <div class="firmas"><div>${firmaLeyenda(firma, 'Recetado por' + (espTxt ? ' · ' + espTxt : ''), doctora)}</div><div><b>&nbsp;</b>Dispensado por</div><div><b>&nbsp;</b>Firma paciente / acompañante · C.I.</div></div>
       <p class="muted" style="font-size:10px;margin-top:14px">El prescriptor y dispensador certifican la veracidad de la información declarada en este documento médico legal. El usuario certifica haber recibido los medicamentos señalados.</p>${fpFoot()}</section>`;
   }
   if (tipo === 'd8') {
@@ -7420,7 +7469,7 @@ function formPropioHTML(tipo, ctx) {
       <div class="sec"><div class="secT">Laboratorio — otros</div><div class="cols3">${otros.map(o => fpChk(o, false)).join('')}</div></div>
       <div class="sec"><div class="secT">Imagenología / gabinete</div><div class="grid" style="grid-template-columns:1fr 1fr">${fpCell('Ecografía')}${fpCell('Rayos X', null, 'nr')}${fpCell('TAC', null, 'nb')}${fpCell('Endoscopía', null, 'nb nr')}</div></div>
       <div class="sec"><div class="secT">Servicio de transfusión / banco de sangre</div><div class="grid" style="grid-template-columns:2fr 1fr 1fr">${fpCell('Unidad / servicio', null, 'nb')}${fpCell('Urgencia', fpChk('Urgente', false) + fpChk('Programada', false), 'n nb')}${fpCell('Grupo sanguíneo y Rh', null, 'nb nr')}</div></div>
-      <div class="firmas" style="grid-template-columns:1fr 1fr"><div><b>${doctora || '&nbsp;'}</b>Firma y sello del solicitante${espTxt ? ' · ' + espTxt : ''}</div><div><b>&nbsp;</b>Sello del establecimiento</div></div>${fpFoot()}</section>`;
+      <div class="firmas" style="grid-template-columns:1fr 1fr"><div>${firmaLeyenda(firma, 'Firma y sello del solicitante' + (espTxt ? ' · ' + espTxt : ''), doctora)}</div><div><b>&nbsp;</b>Sello del establecimiento</div></div>${fpFoot()}</section>`;
   }
   if (tipo === 'pap') {
     const np = splitNombre(p.nombre);
@@ -7444,7 +7493,7 @@ function formPropioHTML(tipo, ctx) {
         ${fpCell('Fecha del próximo PAP', prox ? esc(fmtFecha(prox)) : '<span class="muted" style="font-weight:400;font-size:12px">La calcula el SIVEC cuando llega el resultado</span>', 'nb nr', 'grid-column:1/3;background:var(--tint)')}</div></div>
       <div class="sec"><div class="secT">Croquis de ubicación del domicilio <span>del mapa del SIVEC</span></div><div style="display:grid;grid-template-columns:1fr 190px;gap:12px">${croquis}</div></div>
       <div class="sec" style="display:grid;grid-template-columns:1fr 1.2fr;gap:16px;align-items:end">
-        <div class="firmas" style="grid-template-columns:1fr;margin-top:26px"><div><b>${doctora || '&nbsp;'}</b>Nombre, cargo, firma y sello del responsable</div></div>
+        <div class="firmas" style="grid-template-columns:1fr;margin-top:26px"><div>${firmaLeyenda(firma, 'Nombre, cargo, firma y sello del responsable', doctora)}</div></div>
         <table class="copias"><tr><td><b>Original</b> (blanca)</td><td>Establecimiento — expediente de Patología / Oncológico</td></tr><tr><td><b>1ra copia</b> (amarilla)</td><td>Establecimiento I-II nivel — búsqueda de positivas</td></tr><tr><td><b>2da copia</b> (rosada)</td><td>Establecimiento de salud — GAD</td></tr><tr><td><b>3ra copia</b> (verde)</td><td>Establecimiento que realiza la referencia</td></tr></table></div>
       ${fpFoot('Todos los datos deben llenarse obligatoriamente')}</section>`;
   }
@@ -7464,7 +7513,7 @@ function formPropioHTML(tipo, ctx) {
       <div class="grid" style="grid-template-columns:1.6fr 1fr 1.2fr;margin-top:14px">${fpCell('Nombre completo (paciente) o tutor legal', nom, 'nb')}${fpCell('C.I.', ci, 'nb')}${fpCell('Lugar y fecha', 'Santa Cruz de la Sierra, ' + esc(fmtFecha(p.fecha_toma) || ''), 'n nb nr')}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 150px;gap:22px;margin-top:40px;align-items:end">
         <div class="firmas" style="grid-template-columns:1fr;margin:0"><div><b>&nbsp;</b>Firma paciente, tutor legal o familiar</div></div>
-        <div class="firmas" style="grid-template-columns:1fr;margin:0"><div><b>&nbsp;</b>Firma y sello · Médico Telesalud</div></div><div class="huella">Huella digital</div></div>${fpFoot()}</section>`;
+        <div class="firmas" style="grid-template-columns:1fr;margin:0"><div>${firmaLeyenda(firma, 'Firma y sello · Médico Telesalud', doctora)}</div></div><div class="huella">Huella digital</div></div>${fpFoot()}</section>`;
   }
   // Historia clínica — evolución
   const x = (consulta || colp) ? hcSoapPartes(consulta, colp) : { fecha: p.fecha_toma, S: '', O: '', A: '', P: '' };
@@ -7484,7 +7533,7 @@ function formPropioHTML(tipo, ctx) {
       <tr><td class="l">A<small>ANÁL.</small></td><td class="tx">${esc(x.A) || '&nbsp;'}</td></tr>
       <tr><td class="l">P<small>PLAN</small></td><td class="tx">${plan || '&nbsp;'}</td></tr>
     </table>
-    <div class="firmas" style="grid-template-columns:1fr 1fr;margin-top:40px"><div><b>${doctora || '&nbsp;'}</b>Nombre y firma${espTxt ? ' · ' + espTxt : ''}</div><div><b>&nbsp;</b>Sello del establecimiento</div></div>
+    <div class="firmas" style="grid-template-columns:1fr 1fr;margin-top:40px"><div>${firmaLeyenda(firma, 'Nombre y firma' + (espTxt ? ' · ' + espTxt : ''), doctora)}</div><div><b>&nbsp;</b>Sello del establecimiento</div></div>
     <p class="muted" style="font-size:11px;margin-top:16px">Formato propio de prueba: la hoja 1 (datos administrativos) se sigue imprimiendo en el formato oficial.</p>${fpFoot()}</section>`;
 }
 // ===== Formularios de Referencia (Nº 1) y Contrarreferencia (Nº 2) · Norma Nacional de Referencia y Retorno (RM 1036/2008) =====
@@ -7513,7 +7562,7 @@ function formRefPaciente(p) {
     ${fpCell('Nombres y apellidos', esc((p.nombre || '').toUpperCase()))}${fpCell('CI', esc(p.carnet || ''))}${fpCell('Edad', esc(String(edadDe(p.fecha_nacimiento) ?? '')) + ' años')}${fpCell('Sexo', fpChk('F', true) + fpChk('M', false), 'n nr')}
     ${fpCell('Domicilio', esc(p.direccion || ''), 'n nb', 'grid-column:span 2')}${fpCell('Celular', esc(p.celular || ''), 'n nb')}${fpCell('Nacimiento', fmtFecha(p.fecha_nacimiento) || '', 'n nr nb')}</div></div>`;
 }
-function formReferenciaDoc(p, d, firma) {
+function formReferenciaDoc(p, d, firma, firmaRec) {
   const org = centros.find(c => String(c.id) === String(d.centro_origen)) || {}, dest = centros.find(c => String(c.id) === String(d.destino_id)) || {};
   const bet = bethesdaDe(p), vph = p.resultado_vph ? 'VPH ' + p.resultado_vph + (p.vph_genotipo ? ' (genotipo ' + p.vph_genotipo + ')' : '') : '';
   const dx = [bet && bet !== 'NILM' ? bet : '', p.resultado_vph === 'Positiva' ? 'VPH+' : ''].filter(Boolean).join(' · ') || d.motivo || '';
@@ -7551,12 +7600,12 @@ function formReferenciaDoc(p, d, firma) {
       ${fpCell('Tratamiento instaurado', lineas(1), 'n nr nb')}</div></div>
     <div class="sec"><div class="secT">6. Condiciones del traslado</div><div class="grid" style="grid-template-columns:1fr 1fr 1.4fr">
       ${fpCell('Estado de la paciente', fpChk('Estable', true) + fpChk('Inestable', false), 'n nb')}${fpCell('Prioridad', fpChk('Urgente', d.prioridad === 'urgente') + fpChk('Normal', d.prioridad !== 'urgente'), 'n nb')}${fpCell('Acompañada por', fpChk('Sola', false) + fpChk('Familiar', false) + fpChk('Personal de salud', false), 'n nr nb')}</div></div>
-    <div class="firmas"><div>${firmaLeyenda(firma, 'Nombre, firma y sello de quien refiere', esc(d.derivado_por || ''))}</div><div><b>…… / …… / …… · …… : ……</b>Llegada al establecimiento receptor</div><div><b>&nbsp;</b>Nombre y firma de quien recibe</div></div>
+    <div class="firmas"><div>${firmaLeyenda(firma, 'Nombre, firma y sello de quien refiere', esc(d.derivado_por || ''))}</div><div><b>…… / …… / …… · …… : ……</b>Llegada al establecimiento receptor</div><div>${firmaLeyenda(firmaRec, 'Nombre y firma de quien recibe', '')}</div></div>
     <div class="sec" style="font-size:12px">Referencia justificada: ${fpChk('Sí', false)}${fpChk('No', false)} <span class="muted">(llena el establecimiento receptor)</span></div>
     ${fpFoot('Referencia a colposcopia')}</section>`;
   return formRefDocHTML('Formulario de Referencia — ' + (p.nombre || ''), body);
 }
-function formContrarrefDoc(p, d, firma) {
+function formContrarrefDoc(p, d, firma, firmaRec) {
   const c = d.colposcopia || {}, org = centros.find(x => String(x.id) === String(d.destino_id)) || {}, dest = centros.find(x => String(x.id) === String(d.centro_origen)) || {};
   const final = [c.impresion ? 'Impresión colposcópica: ' + c.impresion : '', d.biopsia_resultado ? 'Biopsia: ' + d.biopsia_resultado : ''].filter(Boolean).join(' · ');
   const cie = cie10De(d.biopsia_resultado || '') || cie10De(d.motivo || '');
@@ -7578,7 +7627,7 @@ function formContrarrefDoc(p, d, firma) {
       ${fpCell('Resultado de la biopsia', d.biopsia_tomada ? esc(d.biopsia_resultado || 'Pendiente: llega por el SIVEC') : 'No se tomó', 'nr nb')}</div></div>
     <div class="sec"><div class="secT">5. Recomendaciones para el establecimiento de origen</div><div class="grid" style="grid-template-columns:1fr">
       ${fpCell('Indicaciones', esc(d.contrarreferencia || ''), 'n nr')}${fpCell('Próximo control', esc(fechaOTexto(d.proximo_control)), 'nr nb')}</div></div>
-    <div class="firmas" style="grid-template-columns:1fr 1fr;margin-top:22px;margin-bottom:26px"><div>${firmaLeyenda(firma, 'Nombre, firma y sello de quien contrarrefiere', esc(d.atendido_por || ''))}</div><div><b>&nbsp;</b>Recepción en el establecimiento de origen (fecha y firma)</div></div>
+    <div class="firmas" style="grid-template-columns:1fr 1fr;margin-top:22px;margin-bottom:26px"><div>${firmaLeyenda(firma, 'Nombre, firma y sello de quien contrarrefiere', esc(d.atendido_por || ''))}</div><div>${firmaLeyenda(firmaRec, 'Recepción en el establecimiento de origen (fecha y firma)', '')}</div></div>
     ${fpFoot('Contrarreferencia de colposcopia')}</section>`;
   return formRefDocHTML('Formulario de Contrarreferencia — ' + (p.nombre || ''), body);
 }
@@ -7611,7 +7660,7 @@ async function printPatientDocs(p) {
 
   const info = await completarHc(data, p); // consulta (SOAP + receta) + colposcopia
   printEspElegida = info.esp.id; currentPrintData = data;
-  printCtx = { p, consulta: info.consulta, colp: info.colp, esp: info.esp };
+  printCtx = { p, consulta: info.consulta, colp: info.colp, esp: info.esp, firma: info.consulta && info.consulta.id ? await firmaDe('consulta', info.consulta.id) : null };
   const selEsp = document.getElementById('printEsp');
   selEsp.innerHTML = ESPECIALIDADES.map(e => `<option value="${e.id}">${esc(e.nombre)} · ${e.codigo}</option>`).join('');
   selEsp.value = info.esp.id;
@@ -7835,7 +7884,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.7.0 · 27/09/2026';
+const SIVEC_VERSION = '1.7.1 · 27/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -8196,7 +8245,7 @@ setInterval(spRevisar, 60000);
 // ===== Firma electrónica con PIN (Paso 30): laboratorio, colposcopia, referencia y contrarreferencia =====
 // Cada profesional tiene su PIN de 6 números. Se pide al liberar/enviar; queda quién firmó, cuándo y la huella SHA-256 del contenido.
 const FIRMA_SIN = 'SIN_FIRMA';
-const FIRMA_TIPOS = { referencia: 'Referencia', contrarreferencia: 'Contrarreferencia', informe_lab: 'Informe de laboratorio', colposcopia: 'Colposcopia' };
+const FIRMA_TIPOS = { referencia: 'Referencia', contrarreferencia: 'Contrarreferencia', informe_lab: 'Informe de laboratorio', colposcopia: 'Colposcopia', consulta: 'Consulta y recetas', recepcion: 'Referencia aceptada', recepcion_contra: 'Contrarreferencia recibida' };
 function firmaCanon(o) {
   if (Array.isArray(o)) return '[' + o.map(firmaCanon).join(',') + ']';
   if (o && typeof o === 'object') return '{' + Object.keys(o).sort().filter(k => o[k] !== undefined).map(k => JSON.stringify(k) + ':' + firmaCanon(o[k])).join(',') + '}';
@@ -8209,51 +8258,71 @@ async function firmaHuella(o) {
 function firmaCodigoFmt(c) { c = String(c || ''); return c.length > 4 ? c.slice(0, 4) + '-' + c.slice(4) : c; }
 function firmaFaltaPaso(err) { return !!err && /sivec_pin|sivec_firm|schema cache|PGRST202|42883|does not exist/i.test((err.code || '') + ' ' + (err.message || '')); }
 // Pide el PIN (o lo crea la primera vez). Devuelve el PIN, null si canceló, o FIRMA_SIN si falta el Paso 30.
-async function firmaPedir({ titulo, detalle, boton }) {
+async function firmaPedir({ titulo, detalle, boton, tipo }) {
   if (!sb || !conRoles() || modoDemo) return FIRMA_SIN;
   let est; try { est = await sb.rpc('sivec_pin_estado'); } catch (e) { return FIRMA_SIN; }
   if (est.error) { if (firmaFaltaPaso(est.error)) return FIRMA_SIN; showToast('No se pudo preparar la firma: ' + est.error.message, 'error'); return null; }
+  return firmaModal({ modo: est.data ? 'firmar' : 'crear', titulo, detalle, boton, tipo });
+}
+// Ventana del PIN: modo 'firmar', 'crear' o 'cambiar'. Resuelve con el PIN (o true al cambiar) o null.
+function firmaModal({ modo, titulo, detalle, boton, tipo }) {
+  const ESCUDO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>';
+  const celdas = id => `<div class="fmCells" data-for="${id}">${'<span></span>'.repeat(6)}<input id="${id}" type="password" inputmode="numeric" autocomplete="${modo === 'firmar' ? 'off' : 'new-password'}" maxlength="6" pattern="[0-9]*" aria-label="PIN de 6 números"></div>`;
   return new Promise(resolve => {
-    let modo = est.data ? 'firmar' : 'crear';
     const ov = document.createElement('div'); ov.id = 'firmaOverlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
-    const fin = v => { ov.remove(); document.removeEventListener('keydown', esc_); resolve(v); };
     const esc_ = e => { if (e.key === 'Escape') fin(null); };
+    const fin = v => { ov.remove(); document.removeEventListener('keydown', esc_); resolve(v); };
     document.addEventListener('keydown', esc_);
-    const pintar = (msg) => {
-      ov.innerHTML = `<div class="fmCard"><div class="fmHead"><span>✍️</span><div><b>${esc(titulo)}</b><small>${modo === 'crear' ? 'Primero creá tu PIN de firma' : 'Firma electrónica con tu PIN personal'}</small></div></div>
-        ${detalle ? `<div class="fmDet">${esc(detalle)}</div>` : ''}
-        ${modo === 'crear' ? `<p class="fmNota">Tu PIN son <b>6 números</b> que solo sabés vos. Vale para firmar informes, colposcopias, referencias y contrarreferencias. No uses tu fecha de nacimiento.</p>
-          <label>Nuevo PIN<input id="fmPin" type="password" inputmode="numeric" autocomplete="new-password" maxlength="6" pattern="[0-9]*"></label>
-          <label>Repetilo<input id="fmPin2" type="password" inputmode="numeric" autocomplete="new-password" maxlength="6" pattern="[0-9]*"></label>`
-        : `<label>Tu PIN de firma<input id="fmPin" type="password" inputmode="numeric" autocomplete="off" maxlength="6" pattern="[0-9]*"></label>`}
-        <div class="fmMsg" role="alert">${msg ? esc(msg) : ''}</div>
-        <div class="fmBtns"><button type="button" class="fmNo">Cancelar</button><button type="button" class="fmSi">${modo === 'crear' ? 'Crear PIN y firmar' : esc(boton || 'Firmar')}</button></div>
-        ${modo === 'firmar' ? '<p class="fmNota" style="text-align:center;margin:0">¿Lo olvidaste? El administrador lo restablece y creás uno nuevo.</p>' : ''}</div>`;
-      const pin = ov.querySelector('#fmPin'), pin2 = ov.querySelector('#fmPin2');
-      [pin, pin2].filter(Boolean).forEach(i => { i.oninput = () => { i.value = i.value.replace(/\D/g, '').slice(0, 6); }; i.onkeydown = e => { if (e.key === 'Enter') ov.querySelector('.fmSi').click(); }; });
-      setTimeout(() => pin.focus(), 30);
-      ov.querySelector('.fmNo').onclick = () => fin(null);
+    const pintar = msg => {
+      const sub = modo === 'crear' ? 'Primero creá tu PIN de firma' : modo === 'cambiar' ? 'Cambiar mi PIN de firma' : 'Firma electrónica con tu PIN personal';
+      const campos = modo === 'firmar' ? `<div class="fmCampo"><label>Tu PIN de firma</label>${celdas('fmPin')}</div>`
+        : `${modo === 'cambiar' ? `<div class="fmCampo"><label>PIN actual</label>${celdas('fmAct')}</div>` : ''}<div class="fmCampo"><label>${modo === 'cambiar' ? 'PIN nuevo' : 'Nuevo PIN'}</label>${celdas('fmPin')}</div><div class="fmCampo"><label>Repetilo</label>${celdas('fmPin2')}</div>`;
+      ov.innerHTML = `<div class="fmCard">
+        <div class="fmHead"><span class="fmIco">${ESCUDO}</span><div><b>${esc(titulo)}</b><small>${sub}</small></div><button type="button" class="fmX" aria-label="Cerrar">×</button></div>
+        <div class="fmBody">
+          ${detalle ? `<div class="fmDoc">${tipo ? `<span class="fmTipo">${esc(FIRMA_TIPOS[tipo] || tipo)}</span>` : ''}<div>${esc(detalle)}</div></div>` : ''}
+          ${modo !== 'firmar' ? '<p class="fmNota">Son <b>6 números</b> que solo sabés vos. El mismo PIN sirve para todo lo que firmás en el SIVEC. No uses tu fecha de nacimiento.</p>' : ''}
+          ${campos}
+          <div class="fmMsg" role="alert">${msg ? esc(msg) : ''}</div>
+          <button type="button" class="fmSi">${modo === 'crear' ? 'Crear PIN y firmar' : modo === 'cambiar' ? 'Cambiar PIN' : esc(boton || 'Firmar')}</button>
+          <button type="button" class="fmNo">Cancelar</button>
+        </div>
+        <div class="fmPie"><span>🔒 PIN cifrado</span><span>🕒 Fecha y hora</span><span>#️⃣ Huella del documento</span></div>
+        ${modo === 'firmar' ? '<p class="fmOlv">¿Olvidaste tu PIN? El administrador lo restablece y creás uno nuevo.</p>' : ''}
+      </div>`;
+      ov.querySelectorAll('.fmCells').forEach(c => {
+        const i = c.querySelector('input'), sp = c.querySelectorAll('span');
+        const upd = () => { i.value = i.value.replace(/\D/g, '').slice(0, 6); sp.forEach((s, k) => { s.className = k < i.value.length ? 'lleno' : k === i.value.length && document.activeElement === i ? 'cursor' : ''; }); };
+        i.oninput = () => { upd(); const mm = ov.querySelector('.fmMsg'); if (mm) mm.textContent = ''; if (i.value.length === 6) { const sig = [...ov.querySelectorAll('.fmCells input')].find(x => x.value.length < 6); if (sig) sig.focus(); } };
+        i.onfocus = i.onblur = upd; i.onkeydown = e => { if (e.key === 'Enter') ov.querySelector('.fmSi').click(); };
+        c.onclick = () => i.focus(); upd();
+      });
+      setTimeout(() => { const f = ov.querySelector('.fmCells input'); if (f) f.focus(); }, 40);
+      ov.querySelector('.fmNo').onclick = ov.querySelector('.fmX').onclick = () => fin(null);
       ov.querySelector('.fmSi').onclick = async () => {
-        const b = ov.querySelector('.fmSi'), v = pin.value;
-        if (!/^\d{6}$/.test(v)) return pintarMsg('El PIN tiene que tener 6 números.');
-        if (modo === 'crear' && v !== pin2.value) return pintarMsg('Los dos PIN no coinciden.');
+        const b = ov.querySelector('.fmSi'), v = ov.querySelector('#fmPin').value, v2 = (ov.querySelector('#fmPin2') || {}).value, act = (ov.querySelector('#fmAct') || {}).value;
+        const aviso = m => { const el = ov.querySelector('.fmMsg'); el.textContent = m; ov.querySelector('.fmCard').classList.remove('sacude'); void ov.offsetWidth; ov.querySelector('.fmCard').classList.add('sacude'); };
+        if (modo === 'cambiar' && !/^\d{6}$/.test(act || '')) return aviso('Escribí tu PIN actual (6 números).');
+        if (!/^\d{6}$/.test(v)) return aviso('El PIN tiene que tener 6 números.');
+        if (modo !== 'firmar' && v !== v2) return aviso('Los dos PIN nuevos no coinciden.');
         b.disabled = true; b.textContent = 'Verificando…';
-        if (modo === 'crear') {
-          const r = await sb.rpc('sivec_pin_definir', { p_pin: v });
+        if (modo !== 'firmar') {
+          const r = await sb.rpc('sivec_pin_definir', modo === 'cambiar' ? { p_pin: v, p_actual: act } : { p_pin: v });
           if (r.error) { b.disabled = false; return pintar(r.error.message); }
+          if (modo === 'cambiar') { showToast('PIN cambiado ✔', 'ok'); return fin(true); }
           showToast('PIN de firma creado ✔ Guardalo bien: nadie más lo conoce.', 'ok');
         }
         const r = await sb.rpc('sivec_pin_verificar', { p_pin: v });
         if (r.error) { b.disabled = false; return pintar(r.error.message); }
         const s = String(r.data || '');
-        if (s === 'ok') return fin(v);
+        if (s === 'ok') { ov.querySelector('.fmCard').classList.add('ok'); await new Promise(z => setTimeout(z, 380)); return fin(v); }
         if (s === 'sin_pin') { modo = 'crear'; return pintar('Todavía no tenés PIN: creá uno.'); }
         if (s.startsWith('bloqueado')) return pintar(`PIN bloqueado por intentos fallidos hasta las ${s.split(':').slice(1).join(':')}. Si lo olvidaste, pedí al administrador que lo restablezca.`);
         const quedan = s.split(':')[1];
         pintar(`PIN incorrecto. ${quedan === '1' ? 'Te queda 1 intento' : 'Te quedan ' + quedan + ' intentos'} antes del bloqueo de 15 minutos.`);
+        const c = ov.querySelector('.fmCard'); c.classList.add('sacude');
       };
     };
-    const pintarMsg = m => { ov.querySelector('.fmMsg').textContent = m; };
     ov.onclick = e => { if (e.target === ov) fin(null); };
     document.body.appendChild(ov); pintar('');
   });
@@ -8280,46 +8349,53 @@ async function firmaDe(tipo, documento) {
 function firmaLeyenda(f, rotulo, nombre) {
   if (!f) return `<b>${nombre || '&nbsp;'}</b>${rotulo}`;
   const t = new Date(f.creado);
-  return `<b>${esc(f.firmante_nombre || nombre || '')}</b>${rotulo.replace(/firma y sello|firma/i, 'firma electrónica')}<br><span style="font-size:10.5px;color:#7d2a4c;font-weight:700">✍ Firmado electrónicamente el ${fmtFecha(t.toISOString().slice(0, 10))} a las ${t.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })}</span><br><span style="font-size:10px">Código de verificación <b>${esc(firmaCodigoFmt(f.codigo))}</b> · huella ${esc(String(f.huella || '').slice(0, 12))}…</span>`;
+  return `<b>${esc(f.firmante_nombre || nombre || '')}</b>${(r => r.charAt(0).toUpperCase() + r.slice(1))(rotulo.replace(/firma y sello|firma/i, 'firma electrónica'))}<br><span style="font-size:10.5px;color:#7d2a4c;font-weight:700">✍ Firmado electrónicamente el ${fmtFecha(t.toISOString().slice(0, 10))} a las ${t.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })}</span><br><span style="font-size:10px">Código de verificación <b>${esc(firmaCodigoFmt(f.codigo))}</b> · huella ${esc(String(f.huella || '').slice(0, 12))}…</span>`;
 }
-// En ⚙ Configuración: crear/cambiar el PIN, verificar un código y (administrador) restablecer el PIN de alguien
+// En ⚙ Configuración: mi PIN (crear/cambiar), verificar un código y (administrador) restablecer el PIN de alguien
 (function firmaEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
   const d = document.createElement('div'); d.id = 'firmaConfig';
-  d.style.cssText = 'margin:0 0 18px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)';
-  d.innerHTML = `<b>✍️ Firma electrónica</b><div class="hint" style="margin:4px 0 8px">Tu PIN de 6 números firma informes, colposcopias, referencias y contrarreferencias.</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="primary" style="margin-top:0" data-fc="pin">Crear o cambiar mi PIN</button></div>
-    <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center"><input id="fcCodigo" placeholder="Código, ej. 58F7-B49B" style="flex:1;min-width:150px;padding:7px 9px;border:1px solid var(--line);border-radius:8px"><button type="button" class="primary" style="margin-top:0" data-fc="verificar">Verificar firma</button></div>
-    <div id="fcRes" class="hint" style="margin-top:6px"></div>
-    <div id="fcAdmin" style="display:none;margin-top:10px;gap:6px;flex-wrap:wrap;align-items:center"><input id="fcCorreo" type="email" placeholder="Correo de quien olvidó el PIN" style="flex:1;min-width:150px;padding:7px 9px;border:1px solid var(--line);border-radius:8px"><button type="button" class="primary" style="margin-top:0" data-fc="reset">Restablecer PIN</button></div>`;
+  d.innerHTML = `<div class="fcHead"><span class="fcIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></span><div><b>Firma electrónica</b><small>Un PIN de 6 números firma todo lo tuyo: consultas y recetas, informes, colposcopias, referencias y contrarreferencias.</small></div></div>
+    <div class="fcFila"><span class="fcEstado" id="fcEstado">Mi PIN: …</span><button type="button" class="fcBtn" data-fc="pin">Crear mi PIN</button></div>
+    <div class="fcSep">Verificar una firma impresa</div>
+    <div class="fcFila"><input id="fcCodigo" placeholder="Código, ej. 58F7-B49B" autocomplete="off"><button type="button" class="fcBtn" data-fc="verificar">Verificar</button></div>
+    <div id="fcRes"></div>
+    <div id="fcAdmin" style="display:none"><div class="fcSep">Administrador · restablecer un PIN olvidado</div>
+      <div class="fcFila"><input id="fcCorreo" type="email" placeholder="Correo de la persona" autocomplete="off"><button type="button" class="fcBtn sec" data-fc="reset">Restablecer</button></div></div>`;
   const sop = panel.querySelector('h2'); (sop && sop.nextElementSibling ? sop.nextElementSibling : panel.firstChild).after(d);
   const res = d.querySelector('#fcRes');
-  document.getElementById('settingsBtn') && document.getElementById('settingsBtn').addEventListener('click', () => { d.querySelector('#fcAdmin').style.display = perfil && (perfil.es_admin || perfil.rol === 'admin') ? 'flex' : 'none'; });
+  const mostrar = (html, tono) => { res.className = tono || ''; res.innerHTML = html; };
+  async function estado() {
+    d.querySelector('#fcAdmin').style.display = perfil && (perfil.es_admin || perfil.rol === 'admin') ? '' : 'none';
+    const el = d.querySelector('#fcEstado'), b = d.querySelector('[data-fc="pin"]');
+    if (!sb || !conRoles()) { el.textContent = 'Mi PIN: iniciá sesión'; return; }
+    let r; try { r = await sb.rpc('sivec_pin_estado'); } catch (e) { r = { error: e }; }
+    if (r.error) { el.innerHTML = firmaFaltaPaso(r.error) ? 'Se activa con el <b>Paso 30</b> del SQL' : 'Mi PIN: sin conexión'; el.className = 'fcEstado'; b.style.display = 'none'; return; }
+    b.style.display = ''; el.className = 'fcEstado ' + (r.data ? 'si' : 'no');
+    el.innerHTML = r.data ? '✔ Mi PIN está creado' : '• Todavía no creaste tu PIN';
+    b.textContent = r.data ? 'Cambiar mi PIN' : 'Crear mi PIN'; b.dataset.tiene = r.data ? '1' : '';
+  }
+  const sb_ = document.getElementById('settingsBtn'); if (sb_) sb_.addEventListener('click', () => setTimeout(estado, 50));
   d.onclick = async e => {
     const b = e.target.closest('[data-fc]'); if (!b || !sb) return;
     if (b.dataset.fc === 'pin') {
-      const est = await sb.rpc('sivec_pin_estado');
-      if (est.error) { res.textContent = firmaFaltaPaso(est.error) ? 'La firma electrónica se activa con el Paso 30 del SQL.' : est.error.message; return; }
-      if (!est.data) { const p = await firmaPedir({ titulo: 'Crear mi PIN de firma' }); if (p && p !== FIRMA_SIN) res.textContent = 'PIN creado ✔'; return; }
-      const actual = prompt('Escribí tu PIN actual (6 números):'); if (!actual) return;
-      const nuevo = prompt('Nuevo PIN (6 números):'); if (!nuevo) return;
-      if (prompt('Repetí el nuevo PIN:') !== nuevo) { res.textContent = 'Los PIN nuevos no coinciden.'; return; }
-      const r = await sb.rpc('sivec_pin_definir', { p_pin: nuevo, p_actual: actual });
-      res.textContent = r.error ? r.error.message : 'PIN cambiado ✔';
+      const ok = await firmaModal({ modo: b.dataset.tiene ? 'cambiar' : 'crear', titulo: b.dataset.tiene ? 'Cambiar mi PIN' : 'Crear mi PIN de firma' });
+      if (ok) { mostrar(b.dataset.tiene ? '✔ PIN cambiado.' : '✔ PIN creado. Ya podés firmar.', 'ok'); estado(); }
     } else if (b.dataset.fc === 'verificar') {
       const c = d.querySelector('#fcCodigo').value.trim(); if (!c) return;
       const { data, error } = await sb.rpc('sivec_firma_verificar', { p_codigo: c });
       const f = Array.isArray(data) ? data[0] : data;
-      res.innerHTML = error ? esc(firmaFaltaPaso(error) ? 'La firma electrónica se activa con el Paso 30 del SQL.' : error.message)
-        : f ? `✔ <b>Firma válida</b>: ${esc(FIRMA_TIPOS[f.tipo] || f.tipo)} firmada por <b>${esc(f.firmante_nombre || '')}</b>${f.establecimiento ? ' · ' + esc(f.establecimiento) : ''} el ${fmtFecha(String(f.creado).slice(0, 10))}.`
-        : '✖ <b>No existe ninguna firma con ese código.</b>';
+      if (error) return mostrar(esc(firmaFaltaPaso(error) ? 'La firma electrónica se activa con el Paso 30 del SQL.' : error.message), 'mal');
+      if (!f) return mostrar('✖ <b>No existe ninguna firma con ese código.</b> Revisá que esté bien escrito.', 'mal');
+      const t = new Date(f.creado);
+      mostrar(`<b>✔ Firma válida</b><span>${esc(FIRMA_TIPOS[f.tipo] || f.tipo)}</span><span>Firmó: <b>${esc(f.firmante_nombre || '')}</b>${f.establecimiento ? ' · ' + esc(f.establecimiento) : ''}</span><span>${fmtFecha(t.toISOString().slice(0, 10))} a las ${t.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })} · huella ${esc(String(f.huella || '').slice(0, 12))}…</span>`, 'ok');
     } else if (b.dataset.fc === 'reset') {
       const correo = d.querySelector('#fcCorreo').value.trim(); if (!correo) return;
       const u = await sb.rpc('sivec_uid_por_correo', { p_correo: correo });
-      if (u.error || !u.data) { res.textContent = 'No se encontró ese correo.'; return; }
+      if (u.error || !u.data) return mostrar('No se encontró ese correo.', 'mal');
       if (!confirm(`¿Restablecer el PIN de firma de ${correo}? La persona va a crear uno nuevo la próxima vez que firme.`)) return;
       const r = await sb.rpc('sivec_pin_restablecer', { p_usuario: u.data });
-      res.textContent = r.error ? r.error.message : 'PIN restablecido ✔ Avisale que cree uno nuevo al firmar.';
+      mostrar(r.error ? esc(r.error.message) : '✔ PIN restablecido. Avisale que cree uno nuevo al firmar.', r.error ? 'mal' : 'ok');
     }
   };
 })();
