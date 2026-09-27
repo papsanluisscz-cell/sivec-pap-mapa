@@ -1145,7 +1145,7 @@ body.dark #firmaConfig #fcRes.mal { background: #450a0a; border-color: #7f1d1d; 
 #sonidoConfig .scModos button { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 10px; padding: 9px 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
 #sonidoConfig .scModos button.on { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
 #sonidoConfig .scVoz { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 13px; font-weight: 600; }
-#sonidoConfig .scVoz div { display: flex; gap: 6px; }
+#sonidoConfig .scVoz div { display: flex; gap: 6px; flex-wrap: wrap; }
 #sonidoConfig .scVoz button { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 8px; padding: 6px 11px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
 #sonidoConfig .scVoz button.on { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
 #sonidoConfig .scPrueba { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; color: var(--ink-soft); }
@@ -2594,7 +2594,7 @@ async function cargarPerfil() {
   perfil = data && data.activo !== false ? data : { sinPerfil: true, inactivo: !!data, correo: session.user.email };
   if (!perfil.sinPerfil) try { localStorage.setItem('sivec_perfil_cache', JSON.stringify({ perfil, centros, redes })); } catch (e) {}
   aplicarRol();
-  if (!perfil.sinPerfil) { terminosVerificar(); colaEnviar(); setTimeout(() => saludoDelDia(false), 2400); }
+  if (!perfil.sinPerfil) { terminosVerificar(); colaEnviar(); setTimeout(() => saludoDelDia(false), 2400); setTimeout(() => { vozHitoMeta(); vozResumenDelDia(false); }, 9000); }
 }
 
 function aplicarRol() {
@@ -4409,6 +4409,7 @@ async function onSubmit(e) {
     msg.className = 'ok';
     if (nueva) { await guardarSoapDeRegistro(nueva); document.getElementById('regPrint').onclick = () => printPatientDocs(nueva); }
     showToast('Paciente guardada correctamente ✔', 'ok');
+    setTimeout(() => vozHitoMeta(), 1500);
     allPatientsData = []; // se vuelve a leer en el próximo registro, así también avisa de la toma recién guardada
     form.reset();
     resetGeoPick(form);
@@ -4512,7 +4513,7 @@ function renderBanners(data) {
 
   const nuevos = data.filter(esResultadoNuevo);
   const rbanner = document.getElementById('resultadosBanner');
-  try { const nAlt = nuevos.filter(p => p.estado_pap === 'Positivo' || p.resultado_vph === 'Positiva').length; const antesAlt = sonidoVistos.alt; sonidoSiAumenta('alt', nAlt, 'alerta'); if (!(nAlt > (antesAlt ?? 0))) sonidoSiAumenta('res', nuevos.length, 'mensaje'); else sonidoVistos.res = nuevos.length; } catch (_) {}
+  try { const nAlt = nuevos.filter(p => p.estado_pap === 'Positivo' || p.resultado_vph === 'Positiva').length; const antesAlt = sonidoVistos.alt; if (sonidoSiAumenta('alt', nAlt, 'alerta')) vozAviso(nAlt - antesAlt === 1 ? 'Llegó un resultado alterado del laboratorio.' : 'Llegaron resultados alterados del laboratorio.', 'alt'); if (!(nAlt > (antesAlt ?? 0))) { if (sonidoSiAumenta('res', nuevos.length, 'mensaje')) vozAviso('Llegaron resultados nuevos del laboratorio.', 'res'); } else sonidoVistos.res = nuevos.length; } catch (_) {}
   if (nuevos.length) {
     const alt = nuevos.filter(p => p.estado_pap === 'Positivo' || p.resultado_vph === 'Positiva').length;
     const rep = nuevos.filter(p => ['rechazada', 'insatisfactoria'].includes(p.muestra_estado)).length;
@@ -4525,7 +4526,7 @@ function renderBanners(data) {
   } else { rbanner.style.display = 'none'; rbanner.innerHTML = ''; }
 
   const crs = data.filter(p => { const d = derivDe(p); return d && derEsNueva(d); });
-  try { sonidoSiAumenta('contra', crs.length, 'mensaje'); } catch (_) {}
+  try { if (sonidoSiAumenta('contra', crs.length, 'mensaje')) vozAviso('Llegó una contrarreferencia nueva.', 'contra'); } catch (_) {}
   const cb = document.getElementById('contrarrefBanner');
   if (crs.length) {
     const noAs = crs.filter(p => derivDe(p).estado === 'no_asistio').length;
@@ -8005,7 +8006,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.10.0 · 27/09/2026';
+const SIVEC_VERSION = '1.11.0 · 27/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -8459,6 +8460,7 @@ async function firmaRegistrar(tipo, documento, contenido, pin) {
     showToast(`Se guardó, pero la firma no se registró (${m}).`, 'error'); return null;
   }
   showToast(`✍️ ${FIRMA_TIPOS[tipo]} firmada · código ${firmaCodigoFmt(data.codigo)}`, 'ok', 'firma');
+  vozAviso({ referencia: 'Referencia firmada.', contrarreferencia: 'Contrarreferencia firmada y enviada.', informe_lab: 'Informe firmado.', colposcopia: 'Colposcopia firmada.', consulta: 'Consulta firmada.', recepcion: 'Referencia aceptada y firmada.', recepcion_contra: 'Contrarreferencia recibida.' }[tipo] || 'Documento firmado.', 'firma');
   return data;
 }
 async function firmaDe(tipo, documento) {
@@ -8564,7 +8566,7 @@ function sonido(nombre) {
 }
 // Avisos de cosas nuevas (resultados, contrarreferencias): suena solo cuando aumentan
 const sonidoVistos = {};
-function sonidoSiAumenta(clave, n, nombre) { const antes = sonidoVistos[clave]; sonidoVistos[clave] = n; if (antes !== undefined ? n > antes : n > 0) sonido(nombre); }
+function sonidoSiAumenta(clave, n, nombre) { const antes = sonidoVistos[clave]; sonidoVistos[clave] = n; if (antes !== undefined ? n > antes : n > 0) sonido(nombre); return antes !== undefined && n > antes; }
 // En ⚙ Configuración
 (function sonidosEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -8573,12 +8575,14 @@ function sonidoSiAumenta(clave, n, nombre) { const antes = sonidoVistos[clave]; 
   d.innerHTML = `<div class="scHead"><b>Sonidos</b><small>Solo en esta computadora. Suena en lo importante: firmas, resultados, contrarreferencias, soporte y errores. "Solo alertas": sin el sonido de firma.</small></div>
     <div class="scModos">${modos.map(([k, t]) => `<button type="button" data-sm="${k}">${t}</button>`).join('')}</div>
     <div class="scVoz"><span>🗣 Saludo con voz al entrar</span><div><button type="button" data-voz="fem">👩 Femenina</button><button type="button" data-voz="masc">👨 Masculina</button><button type="button" data-voz="no">Sin voz</button><button type="button" data-voz="oir">▶ Escuchar</button></div></div>
+    <div class="scVoz"><span>🔔 Avisos por voz durante el día<small style="display:block;font-weight:400;color:var(--ink-soft);font-size:11.5px">Resultado alterado, contrarreferencia, paciente en espera, firma, metas y resumen del día. Nunca dice nombres.</small></span><div><button type="button" data-av="si">Sí</button><button type="button" data-av="no">No</button><button type="button" data-av="oir">▶ Probar</button></div></div>
     <div class="scPrueba"><span>Probar:</span>${[['firma', '✍ Firma'], ['alerta', '⚠ Resultado alterado'], ['mensaje', '💬 Mensaje'], ['error', '✖ Error'], ['ok', '✓ Guardado']].map(([k, t]) => `<button type="button" data-sp2="${k}">${t}</button>`).join('')}</div>`;
   const ancla = document.getElementById('firmaConfig') || (panel.querySelector('h2') || {}).nextElementSibling || panel.firstChild; ancla.after(d);
-  const marcar = () => { d.querySelectorAll('[data-sm]').forEach(b => b.classList.toggle('on', b.dataset.sm === sonidoModo())); d.querySelectorAll('[data-voz]:not([data-voz="oir"])').forEach(b => b.classList.toggle('on', b.dataset.voz === vozModo())); };
+  const marcar = () => { d.querySelectorAll('[data-sm]').forEach(b => b.classList.toggle('on', b.dataset.sm === sonidoModo())); d.querySelectorAll('[data-voz]:not([data-voz="oir"])').forEach(b => b.classList.toggle('on', b.dataset.voz === vozModo())); let av = 'si'; try { av = localStorage.getItem('sivec_voz_avisos') || 'si'; } catch (_) {} d.querySelectorAll('[data-av]:not([data-av="oir"])').forEach(b => b.classList.toggle('on', b.dataset.av === av)); };
   marcar();
   d.onclick = e => {
-    const m = e.target.closest('[data-sm]'), p = e.target.closest('[data-sp2]'), vz = e.target.closest('[data-voz]');
+    const m = e.target.closest('[data-sm]'), p = e.target.closest('[data-sp2]'), vz = e.target.closest('[data-voz]'), av = e.target.closest('[data-av]');
+    if (av) { if (av.dataset.av === 'oir') { if (!vozActiva()) return showToast('Elegí primero una voz (femenina o masculina).', 'err'); sonido('alerta'); setTimeout(() => vozDecir('Llegó un resultado alterado del laboratorio.'), 650); } else { try { localStorage.setItem('sivec_voz_avisos', av.dataset.av); } catch (_) {} marcar(); } return; }
     if (vz) { if (vz.dataset.voz === 'oir') { document.getElementById('settingsPanel')?.classList.remove('open'); saludoDelDia(true); } else { try { localStorage.setItem('sivec_voz', vz.dataset.voz); } catch (_) {} marcar(); } return; }
     if (m) { try { localStorage.setItem('sivec_sonidos', m.dataset.sm); } catch (_) {} marcar(); if (m.dataset.sm !== 'no') sonido(m.dataset.sm === 'alertas' ? 'mensaje' : 'ok'); }
     if (p) { const guard = sonidoModo(); try { localStorage.setItem('sivec_sonidos', 'todos'); } catch (_) {} sonidoCtxListo(); setTimeout(() => { sonido(p.dataset.sp2); try { localStorage.setItem('sivec_sonidos', guard); } catch (_) {} }, 30); }
@@ -8706,16 +8710,78 @@ function vozElegir(genero) {
     return na - nb || ka - kb;
   })[0] || null;
 }
-async function vozDecir(texto) {
+async function vozDecir(texto, encolar) {
   if (!('speechSynthesis' in window) || !texto) return false;
   if (!speechSynthesis.getVoices().length) await new Promise(r => { speechSynthesis.onvoiceschanged = r; setTimeout(r, 1500); });
-  speechSynthesis.cancel();
+  if (!encolar) speechSynthesis.cancel();
   const gen = vozModo() === 'masc' ? 'masc' : 'fem', u = new SpeechSynthesisUtterance(texto), v = vozElegir(gen);
   const acierta = v && (gen === 'masc' ? VOZ_MASC.test(v.name) : !VOZ_MASC.test(v.name));
   if (v) u.voice = v; u.lang = v ? v.lang : 'es-419'; u.rate = 0.97; u.volume = 0.95;
   u.pitch = acierta ? 1 : gen === 'masc' ? 0.72 : 1.12;  // si el equipo no tiene esa voz, se aproxima con el tono
   speechSynthesis.speak(u); return true;
 }
+// ===== Avisos por voz durante el día: frases cortas en el momento, nunca nombres de pacientes =====
+// Se apagan en ⚙ → Sonidos → "Avisos por voz" (o con "Sin voz"). Solo en esta computadora.
+function vozAvisosActivos() { let v = 'si'; try { v = localStorage.getItem('sivec_voz_avisos') || 'si'; } catch (_) {} return v === 'si' && vozActiva(); }
+const vozAvisoUlt = {};
+function vozAviso(texto, clave) {
+  if (!texto || !vozAvisosActivos()) return;
+  const k = clave || texto, t = Date.now();
+  if (vozAvisoUlt[k] && t - vozAvisoUlt[k] < 20000) return; // el mismo aviso no se repite seguido
+  vozAvisoUlt[k] = t;
+  setTimeout(() => vozDecir(texto, true), 650); // primero el sonido, después la voz (sin cortar el saludo)
+}
+// Metas del año del establecimiento: avisa una sola vez al pasar 25 %, 50 %, 75 % y 100 %
+async function vozHitoMeta() {
+  if (!sb || !conRoles() || perfil.rol !== 'centro') return;
+  const c = miCentro(); if (!c || !Number(c.meta_pap_anual)) return;
+  const anio = hoyISO().slice(0, 4);
+  const { data, count, error } = await sb.from('pacientes').select('id', { count: 'exact', head: true }).eq('centro_id', perfil.centro_id).is('deleted_at', null).gte('fecha_toma', anio + '-01-01');
+  if (error) return;
+  const n = count ?? (data || []).length, pct = Math.floor(n * 100 / Number(c.meta_pap_anual));
+  const hito = [100, 75, 50, 25].find(h => pct >= h); if (!hito) return;
+  const clave = 'sivec_hito_' + c.id + '_' + anio;
+  let ya = 0; try { ya = Number(localStorage.getItem(clave) || 0); } catch (_) {}
+  if (hito <= ya) return;
+  try { localStorage.setItem(clave, String(hito)); } catch (_) {}
+  const txt = hito === 100 ? `¡${c.nombre} cumplió la meta del año: ${n} tomas!` : `${c.nombre} llegó al ${hito} % de la meta del año: ${n} de ${c.meta_pap_anual} tomas.`;
+  showToast('🎉 ' + esc(txt), 'ok', 'firma');
+  vozAviso(txt.replace(/^¡|[!.]$/g, '') + '.' + (hito === 100 ? ' ¡Felicidades a todo el equipo!' : ' ¡Sigan así!'), 'hito');
+}
+// Resumen del final del día: una vez por día, después de las 16:30, si el sistema está abierto
+async function vozResumenDelDia(forzar) {
+  if (!sb || !conRoles() || perfil.sinPerfil) return;
+  const ahora = new Date(), hoy = hoyISO(), clave = 'sivec_resumen_' + perfil.id;
+  if (!forzar) {
+    if (ahora.getHours() * 60 + ahora.getMinutes() < 16 * 60 + 30) return;
+    try { if (localStorage.getItem(clave) === hoy) return; } catch (_) {}
+  }
+  const frases = [];
+  try {
+    if (perfil.rol === 'centro' && (tieneFuncion('toma') || tieneFuncion('recepcion'))) {
+      const ayer = new Date(Date.parse(hoy + 'T12:00:00') - 864e5).toISOString().slice(0, 10);
+      const { data } = await sb.from('pacientes').select('id,fecha_toma').eq('centro_id', perfil.centro_id).is('deleted_at', null).gte('fecha_toma', ayer);
+      const nh = (data || []).filter(p => p.fecha_toma === hoy).length, na = (data || []).filter(p => p.fecha_toma === ayer).length;
+      if (nh) frases.push(`Hoy se registraron ${plural(nh, 'toma')}` + (nh > na && na ? `, ${nh - na} más que ayer` : nh === na ? ', igual que ayer' : '') + '.');
+    }
+    if (usaCola()) {
+      const { data } = await sb.from('sivec_turnos').select('id,estado').eq('centro_id', perfil.centro_id).eq('fecha', hoy);
+      const at = (data || []).filter(t => t.estado === 'atendida').length;
+      if (at) frases.push(`Pasaron ${plural(at, 'paciente')} por la cola del día.`);
+    }
+    if (esLab()) {
+      const { data } = await sb.rpc('sivec_lab_muestras', { p_lote: null });
+      const inf = (data || []).filter(x => String(x.fecha_informe || '').slice(0, 10) === hoy).length;
+      if (inf) frases.push(`El laboratorio informó ${plural(inf, 'muestra')} hoy.`);
+    }
+  } catch (_) {}
+  if (!frases.length) return;
+  try { localStorage.setItem(clave, hoy); } catch (_) {}
+  const texto = frases.join(' ') + ' ¡Buen trabajo! Gracias por cuidar a las mujeres de su comunidad.';
+  showToast('🌙 ' + esc(texto), 'ok', 'mensaje');
+  vozAviso(texto, 'resumen');
+}
+setInterval(() => { if (!document.hidden) { vozResumenDelDia(false); } }, 5 * 60000);
 function saludoTexto(items, cl, frase) {
   const t = saludoTrato();
   const solas = items.filter(i => i.sola).map(i => i.voz + '.');
@@ -8794,7 +8860,7 @@ async function hoyCargar(silencio) {
   hoyTurnos = data || [];
   if (esColpo() && tieneFuncion('recepcion')) { try { const r = await sb.rpc('sivec_colpo_lista'); hoyCitas = (r.data || []).filter(d => d.estado === 'citada' && d.fecha_cita === hoyISO() && !hoyTurnos.some(t => t.derivacion_id === d.id)); } catch (_) { hoyCitas = []; } }
   const ahora = hoyMiCola().filter(t => t.estado === 'espera').length;
-  if (silencio && ahora > antes) { sonido('mensaje'); showToast(`👩 Nueva paciente en espera (${ahora})`, 'ok', false); }
+  if (silencio && ahora > antes) { sonido('mensaje'); showToast(`👩 Nueva paciente en espera (${ahora})`, 'ok', false); vozAviso(ahora - antes === 1 ? 'Tiene una paciente nueva en espera.' : `Tiene ${ahora - antes} pacientes nuevas en espera.`, 'cola'); }
   hoyPintar();
 }
 function hoyMiCola() {

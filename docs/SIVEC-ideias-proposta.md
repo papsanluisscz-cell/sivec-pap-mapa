@@ -973,3 +973,10 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 ## 27/09/2026 · Pendientes anotados
 - Próximo: tabla de accesos y, en el panel del administrador, organizar todos los profesionales y las computadoras (qué equipo, de qué establecimiento, quién lo usa).
 - Pregunta del autor: voz más interactiva → propuesta enviada (avisos por voz en el momento, comandos de voz cortos, resumen del día, voces naturales de Edge; asistente conversacional más adelante).
+
+## 27/09/2026 · Avisos por voz durante el día (v1.11.0)
+- Frases cortas en el momento, después del sonido y sin cortar el saludo: "Llegó un resultado alterado del laboratorio", "Llegaron resultados nuevos", "Llegó una contrarreferencia nueva", "Tiene una paciente nueva en espera", "Referencia firmada" / "Contrarreferencia firmada y enviada" / "Informe firmado"…
+- Metas: al pasar 25/50/75/100 % de la meta anual del establecimiento (una sola vez cada una): "El centro llegó al 50 % de la meta del año… ¡Sigan así!".
+- Resumen del día (una vez, después de las 16:30 si el sistema está abierto): tomas de hoy comparadas con ayer, pacientes que pasaron por la cola, muestras informadas por el laboratorio.
+- Nunca dice nombres de pacientes. El mismo aviso no se repite en 20 s.
+- ⚙ → Sonidos → "Avisos por voz durante el día: Sí / No / ▶ Probar" (por computadora). "Sin voz" también los apaga.
