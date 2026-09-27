@@ -931,3 +931,8 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - Firma también: la consulta (sale en D1, D8, registro de PAP, consentimiento e historia clínica), la aceptación de la referencia en el hospital (al dar la cita) y la recepción de la contrarreferencia en el centro. Las firmas de la paciente siguen a mano.
 - Ventana del PIN rediseñada (6 casillas, tarjeta del documento, sacudida si falla) y bloque "Firma electrónica" en ⚙ Configuración. Slide "Cada profesional firma con su PIN" después de "Derivar".
 - Próximo tema: sonidos en el sistema (propuesta enviada al autor).
+
+## 27/09/2026 · Presentación: tres slides de seguridad
+- "Firmado de punta a punta" (4 firmas de una paciente derivada, con sus códigos, y los pies de los Formularios Nº 1 y Nº 2), "¿Esta firma es verdadera?" (verificación del código y huella que cambia si alguien altera el documento) y "Seis candados para los datos de cada mujer" (acceso por rol, PIN cifrado, huella, código, registro de accesos, copias diarias + HTTPS).
+- Ojo: "copias diarias" requiere tener el Supabase Pro activo.
+- Firma de la paciente: propuesta enviada (firma en pantalla con el dedo + huella a futuro); a definir con el autor.
