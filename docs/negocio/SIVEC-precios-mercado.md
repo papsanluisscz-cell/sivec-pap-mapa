@@ -47,31 +47,26 @@ São vendidos por empresas.
 - **Por que por estabelecimento, e não por usuário:** o governo quer que todo o pessoal use, sem contar pessoas.
 - **Alternativa se o comprador exigir "ser dono":** licença perpétua do município mais suporte anual de 20%. Nesse caso a hospedagem é paga por eles.
 
-## 3. SIVEC PAP — preço proposto
+## 3. SIVEC PAP — preços definidos pelo autor (27/09/2026)
 
 | Estabelecimento | Mensalidade | Implantação (uma vez) |
 |---|---|---|
-| Centro de saúde (1º nível) | **Bs 700** (~US$ 100) | Bs 3.500 |
-| Hospital 2º nível (colposcopia) | **Bs 1.750** | Bs 7.000 |
-| 3º nível / laboratório / Oncológico | **Bs 3.500** | Bs 10.500 |
-| Tablero da rede (gestor) e administração | incluído | — |
+| 1º nível sem colposcopia nem biópsia (cidade ou província) | **US$ 100** (Bs 696) | US$ 200 (Bs 1.392) |
+| 1º nível com colposcopia e biópsia | **US$ 250** (Bs 1.740) | US$ 200 (Bs 1.392) |
+| 2º nível (hospital) | **US$ 250** (Bs 1.740) | US$ 500 (Bs 3.480) |
+| 3º e 4º nível e laboratórios de citologia PAP e de VPH | **US$ 501** (Bs 3.486,96) | US$ 550 (Bs 3.828) |
+| Tablero da rede e administração | incluído | — |
 
-**Faixa de negociação:** mínimo Bs 500 e teto Bs 1.000 por centro de 1º nível; os demais valores na mesma proporção.
+### Exemplo: Red Centro + Oncológico
+| Estabelecimento | Qtd. | US$/mês | Implantação US$ |
+|---|---|---|---|
+| 1º nível sem colposcopia | 8 | 800 | 1.600 |
+| 1º nível com colposcopia e biópsia | 1 | 250 | 200 |
+| 2º nível | 1 | 250 | 500 |
+| Oncológico com laboratório PAP/VPH | 1 | 501 | 550 |
+| **Total** | **11** | **US$ 1.801/mês** (Bs 12.534,96) · **US$ 21.612/ano** (Bs 150.419,52) | **US$ 2.850** (Bs 19.836) |
 
-### O que isso dá
-
-| Escala | Composição (**suposto**, confirmar) | Por mês | Por ano | Implantação |
-|---|---|---|---|---|
-| **Red Centro** | 9 centros + 1 hospital 2º nível + Oncológico | Bs 11.550 | **Bs 138.600** (~US$ 19.900) | Bs 35.000 (8 centros novos + hospital) |
-| **Município de Santa Cruz** | ~50 centros + 5 hospitais 2º + 1 laboratório | Bs 47.250 | **Bs 567.000** (~US$ 81.500) | ~Bs 200.000 |
-| **Bolívia** | ~3.000 estabelecimentos de 1º nível | ~Bs 2,1 milhões | **~Bs 25 milhões** (~US$ 3,6 mi) | — |
-
-- **Custo por toma na Red Centro:** Bs 138.600 ÷ ~4.800 tomas/ano ≈ **Bs 29 por toma**. É quase o mesmo que a taxa de uma toma sem SUS (Bs 30), um argumento fácil de entender.
-- **Comparação:** o registro da Austrália custa ≈ US$ 1,1 por habitante por ano. O SIVEC PAP nacional sairia por ≈ US$ 0,29 por habitante por ano, e faz mais: consulta, D1 e circuito do laboratório.
-- **Forma de contratação na Bolívia:**
-  - Red Centro, no 1º ano (~Bs 174 mil com a implantação): **ANPE** (Bs 50 mil a 1 milhão).
-  - Um contrato-teste abaixo de Bs 50 mil pode ser **contratação menor**.
-  - O município inteiro fica perto do limite da ANPE. Acima disso, **licitação pública**.
+**Primeiro ano (mensalidades + implantação): US$ 24.462 (Bs 170.255,52).** Contratação por ANPE (entre Bs 50 mil e 1 milhão).
 
 ## 4. SIVEC geral (completo) — referência
 
