@@ -992,15 +992,15 @@ body:not(.cobroOn) .cobroCampo { display: none !important; }
 #entradaLoader { position:fixed; inset:0; z-index:5000; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:26px;
   background:radial-gradient(ellipse at 50% 35%, #4a1229 0%, #1c0a13 60%, #0e0509 100%); color:#fbf1f5; opacity:1; transition:opacity .35s ease; }
 #entradaLoader.fuera { opacity:0; pointer-events:none; }
-#entradaLoader .eBolas { display:flex; gap:16px; align-items:flex-end; height:70px; }
-#entradaLoader .eBola { position:relative; width:22px; height:70px; }
-#entradaLoader .eBola i { position:absolute; left:0; bottom:10px; width:22px; height:22px; border-radius:50%; background:var(--c); box-shadow:0 0 18px var(--c); animation:eBote 1.1s cubic-bezier(.45,0,.55,1) infinite; animation-delay:var(--d); }
-#entradaLoader .eBola b { position:absolute; left:2px; bottom:0; width:18px; height:5px; border-radius:50%; background:rgba(0,0,0,.45); animation:eSombra 1.1s cubic-bezier(.45,0,.55,1) infinite; animation-delay:var(--d); }
-@keyframes eBote { 0%, 70%, 100% { transform:translateY(0) scale(1, 1); } 10% { transform:translateY(0) scale(1.15, .85); } 40% { transform:translateY(-38px) scale(.95, 1.05); } }
-@keyframes eSombra { 0%, 70%, 100% { transform:scale(1); opacity:.6; } 40% { transform:scale(.45); opacity:.25; } }
+#entradaLoader .eInf { position:relative; width:300px; max-width:86vw; aspect-ratio:2/1; transition:transform .25s ease-out; cursor:pointer; touch-action:manipulation; }
+#entradaLoader .eInf svg, #entradaLoader .eInf canvas { position:absolute; inset:0; width:100%; height:100%; }
+#entradaLoader .eInf svg path { fill:none; stroke:rgba(241,167,195,.13); stroke-width:1.6; }
+#entradaLoader .eTxt { transition:opacity .25s; }
+#entradaLoader .ePaso { font:500 13px/1.4 -apple-system, "Segoe UI", Arial, sans-serif; color:#f1a7c3; min-height:18px; transition:opacity .3s; }
+#entradaLoader .eTip { font:400 12px -apple-system, "Segoe UI", Arial, sans-serif; color:rgba(255,255,255,.35); margin-top:-14px; }
 #entradaLoader .eTxt { font:700 22px/1.3 -apple-system, "Segoe UI", Arial, sans-serif; letter-spacing:.01em; text-align:center; }
 #entradaLoader .eSub { font:500 14px/1.4 -apple-system, "Segoe UI", Arial, sans-serif; color:#d9b3c3; letter-spacing:.18em; text-transform:uppercase; }
-@media (prefers-reduced-motion: reduce) { #entradaLoader .eBola i, #entradaLoader .eBola b { animation:none; } }
+@media (prefers-reduced-motion: reduce) { #entradaLoader .eInf { transition:none; } }
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#7d2a4c">
@@ -2176,19 +2176,65 @@ function accesoDePerfil(p) {
   return c && c.tipo && c.tipo !== 'primer_nivel' ? 'hospital' : 'centro';
 }
 
-// Pantalla de carga al entrar a un perfil (bolitas que saltan en onda); se va cuando el panel ya está listo
+// Pantalla de carga al entrar a un perfil: bolitas que giran en ∞ dejando estela.
+// Interactiva: el ∞ se inclina hacia el dedo/ratón y un toque las acelera.
+let entradaRaf = 0;
 function entradaMostrar(texto) {
   let ov = document.getElementById('entradaLoader');
   if (!ov) { ov = document.createElement('div'); ov.id = 'entradaLoader'; ov.setAttribute('role', 'status'); document.body.appendChild(ov); }
-  const bolas = ['#f1a7c3', '#e25b8f', '#9c3a5f', '#b58bff'].map((c, i) => `<span class="eBola" style="--c:${c};--d:${i * 0.12}s"><i></i><b></b></span>`).join('');
-  ov.innerHTML = `<div class="eBolas">${bolas}</div><div class="eTxt">${esc(texto)}</div><div class="eSub">SIVEC · preparando tu panel</div>`;
+  // Lemniscata de Gerono: x = sin t, y = sin t · cos t
+  const guia = Array.from({ length: 121 }, (_, k) => { const t = k / 120 * Math.PI * 2; return `${k ? 'L' : 'M'}${(150 + 120 * Math.sin(t)).toFixed(1)} ${(75 + 110 * Math.sin(t) * Math.cos(t)).toFixed(1)}`; }).join(' ');
+  ov.innerHTML = `<div class="eInf" title="Tocá para acelerar"><svg viewBox="0 0 300 150" aria-hidden="true"><path d="${guia}"/></svg><canvas></canvas></div>
+    <div class="eTxt">${esc(texto)}</div><div class="ePaso">Verificando tu acceso…</div><div class="eSub">SIVEC · preparando tu panel</div><div class="eTip">tocá el ∞</div>`;
   ov.classList.remove('fuera'); ov.dataset.desde = Date.now();
+  cancelAnimationFrame(entradaRaf);
+  const caja = ov.querySelector('.eInf'), cv = ov.querySelector('canvas'), ctx = cv.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const medir = () => { const r = caja.getBoundingClientRect(); cv.width = r.width * dpr; cv.height = r.height * dpr; };
+  medir();
+  const colores = ['#f1a7c3', '#e25b8f', '#b58bff', '#9c3a5f', '#ffd1e3'];
+  const quieto = typeof pnReduce === 'function' ? pnReduce() : matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let t = 0, vel = 1, ult = performance.now(), pulso = 0;
+  const punto = (u) => ({ x: cv.width / 2 + cv.width * 0.4 * Math.sin(u), y: cv.height / 2 + cv.height * 0.73 * Math.sin(u) * Math.cos(u) });
+  const cuadro = (ahora) => {
+    if (!document.body.contains(cv)) return;
+    const dt = Math.min(ahora - ult, 50) / 1000; ult = ahora;
+    vel += (1 - vel) * Math.min(dt * 1.6, 1); pulso = Math.max(0, pulso - dt * 2);
+    if (!quieto) t += dt * 2.6 * vel;
+    ctx.globalCompositeOperation = 'destination-out'; ctx.fillStyle = `rgba(0,0,0,${quieto ? 1 : 0.22})`; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.globalCompositeOperation = 'source-over';
+    colores.forEach((c, i) => {
+      const p = punto(t - i * 0.62), r = (6.5 + (colores.length - i) * 0.7 + pulso * 4) * dpr;
+      const g = ctx.createRadialGradient(p.x, p.y, r * 0.6, p.x, p.y, r * 2.2);
+      g.addColorStop(0, c + '66'); g.addColorStop(1, c + '00');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, r * 2.2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = c; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
+    });
+    entradaRaf = requestAnimationFrame(cuadro);
+  };
+  entradaRaf = requestAnimationFrame(cuadro);
+  const inclinar = (x, y) => {
+    if (quieto) return;
+    const dx = (x / innerWidth - 0.5) * 2, dy = (y / innerHeight - 0.5) * 2;
+    caja.style.transform = `perspective(600px) rotateY(${dx * 22}deg) rotateX(${-dy * 22}deg) translate(${dx * 10}px, ${dy * 8}px)`;
+  };
+  ov.onpointermove = e => inclinar(e.clientX, e.clientY);
+  ov.onpointerleave = () => { caja.style.transform = ''; };
+  caja.onpointerdown = () => { vel = 3.4; pulso = 1; if (navigator.vibrate) try { navigator.vibrate(12); } catch (_) {} };
+  window.addEventListener('resize', medir, { once: true });
+  // Mensajes de avance mientras se carga el perfil
+  const pasos = ['Verificando tu acceso…', 'Cargando tu establecimiento…', 'Abriendo tus pacientes…', 'Casi listo…'];
+  let k = 0; const el = ov.querySelector('.ePaso');
+  clearInterval(ov._pasos);
+  ov._pasos = setInterval(() => { if (++k >= pasos.length) return clearInterval(ov._pasos); el.style.opacity = 0; setTimeout(() => { el.textContent = pasos[k]; el.style.opacity = 1; }, 300); }, 650);
 }
 async function entradaOcultar(minMs) {
   const ov = document.getElementById('entradaLoader'); if (!ov) return;
-  const falta = (minMs || 900) - (Date.now() - Number(ov.dataset.desde || 0));
+  const falta = (minMs ?? 1600) - (Date.now() - Number(ov.dataset.desde || 0));
   if (falta > 0) await new Promise(r => setTimeout(r, falta));
-  ov.classList.add('fuera'); setTimeout(() => ov.remove(), 400);
+  clearInterval(ov._pasos);
+  const el = ov.querySelector('.ePaso'); if (el && minMs) el.textContent = '¡Listo!';
+  ov.classList.add('fuera'); setTimeout(() => { cancelAnimationFrame(entradaRaf); ov.remove(); }, 400);
 }
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -2212,7 +2258,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   document.getElementById('loginOverlay').style.display = 'none';
   document.getElementById('logoutBtn').style.display = 'inline-block';
   await cargarPerfil();
-  entradaOcultar(900);
+  entradaOcultar(1600);
   const real = accesoDePerfil(perfil);
   try { localStorage.setItem('sivec_login_' + (real || lgAcceso), email); } catch (_) {}
   if (real && lgAcceso && real !== lgAcceso) showToast(`Tu usuario es de <b>${ACCESOS[real]}</b>: se abrió tu panel.`, 'ok');
@@ -7642,7 +7688,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.5.0 · 27/09/2026';
+const SIVEC_VERSION = '1.5.1 · 27/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;

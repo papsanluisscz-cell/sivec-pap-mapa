@@ -890,3 +890,4 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - Al iniciar sesión aparece una pantalla con cuatro bolitas que rebotan (colores del SIVEC) y el texto "Entrando como Centro de salud / Hospital / Red / Administración".
 - Queda visible al menos 0,9 s y se desvanece al abrir el panel; si la contraseña falla, se quita al instante.
 - Respeta "reducir movimiento" del sistema (sin rebote). Idea tomada del cargador de renderforest.
+- v1.5.1: las bolitas ahora giran en forma de infinito (∞) dejando estela de color. Interactivo: el ∞ se inclina hacia el ratón o el dedo, y al tocarlo las bolitas aceleran (y el celular vibra un toque). Mensajes de avance: "Verificando tu acceso… → Cargando tu establecimiento… → Abriendo tus pacientes… → Casi listo…". Dura al menos 1,6 s.
