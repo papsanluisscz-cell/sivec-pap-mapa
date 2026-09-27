@@ -914,3 +914,7 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - Al tocar 💬 el sistema saca solo la captura de la pantalla donde estaba la persona (html2canvas-pro, sin el botón ni la ventana).
 - Para abrir una consulta la captura es obligatoria: se puede cambiar (📸 capturar pantalla en computadora, 📎 elegir del celular, pegar con Ctrl+V, arrastrar), pero el botón Enviar queda bloqueado sin imagen.
 - En el chat, 📎 opcional para los dos lados (el equipo también manda capturas). Imágenes en Supabase Storage privado (bucket sivec-soporte), enlaces que vencen en 1 hora.
+
+## 27/09/2026 · Presentación: slide "Derivar" con los Formularios Nº 1 y Nº 2 (v1.6.2)
+- El slide 22 ahora muestra la referencia Nº 1 y la contrarreferencia Nº 2 del SIVEC (datos de prueba) en lugar de la hoja de la paciente.
+- Correcciones en los formularios: talla en metros ("1.58 m"), próximo control con fecha DD/MM/AAAA, "Red: —" cuando el establecimiento no tiene red (Oncológico).

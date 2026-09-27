@@ -3459,7 +3459,7 @@ function derContrarrefImprimir(p, d) {
     <div class="box row">${c.mapa ? `<div>${cuelloSVG(c.mapa, 170)}</div>` : ''}<div style="flex:1"><h3>Colposcopia</h3>${esc(derResumenColpo(c)) || '—'}</div></div>
     <div class="box"><h3>Biopsia</h3>${d.biopsia_tomada ? (d.biopsia_resultado ? '<b>' + esc(d.biopsia_resultado) + '</b>' : 'Tomada · resultado pendiente (llega por el SIVEC)') : 'No se tomó'}</div>
     <div class="box"><h3>Tratamiento</h3>${esc(d.tratamiento || 'Ninguno')}</div>
-    <div class="box"><h3>Indicaciones para el centro y la paciente</h3>${esc(d.contrarreferencia || '—')}${d.proximo_control ? '<br><b>Próximo control:</b> ' + esc(d.proximo_control) : ''}</div>
+    <div class="box"><h3>Indicaciones para el centro y la paciente</h3>${esc(d.contrarreferencia || '—')}${d.proximo_control ? '<br><b>Próximo control:</b> ' + esc(fechaOTexto(d.proximo_control)) : ''}</div>
     <div class="firma">${esc(d.atendido_por || '')}<br>Firma y sello</div>`;
   imprimirEnFrame('Contrarreferencia — ' + (p.nombre || ''), css, body);
 }
@@ -6397,7 +6397,7 @@ function fichaRecorrido(t, derivs, lab, ext) {
     if (d.estado === 'no_asistio') add(d.fecha_contrarreferencia, 7, 'alto', '✗ No asistió a la colposcopia', dest, ['<span class="fxWarn">Buscarla y volver a citar</span>']);
     if (d.fecha_atencion) add(d.fecha_atencion, 7, trat && d.tratamiento ? 'trat' : 'colpo', trat && d.tratamiento ? '💊 Tratamiento realizado: ' + esc(d.tratamiento) : 'Colposcopia', dest + (d.atendido_por ? ' · ' + d.atendido_por : ''), [esc(derResumenColpo(d.colposcopia)), d.biopsia_tomada && !d.biopsia_resultado ? 'Biopsia tomada · resultado pendiente' : '', d.tratamiento && !trat ? '💊 Tratamiento: ' + esc(d.tratamiento) : '']);
     if (d.biopsia_resultado) add(d.fecha_biopsia_resultado || d.fecha_atencion, 8, /^Negativo/.test(d.biopsia_resultado) ? 'neg' : 'alto', '🧫 Biopsia: ' + esc(d.biopsia_resultado), dest, []);
-    if (d.estado === 'contrarreferida') add(d.fecha_contrarreferencia, 9, 'trat', '↩️ Contrarreferencia al centro', dest, [d.tratamiento ? '💊 Tratamiento: ' + esc(d.tratamiento) : '', d.proximo_control ? '📅 Próximo control: ' + esc(d.proximo_control) : '', d.contrarreferencia ? '<span class="fxMut">' + esc(d.contrarreferencia) + '</span>' : '']);
+    if (d.estado === 'contrarreferida') add(d.fecha_contrarreferencia, 9, 'trat', '↩️ Contrarreferencia al centro', dest, [d.tratamiento ? '💊 Tratamiento: ' + esc(d.tratamiento) : '', d.proximo_control ? '📅 Próximo control: ' + esc(fechaOTexto(d.proximo_control)) : '', d.contrarreferencia ? '<span class="fxMut">' + esc(d.contrarreferencia) + '</span>' : '']);
   });
   return ev;
 }
@@ -7471,9 +7471,11 @@ function cie10De(texto) {
   if (/VPH\+|VPH positiv/i.test(t)) return 'B97.7 · Papilomavirus como causa de enfermedad';
   return '';
 }
+// Fecha AAAA-MM-DD → DD/MM/AAAA; si es texto libre ("6 meses"), queda igual
+function fechaOTexto(v) { return /^\d{4}-\d{2}-\d{2}/.test(String(v || '')) ? fmtFecha(String(v).slice(0, 10)) : String(v || ''); }
 function formRefCtx(org) {
   const c = centros.find(x => String(x.id) === String(org)) || {};
-  return `<div class="ctx"><span>SEDES: <b>Santa Cruz</b></span><span>Red: <b>${esc(redNombre(c.red_id) || 'Centro')}</b></span><span>Municipio: <b>Santa Cruz</b></span><span>Establecimiento: <b>${esc(c.nombre || centroNombre(org))}</b></span><span>SUS <span class="bx x"></span></span></div>`;
+  return `<div class="ctx"><span>SEDES: <b>Santa Cruz</b></span><span>Red: <b>${esc(redNombre(c.red_id) || '—')}</b></span><span>Municipio: <b>Santa Cruz</b></span><span>Establecimiento: <b>${esc(c.nombre || centroNombre(org))}</b></span><span>SUS <span class="bx x"></span></span></div>`;
 }
 function formRefPaciente(p) {
   return `<div class="sec"><div class="secT">Datos de la paciente</div><div class="grid" style="grid-template-columns:2.2fr 1fr .7fr .8fr">
@@ -7510,7 +7512,7 @@ function formReferenciaDoc(p, d) {
       ${fpCell('Motivo de la referencia', esc([d.motivo, d.indicacion].filter(Boolean).join(' · ')) + (d.prioridad === 'urgente' ? ' <span class="pill">URGENTE</span>' : ''), 'nr')}
       ${fpCell('Resumen de la anamnesis', esc([p.fecha_toma ? 'Toma de PAP el ' + fmtFecha(p.fecha_toma) : '', d.notas || ''].filter(Boolean).join(' · ')) || lineas(1), 'n nr')}
     </div>
-    <div class="vit" style="margin-top:8px;grid-template-columns:repeat(6,1fr)">${[['PA', cl.pa], ['FC', cl.fc], ['FR', cl.fr], ['T°', cl.t], ['Peso', cl.peso ? cl.peso + ' kg' : ''], ['Talla', cl.talla ? cl.talla + ' cm' : '']].map(([k, v]) => `<div><span class="k">${k}</span><span class="v">${esc(v || '') || '&nbsp;'}</span></div>`).join('')}</div>
+    <div class="vit" style="margin-top:8px;grid-template-columns:repeat(6,1fr)">${[['PA', cl.pa], ['FC', cl.fc], ['FR', cl.fr], ['T°', cl.t], ['Peso', cl.peso ? cl.peso + ' kg' : ''], ['Talla', cl.talla ? cl.talla + (Number(String(cl.talla).replace(',', '.')) < 3 ? ' m' : ' cm') : '']].map(([k, v]) => `<div><span class="k">${k}</span><span class="v">${esc(v || '') || '&nbsp;'}</span></div>`).join('')}</div>
     <div class="grid" style="grid-template-columns:1fr">
       ${fpCell('Examen físico y ginecológico', cl.examen ? esc(cl.examen) : lineas(2), 'n nr')}
       ${fpCell('Exámenes complementarios', p.antecedentes && !p.resultado_pap ? esc('PAP/VPH: ' + p.antecedentes) : esc(['PAP: ' + (p.resultado_pap || bet || 'pendiente'), vph, p.fecha_informe ? 'informado el ' + fmtFecha(String(p.fecha_informe).slice(0, 10)) + (p.informado_por ? ' por ' + p.informado_por : '') : ''].filter(Boolean).join(' · ')), 'n nr')}
@@ -7544,7 +7546,7 @@ function formContrarrefDoc(p, d) {
       ${fpCell('Tratamiento realizado', esc(d.tratamiento || 'Ninguno'), 'nr')}
       ${fpCell('Resultado de la biopsia', d.biopsia_tomada ? esc(d.biopsia_resultado || 'Pendiente: llega por el SIVEC') : 'No se tomó', 'nr nb')}</div></div>
     <div class="sec"><div class="secT">5. Recomendaciones para el establecimiento de origen</div><div class="grid" style="grid-template-columns:1fr">
-      ${fpCell('Indicaciones', esc(d.contrarreferencia || ''), 'n nr')}${fpCell('Próximo control', esc(d.proximo_control || ''), 'nr nb')}</div></div>
+      ${fpCell('Indicaciones', esc(d.contrarreferencia || ''), 'n nr')}${fpCell('Próximo control', esc(fechaOTexto(d.proximo_control)), 'nr nb')}</div></div>
     <div class="firmas" style="grid-template-columns:1fr 1fr;margin-top:22px;margin-bottom:26px"><div><b>${esc(d.atendido_por || '&nbsp;')}</b>Nombre, firma y sello de quien contrarrefiere</div><div><b>&nbsp;</b>Recepción en el establecimiento de origen (fecha y firma)</div></div>
     ${fpFoot('Contrarreferencia de colposcopia')}</section>`;
   return formRefDocHTML('Formulario de Contrarreferencia — ' + (p.nombre || ''), body);
@@ -7802,7 +7804,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.6.1 · 27/09/2026';
+const SIVEC_VERSION = '1.6.2 · 27/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
