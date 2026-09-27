@@ -1256,6 +1256,34 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
 #pfOverlay .pfSi { border: 0; background: var(--teal-700); color: #fff; border-radius: 12px; padding: 12px; font-weight: 800; font-size: 15px; cursor: pointer; }
 #pfOverlay .pfNo { border: 0; background: none; color: var(--ink-soft); padding: 6px; cursor: pointer; }
 #pfOverlay .pfPie { display: flex; justify-content: space-around; gap: 6px; flex-wrap: wrap; font-size: 11.5px; color: var(--ink-soft); border-top: 1px solid var(--line); padding: 10px 12px; }
+#segPanel { position: fixed; inset: 0; z-index: 3300; background: rgba(28,10,19,.72); backdrop-filter: blur(3px); overflow: auto; padding: 24px 16px; }
+#segPanel .segCard { max-width: 1180px; margin: 0 auto; background: #1c0a13; color: #fbf1f5; border-radius: 24px; padding: 28px; box-shadow: 0 30px 90px rgba(0,0,0,.5); animation: fmEntra .26s cubic-bezier(.2,.8,.2,1); }
+#segPanel .segHead { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 20px; }
+#segPanel .segHead small { color: #f1a7c3; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; font-size: 12px; }
+#segPanel .segHead h2 { margin: 6px 0; font-size: 30px; color: #fbf1f5; } #segPanel .segHead p { margin: 0; color: #e8cdd8; }
+#segPanel .segX { margin-left: auto; background: rgba(255,255,255,.1); color: #fff; border: 0; border-radius: 12px; width: 40px; height: 40px; font-size: 24px; cursor: pointer; flex: none; }
+#segPanel .segGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 900px) { #segPanel .segGrid { grid-template-columns: 1fr 1fr; } } @media (max-width: 600px) { #segPanel .segGrid { grid-template-columns: 1fr; } }
+#segPanel .segC { position: relative; background: #2a1420; border: 1px solid #5a2a40; border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 8px; }
+#segPanel .segN { position: absolute; top: 14px; right: 16px; font-size: 40px; font-weight: 800; color: rgba(241,167,195,.18); }
+#segPanel .segIc { font-size: 30px; } #segPanel .segC h3 { margin: 0; font-size: 19px; color: #fbf1f5; }
+#segPanel .segQue { margin: 0; font-size: 14px; line-height: 1.45; color: #e8cdd8; } #segPanel .segComo { margin: 0; font-size: 13px; line-height: 1.45; color: #c9a9b8; }
+#segPanel .segComo b { color: #f1a7c3; }
+#segPanel .segEst { margin-top: auto; background: rgba(255,255,255,.05); border-radius: 12px; padding: 10px 12px; font-size: 13px; line-height: 1.45; color: #e8cdd8; }
+#segPanel .ok { color: #86efac; font-weight: 700; } #segPanel .no { color: #fca5a5; font-weight: 700; } #segPanel .gris { color: #b695a6; }
+#segPanel code { background: rgba(255,255,255,.08); border-radius: 6px; padding: 1px 6px; font-size: 12px; color: #f1a7c3; }
+#segPanel .segVer { display: flex; gap: 6px; } #segPanel .segVer input { flex: 1; min-width: 0; border-radius: 8px; border: 1px solid #5a2a40; background: #1c0a13; color: #fff; padding: 7px 9px; font: inherit; text-transform: uppercase; }
+#segPanel .segVer button { border: 0; border-radius: 8px; background: #f1a7c3; color: #4a1229; font-weight: 800; padding: 0 12px; cursor: pointer; }
+#segPanel #segVerRes { margin-top: 6px; }
+#segPanel a { color: #f1a7c3; }
+#segPanel .segAcc { margin-top: 18px; background: #2a1420; border: 1px solid #5a2a40; border-radius: 18px; padding: 18px; }
+#segPanel .segAcc h3 { margin: 0 0 10px; font-size: 18px; }
+#segPanel .segAcc table, #segPanel .segAcc thead, #segPanel .segAcc tr, #segPanel .segAcc th, #segPanel .segAcc td { background: transparent !important; box-shadow: none; }
+#segPanel .segAcc table { width: 100%; border-collapse: collapse; font-size: 13px; } #segPanel .segAcc th { text-align: left; color: #f1a7c3; font-weight: 700; padding: 6px 8px; border-bottom: 1px solid #5a2a40; }
+#segPanel .segAcc td { padding: 7px 8px; border-bottom: 1px solid rgba(90,42,64,.5); color: #e8cdd8; }
+#segPanel .segPie { margin: 16px 0 0; font-size: 12.5px; color: #a8899a; text-align: center; }
+.segBoton { display: flex; align-items: center; gap: 10px; width: 100%; border: 1px solid var(--line); background: linear-gradient(135deg, #2a1420, #4a1229); color: #fbf1f5; border-radius: 14px; padding: 12px 14px; font: inherit; font-weight: 700; cursor: pointer; margin: 0 0 18px; text-align: left; }
+.segBoton small { display: block; font-weight: 400; color: #e8cdd8; font-size: 12px; }
 @media (max-width: 520px) { #spPanel { right: 8px; left: 8px; width: auto; max-width: none; bottom: 80px; height: calc(100vh - 100px); } }
 @media (max-width: 760px) { body::after { content: ''; display: block; height: 80px; } }  /* que el botón 💬 no tape el último botón de la página */
 @media print { #spBtn, #spPanel { display: none !important; } }
@@ -1713,6 +1741,7 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
         <div class="cmdClock"><b id="cmdHora">--:--</b><span id="cmdFecha"></span><span class="cmdOn"><i></i>Sistema en línea</span></div>
       </div>
       <div class="cmdKpis" id="cmdKpis"></div>
+      <button type="button" class="segBoton" onclick="segAbrir()" style="max-width:420px"><span style="font-size:24px">🔒</span><span>Seguridad: los seis candados y el registro de accesos<small>Quién abrió historiales de otros centros, PIN, huellas y códigos</small></span></button>
       <div class="admGrid">
         <section class="admCard">
           <h3>Redes de salud</h3>
@@ -8045,7 +8074,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.11.0 · 27/09/2026';
+const SIVEC_VERSION = '1.12.0 · 27/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -9132,6 +9161,70 @@ function pacFirmar(p, documento) {
   });
 }
 
+// ===== Los seis candados: cómo se protegen los datos, explicado y con el estado real =====
+const SEG_ROL = { centro: 'tus pacientes y los de tu establecimiento', gestor: 'solo números de tu red, sin nombres ni edición', admin: 'la configuración de todo el sistema', oncologico: 'solo las muestras que te enviaron', colposcopia: 'solo las pacientes derivadas a tu hospital' };
+async function segAbrir() {
+  document.getElementById('settingsPanel')?.classList.remove('open');
+  document.getElementById('segPanel')?.remove();
+  const ov = document.createElement('div'); ov.id = 'segPanel'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
+  const cerrar = () => { ov.remove(); document.removeEventListener('keydown', k); };
+  const k = e => { if (e.key === 'Escape') cerrar(); };
+  document.addEventListener('keydown', k);
+  const rol = conRoles() ? perfil.rol : '', lugar = conRoles() ? (rol === 'gestor' ? redNombre(perfil.red_id) : centroNombre(perfil.centro_id)) : '';
+  const https = location.protocol === 'https:';
+  const C = (n, ic, t, que, como, estado) => `<article class="segC"><div class="segN">${n}</div><div class="segIc">${ic}</div><h3>${t}</h3><p class="segQue">${que}</p><p class="segComo"><b>En la práctica:</b> ${como}</p><div class="segEst" data-est="${n}">${estado || ''}</div></article>`;
+  ov.innerHTML = `<div class="segCard">
+    <div class="segHead"><div><small>Protección de datos · SIVEC</small><h2>Los seis candados de los datos de cada mujer</h2><p>La seguridad no depende de una sola cosa: son seis capas. Si una falla, las otras siguen cuidando.</p></div><button type="button" class="segX" aria-label="Cerrar">×</button></div>
+    <div class="segGrid">
+      ${C(1, '👥', 'Cada uno ve solo lo suyo', 'La regla la pone la base de datos, no la pantalla. Aunque alguien tenga la dirección del sistema, sin usuario no recibe ningún dato.', 'el centro ve sus pacientes; el laboratorio, sus muestras; el hospital, sus derivadas; el gestor, solo números.', conRoles() ? `<span class="ok">✔ Tu usuario: ${esc(ROLES[rol] || rol)}${lugar ? ' · ' + esc(lugar) : ''}.</span> Ves ${esc(SEG_ROL[rol] || 'lo de tu función')}.` : '<span class="no">Sin inicio de sesión.</span>')}
+      ${C(2, '🔑', 'PIN personal cifrado', 'Cada profesional firma con 6 números que solo sabe él. Se guarda cifrado (bcrypt): nadie lo puede leer, ni el administrador ni nosotros.', 'cinco intentos fallidos bloquean la firma 15 minutos. Si alguien lo olvida, el administrador lo restablece y la persona crea uno nuevo.', '<span class="gris">Consultando…</span>')}
+      ${C(3, '#️⃣', 'Huella de cada documento', 'Al firmar, el sistema calcula la "huella" (SHA-256) del contenido. Si alguien cambia una sola palabra después, la huella ya no coincide.', 'la referencia, la contrarreferencia, el informe del laboratorio, la colposcopia, la consulta y la firma de la paciente quedan sellados.', `<span class="gris">Ejemplo:</span> <code id="segHuella">…</code>`)}
+      ${C(4, '🔎', 'Código de verificación', 'Cada firma tiene un código de 8 letras y números que sale impreso en el papel.', 'cualquiera puede escribirlo acá y comprobar quién firmó, qué y cuándo, aunque el papel esté fotocopiado.', `<div class="segVer"><input id="segCod" placeholder="Ej: 4F2A-9C1B"><button type="button" id="segVerBtn">Verificar</button></div><div id="segVerRes"></div>`)}
+      ${C(5, '🕒', 'Registro de accesos', 'Cuando un centro abre el historial de una mujer que se atendió en otro centro, queda anotado quién, cuándo y a quién buscó.', 'el administrador revisa este registro y puede pedir explicaciones. Nadie puede borrarlo desde el sistema.', perfil && (perfil.es_admin || rol === 'admin') ? '<span class="gris">Cargando el registro…</span>' : '<span class="gris">Solo el administrador ve este registro.</span>')}
+      ${C(6, '🛡️', 'Copias diarias y conexión cifrada', 'Todos los días se hace una copia de seguridad de la base de datos. Entre la computadora y el servidor todo viaja cifrado (HTTPS).', 'si se daña una computadora o se borra algo por error, se recupera. Nadie en la red del centro puede leer lo que se envía.', `<span class="${https ? 'ok' : 'no'}">${https ? '🔒 Esta conexión está cifrada (HTTPS).' : '⚠ Esta copia se abrió sin HTTPS (solo en pruebas).'}</span> Copias diarias con el plan Pro de la base de datos.`)}
+    </div>
+    <section class="segAcc" id="segAcc" hidden><h3>🕒 Registro de accesos a historiales de otros centros</h3><div id="segAccTabla"></div></section>
+    <p class="segPie">Los datos son de la institución de salud y de sus pacientes. En las presentaciones se usa el «modo presentación», con los datos personales cambiados.</p>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.querySelector('.segX').onclick = cerrar;
+  ov.onclick = e => { if (e.target === ov) cerrar(); };
+  const est = n => ov.querySelector(`[data-est="${n}"]`);
+  // 2) mi PIN
+  if (sb && conRoles()) sb.rpc('sivec_pin_estado').then(r => { est(2).innerHTML = r.error ? (firmaFaltaPaso(r.error) ? '<span class="gris">Se activa con el Paso 30 del SQL.</span>' : '<span class="gris">Sin conexión.</span>') : r.data ? '<span class="ok">✔ Tu PIN de firma está creado.</span>' : '<span class="no">• Todavía no creaste tu PIN</span> (⚙ Configuración → Firma electrónica).'; }).catch(() => {});
+  else est(2).innerHTML = '<span class="gris">Sin inicio de sesión.</span>';
+  // 3) huella de ejemplo
+  firmaHuella({ ejemplo: 'Referencia de prueba', fecha: hoyISO() }).then(h => { ov.querySelector('#segHuella').textContent = h.slice(0, 16) + '…'; }).catch(() => {});
+  // 4) verificar un código
+  ov.querySelector('#segVerBtn').onclick = async () => {
+    const c = ov.querySelector('#segCod').value.trim(), res = ov.querySelector('#segVerRes'); if (!c || !sb) return;
+    const { data, error } = await sb.rpc('sivec_firma_verificar', { p_codigo: c });
+    const f = Array.isArray(data) ? data[0] : data;
+    if (error) { res.innerHTML = `<span class="no">${esc(firmaFaltaPaso(error) ? 'Se activa con el Paso 30 del SQL.' : error.message)}</span>`; return; }
+    if (!f) { res.innerHTML = '<span class="no">✖ No existe ninguna firma con ese código.</span>'; sonido('error'); return; }
+    const t = new Date(f.creado);
+    res.innerHTML = `<span class="ok">✔ Firma válida</span> · ${esc(FIRMA_TIPOS[f.tipo] || f.tipo)} · ${esc(f.firmante_nombre || '')} · ${fmtFecha(t.toISOString().slice(0, 10))}`; sonido('firma');
+  };
+  ov.querySelector('#segCod').onkeydown = e => { if (e.key === 'Enter') ov.querySelector('#segVerBtn').click(); };
+  // 5) registro de accesos (administrador)
+  if (sb && perfil && (perfil.es_admin || rol === 'admin')) {
+    const [a, u] = await Promise.all([sb.from('historial_accesos').select('*').order('created_at', { ascending: false }).limit(60), sb.from('perfiles_usuario').select('id,nombre_completo,correo')]);
+    if (!document.body.contains(ov)) return;
+    if (a.error) { est(5).innerHTML = `<span class="gris">${/historial_accesos|does not exist|PGRST205/i.test(a.error.message + a.error.code) ? 'Se activa con el paso del SQL de la línea de tiempo.' : esc(a.error.message)}</span>`; return; }
+    const nom = id => { const p = (u.data || []).find(x => x.id === id); return p ? (p.nombre_completo || p.correo) : '—'; };
+    const L = a.data || [], hoy = L.filter(x => String(x.created_at).slice(0, 10) === hoyISO()).length;
+    est(5).innerHTML = `<span class="ok">✔ ${plural(L.length, 'acceso registrado', 'accesos registrados')}</span>${hoy ? ` · ${hoy} hoy` : ''}. <a href="#segAcc">Ver el registro ↓</a>`;
+    const box = ov.querySelector('#segAcc'); box.hidden = false;
+    ov.querySelector('#segAccTabla').innerHTML = L.length ? `<table><thead><tr><th>Fecha y hora</th><th>Quién</th><th>Desde</th><th>Buscó</th><th>Encontró</th></tr></thead><tbody>${L.map(x => { const t = new Date(x.created_at); return `<tr><td>${fmtFecha(t.toISOString().slice(0, 10))} ${t.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })}</td><td>${esc(nom(x.usuario))}</td><td>${esc(centroNombre(x.centro_id) || '—')}</td><td>${esc(x.nombre || '')}${x.carnet ? ' · CI ' + esc(x.carnet) : ''}</td><td>${plural(x.encontrados || 0, 'toma')} en otros centros</td></tr>`; }).join('')}</tbody></table>` : '<p class="gris">Todavía no hay accesos a historiales de otros centros.</p>';
+  }
+}
+
+// Botón en ⚙ Configuración y en la administración
+(function segBotones() {
+  const panel = document.getElementById('settingsPanel'); if (!panel) return;
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'segBoton'; b.innerHTML = '<span style="font-size:24px">🔒</span><span>Los seis candados<small>Cómo se protegen los datos de cada mujer</small></span>'; b.onclick = segAbrir;
+  const ancla = document.getElementById('firmaConfig') || (panel.querySelector('h2') || {}).nextElementSibling || panel.firstChild; ancla.before(b);
+})();
 // Términos de uso y política de privacidad: cada persona los acepta una vez por versión (Paso 26 del SQL)
 async function terminosVerificar() {
   if (!sb || !conRoles() || modoPresentacion || modoDemo) return;

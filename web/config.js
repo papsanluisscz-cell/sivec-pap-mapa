@@ -5,5 +5,6 @@ window.SIVEC_CONFIG = {
   url: 'https://cvvqwwijnygqnhouqgkx.supabase.co',
   key: 'PEGAR_AQUI_LA_CLAVE_ANON_PUBLIC',
   // Soporte: botón 💬 abajo a la derecha y ⚙ Configuración. WhatsApp con código de país, sin +; teléfono para llamar (ej. +59170000000)
-  soporte: { whatsapp: '591XXXXXXXX', telefono: '', correo: 'soporte@sivec.bo', horario: 'Lunes a sábado, de 8:00 a 20:00' }
+  // FICTICIO hasta comprar el celular de soporte: cambiar antes de usar con pacientes reales
+  soporte: { whatsapp: '59170000000', telefono: '+59170000000', correo: 'soporte@sivec.bo', horario: 'Lunes a sábado, de 8:00 a 20:00' }
 };
