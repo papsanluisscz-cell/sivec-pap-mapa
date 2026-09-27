@@ -3155,9 +3155,9 @@ function derDetalle(p, d, recien) {
       ${fila('Cobertura', !COBRO_ACTIVO ? '' : d.cobertura === 'Sin SUS' ? 'Sin SUS' + (d.monto ? ' · Bs ' + esc(d.monto) + ' en la caja del hospital' : '') + (d.pago_recibo ? ' · pagado (' + esc(d.pago_recibo) + ')' : '') : d.cobertura ? 'SUS' : '')}
       ${vuelta ? fila('Atendida', (d.fecha_atencion ? fmtFecha(d.fecha_atencion) : '') + (d.atendido_por ? ' · ' + esc(d.atendido_por) : '')) + fila('Colposcopia', esc(derResumenColpo(d.colposcopia)) + (d.colposcopia && d.colposcopia.mapa ? '<div style="margin-top:6px">' + cuelloSVG(d.colposcopia.mapa, 150) + '</div>' : '')) + fila('Biopsia', d.biopsia_tomada ? (d.biopsia_resultado ? '<b style="color:#991b1b">' + esc(d.biopsia_resultado) + '</b>' : 'tomada · resultado pendiente') : (d.colposcopia ? 'no se tomó' : '')) + fila('Tratamiento', esc(d.tratamiento || '')) + fila('Próximo control', esc(d.proximo_control || '')) + fila('Indicaciones', esc(d.contrarreferencia || '')) : ''}</div>
     <div class="acts">${derEsNueva(d) ? '<button type="button" class="primary" data-dd="visto">✓ Visto</button>' : ''}
-      <button type="button" class="rowBtn" data-dd="boleta">🖨 Boleta de referencia</button>
+      <button type="button" class="rowBtn" data-dd="boleta">🖨 Formulario de referencia (Nº 1)</button>
       <button type="button" class="rowBtn" data-dd="hoja">🖨 Hoja para la paciente (letra grande)</button>
-      ${vuelta && d.colposcopia ? '<button type="button" class="rowBtn" data-dd="contra">🖨 Imprimir contrarreferencia</button>' : ''}
+      ${vuelta && d.colposcopia ? '<button type="button" class="rowBtn" data-dd="contra">🖨 Formulario de contrarreferencia (Nº 2)</button>' : ''}
       ${['enviada', 'citada'].includes(d.estado) ? '<button type="button" class="rowBtn" data-dd="cancelar">Cancelar derivación</button>' : ''}
       ${['no_asistio', 'contrarreferida'].includes(d.estado) ? '<button type="button" class="rowBtn" data-dd="nueva">🩺 Derivar de nuevo</button>' : ''}
       <button type="button" class="rowBtn" data-dd="cerrar" style="margin-left:auto">Cerrar</button></div>
@@ -3166,9 +3166,9 @@ function derDetalle(p, d, recien) {
     const a = e.target.closest('[data-dd]'); if (!a) return;
     const k = a.dataset.dd;
     if (k === 'cerrar') return derCerrar();
-    if (k === 'boleta') return derBoleta(p, d);
+    if (k === 'boleta') return imprimirDocHTML(formReferenciaDoc(p, d));
     if (k === 'hoja') return derHojaPaciente(p, d);
-    if (k === 'contra') return derContrarrefImprimir(p, d);
+    if (k === 'contra') return imprimirDocHTML(formContrarrefDoc(p, d));
     if (k === 'nueva') return derFormulario(p);
     if (k === 'visto') {
       const { error } = await sb.rpc('sivec_der_visto', { p_ids: [d.id] });
@@ -3321,7 +3321,7 @@ function colDetalle(d) {
       <div class="labSec">Contrarreferencia · indicaciones para el centro</div><textarea id="colContra" rows="3" placeholder="Qué hacer en el centro…">${esc(f.contrarref)}</textarea>
       <button type="button" class="rowBtn" data-ca="texto" style="margin-top:6px">✍ Armar texto con lo marcado</button>
     </div></div>
-    <div class="acts" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button type="button" class="labFirmar" data-ca="enviar">📤 Enviar contrarreferencia al centro</button><button type="button" class="rowBtn" data-ca="guardar" style="margin-top:14px">Guardar sin enviar</button>${yaAtendida ? '<button type="button" class="rowBtn" data-ca="imprimir" style="margin-top:14px">🖨 Imprimir contrarreferencia</button>' : ''}</div>
+    <div class="acts" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button type="button" class="labFirmar" data-ca="enviar">📤 Enviar contrarreferencia al centro</button><button type="button" class="rowBtn" data-ca="guardar" style="margin-top:14px">Guardar sin enviar</button>${yaAtendida ? '<button type="button" class="rowBtn" data-ca="imprimir" style="margin-top:14px">🖨 Formulario de contrarreferencia (Nº 2)</button>' : ''}<button type="button" class="rowBtn" data-ca="refimp" style="margin-top:14px">🖨 Formulario de referencia (Nº 1)</button></div>
     <div class="labNota">La colposcopia queda también en la ficha de la paciente, y el centro la recibe como <b>contrarreferencia nueva</b>. El seguimiento PAP+ del centro avanza solo (colposcopia agendada → realizada → tratamiento).</div></div>`;
   box.onclick = async e => {
     const hr = e.target.closest('#colCuello .cHr'), ct = e.target.closest('#colCuello [data-ct]');
@@ -3355,7 +3355,8 @@ function colDetalle(d) {
       const t = [derResumenColpo(colColpoDe(f)) + '.', f.biopsia ? 'Se tomó biopsia; el resultado llegará por el SIVEC.' : '', f.tratamiento ? 'Tratamiento: ' + f.tratamiento + '.' : '', f.proximo ? 'Próximo control: ' + f.proximo + '.' : ''].filter(Boolean).join(' ');
       f.contrarref = t; document.getElementById('colContra').value = t; return;
     }
-    if (k === 'imprimir') return derContrarrefImprimir(d, d);
+    if (k === 'imprimir') return imprimirDocHTML(formContrarrefDoc(d, d));
+    if (k === 'refimp') return imprimirDocHTML(formReferenciaDoc(d, d));
     if (k === 'cita') {
       const fe = document.getElementById('colCita').value; if (!fe) return alert('Elegí la fecha de la cita.');
       const { error } = await sb.rpc('sivec_colpo_cita', { p_id: d.id, p_fecha: fe });
@@ -7073,7 +7074,7 @@ function fpHead(titulo, sub, derecha, logo) {
   return `<div class="prueba">FORMATO SIVEC · PRUEBA (NO OFICIAL)</div>
   <div class="hd"><div class="logo">${logo || 'Escudo<br>Ministerio de Salud'}</div><h1>${titulo}<small>${sub}</small></h1><div class="hdR">${derecha}</div></div>`;
 }
-function fpFoot(extra) { return `<div class="foot"><span>SIVEC PAP/VPH · C.S. San Luis${extra ? ' · ' + extra : ''}</span><span>Generado ${fmtFecha(hoyISO())} · Hoja 1 de 1</span></div>`; }
+function fpFoot(extra) { const lugar = (typeof miCentro === 'function' && miCentro() && miCentro().nombre) || 'C.S. San Luis'; return `<div class="foot"><span>SIVEC PAP/VPH · ${esc(lugar)}${extra ? ' · ' + extra : ''}</span><span>Generado ${fmtFecha(hoyISO())} · Hoja 1 de 1</span></div>`; }
 
 function croquisHTML(lat, lng) {
   const z = 17, n = Math.pow(2, z) * 256, W = 470, H = 210;
@@ -7195,6 +7196,98 @@ function formPropioHTML(tipo, ctx) {
     </table>
     <div class="firmas" style="grid-template-columns:1fr 1fr;margin-top:40px"><div><b>${doctora || '&nbsp;'}</b>Nombre y firma${espTxt ? ' · ' + espTxt : ''}</div><div><b>&nbsp;</b>Sello del establecimiento</div></div>
     <p class="muted" style="font-size:11px;margin-top:16px">Formato propio de prueba: la hoja 1 (datos administrativos) se sigue imprimiendo en el formato oficial.</p>${fpFoot()}</section>`;
+}
+// ===== Formularios de Referencia (Nº 1) y Contrarreferencia (Nº 2) · Norma Nacional de Referencia y Retorno (RM 1036/2008) =====
+// Mismo diseño que el D1. Los campos siguen la norma; los datos salen de la derivación. CIE-10 sugerido: lo confirma el médico.
+function cie10De(texto) {
+  const t = String(texto || '');
+  if (/invasor/i.test(t)) return 'C53.9 · Tumor maligno del cuello del útero';
+  if (/in situ|AIS/i.test(t)) return 'D06.9 · Carcinoma in situ del cuello del útero';
+  if (/CIN 3/i.test(t)) return 'N87.2 · Displasia cervical severa';
+  if (/CIN 2/i.test(t)) return 'N87.1 · Displasia cervical moderada';
+  if (/CIN 1/i.test(t)) return 'N87.0 · Displasia cervical leve';
+  if (/Negativo|cervicitis/i.test(t)) return 'N72 · Enfermedad inflamatoria del cuello uterino';
+  if (/Carcinoma/i.test(t)) return 'C53.9 · Tumor maligno del cuello del útero (presuntivo)';
+  if (/ASC|LSIL|HSIL|AGC|AIS/i.test(t)) return 'R87.6 · Hallazgo citológico anormal del cuello uterino';
+  if (/VPH\+|VPH positiv/i.test(t)) return 'B97.7 · Papilomavirus como causa de enfermedad';
+  return '';
+}
+function formRefCtx(org) {
+  const c = centros.find(x => String(x.id) === String(org)) || {};
+  return `<div class="ctx"><span>SEDES: <b>Santa Cruz</b></span><span>Red: <b>${esc(redNombre(c.red_id) || 'Centro')}</b></span><span>Municipio: <b>Santa Cruz</b></span><span>Establecimiento: <b>${esc(c.nombre || centroNombre(org))}</b></span><span>SUS <span class="bx x"></span></span></div>`;
+}
+function formRefPaciente(p) {
+  return `<div class="sec"><div class="secT">Datos de la paciente</div><div class="grid" style="grid-template-columns:2.2fr 1fr .7fr .8fr">
+    ${fpCell('Nombres y apellidos', esc((p.nombre || '').toUpperCase()))}${fpCell('CI', esc(p.carnet || ''))}${fpCell('Edad', esc(String(edadDe(p.fecha_nacimiento) ?? '')) + ' años')}${fpCell('Sexo', fpChk('F', true) + fpChk('M', false), 'n nr')}
+    ${fpCell('Domicilio', esc(p.direccion || ''), 'n nb', 'grid-column:span 2')}${fpCell('Celular', esc(p.celular || ''), 'n nb')}${fpCell('Nacimiento', fmtFecha(p.fecha_nacimiento) || '', 'n nr nb')}</div></div>`;
+}
+function formReferenciaDoc(p, d) {
+  const org = centros.find(c => String(c.id) === String(d.centro_origen)) || {}, dest = centros.find(c => String(c.id) === String(d.destino_id)) || {};
+  const bet = bethesdaDe(p), vph = p.resultado_vph ? 'VPH ' + p.resultado_vph + (p.vph_genotipo ? ' (genotipo ' + p.vph_genotipo + ')' : '') : '';
+  const dx = [bet && bet !== 'NILM' ? bet : '', p.resultado_vph === 'Positiva' ? 'VPH+' : ''].filter(Boolean).join(' · ') || d.motivo || '';
+  const cie = cie10De(bet && bet !== 'NILM' ? bet : dx);
+  const nivel = c => (TIPOS_CENTRO[c.tipo] || '').split(' · ')[0];
+  const lineas = n => Array.from({ length: n }, () => '<div style="border-bottom:1px dotted var(--hair);height:22px"></div>').join('');
+  const body = `<section class="sheet">${fpHead('FORMULARIO DE REFERENCIA', 'Norma Nacional de Referencia y Retorno · Formulario Nº 1', `<span class="code">Nº 1</span><div class="folio">Referencia <b>${esc(String(d.id || '').slice(0, 8).toUpperCase() || '………')}</b></div>`)}
+    ${formRefCtx(d.centro_origen)}
+    <div class="sec"><div class="secT">1. Establecimiento que refiere <span>Fecha ${fpFecha(d.fecha_derivacion)} · Hora …… : ……</span></div><div class="grid" style="grid-template-columns:2fr 1fr 1fr">
+      ${fpCell('Nombre', esc(org.nombre || centroNombre(d.centro_origen)))}${fpCell('Nivel', esc(nivel(org)))}${fpCell('Teléfono', esc(org.telefono || ''), 'n nr')}
+      ${fpCell('Profesional que refiere', esc(d.derivado_por || ''), 'nb', 'grid-column:span 2')}${fpCell('Servicio', 'Consulta externa', 'n nr nb')}</div></div>
+    <div class="sec"><div class="secT">2. Establecimiento receptor</div><div class="grid" style="grid-template-columns:2fr 1fr 1fr">
+      ${fpCell('Nombre', esc(dest.nombre || centroNombre(d.destino_id)))}${fpCell('Nivel', esc(nivel(dest)))}${fpCell('Servicio', esc(/tratamiento/i.test(d.indicacion || '') ? 'Ginecología' : 'Colposcopia'), 'nr')}
+      ${fpCell('Dirección', esc(dest.direccion || ''), 'n nb', 'grid-column:span 2')}${fpCell('Fecha de cita', d.fecha_cita ? fmtFecha(d.fecha_cita) : '', 'nr nb')}</div></div>
+    ${formRefPaciente(p)}
+    <div class="sec"><div class="secT">3. Datos clínicos</div><div class="grid" style="grid-template-columns:1fr">
+      ${fpCell('Motivo de la referencia', esc([d.motivo, d.indicacion].filter(Boolean).join(' · ')) + (d.prioridad === 'urgente' ? ' <span class="pill">URGENTE</span>' : ''), 'nr')}
+      ${fpCell('Resumen de la anamnesis', esc([p.fecha_toma ? 'Toma de PAP el ' + fmtFecha(p.fecha_toma) : '', p.anticonceptivo_metodo ? 'Método: ' + p.anticonceptivo_metodo : '', d.notas || ''].filter(Boolean).join(' · ')) + lineas(1), 'n nr')}
+    </div>
+    <div class="vit" style="margin-top:8px">${['PA', 'FC', 'FR', 'T°', 'Peso', 'Talla', 'FUM', 'G / P'].map(k => `<div><span class="k">${k}</span><span class="v">&nbsp;</span></div>`).join('')}</div>
+    <div class="grid" style="grid-template-columns:1fr">
+      ${fpCell('Examen físico y ginecológico', lineas(2), 'n nr')}
+      ${fpCell('Exámenes complementarios', p.antecedentes && !p.resultado_pap ? esc('PAP/VPH: ' + p.antecedentes) : esc(['PAP: ' + (p.resultado_pap || bet || 'pendiente'), vph, p.fecha_informe ? 'informado el ' + fmtFecha(String(p.fecha_informe).slice(0, 10)) + (p.informado_por ? ' por ' + p.informado_por : '') : ''].filter(Boolean).join(' · ')), 'n nr')}
+      ${fpCell('Diagnóstico presuntivo', esc(dx) + (cie ? ` <span class="muted" style="font-weight:400">· CIE-10 sugerido: ${esc(cie)}</span>` : ''), 'nr')}
+      ${fpCell('Tratamiento instaurado', lineas(1), 'n nr nb')}</div></div>
+    <div class="sec"><div class="secT">4. Condiciones del traslado</div><div class="grid" style="grid-template-columns:1fr 1fr 1.4fr">
+      ${fpCell('Estado de la paciente', fpChk('Estable', true) + fpChk('Inestable', false), 'n nb')}${fpCell('Prioridad', fpChk('Urgente', d.prioridad === 'urgente') + fpChk('Normal', d.prioridad !== 'urgente'), 'n nb')}${fpCell('Acompañada por', fpChk('Sola', false) + fpChk('Familiar', false) + fpChk('Personal de salud', false), 'n nr nb')}</div></div>
+    <div class="firmas"><div><b>${esc(d.derivado_por || '&nbsp;')}</b>Nombre, firma y sello de quien refiere</div><div><b>…… / …… / …… · …… : ……</b>Llegada al establecimiento receptor</div><div><b>&nbsp;</b>Nombre y firma de quien recibe</div></div>
+    <div class="sec" style="font-size:12px">Referencia justificada: ${fpChk('Sí', false)}${fpChk('No', false)} <span class="muted">(llena el establecimiento receptor)</span></div>
+    ${fpFoot('Referencia a colposcopia')}</section>`;
+  return formRefDocHTML('Formulario de Referencia — ' + (p.nombre || ''), body);
+}
+function formContrarrefDoc(p, d) {
+  const c = d.colposcopia || {}, org = centros.find(x => String(x.id) === String(d.destino_id)) || {}, dest = centros.find(x => String(x.id) === String(d.centro_origen)) || {};
+  const final = [c.impresion ? 'Impresión colposcópica: ' + c.impresion : '', d.biopsia_resultado ? 'Biopsia: ' + d.biopsia_resultado : ''].filter(Boolean).join(' · ');
+  const cie = cie10De(d.biopsia_resultado || '') || cie10De(d.motivo || '');
+  const nivel = x => (TIPOS_CENTRO[x.tipo] || '').split(' · ')[0];
+  const fig = c.mapa ? `<div class="fig">${cuelloSVG(c.mapa, 170)}<div class="cap">Mapa del cuello (horas)</div></div>` : '';
+  const body = `<section class="sheet">${fpHead('FORMULARIO DE CONTRARREFERENCIA', 'Norma Nacional de Referencia y Retorno · Formulario Nº 2', `<span class="code">Nº 2</span><div class="folio">Referencia <b>${esc(String(d.id || '').slice(0, 8).toUpperCase() || '………')}</b></div>`)}
+    ${formRefCtx(d.destino_id)}
+    <div class="sec"><div class="secT">1. Establecimiento que contrarrefiere <span>Atención ${fpFecha(d.fecha_atencion)}</span></div><div class="grid" style="grid-template-columns:2fr 1fr 1fr">
+      ${fpCell('Nombre', esc(org.nombre || centroNombre(d.destino_id)))}${fpCell('Nivel', esc(nivel(org)))}${fpCell('Servicio', 'Colposcopia', 'nr')}
+      ${fpCell('Profesional que atendió', esc(d.atendido_por || ''), 'nb', 'grid-column:span 2')}${fpCell('Teléfono', esc(org.telefono || ''), 'n nr nb')}</div></div>
+    <div class="sec"><div class="secT">2. Establecimiento de destino (origen de la referencia)</div><div class="grid" style="grid-template-columns:2fr 1fr">
+      ${fpCell('Nombre', esc(dest.nombre || centroNombre(d.centro_origen)), 'nb')}${fpCell('Referido el', fmtFecha(d.fecha_derivacion) || '', 'nr nb')}</div></div>
+    ${formRefPaciente(p)}
+    <div class="sec"><div class="secT">3. Diagnósticos</div><div class="grid" style="grid-template-columns:1fr 1fr">
+      ${fpCell('Diagnóstico de referencia', esc(d.motivo || ''))}${fpCell('Diagnóstico final', esc(final || '') + (cie ? ` <span class="muted" style="font-weight:400">· CIE-10 sugerido: ${esc(cie)}</span>` : ''), 'nr')}</div></div>
+    <div class="sec"><div class="secT">4. Procedimientos realizados</div><div class="grid" style="grid-template-columns:1fr"><div class="cell nr">${fig}<span class="k">Colposcopia</span><span class="v n">${esc(derResumenColpo(c)) || '—'}</span>
+      <div style="margin-top:6px">${fpChk('Biopsia', !!d.biopsia_tomada)}${fpChk('Legrado endocervical', c.lec === true)}${fpChk('IVAA positivo', /Positivo|Sospecha/.test(c.ivaa || ''))}${fpChk('Schiller positivo', c.schiller === 'Positivo')}</div><div style="clear:both"></div></div>
+      ${fpCell('Tratamiento realizado', esc(d.tratamiento || 'Ninguno'), 'nr')}
+      ${fpCell('Resultado de la biopsia', d.biopsia_tomada ? esc(d.biopsia_resultado || 'Pendiente: llega por el SIVEC') : 'No se tomó', 'nr nb')}</div></div>
+    <div class="sec"><div class="secT">5. Recomendaciones para el establecimiento de origen</div><div class="grid" style="grid-template-columns:1fr">
+      ${fpCell('Indicaciones', esc(d.contrarreferencia || ''), 'n nr')}${fpCell('Próximo control', esc(d.proximo_control || ''), 'nr nb')}</div></div>
+    <div class="firmas" style="grid-template-columns:1fr 1fr;margin-top:22px;margin-bottom:26px"><div><b>${esc(d.atendido_por || '&nbsp;')}</b>Nombre, firma y sello de quien contrarrefiere</div><div><b>&nbsp;</b>Recepción en el establecimiento de origen (fecha y firma)</div></div>
+    ${fpFoot('Contrarreferencia de colposcopia')}</section>`;
+  return formRefDocHTML('Formulario de Contrarreferencia — ' + (p.nombre || ''), body);
+}
+function formRefDocHTML(titulo, body) {
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${esc(titulo)}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet"><style>${FORM_CSS}</style></head><body>${body}</body></html>`;
+}
+function imprimirDocHTML(html) {
+  const fr = document.getElementById('printFrame'), doc = fr.contentDocument;
+  doc.open(); doc.write(html); doc.close();
+  setTimeout(() => { fr.contentWindow.focus(); fr.contentWindow.print(); }, 400);
 }
 function formPropioDoc(tipo, ctx) {
   return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${FORM_TITULOS[tipo]}</title>
@@ -7440,7 +7533,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.2.0 · 27/09/2026';
+const SIVEC_VERSION = '1.3.0 · 27/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
