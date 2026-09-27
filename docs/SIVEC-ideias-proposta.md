@@ -969,3 +969,7 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 ## 27/09/2026 · Pantalla de espera desactivada por ahora
 - Decisión del autor: la 📺 pantalla de la sala de espera no se usa por ahora (varios hospitales ya tienen su propio sistema de turnos). Se quitó el botón; el código queda guardado para activarlo si algún hospital lo pide. El 📣 Llamar sigue marcando en la cola que la paciente fue llamada.
 - Guía visual paso a paso (12 pasos, datos ficticios) en docs/guias/fila-del-dia/ (PNG + PDF).
+
+## 27/09/2026 · Pendientes anotados
+- Próximo: tabla de accesos y, en el panel del administrador, organizar todos los profesionales y las computadoras (qué equipo, de qué establecimiento, quién lo usa).
+- Pregunta del autor: voz más interactiva → propuesta enviada (avisos por voz en el momento, comandos de voz cortos, resumen del día, voces naturales de Edge; asistente conversacional más adelante).
