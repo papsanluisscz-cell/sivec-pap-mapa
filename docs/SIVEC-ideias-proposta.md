@@ -965,3 +965,7 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - "Para hoy" suma "N pacientes esperando en la cola".
 - Corregido de paso: las pestañas del laboratorio (Recepción/Por leer/Informadas) quedaban sin reaccionar cuando el usuario tenía laboratorio y colposcopia a la vez.
 - Paso 32 del SQL: columnas `funciones` (usuarios) y `consultorios` (establecimientos) y tabla `sivec_turnos` con número automático por día y regla: solo el propio establecimiento.
+
+## 27/09/2026 · Pantalla de espera desactivada por ahora
+- Decisión del autor: la 📺 pantalla de la sala de espera no se usa por ahora (varios hospitales ya tienen su propio sistema de turnos). Se quitó el botón; el código queda guardado para activarlo si algún hospital lo pide. El 📣 Llamar sigue marcando en la cola que la paciente fue llamada.
+- Guía visual paso a paso (12 pasos, datos ficticios) en docs/guias/fila-del-dia/ (PNG + PDF).

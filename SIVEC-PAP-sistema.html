@@ -1757,7 +1757,7 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
 
     <!-- HOY: cola del día (recepción ➜ consultorio), Paso 32 -->
     <div id="hoyView" class="view">
-      <div class="hoyTop"><div><h2>Hoy</h2><p class="hint" id="hoySub"></p></div><label id="hoyConsLbl">Mi consultorio <select id="hoyConsultorio"></select></label><button type="button" id="tvBtn" onclick="tvAbrir()">📺 Pantalla de espera</button></div>
+      <div class="hoyTop"><div><h2>Hoy</h2><p class="hint" id="hoySub"></p></div><label id="hoyConsLbl">Mi consultorio <select id="hoyConsultorio"></select></label></div>
       <div id="hoyCuerpo"></div>
     </div>
 
@@ -8897,6 +8897,7 @@ document.addEventListener('change', e => { if (e.target.id === 'hoyConsultorio')
 function hoyActivar(si) { clearInterval(hoyTimer); hoyTimer = null; if (si) { hoyCargar(); hoyTimer = setInterval(() => { if (!document.hidden && document.getElementById('hoyView').classList.contains('active')) hoyCargar(true); }, 15000); } }
 
 // ---- Pantalla de la sala de espera (TV): número de turno y consultorio, nunca el nombre ----
+// Desactivada por ahora (muchos hospitales ya tienen su propio sistema de turnos): no hay botón que la abra.
 let tvTimer = null, tvUltimo = null;
 async function tvAbrir() {
   let ov = document.getElementById('tvSala'); if (ov) return;
