@@ -2195,3 +2195,65 @@ select case when pg_get_constraintdef((select oid from pg_constraint where conna
 
 ### Deshacer el Paso 31
 Volver a ejecutar el Paso 30 (deja solo los cuatro tipos del comienzo). Si ya hay firmas de consultas o recepciones, antes: `delete from sivec_firmas where tipo in ('consulta', 'recepcion', 'recepcion_contra');`
+
+---
+
+## Paso 32 — Funciones por persona y cola del día (recepción → consultorio)
+
+Para hospitales y centros grandes. Cada usuario puede tener **funciones**: Admisión / recepción, Consultorio de toma (PAP/VPH), Consultorio de colposcopia, Recepción del laboratorio, Lectura del laboratorio, Jefe del establecimiento. Cada persona ve solo sus pantallas (sin funciones marcadas = ve todo, como hasta ahora). La recepción registra la llegada y **envía la paciente a un consultorio**; en el consultorio aparece en **"Pacientes de hoy"**; se la llama (en la pantalla de la sala de espera sale el número de turno, nunca el nombre) y se marca atendida. Los consultorios de cada establecimiento se cargan en Admin → Establecimientos → 🚪.
+
+```sql
+-- PASO 32 · Funciones por usuario, consultorios y cola del día
+alter table perfiles_usuario add column if not exists funciones text[];
+alter table centros_salud add column if not exists consultorios text[];
+
+create table if not exists sivec_turnos (
+  id bigserial primary key,
+  centro_id uuid not null,
+  fecha date not null default ((now() at time zone 'America/La_Paz')::date),
+  numero int,
+  paciente_id uuid,
+  paciente_nombre text,
+  carnet text,
+  servicio text not null check (servicio in ('toma', 'colposcopia', 'consulta')),
+  consultorio text,
+  derivacion_id uuid,
+  estado text not null default 'espera' check (estado in ('espera', 'llamada', 'en_atencion', 'atendida', 'no_se_presento', 'cancelado')),
+  llegada timestamptz not null default now(),
+  llamada_at timestamptz,
+  atendida_at timestamptz,
+  creado_por uuid default auth.uid(),
+  atendido_por uuid,
+  notas text
+);
+create index if not exists sivec_turnos_dia on sivec_turnos (centro_id, fecha, estado);
+
+-- Número de turno correlativo por establecimiento y por día
+create or replace function sivec_turno_numero() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  perform pg_advisory_xact_lock(hashtext(new.centro_id::text || new.fecha::text));
+  new.numero := coalesce((select max(numero) from sivec_turnos where centro_id = new.centro_id and fecha = new.fecha), 0) + 1;
+  return new;
+end $$;
+drop trigger if exists sivec_turno_numero on sivec_turnos;
+create trigger sivec_turno_numero before insert on sivec_turnos for each row execute function sivec_turno_numero();
+
+alter table sivec_turnos enable row level security;
+drop policy if exists "turnos del establecimiento" on sivec_turnos;
+create policy "turnos del establecimiento" on sivec_turnos for all to authenticated
+  using (sivec_edita_centro(centro_id)) with check (sivec_edita_centro(centro_id));
+grant select, insert, update on sivec_turnos to authenticated;
+grant usage, select on sequence sivec_turnos_id_seq to authenticated;
+
+notify pgrst, 'reload schema';
+
+-- Resultado: debe decir "listo"
+select case when to_regclass('public.sivec_turnos') is not null
+             and exists (select 1 from information_schema.columns where table_name = 'perfiles_usuario' and column_name = 'funciones')
+             and exists (select 1 from information_schema.columns where table_name = 'centros_salud' and column_name = 'consultorios')
+            then 'listo' else 'revisar' end as paso_32;
+```
+
+### Deshacer el Paso 32
+`drop table if exists sivec_turnos; drop function if exists sivec_turno_numero();` (se pierden las colas del día). Las columnas `funciones` y `consultorios` pueden quedar: vacías, todos ven todo como antes.

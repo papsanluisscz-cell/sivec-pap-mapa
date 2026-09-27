@@ -955,3 +955,13 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - El saludo dice el clima (Open-Meteo, gratis, solo la ubicación del establecimiento): temperatura, estado, máxima; paraguas si lluvia ≥ 60 %, agua si ≥ 35 °C, abrigo si mínima ≤ 14 °C. En la tarjeta: ⛅ 29° · máx 34° · ☂ 70 %.
 - Frase del día (día por medio, siempre si no hay pendientes): "Hoy es un buen día para salvar vidas", "Cada PAP que se toma hoy puede evitar un cáncer mañana"…
 - Pregunta del autor: hospitales con recepción, consultorio de toma, colposcopia y laboratorio (recepción de láminas / lectura) → propuesta de "funciones" por usuario y cola del día (a definir).
+
+## 27/09/2026 · Funciones por persona, cola del día y pantalla de espera (v1.10.0, Paso 32)
+- Un usuario por persona. Admin → Usuarios → **Funciones**: Admisión/recepción · Consultorio de toma · Consultorio de colposcopia · Recepción del laboratorio · Lectura del laboratorio · Jefe. Sin marcar = ve todo (como hasta ahora; los centros de 1er nivel no cambian nada). Marcar colposcopia o laboratorio activa solo el permiso correspondiente.
+- Cada función ve solo sus pantallas: recepción (Hoy, Registrar, Pacientes), toma (Hoy, Registrar, Pacientes, PAP+, VPH+), colposcopia (Hoy, Pacientes, Portal), laboratorio (Portal, con solo la pestaña de recepción de láminas o de lectura), jefe (todo).
+- Admin → Establecimientos → 🚪: consultorios del establecimiento (ej: Consultorio 1, Consultorio 2, Colposcopia).
+- Pantalla **Hoy**: la recepción busca a la paciente (o registra una nueva), elige Toma / Colposcopia / Consulta y el consultorio, y la manda ➜ recibe número de turno del día. Las citas de colposcopia de hoy aparecen para marcar "Llegó". En el consultorio aparecen solo sus pacientes: 📣 Llamar · Atender (abre la toma, la ficha o la colposcopia de esa derivación) · ✔ Atendida. Se actualiza sola cada 15 s y suena cuando llega una paciente nueva.
+- 📺 Pantalla de espera para la TV de la sala: número de turno y consultorio (nunca el nombre), con sonido y voz "Turno 5, Consultorio 2".
+- "Para hoy" suma "N pacientes esperando en la cola".
+- Corregido de paso: las pestañas del laboratorio (Recepción/Por leer/Informadas) quedaban sin reaccionar cuando el usuario tenía laboratorio y colposcopia a la vez.
+- Paso 32 del SQL: columnas `funciones` (usuarios) y `consultorios` (establecimientos) y tabla `sivec_turnos` con número automático por día y regla: solo el propio establecimiento.

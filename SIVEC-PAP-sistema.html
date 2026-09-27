@@ -564,6 +564,10 @@
   .admCard table { font-size: 12.5px; }
   .admCard td, .admCard th { padding: 6px 8px; }
   .admCard select, .admCard input { font-size: 12.5px; padding: 5px 7px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); }
+  .admFunc summary { cursor: pointer; font-size: 12px; font-weight: 700; color: var(--teal-700); white-space: nowrap; }
+  .admFunc[open] { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; min-width: 210px; }
+  .admFunc label { display: flex; gap: 6px; align-items: center; font-size: 12px; margin: 4px 0; }
+  .admFunc small { display: block; font-size: 10.5px; color: var(--ink-soft); margin-top: 4px; }
   .admForm { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }
   .admForm input, .admForm select { flex: 1 1 140px; }
   .admForm .primary { padding: 7px 14px; }
@@ -1168,6 +1172,58 @@ body.dark #firmaConfig #fcRes.mal { background: #450a0a; border-color: #7f1d1d; 
 body.dark #paraHoy .phFrase { background: linear-gradient(135deg, #3a1a2a, #2a1f3d); color: #f1a7c3; }
 @media (max-width: 520px) { #paraHoy { top: auto; bottom: 84px; right: 8px; left: 8px; width: auto; } }
 @media (prefers-reduced-motion: reduce) { #paraHoy, #paraHoy .phItem { transition: none; animation: none; } }
+/* ===== Hoy: cola del día ===== */
+#hoyView { padding: 24px 32px; overflow-y: auto; }
+@media (max-width: 700px) { #hoyView { padding: 16px 12px; } }
+#hoyView #tvBtn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 8px 14px; font: inherit; font-weight: 700; font-size: 13px; cursor: pointer; }
+#hoyView #tvBtn:hover { border-color: var(--teal-700); color: var(--teal-700); }
+#hoyView .hoyTop label { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 700; color: var(--ink-soft); }
+#hoyView .hoyTop { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+#hoyView .hoyTop h2 { margin: 0; }
+#hoyView .hoyTop > div { flex: 1; min-width: 200px; }
+#hoyView .hoyTop .hint { margin: 2px 0 0; }
+#hoyView .hoyTop select { padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); }
+#hoyView #hoyCuerpo { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; align-items: start; }
+#hoyView .hoyCard { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+#hoyView .hoyCard h3 { margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+#hoyView .hoyN { background: var(--teal-700); color: #fff; border-radius: 999px; font-size: 12px; padding: 1px 9px; }
+#hoyView .hoyBuscar { display: flex; gap: 8px; }
+#hoyView .hoyBuscar input, #hoyView select#hoyCons { flex: 1; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 15px; background: var(--surface); color: var(--ink); }
+#hoyView .hoyBtn { background: var(--teal-700); color: #fff; border: 0; border-radius: 10px; padding: 9px 13px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
+#hoyView .hoyBtn.sec { background: var(--paper); color: var(--ink); border: 1px solid var(--line); }
+#hoyView .hoyFila { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); text-align: left; font: inherit; color: var(--ink); width: 100%; }
+#hoyView .hoyFila > div:not(.hoyAcc) { flex: 1; min-width: 0; }
+#hoyView .hoyFila b { display: block; font-size: 14.5px; }
+#hoyView .hoyFila small { color: var(--ink-soft); font-size: 12px; }
+#hoyView .hoyRes { cursor: pointer; } #hoyView .hoyRes:hover { border-color: var(--teal-500); } #hoyView .hoyRes span { color: var(--teal-700); font-weight: 700; font-size: 13px; }
+#hoyView .hoyAcc { display: flex; gap: 6px; }
+#hoyView .hoyNum { width: 40px; height: 40px; border-radius: 10px; background: var(--header-grad); color: #fff; font-weight: 800; font-size: 17px; display: flex; align-items: center; justify-content: center; flex: none; }
+#hoyView .est-llamada { border-color: #f59e0b; box-shadow: 0 0 0 2px rgba(245,158,11,.2); }
+#hoyView .est-en_atencion { border-color: #16a34a; }
+#hoyView .est-atendida, #hoyView .est-no_se_presento, #hoyView .est-cancelado { opacity: .6; }
+#hoyView .hoyElegida { background: #f3ecfb; border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+body.dark #hoyView .hoyElegida { background: #2a1f3d; }
+#hoyView .hoyChips { display: flex; flex-wrap: wrap; gap: 6px; }
+#hoyView .hoyChips button { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 999px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+#hoyView .hoyChips button.on { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
+#hoyView #hoyEnviar { display: flex; flex-direction: column; gap: 8px; }
+#hoyView .hoyVacio { color: var(--ink-soft); font-size: 13.5px; text-align: center; padding: 10px; }
+#hoyView .hoyHechos summary { cursor: pointer; color: var(--ink-soft); font-size: 13px; margin-bottom: 6px; }
+#hoyView .hoyHechos .hoyFila { margin-bottom: 6px; }
+#tvSala { position: fixed; inset: 0; z-index: 4000; background: radial-gradient(ellipse at 30% 30%, #4a1229, #1c0a13 70%); color: #fbf1f5; display: flex; flex-direction: column; padding: 4vh 5vw; font-family: inherit; }
+#tvSala .tvX { position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,.12); border: 0; color: #fff; width: 40px; height: 40px; border-radius: 12px; font-size: 22px; cursor: pointer; }
+#tvSala .tvTop { display: flex; justify-content: space-between; font-size: 3vh; opacity: .9; }
+#tvSala .tvMain { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#tvSala .tvMain small { font-size: 4vh; letter-spacing: .3em; text-transform: uppercase; color: #f1a7c3; }
+#tvSala #tvNum { font-size: 30vh; font-weight: 800; line-height: 1; }
+#tvSala #tvCons { font-size: 6vh; font-weight: 700; color: #f1a7c3; }
+#tvSala.flash #tvNum { animation: tvFlash 1.2s ease 2; }
+@keyframes tvFlash { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.12); color: #ffd1e3; } }
+#tvSala .tvLista { display: flex; gap: 2vw; justify-content: center; flex-wrap: wrap; }
+#tvSala .tvLista div { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); border-radius: 16px; padding: 1.5vh 2.5vw; display: flex; flex-direction: column; align-items: center; }
+#tvSala .tvLista b { font-size: 6vh; } #tvSala .tvLista span { font-size: 2.4vh; opacity: .85; }
+#tvSala .tvPie { text-align: center; font-size: 2.4vh; opacity: .6; margin-top: 2vh; }
+
 @media (max-width: 520px) { #spPanel { right: 8px; left: 8px; width: auto; max-width: none; bottom: 80px; height: calc(100vh - 100px); } }
 @media (max-width: 760px) { body::after { content: ''; display: block; height: 80px; } }  /* que el botón 💬 no tape el último botón de la página */
 @media print { #spBtn, #spPanel { display: none !important; } }
@@ -1276,6 +1332,7 @@ body.dark #paraHoy .phFrase { background: linear-gradient(135deg, #3a1a2a, #2a1f
       </div>
     </div>
     <nav>
+      <button data-view="hoy" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 15h2v2H8z"/></svg><span class="navLabel">Hoy</span></button>
       <button data-view="form" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg><span class="navLabel">Registrar</span></button>
       <button data-view="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span class="navLabel">Pacientes</span></button>
       <button data-view="segpap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span class="navLabel">PAP+</span></button>
@@ -1650,7 +1707,7 @@ body.dark #paraHoy .phFrase { background: linear-gradient(135deg, #3a1a2a, #2a1f
       </div>
       <section class="admCard">
         <h3>Usuarios</h3>
-        <table><thead><tr><th>Persona</th><th>Rol</th><th>Establecimiento / red</th><th title="Recibe lotes e informa PAP/VPH (el establecimiento tiene que recibir muestras)">Laboratorio</th><th title="Recibe derivaciones de colposcopia (el establecimiento tiene que tener colposcopia)">Colposcopia</th><th>Administra</th><th>Activo</th><th></th></tr></thead><tbody id="admUsuarios"></tbody></table>
+        <table><thead><tr><th>Persona</th><th>Rol</th><th>Establecimiento / red</th><th title="Recibe lotes e informa PAP/VPH (el establecimiento tiene que recibir muestras)">Laboratorio</th><th title="Recibe derivaciones de colposcopia (el establecimiento tiene que tener colposcopia)">Colposcopia</th><th title="Qué pantallas ve en el establecimiento (recepción, consultorio, laboratorio…). Sin marcar: ve todo.">Funciones</th><th>Administra</th><th>Activo</th><th></th></tr></thead><tbody id="admUsuarios"></tbody></table>
         <form id="admUsuarioForm" class="admForm">
           <input name="correo" type="email" placeholder="Correo" required>
           <input name="nombre" placeholder="Nombre (ej: Dra. Ortuño)" required>
@@ -1661,7 +1718,7 @@ body.dark #paraHoy .phFrase { background: linear-gradient(135deg, #3a1a2a, #2a1f
           <input name="clave" type="text" placeholder="Contraseña provisoria (si no tiene cuenta)" autocomplete="off">
           <button class="primary">Agregar usuario</button>
         </form>
-        <p class="hint" style="margin:8px 0 0">Si la persona ya tiene cuenta en Supabase, basta el correo. Si no, escribí una contraseña provisoria y el sistema le crea la cuenta (si Supabase pide confirmar el correo: Authentication → Users → la cuenta → <i>Confirm</i>). Nunca se borra un usuario: se desactiva.</p>
+        <p class="hint" style="margin:8px 0 0">Si la persona ya tiene cuenta en Supabase, basta el correo. Si no, escribí una contraseña provisoria y el sistema le crea la cuenta (si Supabase pide confirmar el correo: Authentication → Users → la cuenta → <i>Confirm</i>). Nunca se borra un usuario: se desactiva. En hospitales, marcá en <b>Funciones</b> qué hace cada persona (recepción, consultorio, laboratorio…): cada una ve solo sus pantallas y la recepción manda las pacientes a la cola del consultorio.</p>
       </section>
     </div>
 
@@ -1696,6 +1753,12 @@ body.dark #paraHoy .phFrase { background: linear-gradient(135deg, #3a1a2a, #2a1f
       <div class="pnCard" style="margin-top:14px" id="redProfCard"><h3>Tomas por profesional</h3><div class="pnCap" id="redProfCap">Quién tomó cada PAP/VPH en el período · pasá el mouse para ver positivas y entregas</div><div class="pnHb" id="redProf"></div></div>
       <div class="redCard" style="margin-top:14px"><h3>Por establecimiento</h3><div id="redTabla"></div><p class="hint" style="margin:8px 0 0" id="redTablaNota"></p></div>
       <div class="redCard" id="redPend"></div>
+    </div>
+
+    <!-- HOY: cola del día (recepción ➜ consultorio), Paso 32 -->
+    <div id="hoyView" class="view">
+      <div class="hoyTop"><div><h2>Hoy</h2><p class="hint" id="hoySub"></p></div><label id="hoyConsLbl">Mi consultorio <select id="hoyConsultorio"></select></label><button type="button" id="tvBtn" onclick="tvAbrir()">📺 Pantalla de espera</button></div>
+      <div id="hoyCuerpo"></div>
     </div>
 
     <!-- PORTAL (oncológico / colposcopia): pasos 3 y 4 -->
@@ -2503,8 +2566,10 @@ function vistasPermitidas() {
   const base = v === null || v === undefined ? VISTAS_CENTRO.slice() : v.slice();
   if ((esLab() || esColpo()) && !base.includes('portal')) base.push('portal');
   if (perfil.es_admin && !base.includes('red')) base.push('red');
-  if (perfil.es_admin || perfil.rol === 'admin') base.push('admin');
-  return base;
+  let r = vistasPorFuncion(base);
+  if (usaCola() && !r.includes('hoy') && (!misFunciones().length || misFunciones().includes('jefe'))) r.unshift('hoy');
+  if (perfil.es_admin || perfil.rol === 'admin') r.push('admin');
+  return r;
 }
 
 async function cargarPerfil() {
@@ -2556,7 +2621,7 @@ function aplicarRol() {
   else {
     box.style.display = 'flex';
     const lugar = perfil.rol === 'gestor' ? redNombre(perfil.red_id) || centroNombre(perfil.centro_id) : centroNombre(perfil.centro_id);
-    document.getElementById('rolBadge').innerHTML = `<b>${esc(perfil.nombre_completo || perfil.correo || '')}</b><span>${esc(ROLES[perfil.rol] || ROLES_VIEJOS[perfil.rol] || perfil.rol)}${lugar ? ' · ' + esc(lugar) : ''}${esLab() && perfil.rol !== 'oncologico' ? ' · laboratorio' : ''}${esColpo() && perfil.rol !== 'colposcopia' ? ' · colposcopia' : ''}${perfil.es_admin && perfil.rol !== 'admin' ? ' · admin' : ''}</span>`;
+    document.getElementById('rolBadge').innerHTML = `<b>${esc(perfil.nombre_completo || perfil.correo || '')}</b><span>${esc(ROLES[perfil.rol] || ROLES_VIEJOS[perfil.rol] || perfil.rol)}${lugar ? ' · ' + esc(lugar) : ''}${esLab() && perfil.rol !== 'oncologico' ? ' · laboratorio' : ''}${esColpo() && perfil.rol !== 'colposcopia' ? ' · colposcopia' : ''}${perfil.es_admin && perfil.rol !== 'admin' ? ' · admin' : ''}${misFunciones().length ? ' · ' + misFunciones().map(f => esc(FUNCIONES[f].split(' (')[0])).join(', ') : ''}</span>`;
     const vis = centrosVisibles();
     if (['centro', 'oncologico', 'colposcopia'].includes(perfil.rol)) { centroActivo = perfil.centro_id ? String(perfil.centro_id) : ''; sel.style.display = 'none'; }
     // El gestor ya no elige centro: ve el tablero de toda su red (solo números).
@@ -2564,7 +2629,8 @@ function aplicarRol() {
   }
   const activa = document.querySelector('nav button.active');
   const actual = activa && activa.dataset.view;
-  if (!permitidas.includes(actual) && permitidas.length) switchView(permitidas[0]);
+  if (permitidas[0] === 'hoy' && actual === 'form' && !hoyInicio) { hoyInicio = true; switchView('hoy'); }
+  else if (!permitidas.includes(actual) && permitidas.length) switchView(permitidas[0]);
   else if (actual && actual !== 'form') switchView(actual);
 }
 
@@ -2591,7 +2657,7 @@ function loadPortal() {
     ? 'Recibí los lotes que mandan los centros, informá PAP (Bethesda) y VPH, y firmá: el resultado <b>aparece solo en la ficha del centro</b>, sin papel. Solo se ven las muestras enviadas a este establecimiento.'
     : esC ? 'Pacientes derivadas por los centros: dale la cita, ' + (COBRO_ACTIVO ? 'cobrá en caja si no tiene SUS, ' : '') + 'registrá la colposcopia, la biopsia y el tratamiento, y mandá la <b>contrarreferencia</b>: llega sola a la ficha del centro. Solo se ven las pacientes derivadas a este establecimiento.'
     : 'Tu usuario no tiene permiso de laboratorio ni de colposcopia en este establecimiento.';
-  if (esL) labCargar();
+  if (esL) { labAplicarFunciones(); labCargar(); }
   if (esC) colCargar();
 }
 document.getElementById('portalSwitch').addEventListener('click', e => { const b = e.target.closest('[data-ps]'); if (b) { portalModo = b.dataset.ps; loadPortal(); } });
@@ -2622,12 +2688,12 @@ function labIncluyeVph(x) { return /VPH/.test(labMuestraTipo(x)); }
 function labRender() {
   const enCamino = labLotes.filter(l => l.estado !== 'recibido').length, porLeer = labData.filter(x => x.muestra_estado === 'recibida').length;
   document.getElementById('labNRec').textContent = enCamino || ''; document.getElementById('labNLeer').textContent = porLeer || '';
-  document.querySelectorAll('.labTabs button').forEach(b => b.classList.toggle('on', b.dataset.lt === labTab));
+  document.querySelectorAll('#portalLab .labTabs button').forEach(b => b.classList.toggle('on', b.dataset.lt === labTab));
   if (labTab === 'rec') return labLoteId ? labRenderLote() : labRenderLotes();
   if (labTab === 'leer') return labRenderLeer();
   return labRenderInformadas();
 }
-document.querySelector('.labTabs').addEventListener('click', e => { const b = e.target.closest('[data-lt]'); if (!b) return; labTab = b.dataset.lt; labLoteId = null; labRender(); });
+document.querySelector('#portalLab .labTabs').addEventListener('click', e => { const b = e.target.closest('[data-lt]'); if (!b) return; labTab = b.dataset.lt; labLoteId = null; labRender(); });
 
 function labRenderLotes() {
   const hoy = new Date(hoyISO() + 'T12:00:00');
@@ -2825,7 +2891,7 @@ function admRender() {
     : `<tr style="${x.activo === false ? 'opacity:.5' : ''}"><td><b>${esc(x.nombre)}</b>${x.codigo ? `<div class="loteCod">${esc(x.codigo)}</div>` : ''}${x.direccion ? `<div style="font-size:11px;color:var(--ink-soft)">${esc(x.direccion)}</div>` : ''}</td><td>${esc(redNombre(x.red_id)) || '<span style="color:var(--ink-soft)">departamental</span>'}</td><td>${esc(TIPOS_CENTRO[x.tipo] || x.tipo || '')}</td>
     <td style="text-align:center"><input type="checkbox" data-servicio="hace_colposcopia" data-centro="${x.id}"${x.hace_colposcopia ? ' checked' : ''}></td>
     <td style="text-align:center"><input type="checkbox" data-servicio="recibe_muestras" data-centro="${x.id}"${x.recibe_muestras ? ' checked' : ''}>${x.recibe_muestras ? `<div style="font-size:11px;white-space:nowrap;margin-top:3px" title="Qué pruebas procesa este laboratorio">${['PAP', 'VPH'].map(t => `<label style="display:inline-flex;gap:3px;align-items:center;margin:0 3px"><input type="checkbox" data-prueba="${t}" data-centro="${x.id}"${labPruebas(x).includes(t) ? ' checked' : ''} style="flex:0 0 auto">${t}</label>`).join('')}</div>` : ''}</td>
-    <td><button class="rowBtn" data-centro-prof="${x.id}" title="${esc((x.profesionales || []).join(', '))}">👩‍⚕️ ${(x.profesionales || []).length || 'Cargar'}</button></td>
+    <td style="white-space:nowrap"><button class="rowBtn" data-centro-prof="${x.id}" title="${esc((x.profesionales || []).join(', '))}">👩‍⚕️ ${(x.profesionales || []).length || 'Cargar'}</button> <button class="rowBtn" data-centro-cons="${x.id}" title="Consultorios para la cola del día: ${esc((x.consultorios || []).join(', ') || 'ninguno')}">🚪 ${(x.consultorios || []).length || ''}</button></td>
     <td style="white-space:nowrap"><button class="rowBtn" data-centro-editar="${x.id}" title="Corregir nombre, red, nivel, código o dirección">✏️</button> <button class="rowBtn" data-centro-ubicar="${x.id}" title="${x.lat != null ? 'Ubicado · cambiar en el mapa' : 'Marcar en el mapa dónde queda'}">${x.lat != null ? '📍 ✓' : '📍 Ubicar'}</button> <button class="rowBtn" data-centro-act="${x.id}">${x.activo === false ? 'Activar' : 'Desactivar'}</button></td></tr>`).join('') || '<tr><td colspan="7">Todavía no hay establecimientos.</td></tr>';
   const optRedes = redes.map(x => `<option value="${x.id}">${esc(x.nombre)}</option>`).join('');
   const fc = document.getElementById('admCentroForm');
@@ -2841,9 +2907,10 @@ function admRender() {
       <td><select data-f="lugar" data-actual="${lugarDe(u)}"></select></td>
       <td style="text-align:center"><input type="checkbox" data-f="puede_laboratorio"${u.puede_laboratorio || u.rol === 'oncologico' ? ' checked' : ''}></td>
       <td style="text-align:center"><input type="checkbox" data-f="puede_colposcopia"${u.puede_colposcopia || u.rol === 'colposcopia' ? ' checked' : ''}></td>
+      <td>${'funciones' in u ? `<details class="admFunc"><summary>${(u.funciones || []).filter(f => FUNCIONES[f]).map(f => esc(FUNCIONES[f].split(' (')[0])).join(', ') || 'Todas'}</summary>${Object.entries(FUNCIONES).map(([k, t]) => `<label><input type="checkbox" data-func="${k}"${(u.funciones || []).includes(k) ? ' checked' : ''}> ${esc(t)}</label>`).join('')}<small>Sin marcar = ve todo. Después tocá Guardar.</small></details>` : '<span style="font-size:11px;color:var(--ink-soft)" title="Ejecutar el Paso 32 del SQL">Paso 32</span>'}</td>
       <td style="text-align:center"><input type="checkbox" data-f="es_admin"${u.es_admin ? ' checked' : ''}></td>
       <td style="text-align:center"><input type="checkbox" data-f="activo"${u.activo !== false ? ' checked' : ''}></td>
-      <td><button class="rowBtn" data-guardar-usuario>Guardar</button></td></tr>`).join('') || '<tr><td colspan="8">Todavía no hay usuarios con perfil.</td></tr>';
+      <td><button class="rowBtn" data-guardar-usuario>Guardar</button></td></tr>`).join('') || '<tr><td colspan="9">Todavía no hay usuarios con perfil.</td></tr>';
   document.querySelectorAll('#admUsuarios tr[data-uid]').forEach(tr => {
     const rol = tr.querySelector('[data-f=rol]'), lugar = tr.querySelector('[data-f=lugar]');
     admLugarOpciones(lugar, rol.value, lugar.dataset.actual);
@@ -2962,6 +3029,16 @@ document.getElementById('admCentros').addEventListener('click', async e => {
     if (error) return showToast('Error: ' + esc(error.message) + (/column/.test(error.message) ? ' — ejecutar el Paso 19 del SQL.' : ''), 'err');
     c.profesionales = lista; showToast(c.nombre + ': ' + lista.length + ' profesionales ✔', 'ok'); loadAdmin(); return;
   }
+  const bc = e.target.closest('[data-centro-cons]');
+  if (bc) {
+    const c = centros.find(x => String(x.id) === bc.dataset.centroCons); if (!c) return;
+    const txt = prompt('Consultorios de ' + c.nombre + ' para la cola del día (separados por coma).\nEj: Consultorio 1, Consultorio 2, Colposcopia\nVacío = sin cola por consultorio.', (c.consultorios || []).join(', '));
+    if (txt === null) return;
+    const lista = [...new Set(txt.split(/[,;\n]/).map(t => t.trim()).filter(Boolean))];
+    const { error } = await sb.from('centros_salud').update({ consultorios: lista.length ? lista : null }).eq('id', c.id);
+    if (error) return showToast('Error: ' + esc(error.message) + (/column/.test(error.message) ? ' — ejecutar el Paso 32 del SQL.' : ''), 'err');
+    c.consultorios = lista; showToast(c.nombre + ': ' + lista.length + ' consultorios ✔', 'ok'); loadAdmin(); return;
+  }
   const b = e.target.closest('[data-centro-act]'); if (!b) return;
   const c = centros.find(x => String(x.id) === b.dataset.centroAct); if (!c) return;
   const { error } = await sb.from('centros_salud').update({ activo: c.activo === false }).eq('id', c.id);
@@ -2977,11 +3054,15 @@ document.getElementById('admUsuarios').addEventListener('click', async e => {
   if (tr.dataset.uid === (perfil && perfil.id) && !(g('es_admin').checked || rol === 'admin')) {
     if (!confirm('Te estás sacando el permiso de administrador. ¿Seguro?')) return;
   }
+  const fx = tr.querySelector('.admFunc'), funciones = fx ? [...fx.querySelectorAll('[data-func]:checked')].map(i => i.dataset.func) : null;
+  // La función marca sola el permiso que necesita (laboratorio / colposcopia).
+  if (funciones && funciones.some(f => f.startsWith('lab_'))) g('puede_laboratorio').checked = true;
+  if (funciones && funciones.includes('colposcopia')) g('puede_colposcopia').checked = true;
   const lab = g('puede_laboratorio').checked, col = g('puede_colposcopia').checked;
   const cen = centros.find(x => String(x.id) === String(lugar.centro_id));
   if (lab && !(cen && cen.recibe_muestras)) return showToast('Ese establecimiento no recibe muestras: marcá "Recibe muestras" en Establecimientos o quitá el permiso de Laboratorio.', 'err');
   if (col && !(cen && cen.hace_colposcopia)) return showToast('Ese establecimiento no tiene colposcopia habilitada: marcala en Establecimientos o quitá el permiso.', 'err');
-  const { error } = await sb.from('perfiles_usuario').update({ rol, centro_id: lugar.centro_id, red_id: lugar.red_id, es_admin: g('es_admin').checked, activo: g('activo').checked, puede_laboratorio: lab, puede_colposcopia: col }).eq('id', tr.dataset.uid);
+  const { error } = await sb.from('perfiles_usuario').update(Object.assign({ rol, centro_id: lugar.centro_id, red_id: lugar.red_id, es_admin: g('es_admin').checked, activo: g('activo').checked, puede_laboratorio: lab, puede_colposcopia: col }, funciones ? { funciones: funciones.length ? funciones : null } : {})).eq('id', tr.dataset.uid);
   if (error) return showToast('Error: ' + esc(error.message), 'err');
   showToast('Usuario guardado ✔', 'ok');
   if (tr.dataset.uid === (perfil && perfil.id)) await cargarPerfil();
@@ -3036,6 +3117,7 @@ function switchView(name) {
   if (name === 'admin') loadAdmin();
   if (name === 'red') loadRed();
   if (name === 'portal') loadPortal();
+  hoyActivar(name === 'hoy');
 }
 
 function addDays(dateStr, days) {
@@ -7923,7 +8005,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.9.1 · 27/09/2026';
+const SIVEC_VERSION = '1.10.0 · 27/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -8552,6 +8634,14 @@ const plural = (n, s, p) => `${n} ${n === 1 ? s : (p || s + 's')}`;
 async function saludoPendientes() {
   const items = [], hoy = hoyISO();
   const esGestor = conRoles() && (perfil.rol === 'gestor' || perfil.rol === 'admin');
+  // Cola del día (Paso 32): pacientes que la recepción ya mandó
+  if (usaCola()) {
+    try {
+      const { data } = await sb.from('sivec_turnos').select('id,servicio,consultorio,estado').eq('centro_id', perfil.centro_id).eq('fecha', hoy);
+      hoyTurnos = data || []; const n = hoyMiCola().filter(t => t.estado === 'espera').length;
+      if (n) items.push({ ic: '👩', n, txt: plural(n, 'paciente esperando', 'pacientes esperando') + ' en la cola', voz: plural(n, 'paciente esperando', 'pacientes esperando') + ' en la cola', ir: 'vista:hoy' });
+    } catch (e) {}
+  }
   // Centro de salud
   if (conRoles() && perfil.rol === 'centro') {
     try {
@@ -8670,6 +8760,166 @@ function saludoTarjeta(items, texto, cl, frase) {
     else if (ir.startsWith('vista:')) { const v = ir.slice(6); if (document.querySelector(`nav button[data-view="${v}"]`)) switchView(v); }
     cerrar();
   });
+}
+
+// ===== Funciones por persona y cola del día (Paso 32) =====
+// Sin funciones marcadas, la persona ve todo (como siempre). Con funciones, solo sus pantallas.
+const FUNCIONES = { recepcion: 'Admisión / recepción', toma: 'Consultorio de toma (PAP/VPH)', colposcopia: 'Consultorio de colposcopia', lab_recepcion: 'Recepción del laboratorio', lab_lectura: 'Lectura del laboratorio', jefe: 'Jefe del establecimiento' };
+const FUNC_VISTAS = { recepcion: ['hoy', 'form', 'list', 'portal'], toma: ['hoy', 'form', 'list', 'segpap', 'segvph'], colposcopia: ['hoy', 'portal', 'list'], lab_recepcion: ['portal'], lab_lectura: ['portal'], jefe: null };
+const SERVICIOS = { toma: '🧪 Toma de PAP/VPH', colposcopia: '🩺 Colposcopia', consulta: '📝 Consulta' };
+const TURNO_ESTADOS = { espera: 'En espera', llamada: 'Llamada', en_atencion: 'En atención', atendida: 'Atendida', no_se_presento: 'No se presentó', cancelado: 'Cancelado' };
+function misFunciones() { return conRoles() && Array.isArray(perfil.funciones) ? perfil.funciones.filter(f => FUNCIONES[f]) : []; }
+function tieneFuncion(f) { const m = misFunciones(); return !m.length || m.includes('jefe') || m.includes(f); }
+function vistasPorFuncion(base) {
+  const m = misFunciones(); if (!m.length || m.includes('jefe')) return base;
+  const orden = ['hoy', ...VISTAS_CENTRO, 'portal', 'red', 'admin'], quiero = new Set(m.flatMap(f => FUNC_VISTAS[f] || []));
+  return orden.filter(v => quiero.has(v) && (base.includes(v) || (v === 'hoy' && usaCola())));
+}
+function usaCola() { const c = miCentro(); return !!(conRoles() && perfil.rol === 'centro' && (misFunciones().length || (c && Array.isArray(c.consultorios) && c.consultorios.length))); }
+function miConsultorio() { try { return localStorage.getItem('sivec_consultorio') || ''; } catch (_) { return ''; } }
+// Pestañas del laboratorio según la función
+function labAplicarFunciones() {
+  const rec = tieneFuncion('lab_recepcion'), lee = tieneFuncion('lab_lectura');
+  document.querySelectorAll('#portalLab .labTabs [data-lt]').forEach(b => { b.style.display = (b.dataset.lt === 'rec' && !rec) || (b.dataset.lt === 'leer' && !lee) ? 'none' : ''; });
+  if (!rec && labTab === 'rec') labTab = 'leer';
+  if (!lee && labTab === 'leer') labTab = 'rec';
+}
+
+let hoyInicio = false, hoyTurnos = [], hoyTimer = null, hoyTablaOk = true, hoySel = null, hoyServ = 'toma', hoyCitas = [];
+async function hoyCargar(silencio) {
+  const v = document.getElementById('hoyView'); if (!v || !sb || !conRoles()) return;
+  const { data, error } = await sb.from('sivec_turnos').select('*').eq('centro_id', perfil.centro_id).eq('fecha', hoyISO()).order('numero', { ascending: true });
+  if (error) { hoyTablaOk = !/sivec_turnos|does not exist|schema cache|PGRST205|42P01/i.test(error.message + error.code); v.querySelector('#hoyCuerpo').innerHTML = `<div class="hoyVacio">${hoyTablaOk ? esc(error.message) : 'La cola del día se activa con el <b>Paso 32</b> del SQL.'}</div>`; return; }
+  const antes = hoyMiCola().filter(t => t.estado === 'espera').length;
+  hoyTurnos = data || [];
+  if (esColpo() && tieneFuncion('recepcion')) { try { const r = await sb.rpc('sivec_colpo_lista'); hoyCitas = (r.data || []).filter(d => d.estado === 'citada' && d.fecha_cita === hoyISO() && !hoyTurnos.some(t => t.derivacion_id === d.id)); } catch (_) { hoyCitas = []; } }
+  const ahora = hoyMiCola().filter(t => t.estado === 'espera').length;
+  if (silencio && ahora > antes) { sonido('mensaje'); showToast(`👩 Nueva paciente en espera (${ahora})`, 'ok', false); }
+  hoyPintar();
+}
+function hoyMiCola() {
+  const servs = ['toma', 'colposcopia', 'consulta'].filter(s => s === 'consulta' ? tieneFuncion('toma') : tieneFuncion(s));
+  const mc = miConsultorio();
+  return hoyTurnos.filter(t => servs.includes(t.servicio) && (!mc || !t.consultorio || t.consultorio === mc));
+}
+function hoyPintar() {
+  const v = document.getElementById('hoyView'); if (!v) return;
+  const c = miCentro() || {}, cons = Array.isArray(c.consultorios) ? c.consultorios : [];
+  const esRecep = tieneFuncion('recepcion'), esCons = tieneFuncion('toma') || tieneFuncion('colposcopia');
+  v.querySelector('#hoySub').textContent = `${c.nombre || ''} · ${fmtFecha(hoyISO())}`;
+  const sel = v.querySelector('#hoyConsultorio');
+  sel.innerHTML = '<option value="">Todos los consultorios</option>' + cons.map(x => `<option${x === miConsultorio() ? ' selected' : ''}>${esc(x)}</option>`).join('');
+  sel.parentElement.style.display = esCons && cons.length ? '' : 'none';
+  let h = '';
+  if (esRecep) {
+    h += `<section class="hoyCard"><h3>📥 Llegó una paciente</h3>
+      <div class="hoyBuscar"><input id="hoyQ" placeholder="Nombre o carnet" autocomplete="off"><button type="button" class="hoyBtn sec" data-h="nueva">+ Paciente nueva</button></div>
+      <div id="hoyRes"></div>
+      <div id="hoyEnviar" style="display:${hoySel ? '' : 'none'}">
+        <div class="hoyElegida">${hoySel ? `<b>${esc(hoySel.nombre)}</b> · CI ${esc(hoySel.carnet || '—')}` : ''}</div>
+        <div class="hoyChips">${Object.entries(SERVICIOS).filter(([k]) => k !== 'colposcopia' || esColpo() || (c.hace_colposcopia)).map(([k, t]) => `<button type="button" data-serv="${k}" class="${k === hoyServ ? 'on' : ''}">${t}</button>`).join('')}</div>
+        ${cons.length ? `<select id="hoyCons"><option value="">Consultorio (cualquiera)</option>${cons.map(x => `<option>${esc(x)}</option>`).join('')}</select>` : ''}
+        <button type="button" class="hoyBtn" data-h="enviar">Enviar al consultorio ➜</button>
+      </div></section>`;
+    if (hoyCitas.length) h += `<section class="hoyCard"><h3>🩺 Citas de colposcopia de hoy</h3>${hoyCitas.map(d => `<div class="hoyFila"><div><b>${esc(d.nombre || '')}</b><small>De ${esc(centroNombre(d.centro_origen))} · ${esc(d.motivo || '')}</small></div><button type="button" class="hoyBtn" data-cita="${esc(d.id)}">Llegó ➜ consultorio</button></div>`).join('')}</section>`;
+  }
+  const lista = esRecep && !esCons ? hoyTurnos : (esCons ? hoyMiCola() : hoyTurnos);
+  const activos = lista.filter(t => ['espera', 'llamada', 'en_atencion'].includes(t.estado)), hechos = lista.filter(t => !['espera', 'llamada', 'en_atencion'].includes(t.estado));
+  h += `<section class="hoyCard"><h3>${esCons ? '👩‍⚕️ Pacientes de hoy' : '🗂 Cola del día'} <span class="hoyN">${activos.length}</span></h3>
+    ${activos.length ? activos.map(t => hoyFila(t, esCons, esRecep)).join('') : '<div class="hoyVacio">No hay pacientes esperando.</div>'}
+    ${hechos.length ? `<details class="hoyHechos"><summary>Atendidas y otras (${hechos.length})</summary>${hechos.map(t => hoyFila(t, false, false)).join('')}</details>` : ''}</section>`;
+  v.querySelector('#hoyCuerpo').innerHTML = h;
+  const q = v.querySelector('#hoyQ'); if (q) { q.oninput = () => hoyBuscar(q.value); setTimeout(() => { if (document.activeElement === document.body) q.focus(); }, 30); }
+}
+function hoyFila(t, cons, recep) {
+  const min = Math.max(0, Math.round((Date.now() - new Date(t.llegada)) / 60000));
+  const acc = [];
+  if (cons && t.estado === 'espera') acc.push(`<button type="button" class="hoyBtn sec" data-t="llamar" data-id="${t.id}">📣 Llamar</button>`);
+  if (cons && ['espera', 'llamada'].includes(t.estado)) acc.push(`<button type="button" class="hoyBtn" data-t="atender" data-id="${t.id}">Atender</button>`);
+  if (cons && t.estado === 'en_atencion') acc.push(`<button type="button" class="hoyBtn" data-t="atendida" data-id="${t.id}">✔ Atendida</button>`);
+  if (recep && ['espera', 'llamada'].includes(t.estado)) acc.push(`<button type="button" class="hoyBtn sec" data-t="no_se_presento" data-id="${t.id}" title="No se presentó">✖</button>`);
+  return `<div class="hoyFila est-${t.estado}"><span class="hoyNum">${t.numero || '·'}</span><div><b>${esc(t.paciente_nombre || '')}</b><small>${SERVICIOS[t.servicio] || t.servicio}${t.consultorio ? ' · ' + esc(t.consultorio) : ''} · ${TURNO_ESTADOS[t.estado]}${['espera', 'llamada'].includes(t.estado) ? ` · espera ${min} min` : ''}</small></div><div class="hoyAcc">${acc.join('')}</div></div>`;
+}
+async function hoyBuscar(txt) {
+  const box = document.getElementById('hoyRes'); if (!box) return;
+  const q = normTxt(txt || ''); if (q.length < 2) { box.innerHTML = ''; return; }
+  if (!allPatientsData.length) { const { data } = await selectAll(() => pacQ().is('deleted_at', null)); if (data) { allPatientsData = data; tomasIndex = buildTomasIndex(data); } }
+  const vistos = new Set(), res = [];
+  allPatientsData.slice().sort((a, b) => String(b.fecha_toma || '').localeCompare(String(a.fecha_toma || ''))).forEach(p => {
+    if (res.length >= 6) return;
+    const k = (p.carnet || '') + '|' + normTxt(p.nombre || ''); if (vistos.has(k)) return;
+    if (normTxt(p.nombre || '').includes(q) || String(p.carnet || '').includes(txt.trim())) { vistos.add(k); res.push(p); }
+  });
+  box.innerHTML = res.length ? res.map(p => `<button type="button" class="hoyFila hoyRes" data-pac="${esc(String(p.id))}"><div><b>${esc(p.nombre)}</b><small>CI ${esc(p.carnet || '—')} · última toma ${fmtFecha(p.fecha_toma) || '—'}</small></div><span>Elegir ›</span></button>`).join('') : '<div class="hoyVacio">No está registrada: tocá <b>+ Paciente nueva</b>.</div>';
+}
+async function hoyTurnoCrear(base) {
+  const { error } = await sb.from('sivec_turnos').insert([Object.assign({ centro_id: perfil.centro_id }, base)]);
+  if (error) { showToast('No se pudo enviar: ' + error.message, 'err'); return false; }
+  showToast(`${esc(base.paciente_nombre)} ➜ ${esc(base.consultorio || SERVICIOS[base.servicio])} ✔`, 'ok', 'ok');
+  return true;
+}
+document.addEventListener('click', async e => {
+  const v = document.getElementById('hoyView'); if (!v || !v.contains(e.target)) return;
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.h === 'nueva') { switchView('form'); return; }
+  if (b.dataset.pac) { hoySel = allPatientsData.find(p => String(p.id) === b.dataset.pac) || null; hoyPintar(); return; }
+  if (b.dataset.serv) { hoyServ = b.dataset.serv; v.querySelectorAll('[data-serv]').forEach(x => x.classList.toggle('on', x === b)); return; }
+  if (b.dataset.h === 'enviar' && hoySel) {
+    const cons = (v.querySelector('#hoyCons') || {}).value || null;
+    if (await hoyTurnoCrear({ paciente_id: hoySel.id, paciente_nombre: hoySel.nombre, carnet: hoySel.carnet || null, servicio: hoyServ, consultorio: cons })) { hoySel = null; hoyCargar(); }
+    return;
+  }
+  if (b.dataset.cita) {
+    const d = hoyCitas.find(x => String(x.id) === b.dataset.cita); if (!d) return;
+    const cons = (miCentro() || {}).consultorios || [];
+    const c = cons.length ? prompt('¿A qué consultorio va?\n' + cons.map((x, i) => `${i + 1}. ${x}`).join('\n'), '1') : '';
+    if (c === null) return;
+    if (await hoyTurnoCrear({ paciente_id: d.paciente_id, paciente_nombre: d.nombre, carnet: d.carnet || null, servicio: 'colposcopia', consultorio: cons[Number(c) - 1] || null, derivacion_id: d.id })) hoyCargar();
+    return;
+  }
+  if (b.dataset.t) {
+    const t = hoyTurnos.find(x => String(x.id) === b.dataset.id); if (!t) return;
+    const cambio = { llamar: { estado: 'llamada', llamada_at: new Date().toISOString(), consultorio: t.consultorio || miConsultorio() || null }, atender: { estado: 'en_atencion', atendido_por: perfil.id, consultorio: t.consultorio || miConsultorio() || null }, atendida: { estado: 'atendida', atendida_at: new Date().toISOString() }, no_se_presento: { estado: 'no_se_presento' } }[b.dataset.t];
+    const { error } = await sb.from('sivec_turnos').update(cambio).eq('id', t.id);
+    if (error) return showToast('Error: ' + error.message, 'err');
+    Object.assign(t, cambio); hoyPintar();
+    if (b.dataset.t === 'atender') {
+      if (t.servicio === 'colposcopia' && t.derivacion_id) { switchView('portal'); setTimeout(() => { const ps = document.querySelector('#portalSwitch [data-ps="colpo"]'); if (ps && ps.offsetParent) ps.click(); colTab = 'citadas'; colSel = t.derivacion_id; colForm = null; colCargar(); }, 300); }
+      else {
+        let p = allPatientsData.find(x => String(x.id) === String(t.paciente_id));
+        if (!p && t.paciente_id) { const r = await pacQ().eq('id', t.paciente_id).maybeSingle(); p = r.data; }
+        if (p) { if (t.servicio === 'toma') nuevaTomaDe(p); else openFicha(p); }
+      }
+    }
+  }
+});
+document.addEventListener('change', e => { if (e.target.id === 'hoyConsultorio') { try { localStorage.setItem('sivec_consultorio', e.target.value); } catch (_) {} hoyPintar(); } });
+function hoyActivar(si) { clearInterval(hoyTimer); hoyTimer = null; if (si) { hoyCargar(); hoyTimer = setInterval(() => { if (!document.hidden && document.getElementById('hoyView').classList.contains('active')) hoyCargar(true); }, 15000); } }
+
+// ---- Pantalla de la sala de espera (TV): número de turno y consultorio, nunca el nombre ----
+let tvTimer = null, tvUltimo = null;
+async function tvAbrir() {
+  let ov = document.getElementById('tvSala'); if (ov) return;
+  ov = document.createElement('div'); ov.id = 'tvSala';
+  ov.innerHTML = `<button type="button" class="tvX" title="Salir (Esc)">×</button><div class="tvTop"><b>${esc(centroNombre(perfil.centro_id))}</b><span id="tvHora"></span></div>
+    <div class="tvMain"><small>Turno</small><div id="tvNum">—</div><div id="tvCons"></div></div><div class="tvLista" id="tvLista"></div><div class="tvPie">Espere su número · SIVEC</div>`;
+  document.body.appendChild(ov);
+  try { if (ov.requestFullscreen) await ov.requestFullscreen(); } catch (_) {}
+  const cerrar = () => { clearInterval(tvTimer); tvTimer = null; ov.remove(); if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); document.removeEventListener('keydown', k); };
+  const k = e => { if (e.key === 'Escape') cerrar(); };
+  document.addEventListener('keydown', k); ov.querySelector('.tvX').onclick = cerrar;
+  const tick = async () => {
+    document.getElementById('tvHora').textContent = new Date().toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' });
+    const { data } = await sb.from('sivec_turnos').select('id,numero,consultorio,estado,llamada_at').eq('centro_id', perfil.centro_id).eq('fecha', hoyISO()).not('llamada_at', 'is', null).order('llamada_at', { ascending: false }).limit(6);
+    const L = (data || []).filter(t => t.llamada_at).sort((a, b) => String(b.llamada_at).localeCompare(String(a.llamada_at))); if (!L.length) return;
+    const u = L[0];
+    document.getElementById('tvNum').textContent = u.numero; document.getElementById('tvCons').textContent = u.consultorio ? '➜ ' + u.consultorio : '';
+    document.getElementById('tvLista').innerHTML = L.slice(1).map(t => `<div><b>${t.numero}</b><span>${esc(t.consultorio || '')}</span></div>`).join('');
+    const clave = u.id + '|' + u.llamada_at;
+    if (tvUltimo !== null && clave !== tvUltimo) { ov.classList.remove('flash'); void ov.offsetWidth; ov.classList.add('flash'); sonido('alerta'); setTimeout(() => vozDecir(`Turno ${u.numero}${u.consultorio ? ', ' + u.consultorio : ''}.`), 700); }
+    tvUltimo = clave;
+  };
+  await tick(); tvTimer = setInterval(tick, 4000);
 }
 
 // Términos de uso y política de privacidad: cada persona los acepta una vez por versión (Paso 26 del SQL)
