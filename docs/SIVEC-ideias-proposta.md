@@ -891,3 +891,8 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - Queda visible al menos 0,9 s y se desvanece al abrir el panel; si la contraseña falla, se quita al instante.
 - Respeta "reducir movimiento" del sistema (sin rebote). Idea tomada del cargador de renderforest.
 - v1.5.1: las bolitas ahora giran en forma de infinito (∞) dejando estela de color. Interactivo: el ∞ se inclina hacia el ratón o el dedo, y al tocarlo las bolitas aceleran (y el celular vibra un toque). Mensajes de avance: "Verificando tu acceso… → Cargando tu establecimiento… → Abriendo tus pacientes… → Casi listo…". Dura al menos 1,6 s.
+
+## 27/09/2026 · Velo degradé en los gráficos (v1.5.2)
+- "Tomas por mes" (panel del centro y tablero de la red): curva suave que une la punta de las columnas, con un velo en degradé lila que cae y se desvanece, y un punto brillante en el mes actual. Se dibuja de izquierda a derecha al abrir el panel.
+- Las mini líneas de los indicadores también tienen el relleno en degradé.
+- Presentación: slides "El panel del centro" y "La red en vivo" con capturas nuevas (datos de prueba).
