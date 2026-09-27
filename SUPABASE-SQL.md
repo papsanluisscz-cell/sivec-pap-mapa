@@ -1815,3 +1815,56 @@ select case when to_regclass('public.sivec_aceptaciones') is not null
 
 ### Deshacer el Paso 26
 `drop table if exists sivec_aceptaciones;` y `alter table pacientes drop column if exists consent_registro_digital;` (se pierde lo registrado).
+
+---
+
+## Paso 27 — Antecedentes completos en la referencia (Formulario Nº 1)
+
+Al derivar aparece el bloque **Antecedentes y examen**: gineco-obstétricos (menarca, ciclos, FUM, IRS, parejas, gestas, partos, cesáreas, abortos, hijos vivos, fecha del último parto, embarazo, lactancia, menopausia, método, vacuna VPH, PAP/VPH previos, tratamiento previo del cuello), personales y familiares, signos vitales y examen. Se completa solo con la última consulta y el historial de tomas; se guarda con la derivación, sale en el Formulario Nº 1 y el hospital lo ve en su portal.
+
+```sql
+-- PASO 27 · Antecedentes gineco-obstétricos, personales, signos vitales y examen en la referencia (Formulario Nº 1)
+alter table derivaciones add column if not exists clinica jsonb;
+
+-- El centro que derivó guarda los antecedentes de la referencia
+create or replace function sivec_der_clinica(p_id uuid, p_clinica jsonb) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  update derivaciones set clinica = p_clinica where id = p_id and sivec_edita_centro(centro_origen);
+  if not found then raise exception 'Solo el centro que derivó puede completar los antecedentes.'; end if;
+end $$;
+revoke execute on function sivec_der_clinica(uuid, jsonb) from public, anon;
+grant execute on function sivec_der_clinica(uuid, jsonb) to authenticated;
+
+-- El hospital ve los antecedentes en su portal de colposcopia
+drop function if exists sivec_colpo_lista();
+create or replace function sivec_colpo_lista()
+returns table (id uuid, paciente_id uuid, nombre text, carnet text, fecha_nacimiento date, celular text, direccion text,
+  centro_origen uuid, motivo text, indicacion text, prioridad text, notas text, derivado_por text, fecha_derivacion date,
+  estado text, fecha_cita date, fecha_atencion date, atendido_por text, colposcopia jsonb, biopsia_tomada boolean,
+  biopsia_resultado text, tratamiento text, contrarreferencia text, proximo_control text, fecha_contrarreferencia timestamptz, antecedentes text, cobertura text, monto numeric, pago_recibo text, clinica jsonb)
+language sql stable security definer set search_path = public as $$
+  select d.id, d.paciente_id, p.nombre, p.carnet, p.fecha_nacimiento, p.celular, p.direccion,
+    d.centro_origen, d.motivo, d.indicacion, d.prioridad, d.notas, d.derivado_por, d.fecha_derivacion,
+    d.estado, d.fecha_cita, d.fecha_atencion, d.atendido_por, d.colposcopia, d.biopsia_tomada,
+    d.biopsia_resultado, d.tratamiento, d.contrarreferencia, d.proximo_control, d.fecha_contrarreferencia,
+    (select string_agg(to_char(q.fecha_toma, 'MM/YYYY') || ' ' || coalesce(nullif(q.resultado_pap, ''), 'PAP pendiente')
+        || case when q.resultado_vph is not null and q.resultado_vph <> '' then ' · VPH ' || q.resultado_vph || coalesce(' ' || q.vph_genotipo, '') else '' end, '  |  ' order by q.fecha_toma desc)
+       from pacientes q where q.deleted_at is null and (q.id = p.id or (coalesce(p.carnet, '') <> '' and q.carnet = p.carnet))),
+    d.cobertura, d.monto, d.pago_recibo, d.clinica
+  from derivaciones d join pacientes p on p.id = d.paciente_id
+  where sivec_es_colpo() and d.destino_id = sivec_centro() and d.estado <> 'cancelada'
+  order by (d.prioridad = 'urgente') desc, d.fecha_derivacion $$;
+revoke execute on function sivec_colpo_lista() from public, anon;
+grant execute on function sivec_colpo_lista() to authenticated;
+
+notify pgrst, 'reload schema';
+
+-- Resultado: debe decir "listo"
+select case when exists (select 1 from information_schema.columns where table_name = 'derivaciones' and column_name = 'clinica')
+             and pg_get_functiondef('sivec_colpo_lista()'::regprocedure) like '%clinica%'
+            then 'listo' else 'revisar' end as paso_27;
+```
+
+### Deshacer el Paso 27
+Volver a ejecutar `sivec_colpo_lista` del Paso 14 (antes: `drop function if exists sivec_colpo_lista();`). La columna `clinica` puede quedar.

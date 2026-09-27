@@ -984,6 +984,10 @@ body:not(.cobroOn) .cobroCampo { display: none !important; }
 .vphBox[hidden], .vphBox .field[hidden] { display: none !important; }
 .labMet { font-size: 11px; font-weight: 700; color: #6d28d9; background: #ede9fe; border-radius: 999px; padding: 1px 8px; margin-left: 4px; }
 .balPill.kit { background: #fef3c7; color: #92400e; }
+.derCli { margin-top:10px; border:1px solid var(--line); border-radius:12px; padding:8px 12px; background:var(--surface); }
+.derCli summary { cursor:pointer; font-weight:700; font-size:14px; } .derCli summary span { font-weight:400; color:var(--ink-soft); font-size:12.5px; }
+.dcRow { display:flex; flex-wrap:wrap; gap:8px; margin:6px 0; } .dcT { font-size:12.5px; font-weight:700; color:var(--ink-soft); margin-left:6px; }
+.dcL { display:flex; flex-direction:column; gap:2px; font-size:11.5px; color:var(--ink-soft); max-width:100%; } .dcL input, .dcL textarea { width:100%; padding:5px 7px; border:1px solid var(--line); border-radius:7px; background:var(--surface); color:var(--ink); font:inherit; font-size:13px; }
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#7d2a4c">
@@ -3096,6 +3100,7 @@ function derFormulario(p) {
   const box = document.getElementById('derBox');
   if (!dest.length) { alert('Todavía no hay establecimientos con colposcopia habilitada: el administrador los marca en Admin → Establecimientos.'); return; }
   const bet = bethesdaDe(p), alto = bet && (BETHESDA_BY_CODE[bet] || {}).nivel === 'alto';
+  const cl = derClinicaInicial(p);
   let st = { indicacion: 'Colposcopia + biopsia', prioridad: alto || /16|18/.test(p.vph_genotipo || '') ? 'urgente' : 'normal', cobertura: p.cobertura || '' };
   const pinta = () => {
     box.innerHTML = `<h2>🩺 Derivar a colposcopia</h2><p class="hint" style="margin:0">${esc(p.nombre)} · CI ${esc(p.carnet || '—')} · ${edadDe(p.fecha_nacimiento) ?? '—'} años · toma ${fmtFecha(p.fecha_toma)}</p>
@@ -3106,11 +3111,17 @@ function derFormulario(p) {
       <div class="labSec cobroCampo">Cobertura</div><div class="labChips cobroCampo">${[['SUS', 'SUS'], ['Sin SUS', 'Sin SUS']].map(([k, v]) => `<button type="button" class="labChip${st.cobertura === k ? ' on' : ''}" data-dg="cobertura" data-v="${k}">${v}</button>`).join('')}
         <span style="display:${st.cobertura === 'Sin SUS' ? 'inline-flex' : 'none'};align-items:center;gap:5px;font-size:13px">Bs <input type="text" id="derMonto" value="" placeholder="si cobran" style="width:90px"></span></div>
       <div class="labSec">Notas para el hospital (opcional)</div><textarea id="derNotas" rows="2" placeholder="Antecedentes, embarazo, dificultades para asistir…"></textarea>
+      ${derClinicaHTML(cl)}
       <div class="acts"><button type="button" class="primary" data-da="enviar">📤 Derivar</button><button type="button" class="rowBtn" data-da="cerrar" style="margin-left:auto">Cancelar</button></div>
       <p class="hint" style="margin:8px 0 0">El hospital la ve en su portal, le da cita y devuelve la <b>contrarreferencia</b> (colposcopia, biopsia, tratamiento) directo a esta ficha.</p>`;
   };
   pinta();
+  const repintar = () => { const keep = { d: g('derDestino'), m: g('derMotivo'), n: g('derNotas'), b: g('derMonto'), o: (box.querySelector('.derCli') || {}).open }; pinta(); document.getElementById('derDestino').value = keep.d; document.getElementById('derMotivo').value = keep.m; document.getElementById('derNotas').value = keep.n; if (keep.b && document.getElementById('derMonto')) document.getElementById('derMonto').value = keep.b; const dc = box.querySelector('.derCli'); if (dc && keep.o === false) dc.open = false; };
+  derClinicaPrecargar(p, cl).then(cambio => { if (cambio && document.getElementById('derOverlay').classList.contains('open') && box.querySelector('.derCli')) repintar(); });
+  box.oninput = e => { const k = e.target.dataset && e.target.dataset.cl; if (k) cl[k] = e.target.value; };
   box.onclick = async e => {
+    const cc = e.target.closest('[data-clc]');
+    if (cc) { const k = cc.dataset.clc, v = cc.dataset.v; if (k === 'pat') cl.pat = cl.pat.includes(v) ? cl.pat.filter(x => x !== v) : [...cl.pat, v]; else cl[k] = cl[k] === v ? '' : v; return repintar(); }
     const c = e.target.closest('[data-dg]');
     if (c) { const keep = { d: g('derDestino'), m: g('derMotivo'), n: g('derNotas'), b: g('derMonto') }; st[c.dataset.dg] = c.dataset.v; pinta(); document.getElementById('derDestino').value = keep.d; document.getElementById('derMotivo').value = keep.m; document.getElementById('derNotas').value = keep.n; if (keep.b) document.getElementById('derMonto').value = keep.b; return; }
     const a = e.target.closest('[data-da]'); if (!a) return;
@@ -3121,6 +3132,8 @@ function derFormulario(p) {
     const { data, error } = await sb.rpc('sivec_derivar', { p_paciente: p.id, p_destino: destino, p_motivo: g('derMotivo'), p_indicacion: st.indicacion, p_prioridad: st.prioridad, p_notas: g('derNotas'), p_por: perfil.nombre_completo || perfil.correo || '', p_cobertura: COBRO_ACTIVO ? st.cobertura : null, p_monto: monto });
     if (error) { alert('No se pudo derivar: ' + error.message); return; }
     const d = Array.isArray(data) ? data[0] : data;
+    const { error: eCl } = await sb.rpc('sivec_der_clinica', { p_id: d.id, p_clinica: cl });
+    if (eCl) showToast('La derivación se envió, pero los antecedentes no se guardaron' + (/function|sivec_der_clinica/.test(eCl.message) ? ': ejecutar el Paso 27 del SQL' : ': ' + esc(eCl.message)), 'err'); else d.clinica = cl;
     if (COBRO_ACTIVO) p.cobertura = st.cobertura;
     showToast(`${esc(p.nombre)} derivada a ${esc(centroNombre(destino))} ✔`, 'ok');
     derivMap.set(String(p.id), d); p.derivacion_pap = centroNombre(destino);
@@ -3135,6 +3148,57 @@ function colColpoDe(f) {
   const vacio = !Object.values(f.mapa.marcas || {}).some(l => l.length);
   return { adecuada: f.adecuada, uec: f.uec || null, zt: f.zt, hallazgos: f.hallazgos, tamano: f.tamano || null, schiller: f.schiller, ivaa: f.ivaa || null, impresion: f.impresion,
     mapa: vacio ? null : { marcas: f.mapa.marcas }, fragmentos: f.biopsia && f.fragmentos ? Number(f.fragmentos) : null, lec: f.biopsia ? f.lec : null, observaciones: f.observaciones || null };
+}
+// ---- Antecedentes y examen para la referencia (Formulario Nº 1): se precargan de la última consulta y del historial de tomas ----
+const DER_PAT = ['Diabetes', 'Hipertensión', 'VIH', 'Inmunosupresión', 'ITS previas', 'Tabaquismo'];
+function derClinicaInicial(p) {
+  const t = tomasIndex && tomasIndex.get(p.id), grupo = ((t && t.grupo) || [p]).slice().sort((a, b) => String(b.fecha_toma).localeCompare(String(a.fecha_toma)));
+  const previos = grupo.filter(x => bethesdaDe(x) || x.estado_pap === 'Positivo' || x.estado_pap === 'Negativo' || x.resultado_vph)
+    .map(x => fmtFecha(x.fecha_toma) + ' ' + (bethesdaDe(x) || x.estado_pap || '') + (x.resultado_vph ? ' · VPH ' + x.resultado_vph + (x.vph_genotipo ? ' ' + x.vph_genotipo : '') : '')).slice(0, 4).join(' | ');
+  return { menarca: '', ciclos: '', fum: '', irs: '', parejas: '', g: '', p: '', c: '', a: '', hv: '', fup: '', metodo: p.anticonceptivo_metodo || '',
+    embarazo: '', sem: '', lactancia: '', menopausia: '', meno_edad: '', vacuna: '', pap_previos: previos, trat_cuello: '',
+    pat: [], pat_otros: '', alergias: '', cirugias: '', familiares: '', pa: '', fc: '', fr: '', t: '', peso: '', talla: '', examen: '' };
+}
+async function derClinicaPrecargar(p, cl) {
+  let cambio = false;
+  try {
+    const ant = await ultimaConsultaDelGrupo(p), g = (ant && ant.detalle && ant.detalle.gineco) || {};
+    const m = { menarca: g.menarca, ciclos: g.ciclos, fum: g.fum, irs: g.irs, parejas: g.parejas, g: g.g, p: g.p, c: g.c, a: g.a, hv: g.hv, fup: g.fup };
+    Object.entries(m).forEach(([k, v]) => { if (v && !cl[k]) { cl[k] = v; cambio = true; } });
+    const ult = await getLatestConsulta(p.id);
+    if (ult && !cl.examen) { const ex = [ult.objetivo_oce ? 'Cuello: ' + ult.objetivo_oce : '', ult.objetivo_leucorrea ? 'Leucorrea: ' + ult.objetivo_leucorrea : '', ult.objetivo_color || '', ult.objetivo || ''].filter(Boolean).join('. '); if (ex) { cl.examen = ex; cambio = true; } }
+  } catch (e) {}
+  return cambio;
+}
+function derClinicaHTML(cl) {
+  const i = (k, ph, w, type) => `<label class="dcL" style="width:${w || '90px'}"><span>${ph}</span><input data-cl="${k}" type="${type || 'text'}" value="${esc(cl[k] || '')}"></label>`;
+  const ch = (k, v) => `<button type="button" class="labChip${cl[k] === v ? ' on' : ''}" data-clc="${k}" data-v="${esc(v)}">${esc(v)}</button>`;
+  return `<details class="derCli" open><summary>Antecedentes y examen <span>· van al Formulario de referencia Nº 1 (se completan solos con la última consulta)</span></summary>
+    <div class="labSec">Gineco-obstétricos</div>
+    <div class="dcRow">${i('menarca', 'Menarca (edad)', '96px')}${i('ciclos', 'Ciclos', '130px')}${i('fum', 'FUM', '140px', 'date')}${i('irs', 'IRS (edad)', '80px')}${i('parejas', 'Parejas', '70px')}${i('metodo', 'Método anticonceptivo', '190px')}</div>
+    <div class="dcRow">${i('g', 'Gestas', '64px')}${i('p', 'Partos', '64px')}${i('c', 'Cesáreas', '72px')}${i('a', 'Abortos', '70px')}${i('hv', 'Hijos vivos', '84px')}${i('fup', 'Fecha último parto', '150px', 'date')}</div>
+    <div class="dcRow" style="align-items:center"><span class="dcT">Embarazo actual</span>${ch('embarazo', 'No')}${ch('embarazo', 'Sí')}${cl.embarazo === 'Sí' ? i('sem', 'Semanas', '72px') : ''}
+      <span class="dcT">Lactancia</span>${ch('lactancia', 'No')}${ch('lactancia', 'Sí')}<span class="dcT">Menopausia</span>${ch('menopausia', 'No')}${ch('menopausia', 'Sí')}${cl.menopausia === 'Sí' ? i('meno_edad', 'Edad', '60px') : ''}</div>
+    <div class="dcRow" style="align-items:center"><span class="dcT">Vacuna VPH</span>${ch('vacuna', 'No')}${ch('vacuna', 'Sí')}${ch('vacuna', 'No sabe')}</div>
+    <div class="dcRow">${i('pap_previos', 'PAP / VPH previos', '100%')}</div>
+    <div class="dcRow">${i('trat_cuello', 'Tratamiento previo del cuello (crioterapia, LEEP, cono…)', '100%')}</div>
+    <div class="labSec">Personales y familiares</div>
+    <div class="labChips">${DER_PAT.map(v => `<button type="button" class="labChip${cl.pat.includes(v) ? ' on' : ''}" data-clc="pat" data-v="${v}">${v}</button>`).join('')}</div>
+    <div class="dcRow" style="margin-top:6px">${i('pat_otros', 'Otros patológicos', '32%')}${i('alergias', 'Alergias', '30%')}${i('cirugias', 'Cirugías previas', '32%')}</div>
+    <div class="dcRow">${i('familiares', 'Antecedentes familiares de cáncer (cuello, mama, otros)', '100%')}</div>
+    <div class="labSec">Signos vitales y examen</div>
+    <div class="dcRow">${i('pa', 'PA', '80px')}${i('fc', 'FC', '60px')}${i('fr', 'FR', '60px')}${i('t', 'T°', '60px')}${i('peso', 'Peso (kg)', '76px')}${i('talla', 'Talla (cm)', '76px')}</div>
+    <label class="dcL" style="width:100%"><span>Examen físico y ginecológico</span><textarea data-cl="examen" rows="2">${esc(cl.examen || '')}</textarea></label>
+  </details>`;
+}
+function derClinicaTexto(cl) {
+  if (!cl) return '';
+  const f = v => v ? (fmtFecha(v) || v) : '';
+  return [cl.menarca && 'Menarca ' + cl.menarca, cl.ciclos && 'Ciclos ' + cl.ciclos, cl.irs && 'IRS ' + cl.irs, cl.parejas && 'Parejas ' + cl.parejas,
+    [cl.g, cl.p, cl.c, cl.a].some(Boolean) && `G${cl.g || 0} P${cl.p || 0} C${cl.c || 0} A${cl.a || 0}` + (cl.hv ? ` HV${cl.hv}` : ''), cl.fup && 'FUP ' + f(cl.fup), cl.fum && 'FUM ' + f(cl.fum),
+    cl.metodo && 'Método: ' + cl.metodo, cl.embarazo && 'Embarazo: ' + cl.embarazo + (cl.sem ? ' (' + cl.sem + ' sem)' : ''), cl.lactancia === 'Sí' && 'Lactancia', cl.menopausia === 'Sí' && 'Menopausia' + (cl.meno_edad ? ' (' + cl.meno_edad + ' a)' : ''),
+    cl.vacuna && 'Vacuna VPH: ' + cl.vacuna, cl.trat_cuello && 'Tratamiento previo: ' + cl.trat_cuello, (cl.pat || []).length && 'Patológicos: ' + cl.pat.join(', '), cl.pat_otros, cl.alergias && 'Alergias: ' + cl.alergias, cl.familiares && 'Familiares: ' + cl.familiares]
+    .filter(Boolean).join(' · ');
 }
 function derResumenColpo(c) {
   if (!c) return '';
@@ -3296,7 +3360,7 @@ function colDetalle(d) {
   const chip = (g, v, on, extra, label) => `<button type="button" class="labChip ${extra || ''}${on ? ' on' : ''}" data-cg="${g}" data-v="${esc(v)}">${esc(label || v)}</button>`;
   const yaAtendida = ['atendida', 'contrarreferida'].includes(d.estado);
   box.innerHTML = `<div class="labCard"><div class="labHead">${esc(d.nombre)} · ${edadDe(d.fecha_nacimiento) ?? '—'} a<span>CI ${esc(d.carnet || '—')} · ☎ ${esc(d.celular || '—')} · ${esc(d.direccion || '')} · deriva ${esc(centroNombre(d.centro_origen))}${d.derivado_por ? ' (' + esc(d.derivado_por) + ')' : ''}</span></div>
-    <div class="derDato"><b>Motivo</b><span>${esc(d.motivo || '—')} · ${esc(d.indicacion || '')}${d.prioridad === 'urgente' ? ' <span class="urg">URGENTE</span>' : ''}</span><b>Antecedentes PAP/VPH</b><span>${esc(d.antecedentes || '—')}</span>${d.notas ? `<b>Notas del centro</b><span>${esc(d.notas)}</span>` : ''}
+    <div class="derDato"><b>Motivo</b><span>${esc(d.motivo || '—')} · ${esc(d.indicacion || '')}${d.prioridad === 'urgente' ? ' <span class="urg">URGENTE</span>' : ''}</span><b>Antecedentes PAP/VPH</b><span>${esc(d.antecedentes || '—')}</span>${d.clinica ? `<b>Antecedentes GO y otros</b><span>${esc(derClinicaTexto(d.clinica))}</span>` : ''}${d.notas ? `<b>Notas del centro</b><span>${esc(d.notas)}</span>` : ''}
       ${COBRO_ACTIVO ? `<b>Cobertura</b><span>${d.cobertura === 'Sin SUS' ? `<b style="color:#b45309">Sin SUS${d.monto ? ' · cobrar Bs ' + esc(d.monto) + ' en caja' : ' · cobrar según tarifa del hospital'}</b>${d.pago_recibo ? ' · ✓ pagado (' + esc(d.pago_recibo) + ')' : ` <input type="text" id="colRecibo" placeholder="N° de recibo de caja" style="width:170px;display:inline-block;margin-left:6px"> <button type="button" class="rowBtn" data-ca="pago">💵 Registrar pago</button>`}` : d.cobertura === 'SUS' ? 'SUS — sin costo' : '—'}</span>` : ''}</div>
     ${!yaAtendida ? `<div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin:6px 0 4px"><label style="font-size:12px;font-weight:700;color:var(--ink-soft)">FECHA DE CITA<input type="date" id="colCita" value="${esc(d.fecha_cita || '')}" style="display:block;margin-top:3px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--surface);color:var(--ink)"></label><button type="button" class="rowBtn" data-ca="cita">📅 Guardar cita</button>${d.estado === 'citada' ? '<button type="button" class="rowBtn" data-ca="noasistio">✗ No asistió</button>' : ''}</div>` : ''}
     ${colTab === 'biopsia' || (yaAtendida && d.biopsia_tomada) ? `<div class="labSec">Resultado de la biopsia</div><div class="labChips">${COL_BIOPSIA.map(v => `<button type="button" class="labChip ${v.startsWith('Negativo') ? 'neg' : /CIN 1/.test(v) ? '' : 'alto'}${d.biopsia_resultado === v ? ' on' : ''}" data-biop="${esc(v)}">${esc(v)}</button>`).join('')}</div><p class="hint" style="margin:6px 0 0">Al guardarlo, el centro recibe el resultado como contrarreferencia nueva.</p>` : ''}
@@ -5733,7 +5797,8 @@ function soapCamposHTML() {
         <div class="sChips">${chips('sint', SOAP_SINTOMAS)}</div>
         <div class="sLbl">Tiempo de evolución</div><div class="sChips">${chips('evol', SOAP_EVOL)}</div>
         <div class="sLbl">Datos gineco-obstétricos</div>
-        <div class="gRow">${inp('g_fum', 'FUM', '130px', 'date')}${inp('g_g', 'G', '44px')}${inp('g_p', 'P', '44px')}${inp('g_c', 'C', '44px')}${inp('g_a', 'A', '44px')}${inp('g_irs', 'IRS (edad)', '78px')}${inp('g_parejas', 'Parejas', '62px')}${inp('g_pap', 'Último PAP', '150px')}</div>
+        <div class="gRow">${inp('g_menarca', 'Menarca (edad)', '92px')}${inp('g_ciclos', 'Ciclos (ej: 28/5 regular)', '150px')}${inp('g_fum', 'FUM', '130px', 'date')}${inp('g_irs', 'IRS (edad)', '78px')}${inp('g_parejas', 'Parejas', '62px')}</div>
+        <div class="gRow">${inp('g_g', 'G', '44px')}${inp('g_p', 'P', '44px')}${inp('g_c', 'C', '44px')}${inp('g_a', 'A', '44px')}${inp('g_hv', 'HV', '44px')}${inp('g_fup', 'Fecha último parto', '130px', 'date')}${inp('g_pap', 'Último PAP', '150px')}</div>
         <textarea data-s="s_libre" rows="2" placeholder="Texto libre (opcional)…"></textarea>
       </section>
       <section class="sCard"><h4><i>O</i> Especuloscopía</h4>
@@ -5868,8 +5933,11 @@ function soapTextos(d, one) {
   if (sint.length) S.push('Refiere ' + listaY(sint.map(x => x.toLowerCase())) + (d.evolucion ? ' de ' + d.evolucion + ' de evolución' : '') + '.');
   else if ((d.sintomas || []).length) S.push('Asintomática, acude a control.');
   const g = d.gineco || {};
+  if (g.menarca) S.push('Menarca: ' + g.menarca + ' años.');
+  if (g.ciclos) S.push('Ciclos: ' + g.ciclos + '.');
   if (g.fum) S.push('FUM: ' + (fmtFecha(g.fum) || g.fum) + '.');
-  if ([g.g, g.p, g.c, g.a].some(x => x !== '' && x != null)) S.push(`G${g.g || 0} P${g.p || 0} C${g.c || 0} A${g.a || 0}.`);
+  if ([g.g, g.p, g.c, g.a].some(x => x !== '' && x != null)) S.push(`G${g.g || 0} P${g.p || 0} C${g.c || 0} A${g.a || 0}` + (g.hv ? ` HV${g.hv}` : '') + '.');
+  if (g.fup) S.push('Fecha del último parto: ' + (fmtFecha(g.fup) || g.fup) + '.');
   if (g.irs) S.push('IRS: ' + g.irs + ' años.');
   if (g.parejas) S.push('Parejas sexuales: ' + g.parejas + '.');
   if (g.ultimo_pap) S.push('Último PAP: ' + g.ultimo_pap + '.');
@@ -5895,7 +5963,7 @@ function soapLeer(root) {
   const meds = [...root.querySelectorAll('.sRecRow')].map(r => Object.assign(JSON.parse(r.dataset.m), { indic: r.querySelector('.rIndic').value.trim(), cant: r.querySelector('.rCant') ? r.querySelector('.rCant').value.trim() : '' }));
   const d = {
     sintomas: on('sint'), evolucion: one('evol'),
-    gineco: { fum: val('g_fum'), g: val('g_g'), p: val('g_p'), c: val('g_c'), a: val('g_a'), irs: val('g_irs'), parejas: val('g_parejas'), ultimo_pap: val('g_pap') },
+    gineco: { menarca: val('g_menarca'), ciclos: val('g_ciclos'), fum: val('g_fum'), g: val('g_g'), p: val('g_p'), c: val('g_c'), a: val('g_a'), hv: val('g_hv'), fup: val('g_fup'), irs: val('g_irs'), parejas: val('g_parejas'), ultimo_pap: val('g_pap') },
     o_otros: on('ootros'), diagnosticos: on('dx'), control: one('control'),
     s_libre: val('s_libre'), o_libre: val('o_libre'), a_libre: val('a_libre'), p_libre: val('p_libre'), meds,
   };
@@ -5930,6 +5998,7 @@ function soapEscribir(root, c, opts) {
   }
   const g = (d && d.gineco) || (opts && opts.gineco) || {};
   put('g_fum', g.fum); put('g_g', g.g); put('g_p', g.p); put('g_c', g.c); put('g_a', g.a); put('g_irs', g.irs); put('g_parejas', g.parejas); put('g_pap', g.ultimo_pap);
+  put('g_menarca', g.menarca); put('g_ciclos', g.ciclos); put('g_hv', g.hv); put('g_fup', g.fup);
   if (opts && opts.esp && !(c && (c.codigo_esp || c.especialidad))) soapSetEsp(root, opts.esp);
   (opts && opts.ootros || []).forEach(v => set('ootros', v));
   soapMedsRender(root); soapSugerir(root);
@@ -7228,6 +7297,7 @@ function formReferenciaDoc(p, d) {
   const cie = cie10De(bet && bet !== 'NILM' ? bet : dx);
   const nivel = c => (TIPOS_CENTRO[c.tipo] || '').split(' · ')[0];
   const lineas = n => Array.from({ length: n }, () => '<div style="border-bottom:1px dotted var(--hair);height:22px"></div>').join('');
+  const cl = d.clinica || {}, fv = v => v ? (fmtFecha(v) || esc(v)) : '';
   const body = `<section class="sheet">${fpHead('FORMULARIO DE REFERENCIA', 'Norma Nacional de Referencia y Retorno · Formulario Nº 1', `<span class="code">Nº 1</span><div class="folio">Referencia <b>${esc(String(d.id || '').slice(0, 8).toUpperCase() || '………')}</b></div>`)}
     ${formRefCtx(d.centro_origen)}
     <div class="sec"><div class="secT">1. Establecimiento que refiere <span>Fecha ${fpFecha(d.fecha_derivacion)} · Hora …… : ……</span></div><div class="grid" style="grid-template-columns:2fr 1fr 1fr">
@@ -7237,17 +7307,26 @@ function formReferenciaDoc(p, d) {
       ${fpCell('Nombre', esc(dest.nombre || centroNombre(d.destino_id)))}${fpCell('Nivel', esc(nivel(dest)))}${fpCell('Servicio', esc(/tratamiento/i.test(d.indicacion || '') ? 'Ginecología' : 'Colposcopia'), 'nr')}
       ${fpCell('Dirección', esc(dest.direccion || ''), 'n nb', 'grid-column:span 2')}${fpCell('Fecha de cita', d.fecha_cita ? fmtFecha(d.fecha_cita) : '', 'nr nb')}</div></div>
     ${formRefPaciente(p)}
-    <div class="sec"><div class="secT">3. Datos clínicos</div><div class="grid" style="grid-template-columns:1fr">
+    <div class="sec"><div class="secT">3. Antecedentes gineco-obstétricos</div><div class="grid" style="grid-template-columns:repeat(6, 1fr)">
+      ${fpCell('Menarca', esc(cl.menarca ? cl.menarca + ' años' : ''))}${fpCell('Ciclos', esc(cl.ciclos || ''), 'n')}${fpCell('FUM', fv(cl.fum))}${fpCell('IRS', esc(cl.irs ? cl.irs + ' años' : ''))}${fpCell('N° parejas', esc(cl.parejas || ''))}${fpCell('Vacuna VPH', fpChk('Sí', cl.vacuna === 'Sí') + fpChk('No', cl.vacuna === 'No'), 'n nr')}
+      ${fpCell('Gestas', esc(cl.g || ''))}${fpCell('Partos', esc(cl.p || ''))}${fpCell('Cesáreas', esc(cl.c || ''))}${fpCell('Abortos', esc(cl.a || ''))}${fpCell('Hijos vivos', esc(cl.hv || ''))}${fpCell('Fecha último parto', fv(cl.fup), 'nr')}
+      ${fpCell('Embarazo actual', fpChk('No', cl.embarazo === 'No') + fpChk('Sí', cl.embarazo === 'Sí') + (cl.sem ? ' ' + esc(cl.sem) + ' sem' : ''), 'n', 'grid-column:span 2')}${fpCell('Lactancia', fpChk('No', cl.lactancia === 'No') + fpChk('Sí', cl.lactancia === 'Sí'), 'n')}${fpCell('Menopausia', fpChk('No', cl.menopausia === 'No') + fpChk('Sí', cl.menopausia === 'Sí') + (cl.meno_edad ? ' ' + esc(cl.meno_edad) + ' a' : ''), 'n')}${fpCell('Método anticonceptivo', esc(cl.metodo || p.anticonceptivo_metodo || ''), 'n nr', 'grid-column:span 2')}
+      ${fpCell('PAP / VPH previos', esc(cl.pap_previos || ''), 'n', 'grid-column:span 3')}${fpCell('Tratamiento previo del cuello', esc(cl.trat_cuello || ''), 'n nr nb', 'grid-column:span 3')}</div></div>
+    <div class="sec"><div class="secT">4. Antecedentes personales y familiares</div><div class="grid" style="grid-template-columns:1fr 1fr">
+      ${fpCell('Patológicos', DER_PAT.map(v => fpChk(v, (cl.pat || []).includes(v))).join('') + (cl.pat_otros ? '<div>' + esc(cl.pat_otros) + '</div>' : ''), 'n', 'grid-column:span 2')}
+      ${fpCell('Alergias', esc(cl.alergias || ''), 'n')}${fpCell('Cirugías previas', esc(cl.cirugias || ''), 'n nr')}
+      ${fpCell('Familiares (cáncer de cuello, mama, otros)', esc(cl.familiares || ''), 'n nr nb', 'grid-column:span 2')}</div></div>
+    <div class="sec"><div class="secT">5. Datos clínicos</div><div class="grid" style="grid-template-columns:1fr">
       ${fpCell('Motivo de la referencia', esc([d.motivo, d.indicacion].filter(Boolean).join(' · ')) + (d.prioridad === 'urgente' ? ' <span class="pill">URGENTE</span>' : ''), 'nr')}
-      ${fpCell('Resumen de la anamnesis', esc([p.fecha_toma ? 'Toma de PAP el ' + fmtFecha(p.fecha_toma) : '', p.anticonceptivo_metodo ? 'Método: ' + p.anticonceptivo_metodo : '', d.notas || ''].filter(Boolean).join(' · ')) + lineas(1), 'n nr')}
+      ${fpCell('Resumen de la anamnesis', esc([p.fecha_toma ? 'Toma de PAP el ' + fmtFecha(p.fecha_toma) : '', d.notas || ''].filter(Boolean).join(' · ')) || lineas(1), 'n nr')}
     </div>
-    <div class="vit" style="margin-top:8px">${['PA', 'FC', 'FR', 'T°', 'Peso', 'Talla', 'FUM', 'G / P'].map(k => `<div><span class="k">${k}</span><span class="v">&nbsp;</span></div>`).join('')}</div>
+    <div class="vit" style="margin-top:8px;grid-template-columns:repeat(6,1fr)">${[['PA', cl.pa], ['FC', cl.fc], ['FR', cl.fr], ['T°', cl.t], ['Peso', cl.peso ? cl.peso + ' kg' : ''], ['Talla', cl.talla ? cl.talla + ' cm' : '']].map(([k, v]) => `<div><span class="k">${k}</span><span class="v">${esc(v || '') || '&nbsp;'}</span></div>`).join('')}</div>
     <div class="grid" style="grid-template-columns:1fr">
-      ${fpCell('Examen físico y ginecológico', lineas(2), 'n nr')}
+      ${fpCell('Examen físico y ginecológico', cl.examen ? esc(cl.examen) : lineas(2), 'n nr')}
       ${fpCell('Exámenes complementarios', p.antecedentes && !p.resultado_pap ? esc('PAP/VPH: ' + p.antecedentes) : esc(['PAP: ' + (p.resultado_pap || bet || 'pendiente'), vph, p.fecha_informe ? 'informado el ' + fmtFecha(String(p.fecha_informe).slice(0, 10)) + (p.informado_por ? ' por ' + p.informado_por : '') : ''].filter(Boolean).join(' · ')), 'n nr')}
       ${fpCell('Diagnóstico presuntivo', esc(dx) + (cie ? ` <span class="muted" style="font-weight:400">· CIE-10 sugerido: ${esc(cie)}</span>` : ''), 'nr')}
       ${fpCell('Tratamiento instaurado', lineas(1), 'n nr nb')}</div></div>
-    <div class="sec"><div class="secT">4. Condiciones del traslado</div><div class="grid" style="grid-template-columns:1fr 1fr 1.4fr">
+    <div class="sec"><div class="secT">6. Condiciones del traslado</div><div class="grid" style="grid-template-columns:1fr 1fr 1.4fr">
       ${fpCell('Estado de la paciente', fpChk('Estable', true) + fpChk('Inestable', false), 'n nb')}${fpCell('Prioridad', fpChk('Urgente', d.prioridad === 'urgente') + fpChk('Normal', d.prioridad !== 'urgente'), 'n nb')}${fpCell('Acompañada por', fpChk('Sola', false) + fpChk('Familiar', false) + fpChk('Personal de salud', false), 'n nr nb')}</div></div>
     <div class="firmas"><div><b>${esc(d.derivado_por || '&nbsp;')}</b>Nombre, firma y sello de quien refiere</div><div><b>…… / …… / …… · …… : ……</b>Llegada al establecimiento receptor</div><div><b>&nbsp;</b>Nombre y firma de quien recibe</div></div>
     <div class="sec" style="font-size:12px">Referencia justificada: ${fpChk('Sí', false)}${fpChk('No', false)} <span class="muted">(llena el establecimiento receptor)</span></div>
@@ -7533,7 +7612,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.3.0 · 27/09/2026';
+const SIVEC_VERSION = '1.4.0 · 27/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
