@@ -409,6 +409,8 @@
   .pdfBlockLabel { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .pdfBlockLabel .fmtTag { font-weight: 600; background: #fde68a; color: #7c4a03; border-radius: 999px; padding: 1px 8px; margin-left: 6px; font-size: 11px; }
   .pdfBlockLabel .fmtPrint { background: #fff; color: var(--teal-900); border: none; border-radius: 6px; padding: 4px 10px; font-weight: 700; font-size: 12px; cursor: pointer; }
+  .pdfBlockLabel .pfBtnDoc { background: #fef3c7; color: #7c2d12; } .pdfBlockLabel .pfBtnDoc.hecha { background: #dcfce7; color: #166534; }
+  .regOk #regFirma { background: var(--teal-700); color: #fff; border: 0; border-radius: 8px; padding: 5px 10px; font-weight: 700; cursor: pointer; margin-left: 6px; }
   .printBoxActions { flex-wrap: wrap; justify-content: flex-end; align-items: center; }
   .printBody { flex: 1; overflow-y: auto; padding: 20px; background: #d8d8d8; }
   .printLoading { text-align: center; color: #666; padding: 40px; font-size: 14px; }
@@ -1224,6 +1226,36 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
 #tvSala .tvLista b { font-size: 6vh; } #tvSala .tvLista span { font-size: 2.4vh; opacity: .85; }
 #tvSala .tvPie { text-align: center; font-size: 2.4vh; opacity: .6; margin-top: 2vh; }
 
+#pfOverlay { position: fixed; inset: 0; z-index: 3400; background: rgba(28,10,19,.6); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 16px; }
+#pfOverlay .pfCard { background: var(--surface); color: var(--ink); border-radius: 20px; width: 620px; max-width: 100%; max-height: calc(100vh - 32px); overflow: auto; box-shadow: 0 24px 70px rgba(28,10,19,.45); animation: fmEntra .26s cubic-bezier(.2,.8,.2,1); }
+#pfOverlay .pfCard.sacude { animation: fmSacude .38s; }
+#pfOverlay .pfCard.ok .pfHead { background: linear-gradient(135deg, #15803d, #16a34a); }
+#pfOverlay .pfHead { background: var(--header-grad); color: #fff; padding: 16px 18px; display: flex; gap: 12px; align-items: center; }
+#pfOverlay .pfHead b { display: block; font-size: 17px; } #pfOverlay .pfHead small { opacity: .85; font-size: 12.5px; }
+#pfOverlay .pfIco { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,.18); display: flex; align-items: center; justify-content: center; font-size: 22px; flex: none; }
+#pfOverlay .pfX { margin-left: auto; background: none; border: 0; color: #fff; font-size: 26px; cursor: pointer; }
+#pfOverlay .pfBody { padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+#pfOverlay .pfBody label { font-size: 12.5px; font-weight: 700; color: var(--ink-soft); margin-top: 4px; }
+#pfOverlay .pfPane { display: flex; flex-direction: column; gap: 8px; } #pfOverlay .pfPane[hidden] { display: none; }
+#pfOverlay .pfPac { display: flex; justify-content: space-between; gap: 8px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 14px; }
+#pfOverlay .pfModos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+#pfOverlay .pfModos button { border: 2px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 14px; padding: 12px; text-align: left; cursor: pointer; display: grid; grid-template-columns: 30px 1fr; column-gap: 8px; font: inherit; }
+#pfOverlay .pfModos button span { grid-row: span 2; font-size: 24px; } #pfOverlay .pfModos button small { color: var(--ink-soft); font-size: 12px; }
+#pfOverlay .pfModos button.on { border-color: var(--teal-700); background: color-mix(in srgb, var(--teal-700) 8%, var(--surface)); }
+#pfOverlay input { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font: inherit; background: var(--surface); color: var(--ink); }
+#pfOverlay .pfFila { display: flex; gap: 8px; } #pfOverlay .pfFila input { flex: 1; min-width: 0; }
+#pfOverlay .pfBtn { border: 0; background: #16a34a; color: #fff; border-radius: 10px; padding: 0 14px; font-weight: 700; cursor: pointer; font: inherit; }
+#pfOverlay .pfCod { font-size: 26px; letter-spacing: 12px; text-align: center; font-weight: 800; }
+#pfOverlay .pfNota { font-size: 12px; color: var(--ink-soft); margin: 0; }
+#pfOverlay .pfPad { position: relative; border: 2px dashed var(--line); border-radius: 14px; background: #fff; }
+#pfOverlay .pfPad.con { border-style: solid; border-color: var(--teal-700); }
+#pfOverlay .pfPad canvas { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; border-radius: 12px; }
+#pfOverlay .pfLinea { position: absolute; left: 24px; right: 24px; bottom: 34px; border-top: 1px solid #c9b8c0; font-size: 11px; color: #a08c96; padding-top: 2px; pointer-events: none; }
+#pfOverlay .pfMini { position: absolute; top: 8px; right: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+#pfOverlay .pfMsg { color: #b4233c; font-size: 13px; font-weight: 600; min-height: 18px; }
+#pfOverlay .pfSi { border: 0; background: var(--teal-700); color: #fff; border-radius: 12px; padding: 12px; font-weight: 800; font-size: 15px; cursor: pointer; }
+#pfOverlay .pfNo { border: 0; background: none; color: var(--ink-soft); padding: 6px; cursor: pointer; }
+#pfOverlay .pfPie { display: flex; justify-content: space-around; gap: 6px; flex-wrap: wrap; font-size: 11.5px; color: var(--ink-soft); border-top: 1px solid var(--line); padding: 10px 12px; }
 @media (max-width: 520px) { #spPanel { right: 8px; left: 8px; width: auto; max-width: none; bottom: 80px; height: calc(100vh - 100px); } }
 @media (max-width: 760px) { body::after { content: ''; display: block; height: 80px; } }  /* que el botón 💬 no tape el último botón de la página */
 @media print { #spBtn, #spPanel { display: none !important; } }
@@ -4405,9 +4437,9 @@ async function onSubmit(e) {
     showToast('Error al guardar la paciente: ' + error.message, 'err');
   } else {
     const nueva = insertado && insertado[0];
-    msg.innerHTML = `<span class="regOk">✅ ${esc(data.nombre)} guardada correctamente.${nueva ? ' <button type="button" id="regPrint">🖨 Imprimir documentos</button>' : ''}</span>`;
+    msg.innerHTML = `<span class="regOk">✅ ${esc(data.nombre)} guardada correctamente.${nueva ? ' <button type="button" id="regFirma">✍ Firma de la paciente</button> <button type="button" id="regPrint">🖨 Imprimir documentos</button>' : ''}</span>`;
     msg.className = 'ok';
-    if (nueva) { await guardarSoapDeRegistro(nueva); document.getElementById('regPrint').onclick = () => printPatientDocs(nueva); }
+    if (nueva) { await guardarSoapDeRegistro(nueva); document.getElementById('regPrint').onclick = () => printPatientDocs(nueva); document.getElementById('regFirma').onclick = async ev => { const f = await pacFirmar(nueva, 'consentimiento'); if (f) { ev.target.textContent = '✔ Firmado por la paciente'; ev.target.disabled = true; } }; }
     showToast('Paciente guardada correctamente ✔', 'ok');
     setTimeout(() => vozHitoMeta(), 1500);
     allPatientsData = []; // se vuelve a leer en el próximo registro, así también avisa de la toma recién guardada
@@ -7550,7 +7582,7 @@ function croquisHTML(lat, lng) {
 }
 
 function formPropioHTML(tipo, ctx) {
-  const { p, consulta, colp, esp, firma } = ctx;
+  const { p, consulta, colp, esp, firma } = ctx, pf = ctx.pacFirmas || {};
   const d = consulta && consulta.detalle;
   const nom = esc((p.nombre || '').toUpperCase()), ci = esc(p.carnet || ''), dom = esc(p.direccion || '');
   const doctora = esc((consulta && consulta.doctora) || p.doctora || '');
@@ -7574,7 +7606,7 @@ function formPropioHTML(tipo, ctx) {
         <table class="t"><thead><tr><th style="width:36%">Medicamento / insumo (nombre genérico, forma, concentración)</th><th>Indicaciones para el paciente</th><th style="width:62px">Recetada</th><th style="width:66px">Dispensada</th><th style="width:58px">Unitario</th><th style="width:52px">Total</th></tr></thead>
         <tbody>${ins}${filas}${vacias}</tbody></table>
         <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:6px;font-size:11.5px;font-weight:700">Costo total: ________ &nbsp; Costo total al usuario: ________</div></div>
-      <div class="firmas"><div>${firmaLeyenda(firma, 'Recetado por' + (espTxt ? ' · ' + espTxt : ''), doctora)}</div><div><b>&nbsp;</b>Dispensado por</div><div><b>&nbsp;</b>Firma paciente / acompañante · C.I.</div></div>
+      <div class="firmas"><div>${firmaLeyenda(firma, 'Recetado por' + (espTxt ? ' · ' + espTxt : ''), doctora)}</div><div><b>&nbsp;</b>Dispensado por</div><div>${pacFirmaLeyenda(pf.d1, 'Firma paciente / acompañante · C.I.')}</div></div>
       <p class="muted" style="font-size:10px;margin-top:14px">El prescriptor y dispensador certifican la veracidad de la información declarada en este documento médico legal. El usuario certifica haber recibido los medicamentos señalados.</p>${fpFoot()}</section>`;
   }
   if (tipo === 'd8') {
@@ -7634,7 +7666,7 @@ function formPropioHTML(tipo, ctx) {
       ${q(5, '¿La lectura de esta ficha fue acompañada de una <b>explicación clara y detallada</b>?', ['Si', 'No'], p.consent_explicacion).replace('></span>Si<', '></span>Sí<')}
       <div class="grid" style="grid-template-columns:1.6fr 1fr 1.2fr;margin-top:14px">${fpCell('Nombre completo (paciente) o tutor legal', nom, 'nb')}${fpCell('C.I.', ci, 'nb')}${fpCell('Lugar y fecha', 'Santa Cruz de la Sierra, ' + esc(fmtFecha(p.fecha_toma) || ''), 'n nb nr')}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 150px;gap:22px;margin-top:40px;align-items:end">
-        <div class="firmas" style="grid-template-columns:1fr;margin:0"><div><b>&nbsp;</b>Firma paciente, tutor legal o familiar</div></div>
+        <div class="firmas" style="grid-template-columns:1fr;margin:0"><div>${pacFirmaLeyenda(pf.consentimiento, 'Firma paciente, tutor legal o familiar')}</div></div>
         <div class="firmas" style="grid-template-columns:1fr;margin:0"><div>${firmaLeyenda(firma, 'Firma y sello · Médico Telesalud', doctora)}</div></div><div class="huella">Huella digital</div></div>${fpFoot()}</section>`;
   }
   // Historia clínica — evolución
@@ -7772,6 +7804,7 @@ function formPropioDoc(tipo, ctx) {
 }
 
 let printCtx = null;
+const PAC_FIRMA_DOC = { ci: 'consentimiento', d1: 'd1' };
 const PRINT_TARGETS = [['d1', 'prevD1', 'PDFTPL_D1', 'numero_folio_d1'], ['d8', 'prevD8', 'PDFTPL_D8', 'numero_folio_d8'], ['pap', 'prevPAP', 'PDFTPL_PAP', 'numero_folio_pap'], ['ci', 'prevCI', 'PDFTPL_CI', null], ['hc', 'prevHC', 'PDFTPL_HC', null]];
 const PDFTPL_POR_NOMBRE = () => ({ PDFTPL_D1, PDFTPL_D8, PDFTPL_PAP, PDFTPL_CI, PDFTPL_HC });
 async function printPatientDocs(p) {
@@ -7782,7 +7815,7 @@ async function printPatientDocs(p) {
 
   const info = await completarHc(data, p); // consulta (SOAP + receta) + colposcopia
   printEspElegida = info.esp.id; currentPrintData = data;
-  printCtx = { p, consulta: info.consulta, colp: info.colp, esp: info.esp, firma: info.consulta && info.consulta.id ? await firmaDe('consulta', info.consulta.id) : null };
+  printCtx = { p, consulta: info.consulta, colp: info.colp, esp: info.esp, firma: info.consulta && info.consulta.id ? await firmaDe('consulta', info.consulta.id) : null, pacFirmas: await pacFirmasDe(p.id) };
   const selEsp = document.getElementById('printEsp');
   selEsp.innerHTML = ESPECIALIDADES.map(e => `<option value="${e.id}">${esc(e.nombre)} · ${e.codigo}</option>`).join('');
   selEsp.value = info.esp.id;
@@ -7803,7 +7836,7 @@ async function renderPrintDocs(solo) {
     if (solo && solo !== tipo) continue;
     const fr = document.getElementById(id);
     const lbl = fr.parentElement.querySelector('.pdfBlockLabel');
-    lbl.innerHTML = `<span>${esc(FORM_TITULOS[tipo])}${fmt === 'sivec' ? ' <small class="fmtTag">formato SIVEC · prueba</small>' : ''}</span>${fmt === 'sivec' ? `<button type="button" class="fmtPrint" data-fr="${id}">🖨 Imprimir</button>` : ''}`;
+    lbl.innerHTML = `<span>${esc(FORM_TITULOS[tipo])}${fmt === 'sivec' ? ' <small class="fmtTag">formato SIVEC · prueba</small>' : ''}</span>${fmt === 'sivec' ? `<span>${PAC_FIRMA_DOC[tipo] ? `<button type="button" class="fmtPrint pfBtnDoc${(printCtx.pacFirmas || {})[PAC_FIRMA_DOC[tipo]] ? ' hecha' : ''}" data-pfdoc="${PAC_FIRMA_DOC[tipo]}" data-pftipo="${tipo}">${(printCtx.pacFirmas || {})[PAC_FIRMA_DOC[tipo]] ? '✔ Firmado por la paciente' : '✍ Firma de la paciente'}</button> ` : ''}<button type="button" class="fmtPrint" data-fr="${id}">🖨 Imprimir</button></span>` : ''}`;
     if (fmt === 'sivec') {
       fr.removeAttribute('src');
       fr.srcdoc = formPropioDoc(tipo, Object.assign({}, printCtx, { esp: espBuscar(printEspElegida) || printCtx.esp }));
@@ -7821,8 +7854,14 @@ function cambiarFormato(f) {
   try { localStorage.setItem('sivec_form_fmt', f); } catch (e) { /* sin almacenamiento */ }
   if (currentPrintPatient) renderPrintDocs();
 }
-document.getElementById('printBody').addEventListener('click', e => {
-  const b = e.target.closest('.fmtPrint'); if (!b) return;
+document.getElementById('printBody').addEventListener('click', async e => {
+  const pb = e.target.closest('[data-pfdoc]');
+  if (pb) {
+    const f = await pacFirmar(currentPrintPatient, pb.dataset.pfdoc);
+    if (f) { printCtx.pacFirmas = Object.assign({}, printCtx.pacFirmas, { [pb.dataset.pfdoc]: f }); renderPrintDocs(pb.dataset.pftipo); }
+    return;
+  }
+  const b = e.target.closest('.fmtPrint'); if (!b || !b.dataset.fr) return;
   const fr = document.getElementById(b.dataset.fr);
   try { fr.contentWindow.focus(); fr.contentWindow.print(); } catch (err) { alert('No se pudo imprimir este documento: ' + err.message); }
 });
@@ -8987,6 +9026,110 @@ async function tvAbrir() {
     tvUltimo = clave;
   };
   await tick(); tvTimer = setInterval(tick, 4000);
+}
+
+// ===== Firma de la paciente (Paso 33): código por WhatsApp o firma en la pantalla; el profesional firma como testigo con su PIN =====
+const PAC_DOCS = { consentimiento: 'Consentimiento informado', d1: 'Receta D1 (recibe los medicamentos)', referencia: 'Referencia', otro: 'Documento' };
+async function pacFirmasDe(pid) {
+  if (!sb || !pid) return {};
+  const { data, error } = await sb.from('sivec_firmas_paciente').select('*').eq('paciente_id', String(pid)).order('creado', { ascending: false });
+  if (error) return {};
+  const m = {}; (data || []).forEach(f => { if (!m[f.documento]) m[f.documento] = f; }); return m;
+}
+// Bloque de firma de la paciente en los formularios impresos
+function pacFirmaLeyenda(f, rotulo) {
+  if (!f) return `<b>&nbsp;</b>${rotulo}`;
+  const t = new Date(f.creado), cuando = fmtFecha(t.toISOString().slice(0, 10)) + ' ' + t.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' });
+  const img = f.imagen ? `<img src="${f.imagen}" alt="Firma de la paciente" style="display:block;margin:-46px auto 2px;height:44px;max-width:100%">` : '';
+  const como = f.metodo === 'whatsapp' ? `Firmó con código por WhatsApp (celular ***${esc(f.celular || '')})` : 'Firmó en la pantalla';
+  return `${img}<b>${esc(f.firmante_nombre || '')}</b>${rotulo}<br><span style="font-size:10.5px;color:#7d2a4c;font-weight:700">✍ ${como} el ${cuando}${f.testigo_nombre ? ' · testigo: ' + esc(f.testigo_nombre) : ''}</span>`;
+}
+function pacCel591(c) { const d = String(c || '').replace(/\D/g, ''); return d.length === 8 ? '591' + d : d; }
+function pacCodigo() { const a = new Uint32Array(1); crypto.getRandomValues(a); return String(a[0] % 1000000).padStart(6, '0'); }
+// Ventana de la firma. Resuelve con la fila guardada o null.
+function pacFirmar(p, documento) {
+  if (!sb || !conRoles() || !p || !p.id) { showToast('La firma de la paciente necesita el inicio de sesión.', 'err'); return Promise.resolve(null); }
+  const doc = PAC_DOCS[documento] || documento;
+  return new Promise(resolve => {
+    let metodo = p.celular ? 'whatsapp' : 'pantalla', codigo = '', enviado = false, tinta = false;
+    const ov = document.createElement('div'); ov.id = 'pfOverlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
+    const fin = v => { ov.remove(); document.removeEventListener('keydown', escK); resolve(v); };
+    const escK = e => { if (e.key === 'Escape') fin(null); };
+    document.addEventListener('keydown', escK);
+    ov.innerHTML = `<div class="pfCard">
+      <div class="pfHead"><span class="pfIco">✍️</span><div><b>Firma de la paciente</b><small>${esc(doc)} · sin papel</small></div><button type="button" class="pfX" aria-label="Cerrar">×</button></div>
+      <div class="pfBody">
+        <div class="pfPac"><b>${esc(p.nombre || '')}</b><span>CI ${esc(p.carnet || '—')}</span></div>
+        <div class="pfModos"><button type="button" data-pm="whatsapp"><span>📱</span><b>Código por WhatsApp</b><small>Tiene celular: le llega un código</small></button><button type="button" data-pm="pantalla"><span>✍️</span><b>Firma en la pantalla</b><small>Sin celular: con el dedo o el mouse</small></button></div>
+        <div class="pfPane" data-pane="whatsapp">
+          <label>Celular de la paciente</label>
+          <div class="pfFila"><input id="pfCel" inputmode="tel" placeholder="Ej: 70012345" value="${esc(p.celular || '')}"><button type="button" id="pfEnviar" class="pfBtn">📲 Enviar código</button></div>
+          <p class="pfNota" id="pfWaNota">Se abre WhatsApp con el mensaje listo. Conviene usar el celular del establecimiento.</p>
+          <label>Código que dice la paciente</label>
+          <input id="pfCod" class="pfCod" inputmode="numeric" maxlength="6" placeholder="• • • • • •" autocomplete="one-time-code" disabled>
+        </div>
+        <div class="pfPane" data-pane="pantalla">
+          <label>Firme dentro del recuadro</label>
+          <div class="pfPad"><canvas id="pfCanvas" width="560" height="190" aria-label="Recuadro para firmar"></canvas><span class="pfLinea">Firma</span><button type="button" id="pfBorrar" class="pfMini">Borrar</button></div>
+        </div>
+        <label>Quién firma</label>
+        <input id="pfQuien" value="${esc(p.nombre || '')}" placeholder="La paciente, o su tutor/familiar">
+        <div class="pfMsg" role="alert"></div>
+        <button type="button" class="pfSi">Continuar · firma del testigo con PIN</button>
+        <button type="button" class="pfNo">Cancelar</button>
+      </div>
+      <div class="pfPie"><span>🔒 Solo los últimos 4 números del celular</span><span>#️⃣ Huella del documento</span><span>👩‍⚕️ Testigo con PIN</span></div>
+    </div>`;
+    document.body.appendChild(ov);
+    const $ = s => ov.querySelector(s), msg = m => { $('.pfMsg').textContent = m || ''; if (m) { $('.pfCard').classList.remove('sacude'); void ov.offsetWidth; $('.pfCard').classList.add('sacude'); } };
+    const modo = m => { metodo = m; ov.querySelectorAll('[data-pm]').forEach(b => b.classList.toggle('on', b.dataset.pm === m)); ov.querySelectorAll('[data-pane]').forEach(x => x.hidden = x.dataset.pane !== m); msg(''); };
+    ov.querySelectorAll('[data-pm]').forEach(b => b.onclick = () => modo(b.dataset.pm));
+    modo(metodo);
+    // WhatsApp: código de 6 números en un mensaje listo
+    $('#pfEnviar').onclick = () => {
+      const cel = pacCel591($('#pfCel').value);
+      if (!/^591[67]\d{7}$/.test(cel)) return msg('Revisá el celular: 8 números, empieza con 6 o 7.');
+      codigo = pacCodigo(); enviado = true;
+      const c = miCentro() || {}, nombre = String(p.nombre || '').split(' ')[0];
+      const texto = `Hola ${nombre}. Su código para firmar el ${doc.toLowerCase()} en ${c.nombre || 'el establecimiento'} es: *${codigo}*. Dígaselo solo al personal que la atiende. — SIVEC`;
+      window.open('https://wa.me/' + cel + '?text=' + encodeURIComponent(texto), '_blank', 'noopener');
+      $('#pfCod').disabled = false; $('#pfCod').focus();
+      $('#pfWaNota').innerHTML = `Código enviado a ***${esc(cel.slice(-4))}. ¿No llegó? Tocá <b>Enviar código</b> otra vez (sale uno nuevo).`;
+    };
+    $('#pfCod').oninput = e => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6); msg(''); };
+    // Firma en la pantalla (dedo o mouse)
+    const cv = $('#pfCanvas'), ctx = cv.getContext('2d'); let dib = false, ult = null;
+    ctx.lineWidth = 2.6; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1b1f3a';
+    const pto = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * cv.width / r.width, (e.clientY - r.top) * cv.height / r.height]; };
+    cv.onpointerdown = e => { dib = true; ult = pto(e); cv.setPointerCapture(e.pointerId); e.preventDefault(); msg(''); };
+    cv.onpointermove = e => { if (!dib) return; const q = pto(e); ctx.beginPath(); ctx.moveTo(ult[0], ult[1]); ctx.lineTo(q[0], q[1]); ctx.stroke(); ult = q; tinta = true; $('.pfPad').classList.add('con'); };
+    cv.onpointerup = cv.onpointercancel = () => { dib = false; };
+    $('#pfBorrar').onclick = () => { ctx.clearRect(0, 0, cv.width, cv.height); tinta = false; $('.pfPad').classList.remove('con'); };
+    $('.pfX').onclick = $('.pfNo').onclick = () => fin(null);
+    $('.pfSi').onclick = async () => {
+      const quien = $('#pfQuien').value.trim();
+      if (!quien) return msg('Escribí quién firma.');
+      if (metodo === 'whatsapp') {
+        if (!enviado) return msg('Primero tocá "Enviar código" para mandar el código por WhatsApp.');
+        if ($('#pfCod').value !== codigo) { sonido('error'); return msg('El código no coincide. Pedile que lo lea otra vez.'); }
+      } else if (!tinta) return msg('Falta la firma dentro del recuadro.');
+      const imagen = metodo === 'pantalla' ? cv.toDataURL('image/png') : null, cel = metodo === 'whatsapp' ? pacCel591($('#pfCel').value) : null;
+      ov.style.visibility = 'hidden';
+      const pin = await firmaPedir({ titulo: 'Testigo de la firma', detalle: `${doc} · firmó ${quien}`, boton: 'Firmar como testigo', tipo: 'Firma de la paciente' });
+      ov.style.visibility = '';
+      if (pin === FIRMA_SIN) return msg('La firma con PIN todavía no está activada (Paso 30 del SQL).');
+      if (!pin) return;
+      let huella; try { huella = await firmaHuella({ paciente: String(p.id), carnet: p.carnet || '', documento, metodo, celular: cel ? cel.slice(-4) : '', firmante: quien, imagen: imagen || '' }); } catch (e) { return msg('No se pudo calcular la huella: ' + e.message); }
+      $('.pfSi').disabled = true; $('.pfSi').textContent = 'Guardando…';
+      const { data, error } = await sb.rpc('sivec_firma_paciente', { p_paciente: String(p.id), p_documento: documento, p_metodo: metodo, p_celular: cel, p_imagen: imagen, p_firmante: quien, p_huella: huella, p_pin: pin });
+      $('.pfSi').disabled = false; $('.pfSi').textContent = 'Continuar · firma del testigo con PIN';
+      if (error) return msg(/sivec_firma_paciente|schema cache|PGRST202|42883/i.test(error.message + error.code) ? 'Falta ejecutar el Paso 33 del SQL (firma de la paciente).' : error.message);
+      if (!data || !data.ok) return msg(data && data.motivo === 'sin_permiso' ? 'Esta paciente no es de tu establecimiento.' : 'No se guardó: ' + ((data && data.motivo) || 'sin respuesta'));
+      sonido('firma'); showToast(`✍️ ${esc(doc)} firmado por ${esc(quien)} ✔`, 'ok', false); vozAviso('Firma de la paciente registrada.', 'pfirma');
+      $('.pfCard').classList.add('ok'); await new Promise(z => setTimeout(z, 420));
+      fin(Object.assign({ id: data.id, creado: data.creado, testigo_nombre: data.testigo_nombre, documento, metodo, celular: cel ? cel.slice(-4) : '', imagen, firmante_nombre: quien }));
+    };
+  });
 }
 
 // Términos de uso y política de privacidad: cada persona los acepta una vez por versión (Paso 26 del SQL)

@@ -2257,3 +2257,67 @@ select case when to_regclass('public.sivec_turnos') is not null
 
 ### Deshacer el Paso 32
 `drop table if exists sivec_turnos; drop function if exists sivec_turno_numero();` (se pierden las colas del día). Las columnas `funciones` y `consultorios` pueden quedar: vacías, todos ven todo como antes.
+
+## Paso 33 — Firma de la paciente (código por WhatsApp o firma en la pantalla) — requiere el Paso 30
+
+La paciente firma sin papel, de una de dos maneras:
+- **Código por WhatsApp:** el sistema arma un código de 6 números y abre WhatsApp (del celular o la computadora del centro) con el mensaje listo para la paciente; ella dice el código y el profesional lo escribe.
+- **En la pantalla:** si no tiene celular, firma con el dedo (tableta o celular) o con el mouse.
+
+Después el profesional firma como **testigo con su PIN**. Queda guardado: cómo firmó, los últimos 4 números del celular (nunca el número completo), la firma dibujada, la huella del documento, el testigo y la fecha. La firma sale impresa en el consentimiento y en el D1. Nadie puede cambiarla ni borrarla desde el sistema.
+
+```sql
+-- PASO 33 · Firma de la paciente (requiere el Paso 30: PIN de firma)
+create table if not exists sivec_firmas_paciente (
+  id bigserial primary key,
+  centro_id uuid not null,
+  paciente_id text not null,
+  documento text not null check (documento in ('consentimiento', 'd1', 'referencia', 'otro')),
+  metodo text not null check (metodo in ('whatsapp', 'pantalla')),
+  celular text,              -- solo los últimos 4 números
+  imagen text,               -- la firma dibujada (PNG), si firmó en la pantalla
+  firmante_nombre text,      -- la paciente, o quien firma por ella (tutor o familiar)
+  huella text not null,
+  testigo uuid not null default auth.uid(),
+  testigo_nombre text,
+  creado timestamptz not null default now()
+);
+create index if not exists sivec_firmas_paciente_doc on sivec_firmas_paciente (paciente_id, documento);
+alter table sivec_firmas_paciente enable row level security;
+drop policy if exists "firmas de pacientes del establecimiento" on sivec_firmas_paciente;
+create policy "firmas de pacientes del establecimiento" on sivec_firmas_paciente for select to authenticated
+  using (sivec_edita_centro(centro_id));
+grant select on sivec_firmas_paciente to authenticated;
+
+-- Guardar la firma: comprueba el PIN del testigo y que la paciente sea de su establecimiento
+create or replace function sivec_firma_paciente(p_paciente text, p_documento text, p_metodo text, p_celular text,
+  p_imagen text, p_firmante text, p_huella text, p_pin text) returns jsonb
+language plpgsql security definer set search_path = public, extensions as $$
+declare v_est text; v_centro uuid; r sivec_firmas_paciente;
+begin
+  v_est := sivec_pin_verificar(p_pin);
+  if v_est <> 'ok' then return jsonb_build_object('ok', false, 'motivo', v_est); end if;
+  select centro_id into v_centro from pacientes where id::text = p_paciente;
+  if v_centro is null or not sivec_edita_centro(v_centro) then return jsonb_build_object('ok', false, 'motivo', 'sin_permiso'); end if;
+  if p_metodo = 'pantalla' and (p_imagen is null or p_imagen not like 'data:image/png;base64,%' or length(p_imagen) > 400000) then
+    return jsonb_build_object('ok', false, 'motivo', 'firma_invalida'); end if;
+  insert into sivec_firmas_paciente (centro_id, paciente_id, documento, metodo, celular, imagen, firmante_nombre, huella, testigo_nombre)
+  values (v_centro, p_paciente, p_documento, p_metodo, right(regexp_replace(coalesce(p_celular, ''), '\D', '', 'g'), 4),
+          case when p_metodo = 'pantalla' then p_imagen end, p_firmante, p_huella,
+          (select nombre_completo from perfiles_usuario where id = auth.uid()))
+  returning * into r;
+  return jsonb_build_object('ok', true, 'id', r.id, 'creado', r.creado, 'testigo_nombre', r.testigo_nombre);
+end $$;
+revoke all on function sivec_firma_paciente(text, text, text, text, text, text, text, text) from public;
+grant execute on function sivec_firma_paciente(text, text, text, text, text, text, text, text) to authenticated;
+
+notify pgrst, 'reload schema';
+
+-- Resultado: debe decir "listo"
+select case when to_regclass('public.sivec_firmas_paciente') is not null
+             and to_regprocedure('sivec_firma_paciente(text,text,text,text,text,text,text,text)') is not null
+            then 'listo' else 'revisar' end as paso_33;
+```
+
+### Deshacer el Paso 33
+`drop function if exists sivec_firma_paciente(text, text, text, text, text, text, text, text); drop table if exists sivec_firmas_paciente;` (se pierden las firmas de pacientes guardadas; los documentos vuelven a salir con la línea para firmar a mano).
