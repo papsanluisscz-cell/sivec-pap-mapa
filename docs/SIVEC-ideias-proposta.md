@@ -949,3 +949,9 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - Al entrar (una vez por día y por persona), la voz del navegador saluda por el nombre y el trato (doctora/doctor/licenciado…, sacado del nombre del perfil) y dice lo que hay para hoy según la función: centro (resultados nuevos y alterados, derivar, positivas sin conducta, contrarreferencias, entregar, atrasados), laboratorio (lotes por recibir, muestras por informar), hospital (referencias nuevas, citas de hoy, biopsias pendientes), gestor/admin (% de la meta del año, positivas sin tratar, atrasados).
 - Nunca dice nombres de pacientes. Tarjeta "Para hoy" con los mismos números; cada ítem abre la lista ya filtrada. 🔊 para escuchar de nuevo. ⚙ → Sonidos → "Saludo con voz: Sí/No · Escuchar".
 - Sonidos ajustados: los avisos verdes comunes ya no suenan; error más suave (triángulo, grave); sin sonido de entrada.
+
+## 27/09/2026 · Voz masculina, clima y frases del día (v1.9.1)
+- ⚙ → Sonidos → Saludo con voz: 👩 Femenina · 👨 Masculina · Sin voz. Si la computadora no tiene voz masculina en español, se aproxima con tono más grave.
+- El saludo dice el clima (Open-Meteo, gratis, solo la ubicación del establecimiento): temperatura, estado, máxima; paraguas si lluvia ≥ 60 %, agua si ≥ 35 °C, abrigo si mínima ≤ 14 °C. En la tarjeta: ⛅ 29° · máx 34° · ☂ 70 %.
+- Frase del día (día por medio, siempre si no hay pendientes): "Hoy es un buen día para salvar vidas", "Cada PAP que se toma hoy puede evitar un cáncer mañana"…
+- Pregunta del autor: hospitales con recepción, consultorio de toma, colposcopia y laboratorio (recepción de láminas / lectura) → propuesta de "funciones" por usuario y cola del día (a definir).

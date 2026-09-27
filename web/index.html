@@ -1164,6 +1164,8 @@ body.dark #firmaConfig #fcRes.mal { background: #450a0a; border-color: #7f1d1d; 
 #paraHoy .phItem .tx { flex: 1; }
 #paraHoy .phItem .go { color: var(--ink-soft); font-size: 18px; }
 #paraHoy > :last-child { margin-bottom: 12px; }
+#paraHoy .phFrase { margin: 4px 10px 0; padding: 10px 12px; border-radius: 12px; background: linear-gradient(135deg, #fbe9f0, #f3ecfb); color: #7d2a4c; font-weight: 700; font-size: 14px; text-align: center; }
+body.dark #paraHoy .phFrase { background: linear-gradient(135deg, #3a1a2a, #2a1f3d); color: #f1a7c3; }
 @media (max-width: 520px) { #paraHoy { top: auto; bottom: 84px; right: 8px; left: 8px; width: auto; } }
 @media (prefers-reduced-motion: reduce) { #paraHoy, #paraHoy .phItem { transition: none; animation: none; } }
 @media (max-width: 520px) { #spPanel { right: 8px; left: 8px; width: auto; max-width: none; bottom: 80px; height: calc(100vh - 100px); } }
@@ -7921,7 +7923,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.9.0 · 27/09/2026';
+const SIVEC_VERSION = '1.9.1 · 27/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -8488,10 +8490,10 @@ function sonidoSiAumenta(clave, n, nombre) { const antes = sonidoVistos[clave]; 
   const modos = [['todos', '🔊 Todos'], ['alertas', '🔔 Solo alertas'], ['no', '🔇 Apagado']];
   d.innerHTML = `<div class="scHead"><b>Sonidos</b><small>Solo en esta computadora. Suena en lo importante: firmas, resultados, contrarreferencias, soporte y errores. "Solo alertas": sin el sonido de firma.</small></div>
     <div class="scModos">${modos.map(([k, t]) => `<button type="button" data-sm="${k}">${t}</button>`).join('')}</div>
-    <div class="scVoz"><span>🗣 Saludo con voz al entrar</span><div><button type="button" data-voz="si">Sí</button><button type="button" data-voz="no">No</button><button type="button" data-voz="oir">▶ Escuchar</button></div></div>
+    <div class="scVoz"><span>🗣 Saludo con voz al entrar</span><div><button type="button" data-voz="fem">👩 Femenina</button><button type="button" data-voz="masc">👨 Masculina</button><button type="button" data-voz="no">Sin voz</button><button type="button" data-voz="oir">▶ Escuchar</button></div></div>
     <div class="scPrueba"><span>Probar:</span>${[['firma', '✍ Firma'], ['alerta', '⚠ Resultado alterado'], ['mensaje', '💬 Mensaje'], ['error', '✖ Error'], ['ok', '✓ Guardado']].map(([k, t]) => `<button type="button" data-sp2="${k}">${t}</button>`).join('')}</div>`;
   const ancla = document.getElementById('firmaConfig') || (panel.querySelector('h2') || {}).nextElementSibling || panel.firstChild; ancla.after(d);
-  const marcar = () => { d.querySelectorAll('[data-sm]').forEach(b => b.classList.toggle('on', b.dataset.sm === sonidoModo())); d.querySelectorAll('[data-voz="si"],[data-voz="no"]').forEach(b => b.classList.toggle('on', (b.dataset.voz === 'si') === vozActiva())); };
+  const marcar = () => { d.querySelectorAll('[data-sm]').forEach(b => b.classList.toggle('on', b.dataset.sm === sonidoModo())); d.querySelectorAll('[data-voz]:not([data-voz="oir"])').forEach(b => b.classList.toggle('on', b.dataset.voz === vozModo())); };
   marcar();
   d.onclick = e => {
     const m = e.target.closest('[data-sm]'), p = e.target.closest('[data-sp2]'), vz = e.target.closest('[data-voz]');
@@ -8503,7 +8505,39 @@ function sonidoSiAumenta(clave, n, nombre) { const antes = sonidoVistos[clave]; 
 
 // ===== Saludo del día con voz y tarjeta "Para hoy" =====
 // Voz del propio navegador (gratis, no sale nada de la computadora). Nunca dice nombres de pacientes: solo números.
-function vozActiva() { try { return localStorage.getItem('sivec_voz') !== 'no'; } catch (_) { return true; } }
+function vozModo() { let v = 'fem'; try { v = localStorage.getItem('sivec_voz') || 'fem'; } catch (_) {} return v === 'si' ? 'fem' : v; }
+function vozActiva() { return vozModo() !== 'no'; }
+// Clima del día (Open-Meteo: gratis, sin clave; solo se envía la ubicación del establecimiento)
+const CLIMA_WMO = [[0, 'despejado', '☀️'], [2, 'parcialmente nublado', '⛅'], [3, 'nublado', '☁️'], [48, 'con niebla', '🌫️'], [57, 'con llovizna', '🌦️'], [67, 'con lluvia', '🌧️'], [77, 'con nieve', '❄️'], [82, 'con chaparrones', '🌦️'], [99, 'con tormenta', '⛈️']];
+async function climaHoy() {
+  const c = (typeof miCentro === 'function' && miCentro()) || {}, lat = Number(c.lat) || -17.7833, lng = Number(c.lng) || -63.1821;
+  const clave = 'sivec_clima_' + hoyISO() + '_' + lat.toFixed(2) + lng.toFixed(2);
+  try { const g = JSON.parse(localStorage.getItem(clave) || 'null'); if (g && Date.now() - g.t < 3 * 3600e3) return g.c; } catch (_) {}
+  try {
+    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 3500);
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=America%2FLa_Paz&forecast_days=1`, { signal: ctl.signal });
+    clearTimeout(to); if (!r.ok) return null;
+    const j = await r.json(), code = j.current.weather_code, d = CLIMA_WMO.find(x => code <= x[0]) || CLIMA_WMO[2];
+    const cl = { temp: Math.round(j.current.temperature_2m), max: Math.round(j.daily.temperature_2m_max[0]), min: Math.round(j.daily.temperature_2m_min[0]), lluvia: j.daily.precipitation_probability_max[0] || 0, desc: d[1], ic: d[2] };
+    try { localStorage.setItem(clave, JSON.stringify({ t: Date.now(), c: cl })); } catch (_) {}
+    return cl;
+  } catch (_) { return null; }
+}
+function climaTexto(cl) {
+  if (!cl) return '';
+  let t = `En Santa Cruz hay ${cl.temp} grados y está ${cl.desc}; la máxima será de ${cl.max}.`;
+  if (cl.lluvia >= 60) t += ' Hay probabilidad de lluvia: no se olvide el paraguas.';
+  else if (cl.max >= 35) t += ' Va a hacer mucho calor: tome bastante agua.';
+  else if (cl.min <= 14) t += ' Hace frío: abríguese bien.';
+  return t;
+}
+// Frases que aparecen día por medio (y siempre cuando no hay pendientes)
+const FRASES_DIA = ['Hoy es un buen día para salvar vidas.', 'Cada PAP que se toma hoy puede evitar un cáncer mañana.', 'Un resultado entregado a tiempo es una vida protegida.',
+  'Gracias por cuidar a las mujeres de su comunidad.', 'Detrás de cada número hay una madre, una hija, una hermana.', 'Hoy también podemos llegar a tiempo.', 'Lo que usted hace hoy, una familia lo agradece mañana.'];
+function fraseDelDia(forzar) {
+  const d = new Date(), n = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5) + String((perfil && perfil.id) || '').length;
+  return forzar || n % 2 === 0 ? FRASES_DIA[n % FRASES_DIA.length] : '';
+}
 function saludoTrato() {
   const n = String((perfil && (perfil.nombre_completo || '')) || '').trim();
   const m = /^(dra|dr|lic|lcda|lcdo|licda|licdo|enf|ing)\.?\s+(.+)$/i.exec(n);
@@ -8569,8 +8603,12 @@ async function saludoPendientes() {
   }
   return items;
 }
-function vozElegir() {
-  const vs = speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang));
+const VOZ_FEM = /helena|sabina|laura|paulina|m[oó]nica|dalia|elvira|paloma|luc[ií]a|elena|sof[ií]a|camila|valentina|marisol|salom[eé]|ximena|renata|larissa|beatriz|google español|female|mujer/i;
+const VOZ_MASC = /pablo|ra[uú]l|jorge|diego|[aá]lvaro|tom[aá]s|enrique|gonzalo|juan|carlos|ricardo|andr[eé]s|gerardo|lorenzo|mateo|federico|jos[eé]|alonso|\bmale\b|hombre/i;
+function vozElegir(genero) {
+  const todas = speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang));
+  const g = genero === 'masc' ? todas.filter(v => VOZ_MASC.test(v.name)) : todas.filter(v => VOZ_FEM.test(v.name) || !VOZ_MASC.test(v.name));
+  const vs = g.length ? g : todas;
   const pref = ['es-BO', 'es-419', 'es-US', 'es-MX', 'es-AR', 'es-ES'];
   return vs.sort((a, b) => {
     const ka = pref.indexOf(a.lang) < 0 ? 9 : pref.indexOf(a.lang), kb = pref.indexOf(b.lang) < 0 ? 9 : pref.indexOf(b.lang);
@@ -8582,17 +8620,20 @@ async function vozDecir(texto) {
   if (!('speechSynthesis' in window) || !texto) return false;
   if (!speechSynthesis.getVoices().length) await new Promise(r => { speechSynthesis.onvoiceschanged = r; setTimeout(r, 1500); });
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(texto), v = vozElegir();
-  if (v) u.voice = v; u.lang = v ? v.lang : 'es-419'; u.rate = 0.97; u.pitch = 1.02; u.volume = 0.95;
+  const gen = vozModo() === 'masc' ? 'masc' : 'fem', u = new SpeechSynthesisUtterance(texto), v = vozElegir(gen);
+  const acierta = v && (gen === 'masc' ? VOZ_MASC.test(v.name) : !VOZ_MASC.test(v.name));
+  if (v) u.voice = v; u.lang = v ? v.lang : 'es-419'; u.rate = 0.97; u.volume = 0.95;
+  u.pitch = acierta ? 1 : gen === 'masc' ? 0.72 : 1.12;  // si el equipo no tiene esa voz, se aproxima con el tono
   speechSynthesis.speak(u); return true;
 }
-function saludoTexto(items) {
+function saludoTexto(items, cl, frase) {
   const t = saludoTrato();
   const solas = items.filter(i => i.sola).map(i => i.voz + '.');
   const partes = items.filter(i => !i.sola).map(i => i.voz);
   const lista = partes.length > 1 ? partes.slice(0, -1).join(', ') + ' y ' + partes[partes.length - 1] : partes[0];
   const gestor = conRoles() && (perfil.rol === 'gestor' || perfil.rol === 'admin');
-  return `${saludoHora()}${t.voz ? ', ' + t.voz : ''}. ` + solas.join(' ') + (partes.length ? (solas.length ? ' ' : '') + (gestor ? `Hay ${lista}.` : `Para hoy tiene ${lista}.`) : (solas.length ? '' : 'Hoy no tiene pendientes. ¡Buen trabajo!'));
+  const base = `${saludoHora()}${t.voz ? ', ' + t.voz : ''}. ` + (climaTexto(cl) ? climaTexto(cl) + ' ' : '') + solas.join(' ') + (partes.length ? (solas.length ? ' ' : '') + (gestor ? `Hay ${lista}.` : `Para hoy tiene ${lista}.`) : (solas.length ? '' : 'Hoy no tiene pendientes. ¡Buen trabajo!'));
+  return [base, frase].filter(Boolean).join(' ');
 }
 async function saludoDelDia(forzar) {
   if (!sb || !conRoles()) return;
@@ -8600,19 +8641,21 @@ async function saludoDelDia(forzar) {
   let visto = ''; try { visto = localStorage.getItem(clave) || ''; } catch (_) {}
   if (!forzar && visto === hoy) return;
   try { localStorage.setItem(clave, hoy); } catch (_) {}
-  const items = await saludoPendientes();
-  const texto = saludoTexto(items);
-  saludoTarjeta(items, texto);
+  const [items, cl] = await Promise.all([saludoPendientes(), climaHoy()]);
+  const frase = fraseDelDia(false) || (items.length ? '' : fraseDelDia(true));
+  const texto = saludoTexto(items, cl, frase);
+  saludoTarjeta(items, texto, cl, frase);
   if (vozActiva()) vozDecir(texto);
 }
-function saludoTarjeta(items, texto) {
+function saludoTarjeta(items, texto, cl, frase) {
   document.getElementById('paraHoy')?.remove();
   const t = saludoTrato();
   const c = document.createElement('div'); c.id = 'paraHoy'; c.setAttribute('role', 'status');
-  c.innerHTML = `<div class="phHead"><div><small>${saludoHora()}</small><b>${esc(t.texto || '')}</b></div>
+  c.innerHTML = `<div class="phHead"><div><small>${saludoHora()}${cl ? ` · ${cl.ic} ${cl.temp}° · máx ${cl.max}°${cl.lluvia >= 60 ? ' · ☂ ' + cl.lluvia + '%' : ''}` : ''}</small><b>${esc(t.texto || '')}</b></div>
       <button type="button" class="phVoz" title="Escuchar otra vez" aria-label="Escuchar otra vez">🔊</button><button type="button" class="phX" aria-label="Cerrar">×</button></div>
     <div class="phSub">${items.length ? 'Para hoy' : 'Hoy no hay pendientes · ¡buen trabajo!'}</div>
-    ${items.map(i => `<button type="button" class="phItem ${i.tono || ''}" data-ir="${esc(i.ir)}"><span class="ic">${i.ic}</span><span class="tx">${esc(i.txt)}</span><span class="go">›</span></button>`).join('')}`;
+    ${items.map(i => `<button type="button" class="phItem ${i.tono || ''}" data-ir="${esc(i.ir)}"><span class="ic">${i.ic}</span><span class="tx">${esc(i.txt)}</span><span class="go">›</span></button>`).join('')}
+    ${frase ? `<div class="phFrase">💗 ${esc(frase)}</div>` : ''}`;
   document.body.appendChild(c);
   requestAnimationFrame(() => c.classList.add('on'));
   let timer = setTimeout(() => cerrar(), 30000);
