@@ -936,3 +936,11 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - "Firmado de punta a punta" (4 firmas de una paciente derivada, con sus códigos, y los pies de los Formularios Nº 1 y Nº 2), "¿Esta firma es verdadera?" (verificación del código y huella que cambia si alguien altera el documento) y "Seis candados para los datos de cada mujer" (acceso por rol, PIN cifrado, huella, código, registro de accesos, copias diarias + HTTPS).
 - Ojo: "copias diarias" requiere tener el Supabase Pro activo.
 - Firma de la paciente: propuesta enviada (firma en pantalla con el dedo + huella a futuro); a definir con el autor.
+
+## 27/09/2026 · Sonidos (v1.8.0)
+- Sonidos sintetizados en el navegador (sin archivos, funcionan sin internet), volumen bajo: firma ✍ (3 notas que suben), resultado alterado ⚠ (alerta de 3 notas), mensaje 💬 (resultado nuevo, contrarreferencia, respuesta de soporte), error ✖ (PIN incorrecto, errores), guardado ✓, entrada al perfil (whoosh suave).
+- ⚙ Configuración → Sonidos: Todos (por defecto) · Solo alertas · Apagado, por computadora, con botones para probar.
+- Los avisos de resultados y contrarreferencias suenan solo cuando llegan nuevos (no se repiten).
+- Corregido: los avisos con tipo 'error' salían verdes; ahora rojos.
+- Firma de la paciente: sin celular → firma con el mouse en la pantalla; con celular → código por WhatsApp (a implementar).
+- Muestras de los sonidos en docs/sonidos/.

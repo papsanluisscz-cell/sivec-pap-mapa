@@ -1133,6 +1133,15 @@ body.dark #spPanel .spEst.urg { background: #7f1d1d; color: #fecaca; }
 body.dark #firmaConfig #fcRes.ok { background: #052e16; border-color: #14532d; color: #bbf7d0; }
 body.dark #firmaConfig #fcRes.mal { background: #450a0a; border-color: #7f1d1d; color: #fecaca; }
 @media (prefers-reduced-motion: reduce) { #firmaOverlay, #firmaOverlay .fmCard, #firmaOverlay .fmCard.sacude { animation: none; } }
+/* ===== Sonidos (Configuración) ===== */
+#sonidoConfig { margin: 0 0 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+#sonidoConfig .scHead b { display: block; font-size: 14.5px; }
+#sonidoConfig .scHead small { color: var(--ink-soft); font-size: 12px; }
+#sonidoConfig .scModos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+#sonidoConfig .scModos button { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 10px; padding: 9px 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+#sonidoConfig .scModos button.on { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
+#sonidoConfig .scPrueba { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; color: var(--ink-soft); }
+#sonidoConfig .scPrueba button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 5px 10px; font-size: 12px; cursor: pointer; }
 @media (max-width: 520px) { #spPanel { right: 8px; left: 8px; width: auto; max-width: none; bottom: 80px; height: calc(100vh - 100px); } }
 @media (max-width: 760px) { body::after { content: ''; display: block; height: 80px; } }  /* que el botón 💬 no tape el último botón de la página */
 @media print { #spBtn, #spPanel { display: none !important; } }
@@ -2048,11 +2057,13 @@ body.dark #firmaConfig #fcRes.mal { background: #450a0a; border-color: #7f1d1d; 
 <script src="https://unpkg.com/chart.js@4.4.0/dist/chart.umd.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
-function showToast(message, type) {
+function showToast(message, type, son) {
+  if (type === 'error') type = 'err';
   const container = document.getElementById('toastContainer');
   const t = document.createElement('div');
   t.className = 'toast ' + (type === 'err' ? 'err' : 'ok');
   const icon = type === 'err' ? '\u2716' : '\u2713';
+  if (son !== false) { try { sonido(son || (type === 'err' ? 'error' : 'ok')); } catch (_) {} }
   t.innerHTML = '<span class="icon">' + icon + '</span><span>' + message + '</span>';
   container.appendChild(t);
   requestAnimationFrame(() => t.classList.add('show'));
@@ -2322,7 +2333,7 @@ function entradaMostrar(texto) {
   const guia = Array.from({ length: 121 }, (_, k) => { const t = k / 120 * Math.PI * 2; return `${k ? 'L' : 'M'}${(150 + 120 * Math.sin(t)).toFixed(1)} ${(75 + 110 * Math.sin(t) * Math.cos(t)).toFixed(1)}`; }).join(' ');
   ov.innerHTML = `<div class="eInf" title="Tocá para acelerar"><svg viewBox="0 0 300 150" aria-hidden="true"><path d="${guia}"/></svg><canvas></canvas></div>
     <div class="eTxt">${esc(texto)}</div><div class="ePaso">Verificando tu acceso…</div><div class="eSub">SIVEC · preparando tu panel</div><div class="eTip">tocá el ∞</div>`;
-  ov.classList.remove('fuera'); ov.dataset.desde = Date.now();
+  ov.classList.remove('fuera'); ov.dataset.desde = Date.now(); sonido('entrada');
   cancelAnimationFrame(entradaRaf);
   const caja = ov.querySelector('.eInf'), cv = ov.querySelector('canvas'), ctx = cv.getContext('2d');
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -4393,6 +4404,7 @@ function renderBanners(data) {
 
   const nuevos = data.filter(esResultadoNuevo);
   const rbanner = document.getElementById('resultadosBanner');
+  try { const nAlt = nuevos.filter(p => p.estado_pap === 'Positivo' || p.resultado_vph === 'Positiva').length; const antesAlt = sonidoVistos.alt; sonidoSiAumenta('alt', nAlt, 'alerta'); if (!(nAlt > (antesAlt ?? 0))) sonidoSiAumenta('res', nuevos.length, 'mensaje'); else sonidoVistos.res = nuevos.length; } catch (_) {}
   if (nuevos.length) {
     const alt = nuevos.filter(p => p.estado_pap === 'Positivo' || p.resultado_vph === 'Positiva').length;
     const rep = nuevos.filter(p => ['rechazada', 'insatisfactoria'].includes(p.muestra_estado)).length;
@@ -4405,6 +4417,7 @@ function renderBanners(data) {
   } else { rbanner.style.display = 'none'; rbanner.innerHTML = ''; }
 
   const crs = data.filter(p => { const d = derivDe(p); return d && derEsNueva(d); });
+  try { sonidoSiAumenta('contra', crs.length, 'mensaje'); } catch (_) {}
   const cb = document.getElementById('contrarrefBanner');
   if (crs.length) {
     const noAs = crs.filter(p => derivDe(p).estado === 'no_asistio').length;
@@ -7884,7 +7897,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.7.1 · 27/09/2026';
+const SIVEC_VERSION = '1.8.0 · 27/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -8224,7 +8237,7 @@ async function spRevisar() {
   const antes = spTickets.filter(spNoLeido).length;
   spTickets = data || []; spMarcarBoton();
   const ahora = spTickets.filter(spNoLeido).length;
-  if (ahora > antes && !document.getElementById('spPanel').classList.contains('abierto')) showToast(spEsSoporte() ? '🆘 Nueva consulta de soporte' : '💬 El equipo del SIVEC te respondió', 'ok');
+  if (ahora > antes && !document.getElementById('spPanel').classList.contains('abierto')) showToast(spEsSoporte() ? '🆘 Nueva consulta de soporte' : '💬 El equipo del SIVEC te respondió', 'ok', 'mensaje');
   if (document.getElementById('spLista')) spCargarLista();
 }
 document.addEventListener('click', e => {
@@ -8317,10 +8330,10 @@ function firmaModal({ modo, titulo, detalle, boton, tipo }) {
         const s = String(r.data || '');
         if (s === 'ok') { ov.querySelector('.fmCard').classList.add('ok'); await new Promise(z => setTimeout(z, 380)); return fin(v); }
         if (s === 'sin_pin') { modo = 'crear'; return pintar('Todavía no tenés PIN: creá uno.'); }
-        if (s.startsWith('bloqueado')) return pintar(`PIN bloqueado por intentos fallidos hasta las ${s.split(':').slice(1).join(':')}. Si lo olvidaste, pedí al administrador que lo restablezca.`);
+        if (s.startsWith('bloqueado')) { sonido('error'); return pintar(`PIN bloqueado por intentos fallidos hasta las ${s.split(':').slice(1).join(':')}. Si lo olvidaste, pedí al administrador que lo restablezca.`); }
         const quedan = s.split(':')[1];
         pintar(`PIN incorrecto. ${quedan === '1' ? 'Te queda 1 intento' : 'Te quedan ' + quedan + ' intentos'} antes del bloqueo de 15 minutos.`);
-        const c = ov.querySelector('.fmCard'); c.classList.add('sacude');
+        const c = ov.querySelector('.fmCard'); c.classList.add('sacude'); sonido('error');
       };
     };
     ov.onclick = e => { if (e.target === ov) fin(null); };
@@ -8337,7 +8350,7 @@ async function firmaRegistrar(tipo, documento, contenido, pin) {
     const m = error ? error.message : data && data.motivo === 'sin_permiso' ? 'no tenés permiso para firmar este documento' : (data && data.motivo) || 'sin respuesta';
     showToast(`Se guardó, pero la firma no se registró (${m}).`, 'error'); return null;
   }
-  showToast(`✍️ ${FIRMA_TIPOS[tipo]} firmada · código ${firmaCodigoFmt(data.codigo)}`, 'ok');
+  showToast(`✍️ ${FIRMA_TIPOS[tipo]} firmada · código ${firmaCodigoFmt(data.codigo)}`, 'ok', 'firma');
   return data;
 }
 async function firmaDe(tipo, documento) {
@@ -8397,6 +8410,68 @@ function firmaLeyenda(f, rotulo, nombre) {
       const r = await sb.rpc('sivec_pin_restablecer', { p_usuario: u.data });
       mostrar(r.error ? esc(r.error.message) : '✔ PIN restablecido. Avisale que cree uno nuevo al firmar.', r.error ? 'mal' : 'ok');
     }
+  };
+})();
+
+// ===== Sonidos (sintetizados en el navegador: sin archivos, funcionan sin internet) =====
+// Modo por equipo en ⚙ Configuración: 'todos' · 'alertas' (solo lo importante) · 'no'.
+const SONIDO_IMPORTANTES = ['alerta', 'mensaje', 'error'];
+let sonidoCtx = null;
+function sonidoModo() { try { return localStorage.getItem('sivec_sonidos') || 'todos'; } catch (_) { return 'todos'; } }
+function sonidoCtxListo() {
+  if (!sonidoCtx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; sonidoCtx = new AC(); }
+  if (sonidoCtx.state === 'suspended') sonidoCtx.resume().catch(() => {});
+  return sonidoCtx;
+}
+// Los navegadores solo dejan sonar después de un toque o una tecla: se "despierta" el audio con el primer gesto.
+['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, () => { if (sonidoModo() !== 'no') sonidoCtxListo(); }, { once: true, capture: true }));
+function sonidoNota(ctx, t, frec, dur, { tipo = 'sine', vol = 0.12, hasta = null, ataque = 0.008 } = {}) {
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = tipo; o.frequency.setValueAtTime(frec, t);
+  if (hasta) o.frequency.exponentialRampToValueAtTime(hasta, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + ataque); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + dur + 0.02);
+}
+const SONIDOS = {
+  ok: (c, t) => { sonidoNota(c, t, 880, 0.12, { vol: 0.07 }); sonidoNota(c, t + 0.07, 1318.5, 0.18, { vol: 0.06 }); },
+  firma: (c, t) => { [659.25, 783.99, 1046.5].forEach((f, i) => { sonidoNota(c, t + i * 0.09, f, 0.5 - i * 0.08, { tipo: 'triangle', vol: 0.11 }); sonidoNota(c, t + i * 0.09, f * 2, 0.25, { vol: 0.025 }); }); },
+  error: (c, t) => { sonidoNota(c, t, 220, 0.12, { tipo: 'square', vol: 0.045 }); sonidoNota(c, t + 0.15, 196, 0.18, { tipo: 'square', vol: 0.045 }); },
+  alerta: (c, t) => { [[880, 0], [659.25, 0.16], [880, 0.32]].forEach(([f, d]) => { sonidoNota(c, t + d, f, 0.22, { tipo: 'triangle', vol: 0.14 }); sonidoNota(c, t + d, f * 1.5, 0.14, { vol: 0.03 }); }); },
+  mensaje: (c, t) => { sonidoNota(c, t, 783.99, 0.14, { vol: 0.1 }); sonidoNota(c, t + 0.1, 1174.66, 0.28, { tipo: 'triangle', vol: 0.09 }); },
+  click: (c, t) => { sonidoNota(c, t, 1600, 0.04, { tipo: 'square', vol: 0.03, ataque: 0.002 }); },
+  entrada: (c, t) => {
+    const n = c.sampleRate * 0.6, buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / n);
+    const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = buf; f.type = 'bandpass'; f.Q.value = 1.2; f.frequency.setValueAtTime(400, t); f.frequency.exponentialRampToValueAtTime(2600, t + 0.55);
+    g.gain.value = 0.05; s.connect(f).connect(g).connect(c.destination); s.start(t);
+    sonidoNota(c, t + 0.38, 1046.5, 0.35, { tipo: 'triangle', vol: 0.05 });
+  }
+};
+function sonido(nombre) {
+  const modo = sonidoModo();
+  if (modo === 'no' || (modo === 'alertas' && !SONIDO_IMPORTANTES.includes(nombre)) || !SONIDOS[nombre]) return;
+  if (typeof pnReduce === 'function' && nombre === 'entrada' && pnReduce()) return;
+  try { const c = sonidoCtxListo(); if (!c || c.state !== 'running') return; SONIDOS[nombre](c, c.currentTime + 0.01); } catch (_) {}
+}
+// Avisos de cosas nuevas (resultados, contrarreferencias): suena solo cuando aumentan
+const sonidoVistos = {};
+function sonidoSiAumenta(clave, n, nombre) { const antes = sonidoVistos[clave]; sonidoVistos[clave] = n; if (antes !== undefined ? n > antes : n > 0) sonido(nombre); }
+// En ⚙ Configuración
+(function sonidosEnConfiguracion() {
+  const panel = document.getElementById('settingsPanel'); if (!panel) return;
+  const d = document.createElement('div'); d.id = 'sonidoConfig';
+  const modos = [['todos', '🔊 Todos'], ['alertas', '🔔 Solo alertas'], ['no', '🔇 Apagado']];
+  d.innerHTML = `<div class="scHead"><b>Sonidos</b><small>Solo en esta computadora. "Solo alertas": resultados alterados, contrarreferencias, mensajes de soporte y errores.</small></div>
+    <div class="scModos">${modos.map(([k, t]) => `<button type="button" data-sm="${k}">${t}</button>`).join('')}</div>
+    <div class="scPrueba"><span>Probar:</span>${[['firma', '✍ Firma'], ['alerta', '⚠ Resultado alterado'], ['mensaje', '💬 Mensaje'], ['error', '✖ Error'], ['ok', '✓ Guardado']].map(([k, t]) => `<button type="button" data-sp2="${k}">${t}</button>`).join('')}</div>`;
+  const ancla = document.getElementById('firmaConfig') || (panel.querySelector('h2') || {}).nextElementSibling || panel.firstChild; ancla.after(d);
+  const marcar = () => d.querySelectorAll('[data-sm]').forEach(b => b.classList.toggle('on', b.dataset.sm === sonidoModo()));
+  marcar();
+  d.onclick = e => {
+    const m = e.target.closest('[data-sm]'), p = e.target.closest('[data-sp2]');
+    if (m) { try { localStorage.setItem('sivec_sonidos', m.dataset.sm); } catch (_) {} marcar(); if (m.dataset.sm !== 'no') sonido(m.dataset.sm === 'alertas' ? 'mensaje' : 'ok'); }
+    if (p) { const guard = sonidoModo(); try { localStorage.setItem('sivec_sonidos', 'todos'); } catch (_) {} sonidoCtxListo(); setTimeout(() => { sonido(p.dataset.sp2); try { localStorage.setItem('sivec_sonidos', guard); } catch (_) {} }, 30); }
   };
 })();
 
