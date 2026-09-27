@@ -901,3 +901,5 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - `docs/negocio/SIVEC-metrica-SantaCruz.xlsx` refeita: 4 cenários (Red Centro, Município enxuto, Município completo, Município + províncias), equipe, gastos (aluguel, transporte, viagens), caixa necessário.
 - Abas novas: "Papel vs SIVEC" (papel, horas devolvidas, tomas repetidas) e "Vidas e impacto" (lesões tratadas a tempo, cânceres e mortes evitados, órfãos, valor da vida, tratamentos que o SUS deixa de pagar), com fontes.
 - Proposta de slides de impacto (vidas, família, papel) enviada ao autor para validar antes de montar.
+- Apresentação: 5 slides novos depois de "Funcionando con datos reales": "Cada día, 4 o 5", "María, 41 años" (caso ilustrativo), "Lo que el SIVEC evita cada año" (gráfico com véu), "¿Cuánto vale salvarla?" (sem valor em dólares da vida, como o autor decidiu) e "El papel vs el SIVEC" (1,7× só em tratamentos e tempo).
+- Planilha: linha "Tablero da rede" (US$ 250 no slide de preços) em 0 por padrão; o slide "Incluye" diz que o tablero vem incluído — decidir.
