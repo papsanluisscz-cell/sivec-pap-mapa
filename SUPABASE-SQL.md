@@ -1778,3 +1778,40 @@ select case when pg_get_functiondef('sivec_armar_lote(uuid[], uuid, date, text, 
 
 ### Deshacer el Paso 25
 Volver a ejecutar la función `sivec_armar_lote` del Paso 24.
+
+---
+
+## Paso 26 — Términos de uso aceptados y consentimiento de la paciente
+
+- Al entrar por primera vez (y cada vez que cambien los términos), cada persona acepta los **Términos de uso** y la **Política de privacidad**; queda guardado con fecha.
+- En el registro de la toma: casilla de **consentimiento de la paciente** para el registro digital y para compartir su resultado entre los establecimientos que la atienden (hoja para la paciente: docs/empresa/04-Consentimiento-paciente-SIVEC.docx).
+
+```sql
+-- PASO 26 · Términos de uso aceptados por cada persona y consentimiento de la paciente para el registro digital
+-- A) Cada usuario acepta los términos de uso y la política de privacidad una vez por versión
+create table if not exists sivec_aceptaciones (
+  usuario uuid not null default auth.uid(),
+  version text not null,
+  aceptado_at timestamptz not null default now(),
+  primary key (usuario, version)
+);
+alter table sivec_aceptaciones enable row level security;
+drop policy if exists "ve lo suyo" on sivec_aceptaciones;
+drop policy if exists "acepta lo suyo" on sivec_aceptaciones;
+create policy "ve lo suyo" on sivec_aceptaciones for select to authenticated using (usuario = auth.uid() or sivec_es_admin());
+create policy "acepta lo suyo" on sivec_aceptaciones for insert to authenticated with check (usuario = auth.uid());
+grant select, insert on sivec_aceptaciones to authenticated;
+
+-- B) Consentimiento de la paciente para el registro digital y para compartir su resultado entre los establecimientos que la atienden
+alter table pacientes add column if not exists consent_registro_digital boolean;
+
+notify pgrst, 'reload schema';
+
+-- Resultado: debe decir "listo"
+select case when to_regclass('public.sivec_aceptaciones') is not null
+             and exists (select 1 from information_schema.columns where table_name = 'pacientes' and column_name = 'consent_registro_digital')
+            then 'listo' else 'revisar' end as paso_26;
+```
+
+### Deshacer el Paso 26
+`drop table if exists sivec_aceptaciones;` y `alter table pacientes drop column if exists consent_registro_digital;` (se pierde lo registrado).

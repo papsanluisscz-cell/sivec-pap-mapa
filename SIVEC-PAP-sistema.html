@@ -1165,6 +1165,10 @@ body:not(.cobroOn) .cobroCampo { display: none !important; }
           <input type="checkbox" id="hizoVph" name="hizo_prueba_vph">
           <label for="hizoVph" style="margin:0">Se realizó prueba de VPH</label>
         </div>
+        <div class="checkrow">
+          <input type="checkbox" id="consentSivec" name="consent_registro_digital">
+          <label for="consentSivec" style="margin:0">La paciente fue informada y acepta el registro digital en el SIVEC y que su resultado se comparta con los establecimientos que la atienden<span class="helpTip" data-tip="Leéle o entregale la hoja de consentimiento del SIVEC. Si no acepta, se puede registrar igual, pero queda anotado.">ⓘ</span></label>
+        </div>
         <div class="vphBox" data-reg hidden>
           <div class="field"><label>Forma de toma del VPH<span class="helpTip" data-tip="Autotoma: la mujer se toma sola la muestra vaginal con un hisopo, en el establecimiento o en su casa. Toma por profesional: muestra del cuello uterino con espéculo, como el PAP. Las dos sirven para la prueba molecular de VPH (OMS 2021).">ⓘ</span></label>
             <select name="vph_modo"><option value="">— Sin dato —</option><option value="Profesional">Toma por profesional (cuello uterino)</option><option value="Autotoma">Autotoma (vaginal, la hace la mujer)</option></select></div>
@@ -1322,6 +1326,7 @@ body:not(.cobroOn) .cobroCampo { display: none !important; }
       <button id="balanceBuscarBtn" class="primary" style="margin:10px 0 20px">Buscar</button>
       <button id="balanceImprimirBtn" class="rowBtn" style="margin:10px 0 20px 10px; display:none">🖶 Imprimir lista</button>
       <button id="balancePdfBtn" class="rowBtn" style="margin:10px 0 20px 10px; display:none">💾 Salvar PDF</button>
+      <span style="display:inline-flex;gap:6px;align-items:center;margin:10px 0 20px 10px;flex-wrap:wrap"><input type="month" id="snisMes" title="Mes del informe" style="padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)"><button id="snisBtn" class="rowBtn" type="button" onclick="snisInforme()" title="Resumen del mes por grupo de edad para cargar en el SNIS (sin nombres)">📤 Informe mensual SNIS</button></span>
       <div id="lotesBox"></div>
       <div id="balanceResultado"></div>
     </div>
@@ -2261,11 +2266,17 @@ async function cargarPerfil() {
     return aplicarRol();
   }
   const { data, error } = await sb.from('perfiles_usuario').select('*').eq('id', session.user.id).maybeSingle();
+  if (error && esSinInternet(error)) { // sin internet: se usa el perfil guardado de la última vez para poder registrar
+    try { const g = JSON.parse(localStorage.getItem('sivec_perfil_cache') || 'null'); if (g && g.perfil && g.perfil.id === session.user.id) { perfil = g.perfil; centros = g.centros || []; redes = g.redes || []; } } catch (e) {}
+    aplicarRol(); colaPintar(); return;
+  }
   if (error) return aplicarRol(); // tabla perfiles no creada todavía: modo de siempre
   const [r, c] = await Promise.all([sb.from('redes').select('*').order('nombre'), sb.from('centros_salud').select('*').order('nombre')]);
   redes = r.data || []; centros = c.data || [];
   perfil = data && data.activo !== false ? data : { sinPerfil: true, inactivo: !!data, correo: session.user.email };
+  if (!perfil.sinPerfil) try { localStorage.setItem('sivec_perfil_cache', JSON.stringify({ perfil, centros, redes })); } catch (e) {}
   aplicarRol();
+  if (!perfil.sinPerfil) { terminosVerificar(); colaEnviar(); }
 }
 
 function aplicarRol() {
@@ -3860,6 +3871,8 @@ async function onSubmit(e) {
   delete data.disp;
   data.consent_dispositivos_lista = fd.getAll('disp');
   data.hizo_prueba_vph = form.hizoVph.checked;
+  data.consent_registro_digital = !!(form.consent_registro_digital && form.consent_registro_digital.checked);
+  if (!(await columnOk('consent_registro_digital'))) delete data.consent_registro_digital;
   if (!data.hizo_prueba_vph && data.tipo_examen !== 'VPH') data.vph_modo = '';
   await limpiarCobertura(data);
   await limpiarVph(data);
@@ -3872,8 +3885,10 @@ async function onSubmit(e) {
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  if (!(await confirmarTomaRepetida(data))) { btn.disabled = false; return; }
-  await applyGeoPick(form, data, null);
+  const sinRed = !navigator.onLine;
+  if (form.consent_registro_digital && !form.consent_registro_digital.checked && !confirm('La paciente no tiene marcado el consentimiento de registro digital.\n\n¿Registrar igual? Queda anotado que no lo dio.')) { btn.disabled = false; return; }
+  if (!sinRed && !(await confirmarTomaRepetida(data))) { btn.disabled = false; return; }
+  if (!sinRed) await applyGeoPick(form, data, null);
   const msg = document.getElementById('formMsg');
   msg.className = ''; msg.style.display = 'none';
 
@@ -3882,7 +3897,12 @@ async function onSubmit(e) {
   if (centroNuevo) data.centro_id = centroNuevo;
   const { data: insertado, error } = await sb.from('pacientes').insert([data]).select();
   btn.disabled = false;
-  if (error) {
+  if (error && esSinInternet(error)) {
+    colaAgregar(data);
+    msg.innerHTML = `<span class="regOk">📴 ${esc(data.nombre)} quedó guardada <b>en esta computadora</b>. Se envía sola cuando vuelva internet.</span>`; msg.className = 'ok';
+    showToast('Sin internet: la toma quedó guardada en esta computadora y se enviará sola', 'ok');
+    form.reset(); resetGeoPick(form); if (window.regBorrarBorrador) window.regBorrarBorrador();
+  } else if (error) {
     msg.textContent = 'Error al guardar: ' + error.message;
     msg.className = 'err';
     showToast('Error al guardar la paciente: ' + error.message, 'err');
@@ -7335,6 +7355,141 @@ async function saveDocsToDrive() {
 }
 
 init();
+
+// ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
+const SIVEC_VERSION = '1.1.0 · 27/09/2026';
+const TERMINOS_VERSION = '2026-09';
+(function soporteEnConfiguracion() {
+  const panel = document.getElementById('settingsPanel'); if (!panel) return;
+  const sp = (window.SIVEC_CONFIG || {}).soporte || {};
+  const d = document.createElement('div');
+  d.style.cssText = 'margin:0 0 18px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)';
+  const wa = /x/i.test(sp.whatsapp || '') ? '' : String(sp.whatsapp || '').replace(/\D/g, '');
+  d.innerHTML = `<b>🆘 Soporte del SIVEC</b><div class="hint" style="margin:4px 0 8px">${wa ? 'Escribinos por WhatsApp con una captura de pantalla de lo que pasa.' : 'El número de soporte se configura en config.js.'}</div>
+    ${wa ? `<a class="primary" style="display:inline-block;text-decoration:none;padding:8px 14px;border-radius:10px" href="https://wa.me/${wa}?text=${encodeURIComponent('Hola, necesito ayuda con el SIVEC (' + SIVEC_VERSION + ')')}" target="_blank" rel="noopener">WhatsApp ${esc(sp.whatsapp)}</a>` : ''}
+    ${sp.correo ? `<div class="hint" style="margin-top:6px">Correo: ${esc(sp.correo)}</div>` : ''}
+    <div class="hint" style="margin-top:8px">Versión ${SIVEC_VERSION} · <a href="terminos.html" target="_blank" rel="noopener">Términos de uso</a> · <a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a></div>`;
+  const h = panel.querySelector('h2'); if (h) h.after(d); else panel.prepend(d);
+})();
+
+// Términos de uso y política de privacidad: cada persona los acepta una vez por versión (Paso 26 del SQL)
+async function terminosVerificar() {
+  if (!sb || !conRoles() || modoPresentacion || modoDemo) return;
+  const { data, error } = await sb.from('sivec_aceptaciones').select('version').eq('usuario', perfil.id).eq('version', TERMINOS_VERSION).limit(1);
+  if (error || (data && data.length)) return; // sin la tabla todavía, o ya aceptó
+  if (document.getElementById('terminosOverlay')) return;
+  const ov = document.createElement('div'); ov.id = 'terminosOverlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:3000;background:rgba(20,10,16,.72);display:flex;align-items:center;justify-content:center;padding:16px';
+  ov.innerHTML = `<div style="background:var(--surface,#fff);color:var(--ink);max-width:560px;width:100%;border-radius:18px;padding:22px 24px;box-shadow:0 20px 60px rgba(0,0,0,.35);max-height:90vh;overflow:auto">
+    <h2 style="margin:0 0 6px">Antes de empezar</h2>
+    <p class="hint" style="margin:0 0 12px">El SIVEC guarda datos de salud de mujeres. Para usarlo aceptás estas reglas:</p>
+    <ul style="margin:0 0 12px;padding-left:20px;line-height:1.5">
+      <li>Uso tu cuenta <b>solo yo</b>: no presto mi usuario ni mi contraseña.</li>
+      <li>Miro solo las pacientes que <b>atiendo</b>. Cada consulta a otro establecimiento queda registrada.</li>
+      <li>No copio, no fotografío ni comparto datos de pacientes fuera del trabajo.</li>
+      <li>Los datos son de la institución de salud; el SIVEC y su código son de su autor.</li>
+      <li>Si veo algo raro (un error, un acceso que no reconozco), aviso a soporte.</li>
+    </ul>
+    <p class="hint" style="margin:0 0 12px">Texto completo: <a href="terminos.html" target="_blank" rel="noopener">Términos de uso</a> · <a href="privacidad.html" target="_blank" rel="noopener">Política de privacidad</a></p>
+    <label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:14px"><input type="checkbox" id="terminosChk" style="margin-top:3px"> Leí y acepto los términos de uso y la política de privacidad del SIVEC.</label>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="rowBtn" id="terminosSalir">Salir</button><button type="button" class="primary" id="terminosOk" disabled>Aceptar y entrar</button></div></div>`;
+  document.body.appendChild(ov);
+  ov.querySelector('#terminosChk').onchange = e => { ov.querySelector('#terminosOk').disabled = !e.target.checked; };
+  ov.querySelector('#terminosSalir').onclick = async () => { try { await sb.auth.signOut(); } catch (e) {} location.reload(); };
+  ov.querySelector('#terminosOk').onclick = async () => {
+    const { error } = await sb.from('sivec_aceptaciones').insert([{ version: TERMINOS_VERSION }]);
+    if (error && !/duplicate/i.test(error.message)) return showToast('No se pudo guardar: ' + esc(error.message), 'err');
+    ov.remove(); showToast('Gracias ✔', 'ok');
+  };
+}
+
+// Modo sin internet: la toma se guarda en esta computadora y se envía sola cuando vuelve la conexión.
+// Solo se guardan las tomas nuevas que todavía no se enviaron; se borran de la computadora apenas llegan al banco.
+const COLA_KEY = 'sivec_cola_sin_internet';
+function esSinInternet(err) { return !navigator.onLine || /Failed to fetch|NetworkError|Load failed|network|fetch/i.test(String(err && (err.message || err))); }
+function colaLeer() { try { return JSON.parse(localStorage.getItem(COLA_KEY) || '[]'); } catch (e) { return []; } }
+function colaGuardar(c) { try { if (c.length) localStorage.setItem(COLA_KEY, JSON.stringify(c)); else localStorage.removeItem(COLA_KEY); } catch (e) {} colaPintar(); }
+function colaAgregar(data) {
+  const d = Object.assign({}, data);
+  if (!d.centro_id && perfil && perfil.centro_id) d.centro_id = perfil.centro_id;
+  const c = colaLeer(); c.push({ data: d, guardado: new Date().toISOString() }); colaGuardar(c);
+}
+function colaPintar() {
+  const c = colaLeer(); let b = document.getElementById('colaBox');
+  if (!c.length) { if (b) b.remove(); return; }
+  if (!b) { b = document.createElement('button'); b.id = 'colaBox'; b.type = 'button'; b.onclick = () => colaEnviar(true); document.body.appendChild(b); }
+  const conError = c.filter(x => x.error).length;
+  b.style.cssText = `position:fixed;left:16px;bottom:16px;z-index:900;border:0;border-radius:999px;padding:10px 16px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.2);background:${conError ? '#b91c1c' : '#92400e'};color:#fff`;
+  b.textContent = `📴 ${c.length} toma${c.length > 1 ? 's' : ''} sin enviar${conError ? ' · ' + conError + ' con error' : ''} · ${navigator.onLine ? 'Enviar ahora' : 'esperando internet'}`;
+}
+let colaEnviando = false;
+async function colaEnviar(manual) {
+  if (!sb || colaEnviando || !navigator.onLine) { colaPintar(); return; }
+  const c = colaLeer(); if (!c.length) return;
+  colaEnviando = true; const quedan = []; let ok = 0;
+  for (const it of c) {
+    const { error } = await sb.from('pacientes').insert([it.data]);
+    if (!error) ok++;
+    else { if (!esSinInternet(error)) it.error = error.message; quedan.push(it); }
+  }
+  colaEnviando = false; colaGuardar(quedan);
+  if (ok) { showToast(`📶 Volvió internet: ${ok} toma${ok > 1 ? 's' : ''} enviada${ok > 1 ? 's' : ''} ✔`, 'ok'); allPatientsData = []; }
+  if (manual && quedan.some(x => x.error)) alert('No se pudieron enviar:\n\n' + quedan.filter(x => x.error).map(x => `• ${x.data.nombre} (${fmtFecha(x.data.fecha_toma)}): ${x.error}`).join('\n') + '\n\nAvisá a soporte con una captura de esta pantalla.');
+}
+window.addEventListener('online', () => colaEnviar());
+window.addEventListener('offline', colaPintar);
+setTimeout(colaPintar, 1500);
+
+// Informe mensual para el SNIS: tomas y resultados del mes por grupo de edad, sin nombres.
+// Los grupos y renglones siguen el uso habitual del programa; confirmar con el estadístico de la red los casilleros del formulario vigente.
+const SNIS_GRUPOS = [['< 25', 0, 24], ['25–34', 25, 34], ['35–49', 35, 49], ['50–64', 50, 64], ['65 y más', 65, 200]];
+function edadAl(nac, fecha) { if (!nac || !fecha) return null; const a = new Date(nac + 'T12:00:00'), b = new Date(String(fecha).slice(0, 10) + 'T12:00:00'); let e = b.getFullYear() - a.getFullYear(); if (b.getMonth() < a.getMonth() || (b.getMonth() === a.getMonth() && b.getDate() < a.getDate())) e--; return e; }
+async function snisInforme() {
+  const mes = (document.getElementById('snisMes').value || hoyISO().slice(0, 7));
+  const ini = mes + '-01', finD = new Date(+mes.slice(0, 4), +mes.slice(5, 7), 0), fin = mes + '-' + String(finD.getDate()).padStart(2, '0');
+  showToast('Armando el informe SNIS de ' + mes + '…', 'ok');
+  const tq = await selectAll(() => pacQ().is('deleted_at', null).gte('fecha_toma', ini).lte('fecha_toma', fin));
+  if (tq.error) return alert('No se pudo leer: ' + tq.error.message);
+  const tomas = tq.data || [];
+  const iq = (await columnOk('fecha_informe')) ? await selectAll(() => pacQ().is('deleted_at', null).gte('fecha_informe', ini).lte('fecha_informe', fin + 'T23:59:59')) : { data: [] };
+  const informados = iq.data || [];
+  const carnets = [...new Set(tomas.map(p => p.carnet).filter(c => c && String(c).length >= 4))];
+  const previas = new Set();
+  for (let i = 0; i < carnets.length; i += 150) { const { data } = await pacQ('carnet').is('deleted_at', null).in('carnet', carnets.slice(i, i + 150)).lt('fecha_toma', ini); (data || []).forEach(x => previas.add(x.carnet)); }
+  let ders = [];
+  if (await derivOk()) { const { data } = await sb.from('derivaciones').select('*').neq('estado', 'cancelada'); ders = data || []; }
+  const enMes = f => f && String(f).slice(0, 10) >= ini && String(f).slice(0, 10) <= fin;
+  const grupo = e => { const g = SNIS_GRUPOS.find(([, a, b]) => e != null && e >= a && e <= b); return g ? g[0] : 'Sin edad'; };
+  const cols = [...SNIS_GRUPOS.map(g => g[0]), 'Sin edad', 'Total'];
+  const filas = [];
+  const fila = (nombre, lista, fechaDe) => { const r = { Indicador: nombre }; cols.forEach(c => { r[c] = 0; }); lista.forEach(p => { const g = grupo(edadAl(p.fecha_nacimiento, fechaDe(p))); r[g]++; r.Total++; }); filas.push(r); };
+  const pap = tomas.filter(p => !esSoloVph(p)), vph = tomas.filter(p => p.hizo_prueba_vph || p.tipo_examen === 'VPH');
+  fila('PAP tomados', pap, p => p.fecha_toma);
+  fila('   de ellos, primera vez en el SIVEC', pap.filter(p => !previas.has(p.carnet)), p => p.fecha_toma);
+  fila('   de ellos, repetidos', pap.filter(p => previas.has(p.carnet)), p => p.fecha_toma);
+  fila('Pruebas de VPH (toma por profesional)', vph.filter(p => p.vph_modo !== 'Autotoma'), p => p.fecha_toma);
+  fila('Pruebas de VPH (autotoma)', vph.filter(p => p.vph_modo === 'Autotoma'), p => p.fecha_toma);
+  const res = informados.filter(p => bethesdaDe(p));
+  [['PAP informados: negativo (NILM)', c => c === 'NILM'], ['PAP informados: ASC-US', c => c === 'ASC-US'], ['PAP informados: LSIL', c => c === 'LSIL'], ['PAP informados: ASC-H', c => c === 'ASC-H'], ['PAP informados: HSIL', c => c === 'HSIL'], ['PAP informados: AGC / AIS', c => c === 'AGC' || c === 'AIS'], ['PAP informados: carcinoma', c => /Carcinoma/i.test(c)], ['PAP informados: insatisfactorios', c => /Insatisfactoria/i.test(c)]]
+    .forEach(([n, f]) => fila(n, res.filter(p => f(bethesdaDe(p))), p => p.fecha_toma));
+  const vr = informados.filter(p => p.resultado_vph);
+  fila('VPH informados: negativo', vr.filter(p => p.resultado_vph === 'Negativa'), p => p.fecha_toma);
+  fila('VPH informados: positivo 16 y/o 18', vr.filter(p => p.resultado_vph === 'Positiva' && /16|18/.test(p.vph_genotipo || '')), p => p.fecha_toma);
+  fila('VPH informados: positivo otros de alto riesgo', vr.filter(p => p.resultado_vph === 'Positiva' && !/16|18/.test(p.vph_genotipo || '')), p => p.fecha_toma);
+  const pacDe = d => ({ fecha_nacimiento: (tomas.concat(informados).find(p => String(p.id) === String(d.paciente_id)) || {}).fecha_nacimiento });
+  fila('Derivadas a colposcopia', ders.filter(d => enMes(d.fecha_derivacion)).map(d => Object.assign(pacDe(d), { f: d.fecha_derivacion })), p => p.f);
+  fila('Colposcopias realizadas', ders.filter(d => enMes(d.fecha_atencion)).map(d => Object.assign(pacDe(d), { f: d.fecha_atencion })), p => p.f);
+  fila('Biopsias con CIN 2 o más', ders.filter(d => enMes(d.fecha_biopsia_resultado) && /CIN 2|CIN 3|in situ|AIS|invasor/i.test(d.biopsia_resultado || '')).map(d => Object.assign(pacDe(d), { f: d.fecha_biopsia_resultado })), p => p.f);
+  fila('Tratamientos realizados', ders.filter(d => enMes(d.fecha_atencion) && d.tratamiento && d.tratamiento !== 'Ninguno (control)').map(d => Object.assign(pacDe(d), { f: d.fecha_atencion })), p => p.f);
+  const lugar = centroNombre(centroActivo || (perfil && perfil.centro_id)) || 'Establecimiento';
+  const wb = XLSX.utils.book_new();
+  const cab = [[`Informe mensual SIVEC para el SNIS · ${lugar} · ${mes}`], ['Confirmar con el estadístico de la red los casilleros exactos del formulario vigente. Las edades son a la fecha de la toma.'], []];
+  const ws = XLSX.utils.aoa_to_sheet(cab); XLSX.utils.sheet_add_json(ws, filas, { origin: 'A4', header: ['Indicador', ...cols] });
+  ws['!cols'] = [{ wch: 46 }, ...cols.map(() => ({ wch: 10 }))];
+  XLSX.utils.book_append_sheet(wb, ws, 'Informe SNIS');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(tomas.map(p => ({ 'Código de muestra': p.codigo_muestra || '', 'Fecha de toma': p.fecha_toma, 'Edad': edadAl(p.fecha_nacimiento, p.fecha_toma), 'Grupo': grupo(edadAl(p.fecha_nacimiento, p.fecha_toma)), 'Examen': tipoMuestra(p), 'Primera vez': previas.has(p.carnet) ? 'No' : 'Sí', 'PAP': bethesdaDe(p) || p.estado_pap || '', 'VPH': p.resultado_vph || '', 'Genotipo': p.vph_genotipo || '' }))), 'Detalle sin nombres');
+  XLSX.writeFile(wb, `SIVEC_informe_SNIS_${lugar.replace(/[^\wÀ-ÿ]+/g, '_')}_${mes}.xlsx`);
+}
 
 // ===== Sitio: instalar como aplicación (PWA) =====
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});

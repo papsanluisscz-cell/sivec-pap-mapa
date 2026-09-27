@@ -3,5 +3,7 @@
 // (las reglas de la base, Paso 22, deciden qué lee cada persona). NUNCA poner acá la clave "service_role".
 window.SIVEC_CONFIG = {
   url: 'https://cvvqwwijnygqnhouqgkx.supabase.co',
-  key: 'PEGAR_AQUI_LA_CLAVE_ANON_PUBLIC'
+  key: 'PEGAR_AQUI_LA_CLAVE_ANON_PUBLIC',
+  // Soporte que ve cada usuario en ⚙ Configuración (número con código de país, sin +)
+  soporte: { whatsapp: '591XXXXXXXX', correo: 'soporte@sivec.bo' }
 };
