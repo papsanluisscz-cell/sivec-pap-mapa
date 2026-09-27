@@ -1140,8 +1140,32 @@ body.dark #firmaConfig #fcRes.mal { background: #450a0a; border-color: #7f1d1d; 
 #sonidoConfig .scModos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 #sonidoConfig .scModos button { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 10px; padding: 9px 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
 #sonidoConfig .scModos button.on { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
+#sonidoConfig .scVoz { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 13px; font-weight: 600; }
+#sonidoConfig .scVoz div { display: flex; gap: 6px; }
+#sonidoConfig .scVoz button { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 8px; padding: 6px 11px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+#sonidoConfig .scVoz button.on { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
 #sonidoConfig .scPrueba { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; color: var(--ink-soft); }
 #sonidoConfig .scPrueba button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 5px 10px; font-size: 12px; cursor: pointer; }
+/* ===== Tarjeta "Para hoy" ===== */
+#paraHoy { position: fixed; top: 108px; right: 18px; z-index: 2400; width: 370px; max-width: calc(100vw - 36px); background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 18px 48px rgba(28,10,19,.25); overflow: hidden; opacity: 0; transform: translateY(-10px) scale(.98); transition: opacity .3s, transform .35s cubic-bezier(.2,.8,.2,1); }
+#paraHoy.on { opacity: 1; transform: none; }
+#paraHoy .phHead { display: flex; align-items: center; gap: 8px; padding: 14px 14px 12px 16px; background: var(--header-grad); color: #fff; }
+#paraHoy .phHead div { flex: 1; min-width: 0; }
+#paraHoy .phHead small { display: block; font-size: 12px; opacity: .85; letter-spacing: .04em; }
+#paraHoy .phHead b { display: block; font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#paraHoy .phHead button { background: rgba(255,255,255,.18); border: 0; color: #fff; width: 34px; height: 34px; border-radius: 10px; cursor: pointer; font-size: 16px; flex: none; }
+#paraHoy .phSub { padding: 12px 16px 6px; font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+#paraHoy .phItem { display: flex; align-items: center; gap: 10px; width: calc(100% - 20px); margin: 0 10px 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--ink); cursor: pointer; text-align: left; font: inherit; font-size: 14px; animation: phEntra .4s both; }
+#paraHoy .phItem:nth-of-type(2) { animation-delay: .06s; } #paraHoy .phItem:nth-of-type(3) { animation-delay: .12s; } #paraHoy .phItem:nth-of-type(4) { animation-delay: .18s; } #paraHoy .phItem:nth-of-type(5) { animation-delay: .24s; } #paraHoy .phItem:nth-of-type(6) { animation-delay: .3s; }
+@keyframes phEntra { from { opacity: 0; transform: translateX(12px); } }
+#paraHoy .phItem:hover { border-color: var(--teal-500); }
+#paraHoy .phItem.crit { border-left: 4px solid #dc2626; }
+#paraHoy .phItem .ic { font-size: 18px; width: 26px; text-align: center; flex: none; }
+#paraHoy .phItem .tx { flex: 1; }
+#paraHoy .phItem .go { color: var(--ink-soft); font-size: 18px; }
+#paraHoy > :last-child { margin-bottom: 12px; }
+@media (max-width: 520px) { #paraHoy { top: auto; bottom: 84px; right: 8px; left: 8px; width: auto; } }
+@media (prefers-reduced-motion: reduce) { #paraHoy, #paraHoy .phItem { transition: none; animation: none; } }
 @media (max-width: 520px) { #spPanel { right: 8px; left: 8px; width: auto; max-width: none; bottom: 80px; height: calc(100vh - 100px); } }
 @media (max-width: 760px) { body::after { content: ''; display: block; height: 80px; } }  /* que el botón 💬 no tape el último botón de la página */
 @media print { #spBtn, #spPanel { display: none !important; } }
@@ -2063,7 +2087,7 @@ function showToast(message, type, son) {
   const t = document.createElement('div');
   t.className = 'toast ' + (type === 'err' ? 'err' : 'ok');
   const icon = type === 'err' ? '\u2716' : '\u2713';
-  if (son !== false) { try { sonido(son || (type === 'err' ? 'error' : 'ok')); } catch (_) {} }
+  if (son !== false) { try { sonido(son || (type === 'err' ? 'error' : null)); } catch (_) {} }
   t.innerHTML = '<span class="icon">' + icon + '</span><span>' + message + '</span>';
   container.appendChild(t);
   requestAnimationFrame(() => t.classList.add('show'));
@@ -2333,7 +2357,7 @@ function entradaMostrar(texto) {
   const guia = Array.from({ length: 121 }, (_, k) => { const t = k / 120 * Math.PI * 2; return `${k ? 'L' : 'M'}${(150 + 120 * Math.sin(t)).toFixed(1)} ${(75 + 110 * Math.sin(t) * Math.cos(t)).toFixed(1)}`; }).join(' ');
   ov.innerHTML = `<div class="eInf" title="Tocá para acelerar"><svg viewBox="0 0 300 150" aria-hidden="true"><path d="${guia}"/></svg><canvas></canvas></div>
     <div class="eTxt">${esc(texto)}</div><div class="ePaso">Verificando tu acceso…</div><div class="eSub">SIVEC · preparando tu panel</div><div class="eTip">tocá el ∞</div>`;
-  ov.classList.remove('fuera'); ov.dataset.desde = Date.now(); sonido('entrada');
+  ov.classList.remove('fuera'); ov.dataset.desde = Date.now();
   cancelAnimationFrame(entradaRaf);
   const caja = ov.querySelector('.eInf'), cv = ov.querySelector('canvas'), ctx = cv.getContext('2d');
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -2503,7 +2527,7 @@ async function cargarPerfil() {
   perfil = data && data.activo !== false ? data : { sinPerfil: true, inactivo: !!data, correo: session.user.email };
   if (!perfil.sinPerfil) try { localStorage.setItem('sivec_perfil_cache', JSON.stringify({ perfil, centros, redes })); } catch (e) {}
   aplicarRol();
-  if (!perfil.sinPerfil) { terminosVerificar(); colaEnviar(); }
+  if (!perfil.sinPerfil) { terminosVerificar(); colaEnviar(); setTimeout(() => saludoDelDia(false), 2400); }
 }
 
 function aplicarRol() {
@@ -7897,7 +7921,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.8.0 · 27/09/2026';
+const SIVEC_VERSION = '1.9.0 · 27/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -8435,7 +8459,7 @@ function sonidoNota(ctx, t, frec, dur, { tipo = 'sine', vol = 0.12, hasta = null
 const SONIDOS = {
   ok: (c, t) => { sonidoNota(c, t, 880, 0.12, { vol: 0.07 }); sonidoNota(c, t + 0.07, 1318.5, 0.18, { vol: 0.06 }); },
   firma: (c, t) => { [659.25, 783.99, 1046.5].forEach((f, i) => { sonidoNota(c, t + i * 0.09, f, 0.5 - i * 0.08, { tipo: 'triangle', vol: 0.11 }); sonidoNota(c, t + i * 0.09, f * 2, 0.25, { vol: 0.025 }); }); },
-  error: (c, t) => { sonidoNota(c, t, 220, 0.12, { tipo: 'square', vol: 0.045 }); sonidoNota(c, t + 0.15, 196, 0.18, { tipo: 'square', vol: 0.045 }); },
+  error: (c, t) => { sonidoNota(c, t, 311.13, 0.16, { tipo: 'triangle', vol: 0.1 }); sonidoNota(c, t + 0.14, 246.94, 0.28, { tipo: 'triangle', vol: 0.1 }); },
   alerta: (c, t) => { [[880, 0], [659.25, 0.16], [880, 0.32]].forEach(([f, d]) => { sonidoNota(c, t + d, f, 0.22, { tipo: 'triangle', vol: 0.14 }); sonidoNota(c, t + d, f * 1.5, 0.14, { vol: 0.03 }); }); },
   mensaje: (c, t) => { sonidoNota(c, t, 783.99, 0.14, { vol: 0.1 }); sonidoNota(c, t + 0.1, 1174.66, 0.28, { tipo: 'triangle', vol: 0.09 }); },
   click: (c, t) => { sonidoNota(c, t, 1600, 0.04, { tipo: 'square', vol: 0.03, ataque: 0.002 }); },
@@ -8462,18 +8486,148 @@ function sonidoSiAumenta(clave, n, nombre) { const antes = sonidoVistos[clave]; 
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
   const d = document.createElement('div'); d.id = 'sonidoConfig';
   const modos = [['todos', '🔊 Todos'], ['alertas', '🔔 Solo alertas'], ['no', '🔇 Apagado']];
-  d.innerHTML = `<div class="scHead"><b>Sonidos</b><small>Solo en esta computadora. "Solo alertas": resultados alterados, contrarreferencias, mensajes de soporte y errores.</small></div>
+  d.innerHTML = `<div class="scHead"><b>Sonidos</b><small>Solo en esta computadora. Suena en lo importante: firmas, resultados, contrarreferencias, soporte y errores. "Solo alertas": sin el sonido de firma.</small></div>
     <div class="scModos">${modos.map(([k, t]) => `<button type="button" data-sm="${k}">${t}</button>`).join('')}</div>
+    <div class="scVoz"><span>🗣 Saludo con voz al entrar</span><div><button type="button" data-voz="si">Sí</button><button type="button" data-voz="no">No</button><button type="button" data-voz="oir">▶ Escuchar</button></div></div>
     <div class="scPrueba"><span>Probar:</span>${[['firma', '✍ Firma'], ['alerta', '⚠ Resultado alterado'], ['mensaje', '💬 Mensaje'], ['error', '✖ Error'], ['ok', '✓ Guardado']].map(([k, t]) => `<button type="button" data-sp2="${k}">${t}</button>`).join('')}</div>`;
   const ancla = document.getElementById('firmaConfig') || (panel.querySelector('h2') || {}).nextElementSibling || panel.firstChild; ancla.after(d);
-  const marcar = () => d.querySelectorAll('[data-sm]').forEach(b => b.classList.toggle('on', b.dataset.sm === sonidoModo()));
+  const marcar = () => { d.querySelectorAll('[data-sm]').forEach(b => b.classList.toggle('on', b.dataset.sm === sonidoModo())); d.querySelectorAll('[data-voz="si"],[data-voz="no"]').forEach(b => b.classList.toggle('on', (b.dataset.voz === 'si') === vozActiva())); };
   marcar();
   d.onclick = e => {
-    const m = e.target.closest('[data-sm]'), p = e.target.closest('[data-sp2]');
+    const m = e.target.closest('[data-sm]'), p = e.target.closest('[data-sp2]'), vz = e.target.closest('[data-voz]');
+    if (vz) { if (vz.dataset.voz === 'oir') { document.getElementById('settingsPanel')?.classList.remove('open'); saludoDelDia(true); } else { try { localStorage.setItem('sivec_voz', vz.dataset.voz); } catch (_) {} marcar(); } return; }
     if (m) { try { localStorage.setItem('sivec_sonidos', m.dataset.sm); } catch (_) {} marcar(); if (m.dataset.sm !== 'no') sonido(m.dataset.sm === 'alertas' ? 'mensaje' : 'ok'); }
     if (p) { const guard = sonidoModo(); try { localStorage.setItem('sivec_sonidos', 'todos'); } catch (_) {} sonidoCtxListo(); setTimeout(() => { sonido(p.dataset.sp2); try { localStorage.setItem('sivec_sonidos', guard); } catch (_) {} }, 30); }
   };
 })();
+
+// ===== Saludo del día con voz y tarjeta "Para hoy" =====
+// Voz del propio navegador (gratis, no sale nada de la computadora). Nunca dice nombres de pacientes: solo números.
+function vozActiva() { try { return localStorage.getItem('sivec_voz') !== 'no'; } catch (_) { return true; } }
+function saludoTrato() {
+  const n = String((perfil && (perfil.nombre_completo || '')) || '').trim();
+  const m = /^(dra|dr|lic|lcda|lcdo|licda|licdo|enf|ing)\.?\s+(.+)$/i.exec(n);
+  const T = { dra: 'doctora', dr: 'doctor', lic: 'licenciado', lcda: 'licenciada', licda: 'licenciada', lcdo: 'licenciado', licdo: 'licenciado', enf: 'enfermera', ing: 'ingeniero' };
+  if (m) { const r = m[2].replace(/[·(].*$/, '').trim(); return { voz: T[m[1].toLowerCase()] + ' ' + r, texto: n.replace(/[·(].*$/, '').trim() }; }
+  const primero = n.split(/\s+/)[0] || '';
+  return { voz: primero, texto: primero };
+}
+function saludoHora() { const h = new Date().getHours(); return h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches'; }
+const plural = (n, s, p) => `${n} ${n === 1 ? s : (p || s + 's')}`;
+// Junta lo que hay para hoy según lo que hace cada persona. Devuelve [{ic, txt, n, ir, tono}]
+async function saludoPendientes() {
+  const items = [], hoy = hoyISO();
+  const esGestor = conRoles() && (perfil.rol === 'gestor' || perfil.rol === 'admin');
+  // Centro de salud
+  if (conRoles() && perfil.rol === 'centro') {
+    try {
+      if (!allPatientsData.length) { const { data } = await selectAll(() => pacQ().is('deleted_at', null)); if (data) allPatientsData = data; }
+      const data = allPatientsData; tomasIndex = buildTomasIndex(data);
+      const nuevos = data.filter(esResultadoNuevo), alt = nuevos.filter(p => p.estado_pap === 'Positivo' || p.resultado_vph === 'Positiva').length;
+      const pasos = {}; data.forEach(p => { const k = proximoPaso(p).key; pasos[k] = (pasos[k] || 0) + 1; });
+      let contra = 0; try { contra = data.filter(p => { const d = derivDe(p); return d && derEsNueva(d); }).length; } catch (_) {}
+      if (nuevos.length) items.push({ ic: '🔬', n: nuevos.length, txt: plural(nuevos.length, 'resultado nuevo', 'resultados nuevos') + (alt ? `, ${plural(alt, 'alterado')}` : ''), voz: `${plural(nuevos.length, 'resultado nuevo', 'resultados nuevos')} del laboratorio${alt ? `, ${alt === 1 ? 'uno alterado' : alt + ' alterados'}` : ''}`, ir: 'nuevos', tono: alt ? 'crit' : '' });
+      if (pasos.derivar) items.push({ ic: '🔴', n: pasos.derivar, txt: plural(pasos.derivar, 'paciente para derivar', 'pacientes para derivar') + ' a colposcopia', voz: `${plural(pasos.derivar, 'paciente para derivar', 'pacientes para derivar')} a colposcopia`, ir: 'paso:derivar', tono: 'crit' });
+      if (pasos.definir) items.push({ ic: '🩺', n: pasos.definir, txt: plural(pasos.definir, 'positiva sin conducta', 'positivas sin conducta'), voz: `${plural(pasos.definir, 'positiva', 'positivas')} esperando conducta`, ir: 'paso:definir', tono: 'crit' });
+      if (contra) items.push({ ic: '↩️', n: contra, txt: plural(contra, 'contrarreferencia nueva', 'contrarreferencias nuevas'), voz: plural(contra, 'contrarreferencia nueva', 'contrarreferencias nuevas'), ir: 'contrarref' });
+      if (pasos.entregar) items.push({ ic: '📬', n: pasos.entregar, txt: plural(pasos.entregar, 'resultado para entregar', 'resultados para entregar'), voz: plural(pasos.entregar, 'resultado para entregar', 'resultados para entregar'), ir: 'paso:entregar' });
+      if (pasos.buscar) items.push({ ic: '⏰', n: pasos.buscar, txt: plural(pasos.buscar, 'resultado atrasado', 'resultados atrasados') + ' (más de 90 días)', voz: plural(pasos.buscar, 'resultado atrasado', 'resultados atrasados'), ir: 'paso:buscar' });
+    } catch (e) {}
+  }
+  // Laboratorio
+  if (esLab()) {
+    try {
+      const [m, l] = await Promise.all([sb.rpc('sivec_lab_muestras', { p_lote: null }), sb.from('lotes').select('id,estado').eq('destino_id', perfil.centro_id).limit(200)]);
+      const lotes = (l.data || []).filter(x => x.estado !== 'recibido').length, leer = (m.data || []).filter(x => x.muestra_estado === 'recibida').length;
+      if (lotes) items.push({ ic: '📦', n: lotes, txt: plural(lotes, 'lote por recibir', 'lotes por recibir'), voz: plural(lotes, 'lote por recibir', 'lotes por recibir'), ir: 'vista:portal' });
+      if (leer) items.push({ ic: '🔬', n: leer, txt: plural(leer, 'muestra por informar', 'muestras por informar'), voz: plural(leer, 'muestra por informar', 'muestras por informar'), ir: 'vista:portal' });
+    } catch (e) {}
+  }
+  // Hospital: colposcopia
+  if (esColpo()) {
+    try {
+      const { data } = await sb.rpc('sivec_colpo_lista'); const L = data || [];
+      const nuevas = L.filter(d => d.estado === 'enviada').length, citas = L.filter(d => d.fecha_cita === hoy && d.estado === 'citada').length, biop = L.filter(d => d.biopsia_tomada && !d.biopsia_resultado).length;
+      if (nuevas) items.push({ ic: '📥', n: nuevas, txt: plural(nuevas, 'referencia nueva', 'referencias nuevas'), voz: plural(nuevas, 'referencia nueva', 'referencias nuevas'), ir: 'vista:portal', tono: 'crit' });
+      if (citas) items.push({ ic: '📅', n: citas, txt: plural(citas, 'cita de colposcopia hoy', 'citas de colposcopia hoy'), voz: `${plural(citas, 'cita', 'citas')} de colposcopia para hoy`, ir: 'vista:portal' });
+      if (biop) items.push({ ic: '🧪', n: biop, txt: plural(biop, 'biopsia esperando resultado', 'biopsias esperando resultado'), voz: plural(biop, 'biopsia esperando resultado', 'biopsias esperando resultado'), ir: 'vista:portal' });
+    } catch (e) {}
+  }
+  // Gestor y administración: la red
+  if (esGestor) {
+    try {
+      const d = new Date(), ini = d.getFullYear() + '-01-01';
+      const { data } = await sb.rpc('sivec_red_resumen', { p_desde: ini, p_hasta: hoy }); const R = data || [];
+      const tomas = R.reduce((a, c) => a + Number(c.tomas || 0), 0), metaAnual = R.reduce((a, c) => a + Number(c.meta_pap_anual || 0), 0);
+      const dia = Math.max(1, Math.round((d - new Date(d.getFullYear(), 0, 1)) / 864e5)), meta = metaAnual * dia / 365;
+      const pct = meta ? Math.round(tomas / meta * 100) : null, sinTratar = R.reduce((a, c) => a + Number(c.pos_sin_tratar || 0), 0), atras = R.reduce((a, c) => a + Number(c.atrasadas || 0), 0);
+      const red = redNombre(perfil.red_id) || 'la red';
+      if (pct !== null) items.push({ ic: '🎯', n: pct + '%', txt: `${red}: ${pct}% de la meta del año`, voz: `${/^red/i.test(red) ? 'La ' + red : red} va en el ${pct} por ciento de la meta del año`, sola: true, ir: 'vista:red', tono: pct < 60 ? 'crit' : '' });
+      if (sinTratar) items.push({ ic: '🩺', n: sinTratar, txt: plural(sinTratar, 'positiva sin tratar', 'positivas sin tratar') + ' (búsqueda activa)', voz: plural(sinTratar, 'positiva sin tratar', 'positivas sin tratar'), ir: 'vista:red', tono: 'crit' });
+      if (atras) items.push({ ic: '⏰', n: atras, txt: plural(atras, 'resultado atrasado', 'resultados atrasados') + ' en la red', voz: plural(atras, 'resultado atrasado', 'resultados atrasados') + ' en la red', ir: 'vista:red' });
+    } catch (e) {}
+  }
+  return items;
+}
+function vozElegir() {
+  const vs = speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang));
+  const pref = ['es-BO', 'es-419', 'es-US', 'es-MX', 'es-AR', 'es-ES'];
+  return vs.sort((a, b) => {
+    const ka = pref.indexOf(a.lang) < 0 ? 9 : pref.indexOf(a.lang), kb = pref.indexOf(b.lang) < 0 ? 9 : pref.indexOf(b.lang);
+    const na = /natural|google|online|neural/i.test(a.name) ? 0 : 1, nb = /natural|google|online|neural/i.test(b.name) ? 0 : 1;
+    return na - nb || ka - kb;
+  })[0] || null;
+}
+async function vozDecir(texto) {
+  if (!('speechSynthesis' in window) || !texto) return false;
+  if (!speechSynthesis.getVoices().length) await new Promise(r => { speechSynthesis.onvoiceschanged = r; setTimeout(r, 1500); });
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(texto), v = vozElegir();
+  if (v) u.voice = v; u.lang = v ? v.lang : 'es-419'; u.rate = 0.97; u.pitch = 1.02; u.volume = 0.95;
+  speechSynthesis.speak(u); return true;
+}
+function saludoTexto(items) {
+  const t = saludoTrato();
+  const solas = items.filter(i => i.sola).map(i => i.voz + '.');
+  const partes = items.filter(i => !i.sola).map(i => i.voz);
+  const lista = partes.length > 1 ? partes.slice(0, -1).join(', ') + ' y ' + partes[partes.length - 1] : partes[0];
+  const gestor = conRoles() && (perfil.rol === 'gestor' || perfil.rol === 'admin');
+  return `${saludoHora()}${t.voz ? ', ' + t.voz : ''}. ` + solas.join(' ') + (partes.length ? (solas.length ? ' ' : '') + (gestor ? `Hay ${lista}.` : `Para hoy tiene ${lista}.`) : (solas.length ? '' : 'Hoy no tiene pendientes. ¡Buen trabajo!'));
+}
+async function saludoDelDia(forzar) {
+  if (!sb || !conRoles()) return;
+  const clave = 'sivec_saludo_' + perfil.id, hoy = hoyISO();
+  let visto = ''; try { visto = localStorage.getItem(clave) || ''; } catch (_) {}
+  if (!forzar && visto === hoy) return;
+  try { localStorage.setItem(clave, hoy); } catch (_) {}
+  const items = await saludoPendientes();
+  const texto = saludoTexto(items);
+  saludoTarjeta(items, texto);
+  if (vozActiva()) vozDecir(texto);
+}
+function saludoTarjeta(items, texto) {
+  document.getElementById('paraHoy')?.remove();
+  const t = saludoTrato();
+  const c = document.createElement('div'); c.id = 'paraHoy'; c.setAttribute('role', 'status');
+  c.innerHTML = `<div class="phHead"><div><small>${saludoHora()}</small><b>${esc(t.texto || '')}</b></div>
+      <button type="button" class="phVoz" title="Escuchar otra vez" aria-label="Escuchar otra vez">🔊</button><button type="button" class="phX" aria-label="Cerrar">×</button></div>
+    <div class="phSub">${items.length ? 'Para hoy' : 'Hoy no hay pendientes · ¡buen trabajo!'}</div>
+    ${items.map(i => `<button type="button" class="phItem ${i.tono || ''}" data-ir="${esc(i.ir)}"><span class="ic">${i.ic}</span><span class="tx">${esc(i.txt)}</span><span class="go">›</span></button>`).join('')}`;
+  document.body.appendChild(c);
+  requestAnimationFrame(() => c.classList.add('on'));
+  let timer = setTimeout(() => cerrar(), 30000);
+  const cerrar = () => { clearTimeout(timer); c.classList.remove('on'); setTimeout(() => c.remove(), 350); try { speechSynthesis.cancel(); } catch (_) {} };
+  c.onmouseenter = () => clearTimeout(timer);
+  c.querySelector('.phX').onclick = cerrar;
+  c.querySelector('.phVoz').onclick = () => vozDecir(texto);
+  c.querySelectorAll('[data-ir]').forEach(b => b.onclick = () => {
+    const ir = b.dataset.ir;
+    if (ir.startsWith('paso:')) { document.getElementById('filterPaso').value = ir.slice(5); listQuick = ''; switchView('list'); }
+    else if (ir === 'nuevos' || ir === 'contrarref') { switchView('list'); setTimeout(() => { const q = document.querySelector(`[data-quick="${ir}"]`); if (q) q.click(); }, 600); }
+    else if (ir.startsWith('vista:')) { const v = ir.slice(6); if (document.querySelector(`nav button[data-view="${v}"]`)) switchView(v); }
+    cerrar();
+  });
+}
 
 // Términos de uso y política de privacidad: cada persona los acepta una vez por versión (Paso 26 del SQL)
 async function terminosVerificar() {
