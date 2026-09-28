@@ -1329,6 +1329,7 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
 #campanaView .campLbl { display: block; font-size: 11.5px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-soft); margin: 4px 0; }
 #campanaView .campCheck { display: flex; gap: 8px; align-items: center; font-size: 13px; }
 #campanaView .campYa { background: #dcfce7; color: #166534; border-radius: 10px; padding: 7px 10px; font-size: 13px; font-weight: 600; }
+#campanaView .campBuscar { width: 100%; padding: 8px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; margin-bottom: 6px; }
 #campanaView .campHecho { display: flex; flex-direction: column; gap: 6px; background: #ecfdf3; border: 1px solid #86efac; border-radius: 12px; padding: 12px; } #campanaView .campHecho span { font-size: 13px; color: var(--ink-soft); }
 #campanaView .campNota { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-soft); line-height: 1.45; }
 #campanaView .campColpo { border: 2px solid var(--teal-700); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px; background: var(--surface); }
@@ -2009,7 +2010,15 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
           <select name="prueba_schiller"><option value="">— Seleccionar —</option><option>Positiva</option><option>Negativa</option></select>
         </div>
       </div>
-      <div id="cuelloBlock" class="field" style="display:none"><label>Mapa del cuello — 1) elegí el hallazgo · 2) tocá las horas donde está</label>
+      <div class="row2" id="colpIvaaRow" style="display:none">
+        <div class="field"><label>IVAA (ácido acético)</label>
+          <select name="ivaa"><option value="">— Seleccionar —</option><option>Negativo</option><option>Positivo</option><option>Sospecha de cáncer</option></select>
+        </div>
+        <div class="field"><label>Unión escamocolumnar</label>
+          <select name="union_ec"><option value="">— Seleccionar —</option><option>Visible</option><option>No visible</option></select>
+        </div>
+      </div>
+      <div id="cuelloBlock" class="field" style="display:none"><label>Mapa del cuello — 1) elegí el hallazgo · 2) tocá la hora: mitad interna (cerca del orificio) o externa</label>
         <div class="cuelloWrap"><div id="cuelloSvgBox"></div>
           <div class="cuelloTools" id="cuelloTools"></div></div>
         <div class="row2" style="margin-top:8px">
@@ -2077,18 +2086,20 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
       </div>
       <div class="field"><label>A — Análisis (diagnóstico)</label><textarea name="soap_analisis" rows="2" placeholder="Se completa con la Lesión marcada arriba, o agregar detalle"></textarea></div>
       <div class="field"><label>Observaciones</label><textarea name="soap_observaciones" rows="2"></textarea></div>
-      <div class="field"><label>P — Plan (tratamiento, marcar los que correspondan)</label>
+      </div>
+      <div class="field"><label>P — Tratamiento en el momento (marcar los que correspondan)</label>
         <div class="checkGrid">
+          <label><input type="checkbox" name="plan" value="Crioterapia"> Crioterapia</label>
+          <label><input type="checkbox" name="plan" value="Cauterización"> Cauterización</label>
+          <label><input type="checkbox" name="plan" value="Biopsia"> Biopsia</label>
           <label><input type="checkbox" name="plan" value="Metronidazol 500mg VV x10 noches"> Metronidazol 500mg VV x10 noches</label>
           <label><input type="checkbox" name="plan" value="Clotrimazol 500mg VV x10 noches"> Clotrimazol 500mg VV x10 noches</label>
           <label><input type="checkbox" name="plan" value="Aseo vulvoperineal"> Aseo vulvoperineal</label>
           <label><input type="checkbox" name="plan" value="Orientación sexual"> Orientación sexual</label>
-          <label><input type="checkbox" name="plan" value="Cauterización"> Cauterización</label>
         </div>
       </div>
-      </div>
       <div class="field"><label>Derivación</label>
-        <select name="derivacion"><option value="">— Ninguna —</option><option>Oncología</option><option>Ginecología</option><option>Control en 6 meses</option><option>Control en 1 año</option></select>
+        <select name="derivacion"><option value="">— Ninguna —</option><option>Esperar resultado de PAP/VPH</option><option>Oncología</option><option>Ginecología</option><option>Control en 6 meses</option><option>Control en 1 año</option></select>
       </div>
       <div class="actions">
         <button type="button" class="cancelBtn" onclick="closeColposcopia()">Cancelar</button>
@@ -2181,8 +2192,8 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
           <div class="field vphCasa"><label>Kit entregado el</label><input type="date" name="vph_kit_entregado"></div>
           <div class="field vphCasa"><label>Kit devuelto el<span class="helpTip" data-tip="Mientras la paciente no devuelva el kit, la muestra no se puede poner en un lote. Cuando lo traiga, marcá la fecha.">ⓘ</span></label><input type="date" name="vph_kit_devuelto"></div>
         </div>
-      <div class="field" id="genotipoField" style="display:none"><label>Genotipo VPH</label>
-        <select id="vphGenotipoSel"><option value="">— Sin dato —</option><option>16</option><option>18</option><option>16 y 18</option><option>16 + otros de alto riesgo</option><option>18 + otros de alto riesgo</option><option>Otros de alto riesgo</option></select>
+      <div class="field" id="genotipoField" style="display:none"><label>Genotipo VPH · ¿16, 18 u otros? (obligatorio si es positivo)</label>
+        <select id="vphGenotipoSel"><option value="">— Elegir el genotipo —</option><option>16</option><option>18</option><option>16 y 18</option><option>16 + otros de alto riesgo</option><option>18 + otros de alto riesgo</option><option>Otros de alto riesgo</option></select>
         <div class="hint" id="genotipoHint" style="display:none;margin-top:4px">Para guardar el genotipo hay que ejecutar el Paso 2 de SUPABASE-SQL.md (una columna nueva).</div>
       </div>
       <div id="segVphFields" style="display:none">
@@ -3866,8 +3877,8 @@ function colDetalle(d) {
       <div class="labSec">Evaluación general</div><div class="labChips">${chip('adecuada', 'Adecuada', f.adecuada)}${chip('adecuada', 'No adecuada', !f.adecuada)}</div>
       <div class="labSec">Unión escamocolumnar</div><div class="labChips">${COL_UEC.map(v => chip('uec', v, f.uec === v)).join('')}</div>
       <div class="labSec">Zona de transformación</div><div class="labChips">${['Tipo 1', 'Tipo 2', 'Tipo 3'].map(v => chip('zt', v, f.zt === v)).join('')}</div>
-      <div class="labSec">Mapa del cuello · tocá las horas de cada hallazgo</div>
-      <div id="colCuello" style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">${cuelloSVG(f.mapa, 210)}<div class="cuelloTools" style="display:flex;flex-direction:column;gap:5px">${CUELLO_TIPOS.map(t => { const hs = f.mapa.marcas[t.id] || []; return `<button type="button" class="cTool${f.herramienta === t.id ? ' on' : ''}" data-ct="${t.id}"><i style="background:${t.color}"></i>${t.id === 'biopsia' ? '📍 ' : ''}${t.nombre}${hs.length ? ` <small style="color:var(--ink-soft)">· ${cuelloHoras(hs).join(', ')} h</small>` : ''}</button>`; }).join('')}<button type="button" class="cTool" data-ct="__limpiar" style="justify-content:center;color:var(--ink-soft)">Borrar marcas</button></div></div>
+      <div class="labSec">Mapa del cuello · tocá la hora: mitad interna (cerca del orificio) o externa</div>
+      <div id="colCuello" style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">${cuelloSVG(f.mapa, 210)}<div class="cuelloTools" style="display:flex;flex-direction:column;gap:5px">${CUELLO_TIPOS.map(t => { const hs = f.mapa.marcas[t.id] || []; return `<button type="button" class="cTool${f.herramienta === t.id ? ' on' : ''}" data-ct="${t.id}"><i style="background:${t.color}"></i>${t.id === 'biopsia' ? '📍 ' : ''}${t.nombre}${hs.length ? ` <small style="color:var(--ink-soft)">· ${cuelloHoras(hs).join(', ')}</small>` : ''}</button>`; }).join('')}<button type="button" class="cTool" data-ct="__limpiar" style="justify-content:center;color:var(--ink-soft)">Borrar marcas</button></div></div>
       <div class="labSec">Tamaño de la lesión</div><div class="labChips">${COL_TAMANO.map(v => chip('tamano', v, f.tamano === v)).join('')}</div>
       ${COL_HALL_GRUPOS.map(([g, lista, tono]) => `<div class="labSec">${g}</div><div class="labChips">${lista.map(v => chip('hallazgos', v, f.hallazgos.includes(v), tono)).join('')}</div>`).join('')}
     </div><div>
@@ -3877,7 +3888,7 @@ function colDetalle(d) {
       <div class="labSec">Biopsia</div><div class="labChips">${chip('biopsia', 'Biopsia tomada', f.biopsia === true)}${chip('biopsia', 'Sin biopsia', f.biopsia === false)}</div>
       ${f.biopsia ? `<div class="labChips" style="margin-top:6px">${['1', '2', '3', '4'].map(v => chip('fragmentos', v, String(f.fragmentos) === v, '', v + (v === '1' ? ' fragmento' : ' fragmentos'))).join('')}</div>
         <div class="labChips" style="margin-top:6px">${chip('lec', 'Con legrado endocervical', f.lec === true)}${chip('lec', 'Sin legrado endocervical', f.lec === false)}</div>
-        <p class="hint" style="margin:6px 0 0">${(f.mapa.marcas.biopsia || []).length ? '📍 Sitios de biopsia: ' + cuelloHoras(f.mapa.marcas.biopsia).join(', ') + ' h' : 'Marcá en el mapa, con 📍 Biopsia, las horas donde se tomó.'}</p>` : ''}
+        <p class="hint" style="margin:6px 0 0">${(f.mapa.marcas.biopsia || []).length ? '📍 Sitios de biopsia: ' + cuelloHoras(f.mapa.marcas.biopsia).join(', ') : 'Marcá en el mapa, con 📍 Biopsia, las horas donde se tomó.'}</p>` : ''}
       <div class="labSec">Tratamiento</div><div class="labChips">${COL_TRAT.map(v => chip('tratamiento', v, f.tratamiento === v)).join('')}</div>
       <div class="labSec">Próximo control</div><div class="labChips">${COL_CONTROL.map(v => chip('proximo', v, f.proximo === v)).join('')}</div>
       <div class="labSec">Contrarreferencia · indicaciones para el centro</div><textarea id="colContra" rows="3" placeholder="Qué hacer en el centro…">${esc(f.contrarref)}</textarea>
@@ -3890,7 +3901,7 @@ function colDetalle(d) {
     if (hr || ct) {
       f.contrarref = document.getElementById('colContra').value;
       if (ct) { if (ct.dataset.ct === '__limpiar') { if (confirm('¿Borrar todas las marcas del mapa?')) f.mapa.marcas = {}; } else f.herramienta = ct.dataset.ct; }
-      else { const h = Number(hr.dataset.h), l = f.mapa.marcas[f.herramienta] = f.mapa.marcas[f.herramienta] || []; const i = l.indexOf(h); if (i >= 0) l.splice(i, 1); else l.push(h); if (f.herramienta === 'biopsia' && l.length) f.biopsia = true; }
+      else { const h = Number(hr.dataset.h), l = f.mapa.marcas[f.herramienta] = f.mapa.marcas[f.herramienta] || []; cuelloToggle(l, h, hr.dataset.z || 'e'); if (f.herramienta === 'biopsia' && l.length) f.biopsia = true; }
       return colDetalle(d);
     }
     const c = e.target.closest('[data-cg]');
@@ -3952,7 +3963,8 @@ function colDetalle(d) {
       const { error } = await sb.rpc('sivec_colpo_atender', { p_id: d.id, p_colpo: colpo, p_biopsia: f.biopsia, p_tratamiento: f.tratamiento, p_contrarref: f.contrarref, p_proximo: f.proximo, p_por: perfil.nombre_completo || perfil.correo || '', p_enviar: k === 'enviar' });
       if (error) return alert(error.message);
       showToast(k === 'enviar' ? 'Contrarreferencia enviada al centro ✔' : 'Guardado ✔', 'ok');
-      if (k === 'enviar') await firmaRegistrar('contrarreferencia', d.id, { derivacion: d.id, colposcopia: colpo, biopsia: f.biopsia, tratamiento: f.tratamiento, contrarreferencia: f.contrarref, proximo: f.proximo, por: perfil.nombre_completo || perfil.correo || '' }, pinF);
+      if (k === 'enviar') await firmaRegistrar('contrarreferencia', d.id, { derivacion: d.id, colposcopia: colpo, biopsia: f.biopsia, tratamiento: f.tratamiento, contrarreferencia: f.contrarref, proximo: f.proximo, por: perfil.nombre_completo || perfil.correo || '' }, pinF, vozColpo(d.nombre) + ' Contrarreferencia enviada.');
+      else vozAviso(vozColpo(d.nombre), 'firma');
       colTab = f.biopsia && k === 'enviar' ? 'biopsia' : 'hechas'; colSel = null; colForm = null; return colCargar();
     }
   };
@@ -6064,7 +6076,10 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
   Object.keys(data).forEach(k => { if ((k.startsWith('fecha') || k.includes('fecha') || k.includes('proximo_control')) && data[k] === '') data[k] = null; });
   const original = (currentPatients || []).find(x => String(x.id) === String(editingId)) || (allPatientsData || []).find(x => String(x.id) === String(editingId));
   await applyGeoPick(e.target, data, original ? original.direccion : null);
-  if (await columnOk('vph_genotipo')) data.vph_genotipo = data.resultado_vph === 'Positiva' ? (document.getElementById('vphGenotipoSel').value || null) : null;
+  if (await columnOk('vph_genotipo')) {
+    data.vph_genotipo = data.resultado_vph === 'Positiva' ? (document.getElementById('vphGenotipoSel').value || null) : null;
+    if (data.resultado_vph === 'Positiva' && !data.vph_genotipo) { showToast('VPH positivo: elegí el genotipo (16, 18 u otros de alto riesgo).', 'err'); document.getElementById('vphGenotipoSel').focus(); return; }
+  }
   const { error } = await sb.from('pacientes').update(data).eq('id', editingId);
   if (error) { showToast('Error al guardar: ' + error.message, 'err'); return; }
   closeEdit();
@@ -6542,10 +6557,22 @@ const CUELLO_TIPOS = [
   { id: 'puntillado', nombre: 'Puntillado', color: '#f0b27a' }, { id: 'leucoplasia', nombre: 'Leucoplasia', color: '#a9a9a9' },
   { id: 'vasos', nombre: 'Vasos atípicos', color: '#7fcf9a' }, { id: 'biopsia', nombre: 'Biopsia', color: '#6f95c9' },
 ];
-function cuelloHoras(hs) { return [...hs].sort((a, b) => (a % 12) - (b % 12)).map(String); }
+// Cada hora tiene dos mitades: 'i' = interna (cerca del orificio, zona de transformación) y 'e' = externa (periferia).
+// Una marca vieja con solo el número (3) vale para la hora entera; las nuevas se guardan como '3i' o '3e'.
+function cuelloTiene(l, h, z) { return (l || []).some(v => v === h || String(v) === String(h) || String(v) === h + z); }
+function cuelloToggle(l, h, z) {
+  const otra = z === 'i' ? 'e' : 'i', k = l.findIndex(v => v === h || String(v) === String(h));
+  if (k >= 0) { l.splice(k, 1); l.push(h + otra); return; } // era la hora entera: queda solo la otra mitad
+  const j = l.indexOf(h + z); if (j >= 0) l.splice(j, 1); else l.push(h + z);
+}
+function cuelloHoras(hs) {
+  const por = {};
+  (hs || []).forEach(v => { const m = String(v).match(/^(\d+)([ie]?)$/); if (!m) return; const h = Number(m[1]); por[h] = por[h] || new Set(); if (m[2]) por[h].add(m[2]); else { por[h].add('i'); por[h].add('e'); } });
+  return Object.keys(por).map(Number).sort((a, b) => (a % 12) - (b % 12)).map(h => h + ' h' + (por[h].size === 2 ? '' : por[h].has('i') ? ' interna' : ' externa'));
+}
 function cuelloTexto(m) {
   if (!m) return '';
-  const partes = CUELLO_TIPOS.filter(t => (m.marcas && m.marcas[t.id] || []).length).map(t => (t.id === 'biopsia' ? 'biopsia' : t.nombre.toLowerCase()) + ' en ' + listaY(cuelloHoras(m.marcas[t.id])) + ' h');
+  const partes = CUELLO_TIPOS.filter(t => (m.marcas && m.marcas[t.id] || []).length).map(t => (t.id === 'biopsia' ? 'biopsia' : t.nombre.toLowerCase()) + ' en ' + listaY(cuelloHoras(m.marcas[t.id])));
   const out = [];
   if (partes.length) out.push(partes.join('; ').replace(/^./, x => x.toUpperCase()) + '.');
   if (m.zt) out.push('ZT ' + m.zt.toLowerCase() + '.');
@@ -6553,22 +6580,25 @@ function cuelloTexto(m) {
   return out.join(' ');
 }
 function cuelloSVG(m, size) {
-  const R = 100, r0 = 16, cx = 120, cy = 120, marcas = (m && m.marcas) || {};
+  const R = 100, Rm = 58, r0 = 16, cx = 120, cy = 120, marcas = (m && m.marcas) || {};
   const pt = (ang, rad) => [cx + rad * Math.cos(ang), cy + rad * Math.sin(ang)];
   let s = `<svg viewBox="0 0 240 240" width="${size || 240}" height="${size || 240}" class="cuelloSvg" role="img" aria-label="Mapa del cuello uterino">`;
   s += `<circle cx="${cx}" cy="${cy}" r="${R + 6}" fill="#fbe9ee" stroke="#e7b9c7" stroke-width="2"/>`;
   for (let h = 1; h <= 12; h++) {
-    const a0 = (h * 30 - 105) * Math.PI / 180, a1 = (h * 30 - 75) * Math.PI / 180;
-    const tipos = CUELLO_TIPOS.filter(t => t.id !== 'biopsia' && (marcas[t.id] || []).includes(h));
-    const fill = tipos.length ? tipos[0].color : '#f6d5de';
-    const [x0, y0] = pt(a0, R), [x1, y1] = pt(a1, R), [x2, y2] = pt(a1, r0), [x3, y3] = pt(a0, r0);
-    s += `<path class="cHr" data-h="${h}" d="M${x3},${y3} L${x0},${y0} A${R},${R} 0 0 1 ${x1},${y1} L${x2},${y2} A${r0},${r0} 0 0 0 ${x3},${y3} Z" fill="${fill}" stroke="#fff" stroke-width="1.5"/>`;
-    if (tipos.length > 1) { const [tx, ty] = pt((h * 30 - 90) * Math.PI / 180, R * 0.55); tipos.slice(1).forEach((t, i) => { s += `<circle cx="${tx + (i - (tipos.length - 2) / 2) * 9}" cy="${ty}" r="4" fill="${t.color}" stroke="#fff" stroke-width="1" pointer-events="none"/>`; }); }
-    if ((marcas.biopsia || []).includes(h)) { const [bx, by] = pt((h * 30 - 90) * Math.PI / 180, R * 0.8); s += `<circle cx="${bx}" cy="${by}" r="6" fill="#6f95c9" stroke="#fff" stroke-width="2" pointer-events="none"/>`; }
-    const [lx, ly] = pt((h * 30 - 90) * Math.PI / 180, R + 16);
+    const a0 = (h * 30 - 105) * Math.PI / 180, a1 = (h * 30 - 75) * Math.PI / 180, am = (h * 30 - 90) * Math.PI / 180;
+    [['i', r0, Rm], ['e', Rm, R]].forEach(([z, ri, ro]) => {
+      const tipos = CUELLO_TIPOS.filter(t => t.id !== 'biopsia' && cuelloTiene(marcas[t.id], h, z));
+      const fill = tipos.length ? tipos[0].color : (z === 'i' ? '#f3c9d5' : '#f6d5de');
+      const [x0, y0] = pt(a0, ro), [x1, y1] = pt(a1, ro), [x2, y2] = pt(a1, ri), [x3, y3] = pt(a0, ri);
+      s += `<path class="cHr" data-h="${h}" data-z="${z}" d="M${x3},${y3} L${x0},${y0} A${ro},${ro} 0 0 1 ${x1},${y1} L${x2},${y2} A${ri},${ri} 0 0 0 ${x3},${y3} Z" fill="${fill}" stroke="#fff" stroke-width="1.5"><title>${h} h · ${z === 'i' ? 'interna (cerca del orificio)' : 'externa (periferia)'}</title></path>`;
+      const rMid = (ri + ro) / 2;
+      if (tipos.length > 1) { const [tx, ty] = pt(am, rMid); tipos.slice(1).forEach((t, i) => { s += `<circle cx="${tx + (i - (tipos.length - 2) / 2) * 8}" cy="${ty}" r="3.5" fill="${t.color}" stroke="#fff" stroke-width="1" pointer-events="none"/>`; }); }
+      if (cuelloTiene(marcas.biopsia, h, z)) { const [bx, by] = pt(am, z === 'e' ? R * 0.8 : rMid); s += `<circle cx="${bx}" cy="${by}" r="${z === 'e' ? 6 : 5}" fill="#6f95c9" stroke="#fff" stroke-width="2" pointer-events="none"/>`; }
+    });
+    const [lx, ly] = pt(am, R + 16);
     s += `<text x="${lx}" y="${ly + 4}" text-anchor="middle" font-size="11" fill="#8a7078" font-family="sans-serif">${h}</text>`;
   }
-  s += `<circle cx="${cx}" cy="${cy}" r="${R * 0.55}" fill="none" stroke="#c98ea2" stroke-dasharray="3 4"/>`;
+  s += `<circle cx="${cx}" cy="${cy}" r="${Rm}" fill="none" stroke="#c98ea2" stroke-width="2" pointer-events="none"/>`;
   s += `<ellipse cx="${cx}" cy="${cy}" rx="12" ry="5" fill="#7d2a4c"/></svg>`;
   return s;
 }
@@ -7308,7 +7338,7 @@ function cuelloRender() {
   box.innerHTML = cuelloSVG(cuelloMapa, 240);
   document.getElementById('cuelloTools').innerHTML = CUELLO_TIPOS.map(t => {
     const hs = cuelloMapa.marcas[t.id] || [];
-    return `<button type="button" class="cTool${cuelloTool === t.id ? ' on' : ''}" data-t="${t.id}"><i style="background:${t.color}"></i>${t.id === 'biopsia' ? '📍 ' : ''}${t.nombre}${hs.length ? ` <small style="color:var(--ink-soft)">· ${cuelloHoras(hs).join(', ')} h</small>` : ''}</button>`;
+    return `<button type="button" class="cTool${cuelloTool === t.id ? ' on' : ''}" data-t="${t.id}"><i style="background:${t.color}"></i>${t.id === 'biopsia' ? '📍 ' : ''}${t.nombre}${hs.length ? ` <small style="color:var(--ink-soft)">· ${cuelloHoras(hs).join(', ')}</small>` : ''}</button>`;
   }).join('') + '<button type="button" class="cTool" data-t="__limpiar" style="justify-content:center;color:var(--ink-soft)">Borrar todo</button>';
   document.querySelectorAll('#cuelloBlock .cuelloChips').forEach(g => g.querySelectorAll('button').forEach(b => b.classList.toggle('on', cuelloMapa[g.dataset.cg] === b.dataset.v)));
   const txt = cuelloTexto(cuelloMapa);
@@ -7320,7 +7350,7 @@ function cuelloRender() {
     const hr = e.target.closest('.cHr');
     if (hr) {
       const h = Number(hr.dataset.h), l = cuelloMapa.marcas[cuelloTool] = cuelloMapa.marcas[cuelloTool] || [];
-      const i = l.indexOf(h); if (i >= 0) l.splice(i, 1); else l.push(h);
+      cuelloToggle(l, h, hr.dataset.z || 'e');
       cuelloRender(); return;
     }
     const tool = e.target.closest('.cTool');
@@ -7356,16 +7386,34 @@ function fillColpForm(form, colp) {
   form.soap_analisis.value = colp.soap_analisis || '';
   form.soap_observaciones.value = colp.soap_observaciones || '';
   form.derivacion.value = colp.derivacion || '';
+  form.ivaa.value = colp.ivaa || ''; form.union_ec.value = colp.union_ec || '';
   const lesionSet = new Set(colp.lesion || []);
   form.querySelectorAll('input[name="lesion"]').forEach(cb => { cb.checked = lesionSet.has(cb.value); });
   const planSet = new Set(colp.plan || []);
   form.querySelectorAll('input[name="plan"]').forEach(cb => { cb.checked = planSet.has(cb.value); });
 }
 
-async function openColposcopia(p) {
+// IVAA y unión E-C se guardan si existen las columnas (Paso 35); el modo campaña abre este mismo formulario
+let colpIvaaPromise = null, colpCampana = null;
+function colpIvaaOk() {
+  if (!sb) return Promise.resolve(false);
+  if (!colpIvaaPromise) colpIvaaPromise = sb.from('colposcopias').select('ivaa,union_ec,campana_id').limit(1).then(({ error }) => !error, () => false);
+  return colpIvaaPromise;
+}
+async function openColposcopia(p, campana) {
   ajustarColposcopiaSoap();
+  colpCampana = campana || null;
   const form = document.getElementById('colpForm');
   const existing = await getLatestColposcopia(p.id);
+  document.getElementById('colpIvaaRow').style.display = (await colpIvaaOk()) ? '' : 'none';
+  if (campana) { // en la campaña: si ya se registró hoy, se modifica sin preguntar; si no, una nueva con la fecha de la campaña
+    const hoy = existing && String(existing.campana_id || '') === String(campana.id) ? existing : null;
+    colpPatient = p; colpEditingId = hoy ? hoy.id : null; form.reset();
+    if (hoy) fillColpForm(form, hoy); else form.fecha.value = campana.fecha || hoyISO();
+    await cuelloPreparar(hoy);
+    document.getElementById('colpPatientName').textContent = (p.nombre || '') + ' · 📣 ' + (campana.nombre || 'Campaña');
+    document.getElementById('colpOverlay').classList.add('open'); return;
+  }
   if (existing) {
     const quiereModificar = confirm(
       `${p.nombre} ya tiene una colposcopia registrada (fecha: ${fmtFecha(existing.fecha) || existing.fecha || '—'}).\n¿Desea modificarla?`
@@ -7385,7 +7433,7 @@ async function openColposcopia(p) {
   document.getElementById('colpOverlay').classList.add('open');
 }
 function closeColposcopia() {
-  colpPatient = null;
+  colpPatient = null; colpCampana = null;
   colpEditingId = null;
   document.getElementById('colpOverlay').classList.remove('open');
 }
@@ -7409,6 +7457,8 @@ document.getElementById('colpForm').addEventListener('submit', async (e) => {
     derivacion: fd.get('derivacion') || null,
   };
   if (await cuelloOk()) data.cuello_mapa = cuelloVacio(cuelloMapa) ? null : cuelloMapa;
+  if (await colpIvaaOk()) { data.ivaa = fd.get('ivaa') || null; data.union_ec = fd.get('union_ec') || null; if (colpCampana) data.campana_id = colpCampana.id; }
+  if (colpCampana && !data.ivaa && document.getElementById('colpIvaaRow').style.display !== 'none') { showToast('Marcá el resultado del IVAA.', 'err'); return; }
   const pinF = await firmaPedir({ tipo: 'colposcopia', titulo: 'Firmar la colposcopia', detalle: [data.fecha ? fmtFecha(data.fecha) : '', data.prueba_schiller ? 'Schiller ' + data.prueba_schiller : '', (data.lesion || []).join(', ')].filter(Boolean).join(' · '), boton: 'Firmar y guardar' });
   if (pinF === null) return;
   let error, colpId = colpEditingId;
@@ -7419,10 +7469,16 @@ document.getElementById('colpForm').addEventListener('submit', async (e) => {
     colpId = ins && (Array.isArray(ins) ? (ins[0] || {}).id : ins.id);
   }
   if (error) { showToast('Error al guardar la colposcopia: ' + error.message, 'err'); return; }
-  const wasEdit = !!colpEditingId;
+  const wasEdit = !!colpEditingId, nombreP = colpPatient.nombre, enCamp = colpCampana;
   closeColposcopia();
   showToast(wasEdit ? 'Colposcopia actualizada correctamente ✔' : 'Colposcopia guardada correctamente ✔', 'ok');
-  firmaRegistrar('colposcopia', colpId, data, pinF);
+  firmaRegistrar('colposcopia', colpId, data, pinF, vozColpo(nombreP));
+  if (enCamp && typeof campColpos !== 'undefined') {
+    const i = campColpos.findIndex(c => String(c.id) === String(colpId)), fila = Object.assign({ id: colpId }, data);
+    if (i >= 0) campColpos[i] = fila; else campColpos.push(fila);
+    if (data.ivaa && data.ivaa !== 'Negativo') { sonido('alerta'); showToast(`⚠ IVAA ${esc(data.ivaa.toLowerCase())}. Queda en la ficha y su centro la sigue.`, 'err', false); }
+    campPintar();
+  }
 });
 
 async function getLatestColposcopia(pacienteId) {
@@ -8172,7 +8228,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.15.0 · 28/09/2026';
+const SIVEC_VERSION = '1.16.0 · 28/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -8616,17 +8672,17 @@ function firmaModal({ modo, titulo, detalle, boton, tipo }) {
   });
 }
 // Registra la firma de un documento ya guardado. Devuelve la firma o null.
-async function firmaRegistrar(tipo, documento, contenido, pin) {
-  if (!pin || pin === FIRMA_SIN || !documento) return null;
+async function firmaRegistrar(tipo, documento, contenido, pin, voz) {
+  if (!pin || pin === FIRMA_SIN || !documento) { if (voz) vozAviso(voz, 'firma'); return null; }
   let huella;
   try { huella = await firmaHuella(contenido); } catch (e) { showToast('No se pudo calcular la huella del documento: ' + e.message, 'error'); return null; }
   const { data, error } = await sb.rpc('sivec_firmar', { p_tipo: tipo, p_documento: String(documento), p_huella: huella, p_pin: pin });
   if (error || !data || !data.ok) {
     const m = error ? error.message : data && data.motivo === 'sin_permiso' ? 'no tenés permiso para firmar este documento' : (data && data.motivo) || 'sin respuesta';
-    showToast(`Se guardó, pero la firma no se registró (${m}).`, 'error'); return null;
+    showToast(`Se guardó, pero la firma no se registró (${m}).`, 'error'); if (voz) vozAviso(voz, 'firma'); return null;
   }
   showToast(`✍️ ${FIRMA_TIPOS[tipo]} firmada · código ${firmaCodigoFmt(data.codigo)}`, 'ok', 'firma');
-  vozAviso({ referencia: 'Referencia firmada.', contrarreferencia: 'Contrarreferencia firmada y enviada.', informe_lab: 'Informe firmado.', colposcopia: 'Colposcopia firmada.', consulta: 'Consulta firmada.', recepcion: 'Referencia aceptada y firmada.', recepcion_contra: 'Contrarreferencia recibida.' }[tipo] || 'Documento firmado.', 'firma');
+  if (voz) vozAviso(voz, 'firma'); else vozAviso({ referencia: 'Referencia firmada.', contrarreferencia: 'Contrarreferencia firmada y enviada.', informe_lab: 'Informe firmado.', colposcopia: 'Colposcopia firmada.', consulta: 'Consulta firmada.', recepcion: 'Referencia aceptada y firmada.', recepcion_contra: 'Contrarreferencia recibida.' }[tipo] || 'Documento firmado.', 'firma');
   return data;
 }
 async function firmaDe(tipo, documento) {
@@ -8890,6 +8946,8 @@ async function vozDecir(texto, encolar) {
 // Se apagan en ⚙ → Sonidos → "Avisos por voz" (o con "Sin voz"). Solo en esta computadora.
 function vozAvisosActivos() { let v = 'si'; try { v = localStorage.getItem('sivec_voz_avisos') || 'si'; } catch (_) {} return v === 'si' && vozActiva(); }
 const vozAvisoUlt = {};
+// Confirmación hablada de la colposcopia: queda el nombre de la paciente en el audio
+function vozColpo(nombre) { return 'Colposcopía realizada. Paciente: ' + String(nombre || '').toLowerCase().replace(/(^|\s)\S/g, x => x.toUpperCase()).trim() + '.'; }
 function vozAviso(texto, clave) {
   if (!texto || !vozAvisosActivos()) return;
   const k = clave || texto, t = Date.now();
@@ -9379,8 +9437,7 @@ document.addEventListener('change', e => { if (e.target.name === 'fecha_toma' &&
 const CAMP_SERV = { pap: '🧪 PAP', vph: '🧬 VPH', colposcopia: '🩺 Colposcopia (IVAA/Schiller)' };
 const CAMP_EST = { registro: '📋 Recepción', consultorio: '🩺 Consultorio', tablero: '📊 Tablero' };
 const CAMP_TRAT = ['Crioterapia', 'Cauterización', 'Biopsia', 'Metronidazol 500mg VV x10 noches', 'Clotrimazol 500mg VV x10 noches', 'Aseo vulvoperineal', 'Orientación sexual'];
-const CAMP_CONDUCTA = ['Esperar resultado de PAP/VPH', 'Referir a colposcopia completa', 'Control en 6 meses', 'Control en 1 año'];
-let campLista = [], campActual = null, campTurnos = [], campPacs = [], campColpos = [], campTimer = null, campAtender = null, campUltimo = null, campOkTabla = true;
+let campLista = [], campActual = null, campTurnos = [], campPacs = [], campColpos = [], campTimer = null, campAtender = null, campUltimo = null, campOkTabla = true, campEditar = null, campBuscar = '';
 function campIdGuardado() { try { return localStorage.getItem('sivec_campana_id') || ''; } catch (_) { return ''; } }
 function campEstacion() { let e = ''; try { e = localStorage.getItem('sivec_campana_est') || ''; } catch (_) {} return CAMP_EST[e] ? e : ((tieneFuncion('toma') || tieneFuncion('colposcopia')) && !tieneFuncion('recepcion') ? 'consultorio' : 'registro'); }
 function campGuardar(k, v) { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch (_) {} }
@@ -9399,7 +9456,7 @@ async function campCargarDatos(silencio) {
   const [t, p, c] = await Promise.all([
     sb.from('sivec_turnos').select('*').eq('campana_id', id).order('numero', { ascending: true }),
     pacQ().eq('campana_id', id).is('deleted_at', null),
-    sb.from('colposcopias').select('id,paciente_id,ivaa,prueba_schiller,plan,derivacion,campana_id').eq('campana_id', id)]);
+    sb.from('colposcopias').select('*').eq('campana_id', id)]);
   const antes = campMiCola().filter(x => x.estado === 'espera').length;
   campTurnos = t.data || []; campPacs = p.data || []; campColpos = c.data || [];
   const ahora = campMiCola().filter(x => x.estado === 'espera').length;
@@ -9430,7 +9487,8 @@ function campOpcionesCentro() {
 }
 function campRegistroHTML() {
   const sv = campActual.servicios || ['pap', 'vph', 'colposcopia'];
-  const ult = campPacs.slice().sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || ''))).slice(0, 6);
+  const q = campBuscar.trim().toLowerCase();
+  const ult = campPacs.slice().sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || ''))).filter(p => !q || String(p.nombre || '').toLowerCase().includes(q) || String(p.carnet || '').includes(q)).slice(0, q ? 20 : 6);
   return `<section class="hoyCard campReg"><h3>📥 Llegó una mujer</h3>
     <div class="campForm"><label>Carnet<input id="rCarnet" inputmode="numeric" autocomplete="off"></label><label class="w2">Nombre completo<input id="rNombre" autocomplete="off"></label><label>Fecha de nacimiento<input id="rNac" type="date"></label>
     <label>Celular<input id="rCel" inputmode="tel" placeholder="Ej: 70012345"></label><label>Cobertura<select id="rCob"><option value="SUS">SUS</option><option value="Sin SUS">Sin SUS</option><option value="">Sin dato</option></select></label><label class="w2">Su centro de salud (recibe el resultado)<select id="rCentro">${campOpcionesCentro()}</select></label></div>
@@ -9438,7 +9496,9 @@ function campRegistroHTML() {
     <div><small class="campLbl">Hace hoy</small><div class="hoyChips" id="rServ">${sv.map(k => `<button type="button" data-rs="${k}" class="${k === 'vph' ? '' : 'on'}">${CAMP_SERV[k] || k}</button>`).join('')}</div></div>
     <label class="campCheck"><input type="checkbox" id="rCons" checked> Fue informada y acepta el registro digital en el SIVEC</label>
     <button type="button" class="hoyBtn" data-c="registrar">Registrar y enviar a la estación ➜</button><div id="rOk"></div></section>
-    <section class="hoyCard"><h3>🗂 Últimas registradas <span class="hoyN">${campPacs.length}</span></h3>${ult.length ? ult.map(p => { const t = campTurnos.find(x => String(x.paciente_id) === String(p.id)); return `<div class="hoyFila"><span class="hoyNum">${t ? t.numero : '·'}</span><div><b>${esc(p.nombre)}</b><small>${esc(campServTexto(p))} · ${esc(centroNombre(p.centro_seguimiento || p.centro_id))}</small></div></div>`; }).join('') : '<div class="hoyVacio">Todavía nadie.</div>'}</section>`;
+    <section class="hoyCard"><h3>🗂 ${q ? 'Encontradas' : 'Últimas registradas'} <span class="hoyN">${q ? ult.length : campPacs.length}</span></h3>
+    <input id="rBuscar" class="campBuscar" placeholder="🔍 Buscar por nombre o carnet para corregir" value="${esc(campBuscar)}" autocomplete="off">
+    ${ult.length ? ult.map(p => { const t = campTurnos.find(x => String(x.paciente_id) === String(p.id)); return `<div class="hoyFila"><span class="hoyNum">${t ? t.numero : '·'}</span><div><b>${esc(p.nombre)}</b><small>${esc(campServTexto(p))} · ${esc(centroNombre(p.centro_seguimiento || p.centro_id))}</small></div><div class="hoyAcc"><button type="button" class="hoyBtn sec" data-ced="${esc(p.id)}">✏ Editar</button></div></div>${String(campEditar) === String(p.id) ? campEditarHTML(p) : ''}`; }).join('') : `<div class="hoyVacio">${q ? 'No se encontró.' : 'Todavía nadie.'}</div>`}</section>`;
 }
 function campServTexto(p) { return [p.tipo_examen === 'Papanicolau' ? 'PAP' : p.tipo_examen === 'VPH' ? 'VPH' : '', p.tipo_examen === 'Papanicolau' && p.hizo_prueba_vph ? 'VPH' : '', campTurnos.some(t => String(t.paciente_id) === String(p.id) && (t.servicio === 'colposcopia' || /colpo/.test(t.notas || ''))) || p.tipo_examen === 'Colposcopia' ? 'colposcopia' : ''].filter(Boolean).join(' · '); }
 function campHizo(p) { const c = campColpos.find(x => String(x.paciente_id) === String(p.id)); return c ? [c.ivaa ? 'IVAA ' + c.ivaa.toLowerCase() : '', ...(c.plan || []).filter(x => CAMP_TRAT.includes(x))].filter(Boolean).join(' · ') : ''; }
@@ -9481,43 +9541,70 @@ async function campRegistrar() {
   document.getElementById('rOk').innerHTML = `<div class="campHecho"><b>✔ ${esc(nombre)} · turno Nº ${num}</b><span>Va al consultorio: ${esc(serv.map(k => ({ pap: 'PAP', vph: 'VPH', colposcopia: 'colposcopia' })[k]).join(' · '))}${row.numero_folio_pap ? ' · ' + esc(row.numero_folio_pap) : ''}</span><button type="button" class="hoyBtn sec" data-firma="${esc(nueva.id)}">✍ Firma de la paciente</button></div>`;
   document.getElementById('rCarnet').focus();
 }
+// Corregir los datos de la mujer o lo que se le hace hoy (pedido), desde la recepción o el consultorio
+function campServDe(p) {
+  const t = campTurnos.find(x => String(x.paciente_id) === String(p.id)) || {}, n = String(t.notas || '');
+  return { pap: p.tipo_examen === 'Papanicolau' || /pap/.test(n), vph: p.tipo_examen === 'VPH' || !!p.hizo_prueba_vph || /vph/.test(n), colposcopia: p.tipo_examen === 'Colposcopia' || /colpo/.test(n) };
+}
+function campEditarHTML(p) {
+  const sv = campServDe(p), opc = campOpcionesCentro().replace(/ selected/g, '').replace(`value="${esc(p.centro_seguimiento || p.centro_id)}"`, `value="${esc(p.centro_seguimiento || p.centro_id)}" selected`);
+  const t = campTurnos.find(x => String(x.paciente_id) === String(p.id)), atendida = t && t.estado === 'atendida';
+  return `<div class="campColpo campEd" data-ed="${esc(p.id)}"><p class="campSec">✏ Corregir datos y pedido</p>
+    <div class="campForm"><label>Carnet<input data-f="carnet" value="${esc(p.carnet || '')}" inputmode="numeric"></label><label class="w2">Nombre completo<input data-f="nombre" value="${esc(p.nombre || '')}"></label><label>Fecha de nacimiento<input data-f="fecha_nacimiento" type="date" value="${esc(p.fecha_nacimiento || '')}"></label>
+    <label>Celular<input data-f="celular" value="${esc(p.celular || '')}" inputmode="tel"></label><label>Cobertura<select data-f="cobertura">${['SUS', 'Sin SUS', ''].map(v => `<option value="${v}"${(p.cobertura || '') === v ? ' selected' : ''}>${v || 'Sin dato'}</option>`).join('')}</select></label><label class="w2">Su centro de salud (recibe el resultado)<select data-f="centro_seguimiento">${opc}</select></label></div>
+    <div><small class="campLbl">Pedido · qué se hace hoy</small><div class="hoyChips" data-cg="edserv" data-multi="1">${['pap', 'vph', 'colposcopia'].map(k => `<button type="button" data-cv="${k}" class="${sv[k] ? 'on' : ''}">${CAMP_SERV[k] || k}</button>`).join('')}</div>${atendida ? '<small class="campLbl">Ya fue atendida: el pedido se corrige en el consultorio.</small>' : ''}</div>
+    <div class="hoyAcc"><button type="button" class="hoyBtn sec" data-c="edCancelar">Cancelar</button><button type="button" class="hoyBtn" data-c="edGuardar" data-id="${esc(p.id)}">Guardar cambios</button></div></div>`;
+}
+async function campGuardarEdicion(id) {
+  const box = document.querySelector(`.campEd[data-ed="${id}"]`), p = campPacs.find(x => String(x.id) === String(id)); if (!box || !p) return;
+  const v = k => { const el = box.querySelector(`[data-f="${k}"]`); return el ? el.value.trim() : ''; };
+  const nombre = v('nombre').toUpperCase(); if (!nombre) return showToast('Falta el nombre.', 'err');
+  const serv = [...box.querySelectorAll('[data-cg="edserv"] .on')].map(b => b.dataset.cv); if (!serv.length) return showToast('Marcá qué se hace hoy.', 'err');
+  const t = campTurnos.find(x => String(x.paciente_id) === String(p.id)), atendida = t && t.estado === 'atendida';
+  const cambio = { nombre, carnet: v('carnet') || null, fecha_nacimiento: v('fecha_nacimiento') || null, celular: v('celular') || null, cobertura: v('cobertura') || null, centro_seguimiento: v('centro_seguimiento') || p.centro_seguimiento || perfil.centro_id };
+  if (!atendida) {
+    const pap = serv.includes('pap'), vph = serv.includes('vph');
+    Object.assign(cambio, { tipo_examen: pap ? 'Papanicolau' : vph ? 'VPH' : 'Colposcopia', hizo_prueba_vph: vph, estado_pap: pap ? (p.estado_pap || 'Pendiente') : null, fecha_estimada: pap ? addDays(campActual.fecha, 90) : null });
+    if ((pap || vph) && !p.numero_folio_pap) { const f = { centro_id: perfil.centro_id, fecha_toma: campActual.fecha }; await folioAsignar(f); ['numero_folio_d1', 'numero_folio_d8', 'numero_folio_pap'].forEach(k => { if (f[k]) cambio[k] = f[k]; }); }
+  }
+  await limpiarCobertura(cambio);
+  const { error } = await sb.from('pacientes').update(cambio).eq('id', p.id);
+  if (error) return showToast('No se pudo guardar: ' + esc(error.message), 'err');
+  Object.assign(p, cambio); const g = allPatientsData.find(x => String(x.id) === String(p.id)); if (g) Object.assign(g, cambio);
+  if (t) { const ct = { paciente_nombre: nombre, carnet: cambio.carnet }; if (!atendida) ct.notas = serv.join(','); const r = await sb.from('sivec_turnos').update(ct).eq('id', t.id); if (!r.error) Object.assign(t, ct); }
+  campEditar = null; sonido('ok'); showToast('Datos corregidos ✔', 'ok'); campPintar();
+}
 function campColaHTML() {
   const cola = campMiCola(), activos = cola.filter(t => ['espera', 'llamada', 'en_atencion'].includes(t.estado)), hechos = cola.filter(t => !activos.includes(t));
   const fila = t => { const p = campPacs.find(x => String(x.id) === String(t.paciente_id)) || {}; const min = Math.max(0, Math.round((Date.now() - new Date(t.llegada)) / 60000));
-    const acc = ['espera', 'llamada'].includes(t.estado) ? `${t.estado === 'espera' ? `<button type="button" class="hoyBtn sec" data-ct="llamar" data-id="${t.id}">📣 Llamar</button>` : ''}<button type="button" class="hoyBtn" data-ct="atender" data-id="${t.id}">Atender</button>` : t.estado === 'en_atencion' ? `<button type="button" class="hoyBtn" data-ct="atender" data-id="${t.id}">Seguir</button>` : '';
+    const ed = `<button type="button" class="hoyBtn sec" data-ced="${esc(p.id || '')}" title="Corregir datos o pedido">✏</button>`;
+    const acc = ed + (['espera', 'llamada'].includes(t.estado) ? `${t.estado === 'espera' ? `<button type="button" class="hoyBtn sec" data-ct="llamar" data-id="${t.id}">📣 Llamar</button>` : ''}<button type="button" class="hoyBtn" data-ct="atender" data-id="${t.id}">Atender</button>` : t.estado === 'en_atencion' ? `<button type="button" class="hoyBtn" data-ct="atender" data-id="${t.id}">Seguir</button>` : '');
     const edad = edadTexto(p.fecha_nacimiento, campActual.fecha), hizo = t.estado === 'atendida' ? campHizo(p) : '';
-    return `<div class="hoyFila est-${t.estado}"><span class="hoyNum">${t.numero || '·'}</span><div><b>${esc(t.paciente_nombre || '')}</b><small>${[edad, campServTexto(p) || (t.notas || '').replace(/,/g, ' · '), p.numero_folio_pap, hizo, TURNO_ESTADOS[t.estado] + (['espera', 'llamada'].includes(t.estado) ? ' · espera ' + min + ' min' : '')].filter(Boolean).map(esc).join(' · ')}</small></div><div class="hoyAcc">${acc}</div></div>${campAtender === t.id ? campConsultaForm(t, p) : ''}`; };
+    return `<div class="hoyFila est-${t.estado}"><span class="hoyNum">${t.numero || '·'}</span><div><b>${esc(t.paciente_nombre || '')}</b><small>${[edad, campServTexto(p) || (t.notas || '').replace(/,/g, ' · '), p.numero_folio_pap, hizo, TURNO_ESTADOS[t.estado] + (['espera', 'llamada'].includes(t.estado) ? ' · espera ' + min + ' min' : '')].filter(Boolean).map(esc).join(' · ')}</small></div><div class="hoyAcc">${acc}</div></div>${String(campEditar) === String(p.id) ? campEditarHTML(p) : ''}${campAtender === t.id ? campConsultaForm(t, p) : ''}`; };
   return `<section class="hoyCard campCola"><h3>🩺 Consultorio · mujeres en espera <span class="hoyN">${activos.length}</span></h3>
     ${activos.length ? activos.map(fila).join('') : '<div class="hoyVacio">No hay mujeres esperando. Llegan solas desde la recepción.</div>'}
     ${hechos.length ? `<details class="hoyHechos"><summary>Atendidas (${hechos.length})</summary>${hechos.map(fila).join('')}</details>` : ''}
     <p class="campNota">En el consultorio la doctora hace todo en una sola atención: <b>la toma de PAP/VPH</b>, <b>la colposcopia con IVAA y Schiller</b> y <b>el tratamiento en el momento</b> (crioterapia, cauterización y lo demás). El PAP y el VPH van después en lote al Instituto Oncológico.</p></section>`;
 }
+function campColpoDe(p) { return campColpos.filter(x => String(x.paciente_id) === String(p.id)).pop() || null; }
 function campConsultaForm(t, p) {
-  const quiere = String(t.notas || ''), tienePap = p.tipo_examen === 'Papanicolau' || /pap/.test(quiere), tieneVph = p.tipo_examen === 'VPH' || p.hizo_prueba_vph || /vph/.test(quiere), colpo = /colpo/.test(quiere) || p.tipo_examen === 'Colposcopia';
-  const ch = (k, ops, multi) => `<div class="hoyChips" data-cg="${k}"${multi ? ' data-multi="1"' : ''}>${ops.map(([v, txt, cls]) => `<button type="button" data-cv="${esc(v)}" class="${cls || ''}">${txt}</button>`).join('')}</div>`;
+  const sv = campServDe(p), c = campColpoDe(p);
+  const res = c ? [c.ivaa ? 'IVAA ' + c.ivaa.toLowerCase() : '', c.prueba_schiller ? 'Schiller ' + c.prueba_schiller.toLowerCase() : '', cuelloTexto(c.cuello_mapa), (c.lesion || []).join(', '), (c.plan || []).length ? 'Tratamiento: ' + c.plan.join(', ') : '', c.derivacion || ''].filter(Boolean).join(' · ') : '';
   return `<div class="campColpo" data-turno="${t.id}">
     <p class="campSec">1 · Toma de la muestra</p>
-    <div class="campG"><b>Muestra</b><div class="hoyChips" data-cg="toma" data-multi="1"><button type="button" data-cv="pap" class="${tienePap ? 'on' : ''}">🧪 PAP (lámina)</button><button type="button" data-cv="vph" class="${tieneVph ? 'on' : ''}">🧬 VPH</button></div></div>
-    <p class="campSec">2 · Colposcopia <label class="campCheck" style="display:inline-flex;margin-left:8px"><input type="checkbox" id="cHizoColpo"${colpo ? ' checked' : ''}> se hizo</label></p>
-    <div class="campColpoCampos"${colpo ? '' : ' hidden'}>
-    <div class="campG"><b>IVAA</b>${ch('ivaa', [['Negativo', 'Negativo', 'neg'], ['Positivo', 'Positivo', 'pos'], ['Sospecha de cáncer', 'Sospecha de cáncer', 'pos']])}</div>
-    <div class="campG"><b>Schiller</b>${ch('schiller', [['Negativa', 'Yodo positivo (normal)', 'neg'], ['Positiva', 'Zona yodo negativa', 'pos']])}</div>
-    <div class="campG"><b>Unión E-C</b>${ch('union', [['Visible', 'Visible'], ['No visible', 'No visible']])}</div></div>
-    <p class="campSec">3 · Tratamiento en el momento</p>
-    <div class="campG"><b>Tratamiento</b>${ch('trat', CAMP_TRAT.map(x => [x, x]), true)}</div>
-    <div class="campG"><b>Conducta</b>${ch('conducta', CAMP_CONDUCTA.map(x => [x, x]))}</div>
-    <input id="cObs" placeholder="Observaciones (opcional)">
-    <div class="hoyAcc"><button type="button" class="hoyBtn sec" data-c="cancelarColpo">Cancelar</button><button type="button" class="hoyBtn" data-c="guardarColpo" data-id="${t.id}">✍ Guardar la atención</button></div></div>`;
+    <div class="campG"><b>Muestra</b><div class="hoyChips" data-cg="toma" data-multi="1"><button type="button" data-cv="pap" class="${sv.pap ? 'on' : ''}">🧪 PAP (lámina)</button><button type="button" data-cv="vph" class="${sv.vph ? 'on' : ''}">🧬 VPH</button></div></div>
+    <p class="campSec">2 · Colposcopia y tratamiento en el momento</p>
+    ${c ? `<div class="campHecho"><b>✔ Colposcopía realizada</b><span>${esc(res) || 'Registrada.'}</span><button type="button" class="hoyBtn sec" data-c="abrirColpo" data-id="${t.id}">✏ Ver o modificar la colposcopia</button></div>`
+      : `<button type="button" class="hoyBtn${sv.colposcopia ? '' : ' sec'}" data-c="abrirColpo" data-id="${t.id}">🔬 Registrar la colposcopia (mapa del cuello, IVAA, Schiller y tratamiento)</button>${sv.colposcopia ? '' : '<small class="campLbl">No estaba en el pedido; se puede hacer igual.</small>'}`}
+    <div class="hoyAcc"><button type="button" class="hoyBtn sec" data-c="cancelarColpo">Cerrar</button><button type="button" class="hoyBtn" data-c="guardarColpo" data-id="${t.id}">✔ Terminar la atención</button></div></div>`;
 }
 async function campGuardarConsulta(tid) {
   const box = document.querySelector(`.campColpo[data-turno="${tid}"]`), t = campTurnos.find(x => String(x.id) === String(tid)); if (!box || !t) return;
-  const uno = k => { const b = box.querySelector(`[data-cg="${k}"] .on`); return b ? b.dataset.cv : null; }, varios = k => [...box.querySelectorAll(`[data-cg="${k}"] .on`)].map(b => b.dataset.cv);
-  const toma = varios('toma'), hizoColpo = box.querySelector('#cHizoColpo').checked, trat = varios('trat'), conducta = uno('conducta');
-  const ivaa = hizoColpo ? uno('ivaa') : null, schiller = hizoColpo ? uno('schiller') : null, union = hizoColpo ? uno('union') : null;
-  if (hizoColpo && !ivaa) return showToast('Marcá el resultado del IVAA.', 'err');
-  if (!toma.length && !hizoColpo && !trat.length) return showToast('Marcá la toma, la colposcopia o el tratamiento.', 'err');
-  const p = campPacs.find(x => String(x.id) === String(t.paciente_id)) || {};
-  // 1) La toma: el tipo de examen queda como se hizo de verdad
+  const toma = [...box.querySelectorAll('[data-cg="toma"] .on')].map(b => b.dataset.cv);
+  const p = campPacs.find(x => String(x.id) === String(t.paciente_id)) || {}, c = campColpoDe(p), sv = campServDe(p);
+  if (!toma.length && !c) return showToast('Marcá la toma o registrá la colposcopia.', 'err');
+  if (sv.colposcopia && !c && !confirm('La colposcopia estaba en el pedido y no se registró. ¿Terminar la atención igual?')) return;
+  // La toma: el tipo de examen queda como se hizo de verdad
   const pap = toma.includes('pap'), vph = toma.includes('vph');
   const cambioPac = { tipo_examen: pap ? 'Papanicolau' : vph ? 'VPH' : 'Colposcopia', hizo_prueba_vph: vph, estado_pap: pap ? (p.estado_pap || 'Pendiente') : null, fecha_estimada: pap ? addDays(campActual.fecha, 90) : null };
   if ((pap || vph) && !p.numero_folio_pap) {
@@ -9527,29 +9614,14 @@ async function campGuardarConsulta(tid) {
   const up = await sb.from('pacientes').update(cambioPac).eq('id', t.paciente_id);
   if (up.error) return showToast('No se pudo guardar la toma: ' + esc(up.error.message), 'err');
   Object.assign(p, cambioPac);
-  // 2 y 3) Colposcopia y tratamiento: una nota firmada con PIN
-  let colpId = null, data = null;
-  if (hizoColpo || trat.length || conducta) {
-    data = { paciente_id: t.paciente_id, fecha: campActual.fecha, ivaa, prueba_schiller: schiller, union_ec: union, plan: [...trat, ...(conducta ? [conducta] : [])], derivacion: /^Control en/.test(conducta || '') ? conducta : null, otros_hallazgos: box.querySelector('#cObs').value.trim() || null,
-      soap_analisis: [hizoColpo ? 'IVAA ' + ivaa + (schiller ? ' · Schiller ' + schiller.toLowerCase() : '') : '', trat.length ? 'Tratamiento: ' + trat.join(', ') : '', 'Campaña ' + campActual.nombre].filter(Boolean).join(' · '), campana_id: campActual.id };
-    const pin = await firmaPedir({ tipo: 'colposcopia', titulo: 'Firmar la atención', detalle: `${t.paciente_nombre}${hizoColpo ? ' · IVAA ' + ivaa : ''}${trat.length ? ' · ' + trat.join(', ') : ''}`, boton: 'Firmar y guardar' });
-    if (pin === null) return;
-    let { data: ins, error } = await sb.from('colposcopias').insert([data]).select('id');
-    if (error && campFaltaPaso(error)) { const d2 = Object.assign({}, data); delete d2.ivaa; delete d2.union_ec; delete d2.campana_id; ({ data: ins, error } = await sb.from('colposcopias').insert([d2]).select('id')); }
-    if (error) return showToast('No se pudo guardar: ' + esc(error.message), 'err');
-    colpId = ins && ins[0] && ins[0].id;
-    if (colpId) firmaRegistrar('colposcopia', colpId, data, pin);
-    campColpos.push(Object.assign({ id: colpId }, data));
-  }
   await sb.from('sivec_turnos').update({ estado: 'atendida', atendida_at: new Date().toISOString(), atendido_por: perfil.id }).eq('id', t.id);
   t.estado = 'atendida'; campAtender = null;
-  if (ivaa && ivaa !== 'Negativo') { sonido('alerta'); showToast(`⚠ IVAA ${esc(ivaa.toLowerCase())}${trat.length ? ' · tratada en el momento: ' + esc(trat.join(', ')) : ''}. Queda en la ficha y su centro la sigue.`, 'err', false); }
-  else showToast(`Atención guardada ✔${trat.length ? ' · ' + esc(trat.join(', ')) : ''}`, 'ok', 'ok');
+  showToast(`Atención terminada ✔${pap || vph ? ' · ' + [pap ? 'PAP' : '', vph ? 'VPH' : ''].filter(Boolean).join(' + ') + ' para el lote' : ''}`, 'ok', 'ok');
   campPintar();
 }
 function campTableroHTML() {
   const P = campPacs, pap = P.filter(p => p.tipo_examen === 'Papanicolau').length, vph = P.filter(p => p.tipo_examen === 'VPH' || p.hizo_prueba_vph).length;
-  const colpo = campColpos.filter(c => c.ivaa).length, pos = campColpos.filter(c => c.ivaa && c.ivaa !== 'Negativo').length, meta = Number(campActual.meta) || 0;
+  const colpo = campColpos.length, pos = campColpos.filter(c => c.ivaa && c.ivaa !== 'Negativo').length, meta = Number(campActual.meta) || 0;
   const tratadas = campColpos.filter(c => (c.plan || []).some(x => CAMP_TRAT.includes(x))).length, crio = campColpos.filter(c => (c.plan || []).includes('Crioterapia')).length, caut = campColpos.filter(c => (c.plan || []).includes('Cauterización')).length;
   const sinLote = P.filter(p => p.tipo_examen !== 'Colposcopia' && !p.lote_id).length;
   const horas = {}; campTurnos.filter(t => t.servicio === 'toma' || !campTurnos.some(x => x.paciente_id === t.paciente_id && x.servicio === 'toma')).forEach(t => { const h = new Date(t.llegada).getHours(); horas[h] = (horas[h] || 0) + 1; });
@@ -9560,6 +9632,8 @@ function campTableroHTML() {
   const cerrada = campActual.estado === 'cerrada';
   return `<section class="hoyCard campTab"><h3>📊 ${cerrada ? 'Informe de la campaña' : 'La campaña en vivo'}</h3>
     <div class="campKpis"><div><b>${P.length}</b><small>mujeres${meta ? ' (meta ' + meta + ')' : ''}</small></div><div><b>${pap}</b><small>PAP tomados</small></div><div><b>${vph}</b><small>VPH tomados</small></div><div><b>${colpo}</b><small>colposcopias</small></div><div class="${pos ? 'alta' : ''}"><b>${pos}</b><small>IVAA positivos</small></div><div><b>${tratadas}</b><small>tratadas en el momento${crio || caut ? ` (${crio} crio · ${caut} caut.)` : ''}</small></div></div>
+    ${(() => { const V = P.filter(p => p.resultado_vph); if (!V.length) return ''; const pos = V.filter(p => p.resultado_vph === 'Positiva'), g = re => pos.filter(p => re.test(p.vph_genotipo || '')).length;
+      return `<small class="campLbl">Resultados de VPH (llegan del Oncológico)</small><div class="campKpis"><div><b>${V.length - pos.length}</b><small>negativos</small></div><div class="${g(/16/) ? 'alta' : ''}"><b>${g(/16/)}</b><small>positivo 16</small></div><div class="${g(/18/) ? 'alta' : ''}"><b>${g(/18/)}</b><small>positivo 18</small></div><div><b>${pos.filter(p => /otros/i.test(p.vph_genotipo || '') && !/16|18/.test(p.vph_genotipo || '')).length}</b><small>otros de alto riesgo</small></div>${pos.some(p => !p.vph_genotipo) ? `<div><b>${pos.filter(p => !p.vph_genotipo).length}</b><small>positivo sin genotipo</small></div>` : ''}</div>`; })()}
     ${meta ? `<div class="campMeta"><i style="width:${Math.min(100, Math.round(P.length * 100 / meta))}%"></i><span>${Math.round(P.length * 100 / meta)} % de la meta</span></div>` : ''}
     <small class="campLbl">Mujeres por hora</small><div class="campBarras">${Array.from({ length: h1 - h0 + 1 }, (_, k) => h0 + k).map(h => `<div><i style="height:${Math.round((horas[h] || 0) * 100 / maxH)}%"></i><span>${h}h</span></div>`).join('')}</div>
     ${cerrada ? '' : `<small class="campLbl">Estaciones ahora</small><div class="campEsp"><div>📋 Recepción<b>${campPacs.length} registradas</b><small>${P.filter(p => Date.now() - new Date(p.created_at || 0) < 3600e3).length} en la última hora</small></div><div>🩺 Consultorio<b>${esp().length} esperando</b><small>${minEsp()} min promedio</small></div></div>`}
@@ -9570,7 +9644,7 @@ function campTableroHTML() {
 }
 function campInforme() {
   const P = campPacs, c = campActual, porCentro = {};
-  P.forEach(p => { const k = centroNombre(p.centro_seguimiento || p.centro_id) || '—'; porCentro[k] = porCentro[k] || { n: 0, pap: 0, vph: 0, colpo: 0, pos: 0, trat: 0 }; const o = porCentro[k]; o.n++; if (p.tipo_examen === 'Papanicolau') o.pap++; if (p.tipo_examen === 'VPH' || p.hizo_prueba_vph) o.vph++; const cc = campColpos.find(x => String(x.paciente_id) === String(p.id)); if (cc) { if (cc.ivaa) o.colpo++; if (cc.ivaa && cc.ivaa !== 'Negativo') o.pos++; if ((cc.plan || []).some(x => CAMP_TRAT.includes(x))) o.trat++; } });
+  P.forEach(p => { const k = centroNombre(p.centro_seguimiento || p.centro_id) || '—'; porCentro[k] = porCentro[k] || { n: 0, pap: 0, vph: 0, colpo: 0, pos: 0, trat: 0 }; const o = porCentro[k]; o.n++; if (p.tipo_examen === 'Papanicolau') o.pap++; if (p.tipo_examen === 'VPH' || p.hizo_prueba_vph) o.vph++; const cc = campColpos.find(x => String(x.paciente_id) === String(p.id)); if (cc) { o.colpo++; if (cc.ivaa && cc.ivaa !== 'Negativo') o.pos++; if ((cc.plan || []).some(x => CAMP_TRAT.includes(x))) o.trat++; } });
   const w = window.open('', '_blank'); if (!w) return showToast('Permití las ventanas emergentes para imprimir.', 'err');
   const tot = Object.values(porCentro).reduce((a, o) => ({ n: a.n + o.n, pap: a.pap + o.pap, vph: a.vph + o.vph, colpo: a.colpo + o.colpo, pos: a.pos + o.pos, trat: a.trat + o.trat }), { n: 0, pap: 0, vph: 0, colpo: 0, pos: 0, trat: 0 });
   w.document.write(`<!doctype html><meta charset="utf-8"><title>Informe · ${esc(c.nombre)}</title><style>body{font-family:Arial,sans-serif;margin:32px;color:#222}h1{color:#7d2a4c;margin:0}table{border-collapse:collapse;width:100%;margin-top:16px}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left}th{background:#f5e9ee}</style>
@@ -9610,6 +9684,10 @@ document.addEventListener('click', async e => {
   if (c === 'registrar') return campRegistrar();
   if (c === 'cancelarColpo') { campAtender = null; return campPintar(); }
   if (c === 'guardarColpo') return campGuardarConsulta(b.dataset.id);
+  if (c === 'abrirColpo') { const t = campTurnos.find(x => String(x.id) === b.dataset.id), p = t && campPacs.find(x => String(x.id) === String(t.paciente_id)); if (p) return openColposcopia(p, campActual); return; }
+  if (c === 'edCancelar') { campEditar = null; return campPintar(); }
+  if (c === 'edGuardar') return campGuardarEdicion(b.dataset.id);
+  if (b.dataset.ced) { campEditar = String(campEditar) === b.dataset.ced ? null : b.dataset.ced; return campPintar(); }
   if (c === 'lote') return switchView('balance');
   if (c === 'cerrar') return campCerrar();
   if (c === 'informe') return campInforme();
@@ -9623,8 +9701,8 @@ document.addEventListener('click', async e => {
     return campPintar();
   }
 });
-document.addEventListener('change', e => { if (e.target.id === 'cHizoColpo') { const c = e.target.closest('.campColpo').querySelector('.campColpoCampos'); if (c) c.hidden = !e.target.checked; } });
-function campActivar(si) { clearInterval(campTimer); campTimer = null; if (si) { campCargar(); campTimer = setInterval(() => { const v = document.getElementById('campanaView'); if (!document.hidden && v && v.classList.contains('active') && campActual && !campAtender && !(document.activeElement && v.contains(document.activeElement) && /INPUT|SELECT/.test(document.activeElement.tagName))) campCargarDatos(true).then(campPintar); }, 12000); } }
+document.addEventListener('input', e => { if (e.target.id === 'rBuscar') { campBuscar = e.target.value; const pos = e.target.selectionStart; campPintar(); const n = document.getElementById('rBuscar'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (_) {} } } });
+function campActivar(si) { clearInterval(campTimer); campTimer = null; if (si) { campCargar(); campTimer = setInterval(() => { const v = document.getElementById('campanaView'); if (!document.hidden && v && v.classList.contains('active') && campActual && !campAtender && !campEditar && !document.getElementById('colpOverlay').classList.contains('open') && !(document.activeElement && v.contains(document.activeElement) && /INPUT|SELECT/.test(document.activeElement.tagName))) campCargarDatos(true).then(campPintar); }, 12000); } }
 
 // Términos de uso y política de privacidad: cada persona los acepta una vez por versión (Paso 26 del SQL)
 async function terminosVerificar() {
