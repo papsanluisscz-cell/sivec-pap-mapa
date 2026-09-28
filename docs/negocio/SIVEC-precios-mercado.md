@@ -47,26 +47,26 @@ São vendidos por empresas.
 - **Por que por estabelecimento, e não por usuário:** o governo quer que todo o pessoal use, sem contar pessoas.
 - **Alternativa se o comprador exigir "ser dono":** licença perpétua do município mais suporte anual de 20%. Nesse caso a hospedagem é paga por eles.
 
-## 3. SIVEC PAP — preços definidos pelo autor (27/09/2026)
+## 3. SIVEC PAP — preços definidos pelo autor (atualizados 28/09/2026)
 
 | Estabelecimento | Mensalidade | Implantação (uma vez) |
 |---|---|---|
-| 1º nível sem colposcopia nem biópsia (cidade ou província) | **US$ 100** (Bs 696) | US$ 200 (Bs 1.392) |
-| 1º nível com colposcopia e biópsia | **US$ 250** (Bs 1.740) | US$ 200 (Bs 1.392) |
-| 2º nível (hospital) | **US$ 250** (Bs 1.740) | US$ 500 (Bs 3.480) |
-| 3º e 4º nível e laboratórios de citologia PAP e de VPH | **US$ 501** (Bs 3.486,96) | US$ 550 (Bs 3.828) |
-| Tablero da rede e administração | incluído | — |
+| 1º nível sem colposcopia nem biópsia (cidade ou província) | **US$ 120** (Bs 835,20) | US$ 225 (Bs 1.566) |
+| 1º nível com colposcopia e biópsia | **US$ 270** (Bs 1.879,20) | US$ 225 (Bs 1.566) |
+| 2º nível (hospital) | **US$ 275** (Bs 1.914) | US$ 525 (Bs 3.654) |
+| 3º e 4º nível e laboratórios de citologia PAP e de VPH | **US$ 521** (Bs 3.626,16) | US$ 575 (Bs 4.002) |
+| Tablero da rede e administração | **US$ 250** (Bs 1.740) | US$ 275 (Bs 1.914) |
 
 ### Exemplo: Red Centro + Oncológico
 | Estabelecimento | Qtd. | US$/mês | Implantação US$ |
 |---|---|---|---|
-| 1º nível sem colposcopia | 8 | 800 | 1.600 |
-| 1º nível com colposcopia e biópsia | 1 | 250 | 200 |
-| 2º nível | 1 | 250 | 500 |
-| Oncológico com laboratório PAP/VPH | 1 | 501 | 550 |
-| **Total** | **11** | **US$ 1.801/mês** (Bs 12.534,96) · **US$ 21.612/ano** (Bs 150.419,52) | **US$ 2.850** (Bs 19.836) |
+| 1º nível sem colposcopia | 8 | 960 | 1.800 |
+| 1º nível com colposcopia e biópsia | 1 | 270 | 225 |
+| 2º nível | 1 | 275 | 525 |
+| Oncológico com laboratório PAP/VPH | 1 | 521 | 575 |
+| **Total** | **11** | **US$ 2.026/mês** (Bs 14.100,96) · **US$ 24.312/ano** (Bs 169.211,52) | **US$ 3.125** (Bs 21.750) |
 
-**Primeiro ano (mensalidades + implantação): US$ 24.462 (Bs 170.255,52).** Contratação por ANPE (entre Bs 50 mil e 1 milhão).
+**Primeiro ano (mensalidades + implantação): US$ 27.437 (Bs 190.961,52).** Contratação por ANPE (entre Bs 50 mil e 1 milhão).
 
 ## 4. SIVEC geral (completo) — referência
 

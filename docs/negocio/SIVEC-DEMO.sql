@@ -3,6 +3,9 @@
 --  Para un proyecto de Supabase NUEVO y vacío (no usar en la base real).
 --  1) Supabase → New project "SIVEC DEMO"  2) SQL Editor → pegar TODO este archivo → Run
 --  3) En el sistema: Configuración → URL y clave del proyecto DEMO (o "Usar código de conexión")
+--  4) Luego pegar docs/negocio/SIVEC-DEMO-pasos-23-35.sql → Run (pasos nuevos).
+--  ACCESO RÁPIDO PARA DEMOSTRAR: en cualquier puerta, usuario "demo" y contraseña "demo";
+--  la barra de abajo cambia de puerta (Admin, Red, Centro, Hospital, Laboratorio, Campaña).
 --  Cuentas (contraseña para todas: Demo-2026):
 --    admin@demo.sivec.bo · gestor.centro@demo.sivec.bo · gestor.norte@demo.sivec.bo
 --    sanluis@demo.sivec.bo · santarosita@demo.sivec.bo · frances@demo.sivec.bo · laboratorio@demo.sivec.bo

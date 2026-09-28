@@ -497,6 +497,11 @@
   .admOk { font-weight: 800; } .admDel:hover { border-color: #f87171 !important; }
   body.comando #redView .pnCard, body.comando #redView .redCard { background: linear-gradient(170deg, rgba(255,255,255,.055), rgba(255,255,255,.015)); border-color: rgba(241,167,195,.18); }
   @media (max-width: 760px) { .cmdHead { flex-direction: column; } body.comando .cmdClock { align-items: flex-start; } }
+  #demoPuertas { position: fixed; left: 12px; bottom: 12px; z-index: 2100; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; max-width: calc(100vw - 110px); background: rgba(28,10,19,.88); backdrop-filter: blur(6px); border: 1px solid rgba(241,167,195,.35); border-radius: 16px; padding: 6px 8px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+  #demoPuertas span { color: #f1a7c3; font-size: 11.5px; font-weight: 800; letter-spacing: .04em; padding: 0 4px; }
+  #demoPuertas button { border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.08); color: #fff; border-radius: 999px; padding: 5px 10px; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+  #demoPuertas button.on { background: #f1a7c3; color: #4a1229; border-color: #f1a7c3; }
+  body.modoDemo #demoFranja { bottom: 64px; }
   #demoFranja { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 2000; pointer-events: none; font-size: 12px; letter-spacing: .04em; color: #fff;
     background: linear-gradient(90deg, #b45309, #d97706); padding: 6px 16px; border-radius: 999px; box-shadow: 0 6px 20px rgba(0,0,0,.25); white-space: nowrap; }
   #demoFranja b { letter-spacing: .14em; }
@@ -2476,7 +2481,27 @@ async function init() {
 }
 
 // Base de demostración (tabla sivec_meta con modo = demo): franja "DEMO" y cuentas de prueba en la entrada.
-const DEMO_CUENTAS = { admin: 'admin@demo.sivec.bo', red: 'gestor.centro@demo.sivec.bo', centro: 'sanluis@demo.sivec.bo', hospital: 'frances@demo.sivec.bo', campana: 'sanluis@demo.sivec.bo' };
+const DEMO_CUENTAS = { admin: 'admin@demo.sivec.bo', red: 'gestor.centro@demo.sivec.bo', centro: 'sanluis@demo.sivec.bo', hospital: 'frances@demo.sivec.bo', laboratorio: 'laboratorio@demo.sivec.bo', campana: 'sanluis@demo.sivec.bo' };
+// En la base de demostración, en cualquier puerta se entra con usuario "demo" y contraseña "demo" (solo existe allí: datos ficticios)
+const DEMO_CLAVE = 'Demo-2026';
+const DEMO_PUERTAS = [['admin', '🛡 Admin'], ['red', '🕸 Red'], ['centro', '🏥 Centro'], ['hospital', '🏨 Hospital'], ['laboratorio', '🔬 Laboratorio'], ['campana', '📣 Campaña']];
+function demoPuertasPintar() {
+  document.getElementById('demoPuertas')?.remove();
+  if (!modoDemo || !perfil || perfil.sinPerfil) return;
+  const actual = (() => { try { return localStorage.getItem('sivec_demo_puerta') || ''; } catch (_) { return ''; } })();
+  const d = document.createElement('div'); d.id = 'demoPuertas';
+  d.innerHTML = `<span>🎬 Demo · entrar como</span>${DEMO_PUERTAS.map(([k, t]) => `<button type="button" data-dp="${k}" class="${k === actual ? 'on' : ''}">${t}</button>`).join('')}`;
+  document.body.appendChild(d);
+  d.onclick = async e => {
+    const b = e.target.closest('[data-dp]'); if (!b) return;
+    const k = b.dataset.dp; entradaMostrar('Entrando como ' + (ACCESOS[k] || 'Laboratorio'));
+    try { await sb.auth.signOut(); } catch (_) {}
+    const { error } = await sb.auth.signInWithPassword({ email: DEMO_CUENTAS[k], password: DEMO_CLAVE });
+    if (error) { entradaOcultar(0); return showToast('No se pudo entrar a la demo: ' + esc(error.message), 'err'); }
+    try { localStorage.setItem('sivec_demo_puerta', k); localStorage.setItem('sivec_demo_ir', k); } catch (_) {}
+    location.reload();
+  };
+}
 let modoDemo = false;
 async function detectarDemo() {
   try { const { data, error } = await sb.from('sivec_meta').select('valor').eq('clave', 'modo').maybeSingle(); modoDemo = !error && data && data.valor === 'demo'; } catch (_) { modoDemo = false; }
@@ -2491,7 +2516,8 @@ async function detectarDemo() {
     f.innerHTML = '<b>DEMOSTRACIÓN</b> · datos ficticios · ninguna paciente es real';
     document.body.appendChild(f);
     const n = document.querySelector('.lgNota');
-    if (n) n.innerHTML = '🎬 <b>Base de demostración:</b> cada botón ya trae su usuario de prueba. Contraseña para todos: <b>Demo-2026</b>';
+    if (n) n.innerHTML = '🎬 <b>Base de demostración:</b> en cualquier puerta entrá con usuario <b>demo</b> y contraseña <b>demo</b>. Adentro, la barra de abajo cambia de puerta con un toque.';
+    const em = document.getElementById('loginEmail'); if (em) { em.type = 'text'; em.autocomplete = 'off'; }
   }
 }
 
@@ -2517,7 +2543,7 @@ function lgMostrar(acceso) {
   const t = document.querySelector(`.lgTile[data-acceso="${acceso}"]`);
   document.getElementById('lgSel').innerHTML = `<span class="lgIc">${t.querySelector('.lgIc').innerHTML}</span><div><b>${ACCESOS[acceso]}</b><small>${t.querySelector('small').textContent}</small></div>`;
   let mail = ''; try { mail = localStorage.getItem('sivec_login_' + acceso) || ''; } catch (_) {}
-  if (modoDemo) { mail = DEMO_CUENTAS[acceso] || mail; setTimeout(() => { const pw = document.getElementById('loginPassword'); if (!pw.value) pw.placeholder = 'Demo-2026'; }, 0); }
+  if (modoDemo) { mail = 'demo'; setTimeout(() => { const pw = document.getElementById('loginPassword'); if (!pw.value) pw.placeholder = 'demo'; }, 0); }
   const em = document.getElementById('loginEmail'); em.value = mail;
   document.getElementById('loginMsg').style.display = 'none';
   setTimeout(() => (mail ? document.getElementById('loginPassword') : em).focus(), 50);
@@ -2594,8 +2620,9 @@ async function entradaOcultar(minMs) {
 }
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
+  let email = document.getElementById('loginEmail').value.trim();
+  let password = document.getElementById('loginPassword').value;
+  if (modoDemo && /^demo$/i.test(email)) { email = DEMO_CUENTAS[lgAcceso] || DEMO_CUENTAS.centro; if (/^demo$/i.test(password)) password = DEMO_CLAVE; try { localStorage.setItem('sivec_demo_puerta', lgAcceso || 'centro'); } catch (_) {} }
   const btn = document.getElementById('loginBtn');
   const msg = document.getElementById('loginMsg');
   msg.style.display = 'none';
@@ -2635,7 +2662,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
   await sb.auth.signOut();
   document.getElementById('loginOverlay').style.display = 'flex';
   document.getElementById('logoutBtn').style.display = 'none';
-  perfil = null; aplicarRol();
+  perfil = null; aplicarRol(); document.getElementById('demoPuertas')?.remove();
   location.reload(); // que no quede nada de la cuenta anterior en pantalla
 });
 
@@ -2717,6 +2744,9 @@ async function cargarPerfil() {
   if (!perfil.sinPerfil) try { localStorage.setItem('sivec_perfil_cache', JSON.stringify({ perfil, centros, redes })); } catch (e) {}
   aplicarRol();
   if (!perfil.sinPerfil) { terminosVerificar(); colaEnviar(); setTimeout(() => saludoDelDia(false), 2400); setTimeout(() => { vozHitoMeta(); vozResumenDelDia(false); }, 9000); }
+  demoPuertasPintar();
+  let ir = ''; try { ir = localStorage.getItem('sivec_demo_ir') || ''; localStorage.removeItem('sivec_demo_ir'); } catch (_) {}
+  if (ir === 'campana' && document.querySelector('nav button[data-view="campana"]').style.display !== 'none') switchView('campana');
 }
 
 function aplicarRol() {
@@ -8142,7 +8172,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.14.1 · 28/09/2026';
+const SIVEC_VERSION = '1.15.0 · 28/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
