@@ -2321,3 +2321,46 @@ select case when to_regclass('public.sivec_firmas_paciente') is not null
 
 ### Deshacer el Paso 33
 `drop function if exists sivec_firma_paciente(text, text, text, text, text, text, text, text); drop table if exists sivec_firmas_paciente;` (se pierden las firmas de pacientes guardadas; los documentos vuelven a salir con la línea para firmar a mano).
+
+## Paso 34 — Código SIVEC de los formularios (D1, D8 y PAP)
+
+Si el establecimiento no usa talonario, el SIVEC arma solo el número de los formularios de cada toma: **un mismo número para toda la toma**, cambiando solo el prefijo del documento. Ejemplo: `PAP-SL-0926-014`, `D1-SL-0926-014`, `D8-SL-0926-014` (PAP · San Luis · septiembre de 2026 · toma Nº 14 del mes). El contador está en la base de datos: dos computadoras nunca reciben el mismo número. La sigla del establecimiento se arma sola con el nombre (San Luis → SL) o se escribe en Admin → Establecimientos → ✏️.
+
+```sql
+-- PASO 34 · Código SIVEC de los formularios
+alter table centros_salud add column if not exists sigla text;
+
+create table if not exists sivec_folios (
+  centro_id uuid not null,
+  periodo text not null,          -- 'AAAA-MM'
+  ultimo int not null default 0,
+  primary key (centro_id, periodo)
+);
+alter table sivec_folios enable row level security;   -- sin reglas: solo se usa por la función de abajo
+
+create or replace function sivec_folio_siguiente(p_centro uuid, p_periodo text) returns int
+language plpgsql security definer set search_path = public as $$
+declare v int;
+begin
+  if not (sivec_edita_centro(p_centro) or sivec_es_admin()) then raise exception 'Sin permiso para numerar en este establecimiento.'; end if;
+  if p_periodo !~ '^\d{4}-\d{2}$' then raise exception 'Periodo inválido.'; end if;
+  insert into sivec_folios (centro_id, periodo, ultimo) values (p_centro, p_periodo, 1)
+  on conflict (centro_id, periodo) do update set ultimo = sivec_folios.ultimo + 1
+  returning ultimo into v;
+  return v;
+end $$;
+revoke all on function sivec_folio_siguiente(uuid, text) from public;
+grant execute on function sivec_folio_siguiente(uuid, text) to authenticated;
+
+notify pgrst, 'reload schema';
+
+-- Resultado: debe decir "listo"
+select case when to_regprocedure('sivec_folio_siguiente(uuid,text)') is not null
+             and exists (select 1 from information_schema.columns where table_name = 'centros_salud' and column_name = 'sigla')
+            then 'listo' else 'revisar' end as paso_34;
+```
+
+Sin el Paso 34 el código igual se arma, contando las tomas que la computadora ya tiene cargadas (puede repetirse si dos computadoras registran al mismo tiempo).
+
+### Deshacer el Paso 34
+`drop function if exists sivec_folio_siguiente(uuid, text); drop table if exists sivec_folios;` (los códigos ya guardados en las pacientes no se tocan; la columna `sigla` puede quedar).

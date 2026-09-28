@@ -409,6 +409,9 @@
   .pdfBlockLabel { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .pdfBlockLabel .fmtTag { font-weight: 600; background: #fde68a; color: #7c4a03; border-radius: 999px; padding: 1px 8px; margin-left: 6px; font-size: 11px; }
   .pdfBlockLabel .fmtPrint { background: #fff; color: var(--teal-900); border: none; border-radius: 6px; padding: 4px 10px; font-weight: 700; font-size: 12px; cursor: pointer; }
+  .folioModo { display: flex; gap: 6px; flex-wrap: wrap; } .folioModo button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 7px 14px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+  .folioModo button.on { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
+  .folioNota { display: block; margin-top: 6px; color: var(--ink-soft); font-size: 12px; line-height: 1.4; } input.folioAuto { background: color-mix(in srgb, var(--teal-700) 6%, var(--surface)); font-family: ui-monospace, monospace; }
   .pdfBlockLabel .pfBtnDoc { background: #fef3c7; color: #7c2d12; } .pdfBlockLabel .pfBtnDoc.hecha { background: #dcfce7; color: #166534; }
   .regOk #regFirma { background: var(--teal-700); color: #fff; border: 0; border-radius: 8px; padding: 5px 10px; font-weight: 700; cursor: pointer; margin-left: 6px; }
   .printBoxActions { flex-wrap: wrap; justify-content: flex-end; align-items: center; }
@@ -1425,6 +1428,9 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
         <div class="formGrid">
           <div class="field"><label>Nombre completo *</label><input name="nombre" required></div>
           <div class="field"><label>Carnet</label><input name="carnet"><div id="regExt" class="regExt" style="display:none"></div></div>
+          <div class="field span3 folioSel"><label>Numeración de los formularios<span class="helpTip" data-tip="Código SIVEC: el sistema arma solo un número para toda la toma (sirve si no hay talonario). Talonario: se escribe el número impreso en cada hoja.">ⓘ</span></label>
+            <div class="folioModo" id="folioModo"><button type="button" data-fm="sivec">🔢 Código SIVEC automático</button><button type="button" data-fm="manual">📒 Talonario (a mano)</button></div>
+            <small id="folioNota" class="folioNota"></small></div>
           <div class="field"><label>N° Registro D1<span class="helpTip" data-tip="Número de folio impreso en el formulario físico D1 (recetario). Si no lo tenés a mano, podés dejarlo en blanco.">ⓘ</span></label><input name="numero_folio_d1" placeholder="Ej: 0056476"></div>
           <div class="field"><label>N° Registro D8<span class="helpTip" data-tip="Número de folio impreso en el formulario físico D8 (solicitud de exámenes). Si no lo tenés a mano, podés dejarlo en blanco.">ⓘ</span></label><input name="numero_folio_d8" placeholder="Ej: 0056476"></div>
           <div class="field"><label>N° Registro PAP<span class="helpTip" data-tip="Número de folio impreso en el formulario físico de PAP. Si no lo tenés a mano, podés dejarlo en blanco.">ⓘ</span></label><input name="numero_folio_pap" placeholder="Ej: 0056476"></div>
@@ -2690,6 +2696,7 @@ function aplicarRol() {
   }
   const activa = document.querySelector('nav button.active');
   const actual = activa && activa.dataset.view;
+  try { folioPintar(); } catch (_) {}
   if (permitidas[0] === 'hoy' && actual === 'form' && !hoyInicio) { hoyInicio = true; switchView('hoy'); }
   else if (!permitidas.includes(actual) && permitidas.length) switchView(permitidas[0]);
   else if (actual && actual !== 'form') switchView(actual);
@@ -2946,7 +2953,7 @@ function admRender() {
   const optRedesE = sel => '<option value="">Sin red (departamental)</option>' + redes.map(r => `<option value="${r.id}"${String(r.id) === String(sel) ? ' selected' : ''}>${esc(r.nombre)}</option>`).join('');
   const optTipos = sel => Object.entries(TIPOS_CENTRO).map(([k, v]) => `<option value="${k}"${k === sel ? ' selected' : ''}>${v}</option>`).join('');
   document.getElementById('admCentros').innerHTML = centros.map(x => admEdit === 'c' + x.id
-    ? `<tr class="admEditRow" data-centro="${x.id}"><td><div class="admEditCampos"><input data-e="nombre" value="${esc(x.nombre)}" placeholder="Nombre"><input data-e="direccion" value="${esc(x.direccion || '')}" placeholder="Dirección (ayuda a ubicarlo en el mapa)"><input data-e="codigo" value="${esc(x.codigo || '')}" placeholder="Código (opcional)"></div></td>
+    ? `<tr class="admEditRow" data-centro="${x.id}"><td><div class="admEditCampos"><input data-e="nombre" value="${esc(x.nombre)}" placeholder="Nombre"><input data-e="direccion" value="${esc(x.direccion || '')}" placeholder="Dirección (ayuda a ubicarlo en el mapa)"><input data-e="codigo" value="${esc(x.codigo || '')}" placeholder="Código (opcional)"><input data-e="sigla" value="${esc(x.sigla || '')}" placeholder="Sigla para los formularios (ej: ${esc(centroSigla(x))})" maxlength="4" style="text-transform:uppercase"></div></td>
         <td><select data-e="red_id">${optRedesE(x.red_id)}</select></td><td><select data-e="tipo">${optTipos(x.tipo)}</select></td><td colspan="3"></td>
         <td style="white-space:nowrap"><button class="rowBtn admOk" data-centro-guardar="${x.id}">✓ Guardar</button> <button class="rowBtn" data-cancelar>✕</button></td></tr>`
     : `<tr style="${x.activo === false ? 'opacity:.5' : ''}"><td><b>${esc(x.nombre)}</b>${x.codigo ? `<div class="loteCod">${esc(x.codigo)}</div>` : ''}${x.direccion ? `<div style="font-size:11px;color:var(--ink-soft)">${esc(x.direccion)}</div>` : ''}</td><td>${esc(redNombre(x.red_id)) || '<span style="color:var(--ink-soft)">departamental</span>'}</td><td>${esc(TIPOS_CENTRO[x.tipo] || x.tipo || '')}</td>
@@ -3039,9 +3046,10 @@ document.getElementById('adminView').addEventListener('click', async e => {
   }
   if (d.centroGuardar) {
     const tr = t.closest('tr'), v = k => tr.querySelector(`[data-e=${k}]`).value.trim();
-    const row = { nombre: v('nombre'), red_id: v('red_id') || null, red: redNombre(v('red_id')) || null, tipo: v('tipo'), codigo: v('codigo') || null, direccion: v('direccion') || null };
+    const row = { nombre: v('nombre'), red_id: v('red_id') || null, red: redNombre(v('red_id')) || null, tipo: v('tipo'), codigo: v('codigo') || null, direccion: v('direccion') || null, sigla: v('sigla').toUpperCase() || null };
     if (!row.nombre) return showToast('El establecimiento necesita un nombre.', 'err');
     let { error } = await sb.from('centros_salud').update(row).eq('id', d.centroGuardar);
+    if (error && /sigla/.test(error.message)) { delete row.sigla; ({ error } = await sb.from('centros_salud').update(row).eq('id', d.centroGuardar)); if (!error) showToast('Guardado sin la sigla — ejecutar el Paso 34 del SQL.', 'err'); }
     if (error && /direccion/.test(error.message)) { delete row.direccion; ({ error } = await sb.from('centros_salud').update(row).eq('id', d.centroGuardar)); if (!error) showToast('Guardado sin la dirección — ejecutar el Paso 21 del SQL.', 'err'); }
     if (error) return showToast('No se pudo guardar: ' + esc(error.message), 'err');
     admEdit = ''; showToast('Establecimiento actualizado ✔', 'ok'); return loadAdmin();
@@ -3178,6 +3186,7 @@ function switchView(name) {
   if (name === 'admin') loadAdmin();
   if (name === 'red') loadRed();
   if (name === 'portal') loadPortal();
+  if (name === 'form') folioPintar();
   hoyActivar(name === 'hoy');
 }
 
@@ -4453,13 +4462,14 @@ async function onSubmit(e) {
   const centroNuevo = centroParaRegistrar();
   if (centroNuevo === false) { btn.disabled = false; showToast('Elegí arriba el centro donde se registra la toma.', 'err'); return; }
   if (centroNuevo) data.centro_id = centroNuevo;
+  await folioAsignar(data);
   const { data: insertado, error } = await sb.from('pacientes').insert([data]).select();
   btn.disabled = false;
   if (error && esSinInternet(error)) {
     colaAgregar(data);
     msg.innerHTML = `<span class="regOk">📴 ${esc(data.nombre)} quedó guardada <b>en esta computadora</b>. Se envía sola cuando vuelva internet.</span>`; msg.className = 'ok';
     showToast('Sin internet: la toma quedó guardada en esta computadora y se enviará sola', 'ok');
-    form.reset(); resetGeoPick(form); if (window.regBorrarBorrador) window.regBorrarBorrador();
+    form.reset(); resetGeoPick(form); folioPintar(); if (window.regBorrarBorrador) window.regBorrarBorrador();
   } else if (error) {
     msg.textContent = 'Error al guardar: ' + error.message;
     msg.className = 'err';
@@ -4472,7 +4482,7 @@ async function onSubmit(e) {
     showToast('Paciente guardada correctamente ✔', 'ok');
     setTimeout(() => vozHitoMeta(), 1500);
     allPatientsData = []; // se vuelve a leer en el próximo registro, así también avisa de la toma recién guardada
-    form.reset();
+    form.reset(); folioPintar();
     resetGeoPick(form);
     if (window.regBorrarBorrador) window.regBorrarBorrador();
   }
@@ -4596,7 +4606,7 @@ function renderBanners(data) {
       `<button type="button" class="bannerBtn" data-quick="contrarref">${listQuick === 'contrarref' ? 'Ver todas' : 'Ver solo estas'}</button>`;
   } else { cb.style.display = 'none'; cb.innerHTML = ''; }
 
-  const hoy = new Date().toISOString().slice(0, 10);
+  const hoy = hoyISO();
   const atrasadas = data.filter(esAtrasada);
   const obanner = document.getElementById('overdueBanner');
   if (atrasadas.length) {
@@ -4659,7 +4669,9 @@ function addYears(fecha, n) {
   const d = new Date(fecha + 'T12:00:00'); d.setFullYear(d.getFullYear() + Number(n || 0));
   return d.toISOString().slice(0, 10);
 }
-function hoyISO() { return new Date().toISOString().slice(0, 10); }
+// Fecha de hoy en la hora local de la computadora (en Bolivia, UTC−4): con toISOString() después de las 20:00 ya daba el día siguiente
+function hoyISO() { return fechaLocalISO(new Date()); }
+function fechaLocalISO(d) { d = d instanceof Date ? d : new Date(d); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); }
 function fueraDeRangoEdad(p) {
   const edad = edadDe(p.fecha_nacimiento);
   if (edad == null) return null;
@@ -4771,9 +4783,9 @@ async function marcarVisto(lista) {
 function esAtrasada(p) {
   if (esSoloVph(p)) return false;
   const fechaEst = p.fecha_estimada || addDays(p.fecha_toma, 90);
-  return (p.estado_pap || 'Pendiente') === 'Pendiente' && !!fechaEst && fechaEst < new Date().toISOString().slice(0, 10);
+  return (p.estado_pap || 'Pendiente') === 'Pendiente' && !!fechaEst && fechaEst < hoyISO();
 }
-function esVencimiento(p) { return !!p.anticonceptivo_proximo_control && p.anticonceptivo_proximo_control <= addDays(new Date().toISOString().slice(0, 10), 30); }
+function esVencimiento(p) { return !!p.anticonceptivo_proximo_control && p.anticonceptivo_proximo_control <= addDays(hoyISO(), 30); }
 function pasaQuick(p) {
   switch (listQuick) {
     case 'pap:Positivo': return !esSoloVph(p) && p.estado_pap === 'Positivo';
@@ -4842,7 +4854,7 @@ function renderPatientCards(data, base) {
   });
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
-  const hoy = new Date().toISOString().slice(0, 10);
+  const hoy = hoyISO();
   data.slice(0, listLimit).forEach(p => {
     const estado = estadoDe(p);
     const fechaEst = p.fecha_estimada || addDays(p.fecha_toma, 90);
@@ -4944,7 +4956,7 @@ function exportPatientsToExcel() {
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Pacientes');
-  const fecha = new Date().toISOString().slice(0, 10);
+  const fecha = hoyISO();
   XLSX.writeFile(wb, `SIVEC-PAP-VPH_pacientes_${fecha}.xlsx`);
 }
 
@@ -7130,7 +7142,7 @@ async function loadMetodos() {
     .order('nombre', { ascending: true }));
   if (error) { tbody.innerHTML = `<tr><td colspan="8">Error: ${esc(error.message)}</td></tr>`; return; }
   if (!data.length) { tbody.innerHTML = '<tr><td colspan="8">Todavía no hay pacientes con datos de método anticonceptivo.</td></tr>'; return; }
-  const hoy = new Date().toISOString().slice(0, 10);
+  const hoy = hoyISO();
   metData = data;
   renderMetCal();
   tbody.innerHTML = data.map(p => {
@@ -7683,7 +7695,7 @@ function formPropioHTML(tipo, ctx) {
   if (tipo === 'ci') {
     const disp = p.consent_dispositivos_lista || [];
     const q = (n, txt, ops, val, ancho) => `<div class="q"${ancho ? ` style="grid-template-columns:26px 1fr ${ancho}"` : ''}><span class="n">${n}</span><span>${txt}</span><span class="ans">${ops.map(o => fpChk(o, val === o)).join('')}</span></div>`;
-    return `<section class="sheet">${fpHead('CONSENTIMIENTO INFORMADO', 'Ficha específica de información · Servicio de Telesalud', '<div class="logo" style="height:52px">Logo Programa<br>Telesalud</div>')}
+    return `<section class="sheet">${fpHead('CONSENTIMIENTO INFORMADO', 'Ficha específica de información · Servicio de Telesalud', '<div class="logo" style="height:52px">Logo Programa<br>Telesalud</div>' + (p.numero_folio_pap ? `<div class="folio">Registro <b>${esc(p.numero_folio_pap)}</b></div>` : ''))}
       <div class="grid" style="grid-template-columns:1.6fr 1fr 1fr;margin-top:12px">${fpCell('Paciente', nom)}${fpCell('C.I.', ci)}${fpCell('Fecha de nacimiento', fpFecha(p.fecha_nacimiento), 'nr')}
         ${fpCell('Dirección', dom, 'n nb')}${fpCell('Nº de celular', esc(p.celular || ''), 'n nb')}${fpCell('Ocupación', esc(p.ocupacion || ''), 'n nb nr')}</div>
       <p class="intro" style="margin-top:12px">Estimada paciente: el/la médico responsable del área de Telesalud le solicita leer con detenimiento este documento. <b>El consentimiento informado</b> es su derecho a aceptar de forma libre, informada, voluntaria y sin presiones que se realice algún procedimiento clínico, imagenológico (videoconferencia y/o fotografías) y/o la discusión diagnóstica de su caso. Marque su aceptación o rechazo.</p>
@@ -7707,7 +7719,7 @@ function formPropioHTML(tipo, ctx) {
   const plan = meds && meds.length
     ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 16px">${meds.map(mm => `<span>${mm.icon || '•'} <b>${esc(mm.nombre)}</b>${mm.indic ? ' — ' + esc(mm.indic) : ''}</span>`).join('')}</div>${[consulta.plan_texto, consulta.derivacion && 'Derivación: ' + consulta.derivacion, colp && colp.derivacion && colp.derivacion !== consulta.derivacion && 'Derivación (colposcopia): ' + colp.derivacion].filter(Boolean).length ? `<p style="margin:6px 0 0">${esc([consulta.plan_texto, consulta.derivacion && 'Derivación: ' + consulta.derivacion + '.', colp && colp.derivacion && colp.derivacion !== consulta.derivacion && 'Derivación (colposcopia): ' + colp.derivacion + '.'].filter(Boolean).join(' '))}</p>` : ''}`
     : esc(x.P);
-  return `<section class="sheet">${fpHead('HISTORIA CLÍNICA — EVOLUCIÓN', 'Nota S-O-A-P · Código R.A. SALUD INE 101/2010', '<div class="folio">Nº H.C. <b>……</b></div>')}
+  return `<section class="sheet">${fpHead('HISTORIA CLÍNICA — EVOLUCIÓN', 'Nota S-O-A-P · Código R.A. SALUD INE 101/2010', `<div class="folio">Nº H.C. <b>……</b></div>${p.numero_folio_pap ? `<div class="folio">Registro <b>${esc(p.numero_folio_pap)}</b></div>` : ''}`)}
     <div class="ctx"><span>Paciente: <b>${nom}</b></span><span>C.I.: <b>${ci}</b></span><span>Edad: <b>${esc(edad)}</b></span><span>Establecimiento: <b>C.S. San Luis</b></span></div>
     <div class="vit"><div><span class="k">Fecha</span><span class="v">${esc(fmtFecha(x.fecha) || '')}</span></div><div><span class="k">Edad</span><span class="v">${esc(String(edad).replace(/\D.*$/, ''))}</span></div><div><span class="k">Talla</span></div><div><span class="k">Peso</span></div><div><span class="k">Temp.</span></div><div><span class="k">FC</span></div><div><span class="k">PA</span></div><div><span class="k">FR</span></div></div>
     <table class="soapT">
@@ -8074,7 +8086,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.12.0 · 27/09/2026';
+const SIVEC_VERSION = '1.13.0 · 28/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -8540,7 +8552,7 @@ async function firmaDe(tipo, documento) {
 function firmaLeyenda(f, rotulo, nombre) {
   if (!f) return `<b>${nombre || '&nbsp;'}</b>${rotulo}`;
   const t = new Date(f.creado);
-  return `<b>${esc(f.firmante_nombre || nombre || '')}</b>${(r => r.charAt(0).toUpperCase() + r.slice(1))(rotulo.replace(/firma y sello|firma/i, 'firma electrónica'))}<br><span style="font-size:10.5px;color:#7d2a4c;font-weight:700">✍ Firmado electrónicamente el ${fmtFecha(t.toISOString().slice(0, 10))} a las ${t.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })}</span><br><span style="font-size:10px">Código de verificación <b>${esc(firmaCodigoFmt(f.codigo))}</b> · huella ${esc(String(f.huella || '').slice(0, 12))}…</span>`;
+  return `<b>${esc(f.firmante_nombre || nombre || '')}</b>${(r => r.charAt(0).toUpperCase() + r.slice(1))(rotulo.replace(/firma y sello|firma/i, 'firma electrónica'))}<br><span style="font-size:10.5px;color:#7d2a4c;font-weight:700">✍ Firmado electrónicamente el ${fmtFecha(fechaLocalISO(t))} a las ${t.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })}</span><br><span style="font-size:10px">Código de verificación <b>${esc(firmaCodigoFmt(f.codigo))}</b> · huella ${esc(String(f.huella || '').slice(0, 12))}…</span>`;
 }
 // En ⚙ Configuración: mi PIN (crear/cambiar), verificar un código y (administrador) restablecer el PIN de alguien
 (function firmaEnConfiguracion() {
@@ -8579,7 +8591,7 @@ function firmaLeyenda(f, rotulo, nombre) {
       if (error) return mostrar(esc(firmaFaltaPaso(error) ? 'La firma electrónica se activa con el Paso 30 del SQL.' : error.message), 'mal');
       if (!f) return mostrar('✖ <b>No existe ninguna firma con ese código.</b> Revisá que esté bien escrito.', 'mal');
       const t = new Date(f.creado);
-      mostrar(`<b>✔ Firma válida</b><span>${esc(FIRMA_TIPOS[f.tipo] || f.tipo)}</span><span>Firmó: <b>${esc(f.firmante_nombre || '')}</b>${f.establecimiento ? ' · ' + esc(f.establecimiento) : ''}</span><span>${fmtFecha(t.toISOString().slice(0, 10))} a las ${t.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })} · huella ${esc(String(f.huella || '').slice(0, 12))}…</span>`, 'ok');
+      mostrar(`<b>✔ Firma válida</b><span>${esc(FIRMA_TIPOS[f.tipo] || f.tipo)}</span><span>Firmó: <b>${esc(f.firmante_nombre || '')}</b>${f.establecimiento ? ' · ' + esc(f.establecimiento) : ''}</span><span>${fmtFecha(fechaLocalISO(t))} a las ${t.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })} · huella ${esc(String(f.huella || '').slice(0, 12))}…</span>`, 'ok');
     } else if (b.dataset.fc === 'reset') {
       const correo = d.querySelector('#fcCorreo').value.trim(); if (!correo) return;
       const u = await sb.rpc('sivec_uid_por_correo', { p_correo: correo });
@@ -9068,7 +9080,7 @@ async function pacFirmasDe(pid) {
 // Bloque de firma de la paciente en los formularios impresos
 function pacFirmaLeyenda(f, rotulo) {
   if (!f) return `<b>&nbsp;</b>${rotulo}`;
-  const t = new Date(f.creado), cuando = fmtFecha(t.toISOString().slice(0, 10)) + ' ' + t.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' });
+  const t = new Date(f.creado), cuando = fmtFecha(fechaLocalISO(t)) + ' ' + t.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' });
   const img = f.imagen ? `<img src="${f.imagen}" alt="Firma de la paciente" style="display:block;margin:-46px auto 2px;height:44px;max-width:100%">` : '';
   const como = f.metodo === 'whatsapp' ? `Firmó con código por WhatsApp (celular ***${esc(f.celular || '')})` : 'Firmó en la pantalla';
   return `${img}<b>${esc(f.firmante_nombre || '')}</b>${rotulo}<br><span style="font-size:10.5px;color:#7d2a4c;font-weight:700">✍ ${como} el ${cuando}${f.testigo_nombre ? ' · testigo: ' + esc(f.testigo_nombre) : ''}</span>`;
@@ -9203,7 +9215,7 @@ async function segAbrir() {
     if (error) { res.innerHTML = `<span class="no">${esc(firmaFaltaPaso(error) ? 'Se activa con el Paso 30 del SQL.' : error.message)}</span>`; return; }
     if (!f) { res.innerHTML = '<span class="no">✖ No existe ninguna firma con ese código.</span>'; sonido('error'); return; }
     const t = new Date(f.creado);
-    res.innerHTML = `<span class="ok">✔ Firma válida</span> · ${esc(FIRMA_TIPOS[f.tipo] || f.tipo)} · ${esc(f.firmante_nombre || '')} · ${fmtFecha(t.toISOString().slice(0, 10))}`; sonido('firma');
+    res.innerHTML = `<span class="ok">✔ Firma válida</span> · ${esc(FIRMA_TIPOS[f.tipo] || f.tipo)} · ${esc(f.firmante_nombre || '')} · ${fmtFecha(fechaLocalISO(t))}`; sonido('firma');
   };
   ov.querySelector('#segCod').onkeydown = e => { if (e.key === 'Enter') ov.querySelector('#segVerBtn').click(); };
   // 5) registro de accesos (administrador)
@@ -9212,10 +9224,10 @@ async function segAbrir() {
     if (!document.body.contains(ov)) return;
     if (a.error) { est(5).innerHTML = `<span class="gris">${/historial_accesos|does not exist|PGRST205/i.test(a.error.message + a.error.code) ? 'Se activa con el paso del SQL de la línea de tiempo.' : esc(a.error.message)}</span>`; return; }
     const nom = id => { const p = (u.data || []).find(x => x.id === id); return p ? (p.nombre_completo || p.correo) : '—'; };
-    const L = a.data || [], hoy = L.filter(x => String(x.created_at).slice(0, 10) === hoyISO()).length;
+    const L = a.data || [], hoy = L.filter(x => fechaLocalISO(x.created_at) === hoyISO()).length;
     est(5).innerHTML = `<span class="ok">✔ ${plural(L.length, 'acceso registrado', 'accesos registrados')}</span>${hoy ? ` · ${hoy} hoy` : ''}. <a href="#segAcc">Ver el registro ↓</a>`;
     const box = ov.querySelector('#segAcc'); box.hidden = false;
-    ov.querySelector('#segAccTabla').innerHTML = L.length ? `<table><thead><tr><th>Fecha y hora</th><th>Quién</th><th>Desde</th><th>Buscó</th><th>Encontró</th></tr></thead><tbody>${L.map(x => { const t = new Date(x.created_at); return `<tr><td>${fmtFecha(t.toISOString().slice(0, 10))} ${t.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })}</td><td>${esc(nom(x.usuario))}</td><td>${esc(centroNombre(x.centro_id) || '—')}</td><td>${esc(x.nombre || '')}${x.carnet ? ' · CI ' + esc(x.carnet) : ''}</td><td>${plural(x.encontrados || 0, 'toma')} en otros centros</td></tr>`; }).join('')}</tbody></table>` : '<p class="gris">Todavía no hay accesos a historiales de otros centros.</p>';
+    ov.querySelector('#segAccTabla').innerHTML = L.length ? `<table><thead><tr><th>Fecha y hora</th><th>Quién</th><th>Desde</th><th>Buscó</th><th>Encontró</th></tr></thead><tbody>${L.map(x => { const t = new Date(x.created_at); return `<tr><td>${fmtFecha(fechaLocalISO(t))} ${t.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })}</td><td>${esc(nom(x.usuario))}</td><td>${esc(centroNombre(x.centro_id) || '—')}</td><td>${esc(x.nombre || '')}${x.carnet ? ' · CI ' + esc(x.carnet) : ''}</td><td>${plural(x.encontrados || 0, 'toma')} en otros centros</td></tr>`; }).join('')}</tbody></table>` : '<p class="gris">Todavía no hay accesos a historiales de otros centros.</p>';
   }
 }
 
@@ -9225,6 +9237,57 @@ async function segAbrir() {
   const b = document.createElement('button'); b.type = 'button'; b.className = 'segBoton'; b.innerHTML = '<span style="font-size:24px">🔒</span><span>Los seis candados<small>Cómo se protegen los datos de cada mujer</small></span>'; b.onclick = segAbrir;
   const ancla = document.getElementById('firmaConfig') || (panel.querySelector('h2') || {}).nextElementSibling || panel.firstChild; ancla.before(b);
 })();
+// ===== Código SIVEC de los formularios: un mismo número por toma (PAP-SL-0926-014, D1-…, D8-…) — Paso 34 =====
+function folioModo() { try { return localStorage.getItem('sivec_folio_modo') || 'sivec'; } catch (_) { return 'sivec'; } }
+function centroSigla(c) {
+  if (!c) return 'XX';
+  const limpio = t => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
+  if (c.sigla) return limpio(c.sigla).replace(/[^A-Z0-9]/g, '').slice(0, 4) || 'XX';
+  const n = limpio(c.nombre).replace(/[.,]/g, ' ').replace(/^\s*(CENTRO DE SALUD|CENTRO|C S|CS|HOSPITAL|INSTITUTO|PUESTO DE SALUD|P S)\s+/, '');
+  const w = n.split(/\s+/).filter(x => x && !/^(DE|DEL|LA|LAS|LOS|EL|Y|MUNICIPAL)$/.test(x));
+  const s = w.length > 1 ? w.slice(0, 3).map(x => x[0]).join('') : (w[0] || 'XX').slice(0, 2);
+  return s.replace(/[^A-Z0-9]/g, '') || 'XX';
+}
+function folioPrefijo(centroId, fecha) {
+  const c = centros.find(x => String(x.id) === String(centroId)) || miCentro();
+  const f = /^\d{4}-\d{2}/.test(fecha || '') ? fecha : hoyISO();
+  return { sigla: centroSigla(c), mmyy: f.slice(5, 7) + f.slice(2, 4), periodo: f.slice(0, 7) };
+}
+async function folioAsignar(data) {
+  if (folioModo() !== 'sivec' || (data.numero_folio_d1 && data.numero_folio_d8 && data.numero_folio_pap)) return;
+  const centroId = data.centro_id || (perfil && perfil.centro_id);
+  const { sigla, mmyy, periodo } = folioPrefijo(centroId, data.fecha_toma);
+  let n = null;
+  if (sb && centroId && navigator.onLine) {
+    const r = await sb.rpc('sivec_folio_siguiente', { p_centro: centroId, p_periodo: periodo });
+    if (!r.error && r.data) n = Number(r.data);
+  }
+  if (!n) { // sin el Paso 34 o sin internet: se cuenta con lo que ya está cargado
+    const re = new RegExp('^PAP-' + sigla + '-' + mmyy + '-(\\d+)$');
+    n = 1 + allPatientsData.reduce((m, p) => { const k = re.exec(p.numero_folio_pap || ''); return k ? Math.max(m, Number(k[1])) : m; }, 0);
+  }
+  const num = `${sigla}-${mmyy}-${String(n).padStart(3, '0')}`;
+  if (!data.numero_folio_d1) data.numero_folio_d1 = 'D1-' + num;
+  if (!data.numero_folio_d8) data.numero_folio_d8 = 'D8-' + num;
+  if (!data.numero_folio_pap) data.numero_folio_pap = 'PAP-' + num;
+}
+// Selector en el paso 2 del registro: código SIVEC automático o talonario a mano
+function folioPintar() {
+  const f = document.getElementById('patientForm'); if (!f) return;
+  const auto = folioModo() === 'sivec';
+  document.querySelectorAll('#folioModo [data-fm]').forEach(b => b.classList.toggle('on', (b.dataset.fm === 'sivec') === auto));
+  const { sigla, mmyy } = folioPrefijo(centroParaRegistrar() || (perfil && perfil.centro_id), f.fecha_toma && f.fecha_toma.value);
+  [['numero_folio_d1', 'D1'], ['numero_folio_d8', 'D8'], ['numero_folio_pap', 'PAP']].forEach(([k, pre]) => {
+    const i = f[k]; if (!i) return;
+    i.readOnly = auto; i.classList.toggle('folioAuto', auto);
+    if (auto) { i.value = ''; i.placeholder = `${pre}-${sigla}-${mmyy}-··· (al guardar)`; } else i.placeholder = 'Ej: 0056476';
+  });
+  const n = document.getElementById('folioNota');
+  if (n) n.innerHTML = auto ? `El SIVEC arma el número al guardar: <b>el mismo para toda la toma</b> (D1, D8, PAP, consentimiento e historia clínica). Ej.: <b>PAP-${esc(sigla)}-${esc(mmyy)}-014</b> = PAP · ${esc(sigla)} · mes ${esc(mmyy.slice(0, 2))}/20${esc(mmyy.slice(2))} · toma Nº 14 del mes.` : 'Escribí el número impreso en cada formulario del talonario (o dejalo en blanco).';
+}
+document.addEventListener('click', e => { const b = e.target.closest('#folioModo [data-fm]'); if (!b) return; try { localStorage.setItem('sivec_folio_modo', b.dataset.fm); } catch (_) {} folioPintar(); });
+document.addEventListener('change', e => { if (e.target.name === 'fecha_toma' && e.target.form && e.target.form.id === 'patientForm') folioPintar(); });
+
 // Términos de uso y política de privacidad: cada persona los acepta una vez por versión (Paso 26 del SQL)
 async function terminosVerificar() {
   if (!sb || !conRoles() || modoPresentacion || modoDemo) return;
