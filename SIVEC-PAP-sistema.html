@@ -298,6 +298,29 @@
   #colpModal label { display:block; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
   #colpModal input, #colpModal select, #colpModal textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 13.5px; font-family: inherit; }
   #colpModal .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  /* Colposcopia: casillas y opciones como chips que se tocan (igual que la consulta) */
+  #colpModal .cxChips { display: flex; flex-wrap: wrap; gap: 6px; }
+  #colpModal .cx { position: relative; margin: 0; cursor: pointer; font-weight: 400; }
+  #colpModal .cx input { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; }
+  #colpModal .cx span { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); line-height: 1.3; transition: background .15s, border-color .15s, transform .12s, box-shadow .15s; user-select: none; }
+  #colpModal .cx:hover span { border-color: var(--teal-500); }
+  #colpModal .cx input:checked + span { background: #f7e2ea; border-color: #9c3a5f; color: #5b1733; font-weight: 700; animation: cxPop .22s ease; }
+  #colpModal .cx input:checked + span::before { content: '✓'; }
+  #colpModal .cx.neg input:checked + span { background: #e5f6ec; border-color: #16a34a; color: #14532d; }
+  #colpModal .cx.alto input:checked + span { background: #fde2e2; border-color: #dc2626; color: #7f1d1d; }
+  #colpModal .cx.inf input:checked + span, #colpModal .cx.med input:checked + span { background: #fff3dc; border-color: #d97706; color: #78350f; }
+  #colpModal .cx.proc input:checked + span { background: #ede4fb; border-color: #7c3aed; color: #3b0764; }
+  #colpModal .cx.sug input:not(:checked) + span { border-color: #d97706; box-shadow: 0 0 0 3px rgba(217,119,6,.18); animation: cxBrillo 1.6s ease-in-out infinite; }
+  #colpModal .cx.sug input:not(:checked) + span::after { content: '✨'; }
+  #colpModal .cx input:focus-visible + span { outline: 2px solid var(--teal-500); outline-offset: 2px; }
+  body.dark #colpModal .cx input:checked + span { background: #43202f; color: #fbe3ec; }
+  body.dark #colpModal .cx.neg input:checked + span { background: #14331f; color: #c7f0d4; } body.dark #colpModal .cx.alto input:checked + span { background: #3d1515; color: #fecaca; }
+  body.dark #colpModal .cx.inf input:checked + span, body.dark #colpModal .cx.med input:checked + span { background: #3a2a0c; color: #fde6b8; } body.dark #colpModal .cx.proc input:checked + span { background: #2a1846; color: #e3d3fb; }
+  @keyframes cxPop { 0% { transform: scale(.92); } 60% { transform: scale(1.06); } 100% { transform: scale(1); } }
+  @keyframes cxBrillo { 50% { box-shadow: 0 0 0 5px rgba(217,119,6,.08); } }
+  #colpModal .cxSub { font-size: 11.5px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: var(--ink-soft); margin: 10px 0 6px; }
+  #colpModal .cxAyuda { font-weight: 400; color: var(--ink-soft); font-size: 12px; margin-left: 6px; }
+  #colpModal .cxRes { margin-top: 10px; font-size: 13px; padding: 8px 12px; border-radius: 10px; background: var(--surface-2, rgba(125,42,76,.06)); color: var(--ink); } #colpModal .cxRes:empty { display: none; }
   #colpModal .checkGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; border: 1px solid var(--line); border-radius: 6px; padding: 10px; }
   #colpModal .checkGrid label { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 400; margin: 0; }
   #colpModal .checkGrid input { width: auto; }
@@ -2006,16 +2029,16 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
     <form id="colpForm">
       <div class="row2">
         <div class="field"><label>Fecha</label><input type="date" name="fecha" required></div>
-        <div class="field"><label>Prueba de Schiller</label>
-          <select name="prueba_schiller"><option value="">— Seleccionar —</option><option>Positiva</option><option>Negativa</option></select>
+        <div class="field"><label>Prueba de Schiller (Lugol)</label>
+          <div class="cxChips" data-radio="1"><label class="cx neg"><input type="radio" name="prueba_schiller" value="Negativa"><span>Negativa (capta yodo)</span></label><label class="cx alto"><input type="radio" name="prueba_schiller" value="Positiva"><span>Positiva (zona yodo negativa)</span></label></div>
         </div>
       </div>
       <div class="row2" id="colpIvaaRow" style="display:none">
-        <div class="field"><label>IVAA (ácido acético)</label>
-          <select name="ivaa"><option value="">— Seleccionar —</option><option>Negativo</option><option>Positivo</option><option>Sospecha de cáncer</option></select>
+        <div class="field"><label>IVAA (ácido acético 3–5 %)</label>
+          <div class="cxChips" data-radio="1"><label class="cx neg"><input type="radio" name="ivaa" value="Negativo"><span>Negativo</span></label><label class="cx alto"><input type="radio" name="ivaa" value="Positivo"><span>Positivo</span></label><label class="cx alto"><input type="radio" name="ivaa" value="Sospecha de cáncer"><span>Sospecha de cáncer</span></label></div>
         </div>
         <div class="field"><label>Unión escamocolumnar</label>
-          <select name="union_ec"><option value="">— Seleccionar —</option><option>Visible</option><option>No visible</option></select>
+          <div class="cxChips" data-radio="1"><label class="cx neg"><input type="radio" name="union_ec" value="Visible"><span>Visible</span></label><label class="cx "><input type="radio" name="union_ec" value="No visible"><span>No visible</span></label></div>
         </div>
       </div>
       <div id="cuelloBlock" class="field" style="display:none"><label>Mapa del cuello — 1) elegí el hallazgo · 2) tocá la hora: mitad interna (cerca del orificio) o externa</label>
@@ -2028,44 +2051,11 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
         <div class="cuelloRes" id="cuelloRes"></div>
       </div>
       <div id="cuelloNota" class="segNote" style="display:none">🕐 Para marcar las lesiones en el <b>reloj del cuello</b>, ejecutá el Paso 6 del SQL en Supabase.</div>
-      <div class="field"><label>Zona afectada</label>
-        <select name="zona_afectada">
-          <option value="">— Seleccionar —</option>
-          <option>Sin lesión</option>
-          <option>Zona de transformación</option>
-          <option>Todo el cérvix</option>
-          <option>Posición horaria 1h</option>
-          <option>Posición horaria 2h</option>
-          <option>Posición horaria 3h</option>
-          <option>Posición horaria 4h</option>
-          <option>Posición horaria 5h</option>
-          <option>Posición horaria 6h</option>
-          <option>Posición horaria 7h</option>
-          <option>Posición horaria 8h</option>
-          <option>Posición horaria 9h</option>
-          <option>Posición horaria 10h</option>
-          <option>Posición horaria 11h</option>
-          <option>Posición horaria 12h</option>
-        </select>
+      <div class="field"><label>Zona afectada <small class="cxAyuda">las horas se marcan en el mapa de arriba</small></label>
+        <div class="cxChips" data-radio="1"><label class="cx neg"><input type="radio" name="zona_afectada" value="Sin lesión"><span>Sin lesión</span></label><label class="cx "><input type="radio" name="zona_afectada" value="Zona de transformación"><span>Zona de transformación</span></label><label class="cx alto"><input type="radio" name="zona_afectada" value="Todo el cérvix"><span>Todo el cérvix</span></label></div>
       </div>
-      <div class="field"><label>Lesión / Hallazgos (marcar los que correspondan)</label>
-        <div class="checkGrid">
-          <label><input type="checkbox" name="lesion" value="Sin Lesión"> Sin Lesión</label>
-          <label><input type="checkbox" name="lesion" value="Ectropión"> Ectropión</label>
-          <label><input type="checkbox" name="lesion" value="LSIL"> LSIL</label>
-          <label><input type="checkbox" name="lesion" value="HSIL"> HSIL</label>
-          <label><input type="checkbox" name="lesion" value="AGC"> AGC</label>
-          <label><input type="checkbox" name="lesion" value="ASC-H"> ASC-H</label>
-          <label><input type="checkbox" name="lesion" value="ASC-US"> ASC-US</label>
-          <label><input type="checkbox" name="lesion" value="Micosis"> Micosis</label>
-          <label><input type="checkbox" name="lesion" value="Trichomona"> Trichomona</label>
-          <label><input type="checkbox" name="lesion" value="Cervicitis"> Cervicitis</label>
-          <label><input type="checkbox" name="lesion" value="Gardnerella"> Gardnerella</label>
-          <label><input type="checkbox" name="lesion" value="Vaginosis"> Vaginosis</label>
-          <label><input type="checkbox" name="lesion" value="Vaginitis"> Vaginitis</label>
-          <label><input type="checkbox" name="lesion" value="Cervicovaginitis"> Cervicovaginitis</label>
-          <label><input type="checkbox" name="lesion" value="Colpitis"> Colpitis</label>
-        </div>
+      <div class="field"><label>Lesión / Hallazgos <small class="cxAyuda">tocá los que correspondan</small></label>
+        <div class="cxChips"><label class="cx neg"><input type="checkbox" name="lesion" value="Sin Lesión"><span>Sin lesión</span></label><label class="cx "><input type="checkbox" name="lesion" value="Ectropión"><span>Ectropión</span></label><label class="cx med"><input type="checkbox" name="lesion" value="LSIL"><span>LSIL</span></label><label class="cx alto"><input type="checkbox" name="lesion" value="HSIL"><span>HSIL</span></label><label class="cx med"><input type="checkbox" name="lesion" value="ASC-US"><span>ASC-US</span></label><label class="cx alto"><input type="checkbox" name="lesion" value="ASC-H"><span>ASC-H</span></label><label class="cx alto"><input type="checkbox" name="lesion" value="AGC"><span>AGC</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Micosis"><span>Micosis</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Trichomona"><span>Trichomona</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Gardnerella"><span>Gardnerella</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Vaginosis"><span>Vaginosis</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Vaginitis"><span>Vaginitis</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Cervicitis"><span>Cervicitis</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Cervicovaginitis"><span>Cervicovaginitis</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Colpitis"><span>Colpitis</span></label></div>
       </div>
       <div class="field"><label>Otros hallazgos</label><input name="otros_hallazgos"></div>
 
@@ -2087,19 +2077,14 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
       <div class="field"><label>A — Análisis (diagnóstico)</label><textarea name="soap_analisis" rows="2" placeholder="Se completa con la Lesión marcada arriba, o agregar detalle"></textarea></div>
       <div class="field"><label>Observaciones</label><textarea name="soap_observaciones" rows="2"></textarea></div>
       </div>
-      <div class="field"><label>P — Tratamiento en el momento (marcar los que correspondan)</label>
-        <div class="checkGrid">
-          <label><input type="checkbox" name="plan" value="Crioterapia"> Crioterapia</label>
-          <label><input type="checkbox" name="plan" value="Cauterización"> Cauterización</label>
-          <label><input type="checkbox" name="plan" value="Biopsia"> Biopsia</label>
-          <label><input type="checkbox" name="plan" value="Metronidazol 500mg VV x10 noches"> Metronidazol 500mg VV x10 noches</label>
-          <label><input type="checkbox" name="plan" value="Clotrimazol 500mg VV x10 noches"> Clotrimazol 500mg VV x10 noches</label>
-          <label><input type="checkbox" name="plan" value="Aseo vulvoperineal"> Aseo vulvoperineal</label>
-          <label><input type="checkbox" name="plan" value="Orientación sexual"> Orientación sexual</label>
-        </div>
+      <div class="field cxTrat"><label>P — Tratamiento en el momento <small class="cxAyuda">✨ los sugeridos brillan según lo marcado</small></label>
+        <div class="cxSub">Procedimientos</div><div class="cxChips"><label class="cx proc"><input type="checkbox" name="plan" value="Crioterapia"><span>❄ Crioterapia</span></label><label class="cx proc"><input type="checkbox" name="plan" value="Termocoagulación"><span>🔥 Termocoagulación (ablación térmica)</span></label><label class="cx proc"><input type="checkbox" name="plan" value="Cauterización"><span>⚡ Cauterización</span></label><label class="cx proc"><input type="checkbox" name="plan" value="LEEP / asa diatérmica"><span>〰 LEEP / asa diatérmica</span></label><label class="cx proc"><input type="checkbox" name="plan" value="Biopsia"><span>📍 Biopsia dirigida</span></label><label class="cx proc"><input type="checkbox" name="plan" value="Legrado endocervical"><span>Legrado endocervical</span></label><label class="cx proc"><input type="checkbox" name="plan" value="Polipectomía"><span>Polipectomía</span></label></div>
+        <div class="cxSub">Medicación</div><div class="cxChips"><label class="cx med"><input type="checkbox" name="plan" value="Metronidazol 500mg VV x10 noches"><span>💊 Metronidazol 500 mg óvulo VV × 10 noches</span></label><label class="cx med"><input type="checkbox" name="plan" value="Metronidazol 500 mg VO c/12 h x7 días"><span>💊 Metronidazol 500 mg VO c/12 h × 7 días</span></label><label class="cx med"><input type="checkbox" name="plan" value="Clotrimazol 500mg VV x10 noches"><span>💊 Clotrimazol 500 mg óvulo VV × 10 noches</span></label><label class="cx med"><input type="checkbox" name="plan" value="Fluconazol 150 mg VO dosis única"><span>💊 Fluconazol 150 mg VO dosis única</span></label><label class="cx med"><input type="checkbox" name="plan" value="Nistatina óvulos VV x14 noches"><span>💊 Nistatina óvulo VV × 14 noches</span></label><label class="cx med"><input type="checkbox" name="plan" value="Azitromicina 1 g VO dosis única"><span>💊 Azitromicina 1 g VO dosis única</span></label><label class="cx med"><input type="checkbox" name="plan" value="Doxiciclina 100 mg VO c/12 h x7 días"><span>💊 Doxiciclina 100 mg VO c/12 h × 7 días</span></label><label class="cx med"><input type="checkbox" name="plan" value="Estriol crema vaginal"><span>💊 Estriol crema vaginal</span></label></div>
+        <div class="cxSub">Indicaciones</div><div class="cxChips"><label class="cx "><input type="checkbox" name="plan" value="Aseo vulvoperineal"><span>🚿 Aseo vulvoperineal</span></label><label class="cx "><input type="checkbox" name="plan" value="Orientación sexual"><span>💬 Orientación sexual</span></label><label class="cx "><input type="checkbox" name="plan" value="Uso de preservativo"><span>Uso de preservativo</span></label><label class="cx "><input type="checkbox" name="plan" value="Tratar a la pareja"><span>👫 Tratar a la pareja</span></label><label class="cx "><input type="checkbox" name="plan" value="Abstinencia sexual 4 semanas"><span>Abstinencia sexual 4 semanas</span></label></div>
+        <div class="cxRes" id="colpTratRes"></div>
       </div>
-      <div class="field"><label>Derivación</label>
-        <select name="derivacion"><option value="">— Ninguna —</option><option>Esperar resultado de PAP/VPH</option><option>Oncología</option><option>Ginecología</option><option>Control en 6 meses</option><option>Control en 1 año</option></select>
+      <div class="field"><label>Derivación / conducta</label>
+        <div class="cxChips" data-radio="1"><label class="cx "><input type="radio" name="derivacion" value="Esperar resultado de PAP/VPH"><span>Esperar resultado de PAP/VPH</span></label><label class="cx "><input type="radio" name="derivacion" value="Control en 6 meses"><span>Control en 6 meses</span></label><label class="cx neg"><input type="radio" name="derivacion" value="Control en 1 año"><span>Control en 1 año</span></label><label class="cx med"><input type="radio" name="derivacion" value="Ginecología"><span>Ginecología</span></label><label class="cx alto"><input type="radio" name="derivacion" value="Oncología"><span>Oncología</span></label></div>
       </div>
       <div class="actions">
         <button type="button" class="cancelBtn" onclick="closeColposcopia()">Cancelar</button>
@@ -7376,8 +7361,10 @@ function cuelloVacio(m) { return !m.zt && !m.impresion && !Object.values(m.marca
 
 function fillColpForm(form, colp) {
   form.fecha.value = colp.fecha || '';
-  form.prueba_schiller.value = colp.prueba_schiller || '';
-  form.zona_afectada.value = colp.zona_afectada || '';
+  const marcar = (n, v) => { // un valor viejo que ya no está entre los chips se agrega para no perderlo
+    const L = [...form.querySelectorAll(`input[name="${n}"]`)]; if (v && L.length && !L.some(i => i.value === v)) { const l = document.createElement('label'); l.className = 'cx'; l.innerHTML = `<input type="radio" name="${n}" value="${esc(v)}"><span>${esc(v)}</span>`; L[0].closest('.cxChips').appendChild(l); }
+    form.querySelectorAll(`input[name="${n}"]`).forEach(i => { i.checked = !!v && i.value === v; }); };
+  marcar('prueba_schiller', colp.prueba_schiller); marcar('zona_afectada', colp.zona_afectada);
   form.otros_hallazgos.value = colp.otros_hallazgos || '';
   form.soap_subjetivo.value = colp.soap_subjetivo || '';
   form.soap_objetivo_oce.value = colp.soap_objetivo_oce || '';
@@ -7385,8 +7372,7 @@ function fillColpForm(form, colp) {
   form.soap_objetivo_color.value = colp.soap_objetivo_color || '';
   form.soap_analisis.value = colp.soap_analisis || '';
   form.soap_observaciones.value = colp.soap_observaciones || '';
-  form.derivacion.value = colp.derivacion || '';
-  form.ivaa.value = colp.ivaa || ''; form.union_ec.value = colp.union_ec || '';
+  marcar('derivacion', colp.derivacion); marcar('ivaa', colp.ivaa); marcar('union_ec', colp.union_ec);
   const lesionSet = new Set(colp.lesion || []);
   form.querySelectorAll('input[name="lesion"]').forEach(cb => { cb.checked = lesionSet.has(cb.value); });
   const planSet = new Set(colp.plan || []);
@@ -7400,6 +7386,36 @@ function colpIvaaOk() {
   if (!colpIvaaPromise) colpIvaaPromise = sb.from('colposcopias').select('ivaa,union_ec,campana_id').limit(1).then(({ error }) => !error, () => false);
   return colpIvaaPromise;
 }
+// Tratamientos sugeridos según lo marcado (brillan; la doctora decide)
+function colpSugerir() {
+  const f = document.getElementById('colpForm'); if (!f) return;
+  const fd = new FormData(f), les = fd.getAll('lesion'), ivaa = fd.get('ivaa'), sch = fd.get('prueba_schiller'), imp = cuelloMapa && cuelloMapa.impresion || '', zt = cuelloMapa && cuelloMapa.zt || '';
+  const sug = new Set();
+  const lesionAlta = ivaa === 'Positivo' || /mayores|invasi/i.test(imp) || les.some(x => ['HSIL', 'ASC-H', 'AGC'].includes(x));
+  if (lesionAlta && zt !== 'Tipo 3') { sug.add('Crioterapia'); sug.add('Termocoagulación'); }
+  if (lesionAlta || sch === 'Positiva' || /menores/i.test(imp)) sug.add('Biopsia');
+  if (zt === 'Tipo 3' && lesionAlta) { sug.add('Legrado endocervical'); sug.add('LEEP / asa diatérmica'); }
+  if (ivaa === 'Sospecha de cáncer' || /invasi/i.test(imp)) { sug.delete('Crioterapia'); sug.delete('Termocoagulación'); sug.add('Oncología'); }
+  if (les.includes('Micosis')) { sug.add('Clotrimazol 500mg VV x10 noches'); sug.add('Fluconazol 150 mg VO dosis única'); }
+  if (les.some(x => ['Trichomona', 'Gardnerella', 'Vaginosis'].includes(x))) { sug.add('Metronidazol 500mg VV x10 noches'); sug.add('Metronidazol 500 mg VO c/12 h x7 días'); if (les.includes('Trichomona')) sug.add('Tratar a la pareja'); }
+  if (les.some(x => ['Cervicitis', 'Cervicovaginitis'].includes(x))) { sug.add('Azitromicina 1 g VO dosis única'); sug.add('Doxiciclina 100 mg VO c/12 h x7 días'); }
+  if (les.some(x => ['Vaginitis', 'Colpitis', 'Cervicovaginitis'].includes(x))) sug.add('Aseo vulvoperineal');
+  if (fd.getAll('plan').some(x => ['Crioterapia', 'Termocoagulación', 'Cauterización', 'LEEP / asa diatérmica'].includes(x))) sug.add('Abstinencia sexual 4 semanas');
+  f.querySelectorAll('.cx input[name="plan"], .cx input[name="derivacion"]').forEach(i => i.closest('.cx').classList.toggle('sug', sug.has(i.value)));
+  const plan = fd.getAll('plan'), res = document.getElementById('colpTratRes');
+  if (res) res.innerHTML = plan.length ? `<b>${plan.length === 1 ? '1 indicación' : plan.length + ' indicaciones'}:</b> ` + plan.map(esc).join(' · ') : '';
+}
+(function () {
+  const f = document.getElementById('colpForm'); if (!f) return;
+  let estaba = false;
+  f.addEventListener('pointerdown', e => { const i = e.target.closest('.cx') && e.target.closest('.cx').querySelector('input[type=radio]'); estaba = !!(i && i.checked); });
+  f.addEventListener('click', e => {
+    const l = e.target.closest('.cx'); if (!l || e.target.tagName === 'INPUT') return;
+    const i = l.querySelector('input'); if (i.type === 'radio' && estaba) { e.preventDefault(); i.checked = false; estaba = false; colpSugerir(); }
+  });
+  f.addEventListener('change', e => { if (e.target.closest('.cx')) { sonido('click'); colpSugerir(); } });
+  const blk = document.getElementById('cuelloBlock'); if (blk) blk.addEventListener('click', () => setTimeout(colpSugerir, 0));
+})();
 async function openColposcopia(p, campana) {
   ajustarColposcopiaSoap();
   colpCampana = campana || null;
@@ -7412,7 +7428,7 @@ async function openColposcopia(p, campana) {
     if (hoy) fillColpForm(form, hoy); else form.fecha.value = campana.fecha || hoyISO();
     await cuelloPreparar(hoy);
     document.getElementById('colpPatientName').textContent = (p.nombre || '') + ' · 📣 ' + (campana.nombre || 'Campaña');
-    document.getElementById('colpOverlay').classList.add('open'); return;
+    colpSugerir(); document.getElementById('colpOverlay').classList.add('open'); return;
   }
   if (existing) {
     const quiereModificar = confirm(
@@ -7430,7 +7446,7 @@ async function openColposcopia(p, campana) {
   }
   await cuelloPreparar(colpEditingId ? existing : null);
   document.getElementById('colpPatientName').textContent = p.nombre || '';
-  document.getElementById('colpOverlay').classList.add('open');
+  colpSugerir(); document.getElementById('colpOverlay').classList.add('open');
 }
 function closeColposcopia() {
   colpPatient = null; colpCampana = null;
@@ -8228,7 +8244,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.16.0 · 28/09/2026';
+const SIVEC_VERSION = '1.17.0 · 28/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -8767,7 +8783,8 @@ function sonidoNota(ctx, t, frec, dur, { tipo = 'sine', vol = 0.12, hasta = null
 const SONIDOS = {
   ok: (c, t) => { sonidoNota(c, t, 880, 0.12, { vol: 0.07 }); sonidoNota(c, t + 0.07, 1318.5, 0.18, { vol: 0.06 }); },
   firma: (c, t) => { [659.25, 783.99, 1046.5].forEach((f, i) => { sonidoNota(c, t + i * 0.09, f, 0.5 - i * 0.08, { tipo: 'triangle', vol: 0.11 }); sonidoNota(c, t + i * 0.09, f * 2, 0.25, { vol: 0.025 }); }); },
-  error: (c, t) => { sonidoNota(c, t, 311.13, 0.16, { tipo: 'triangle', vol: 0.1 }); sonidoNota(c, t + 0.14, 246.94, 0.28, { tipo: 'triangle', vol: 0.1 }); },
+  // Error: dos notas que bajan, en un tono que se oye bien en parlantes de computadora y celular
+  error: (c, t) => { [[587.33, 0, 0.15], [415.3, 0.17, 0.3]].forEach(([f, d, dur]) => { sonidoNota(c, t + d, f, dur, { vol: 0.16 }); sonidoNota(c, t + d, f, dur * 0.8, { tipo: 'square', vol: 0.035 }); sonidoNota(c, t + d, f * 2, dur * 0.6, { vol: 0.03 }); }); },
   alerta: (c, t) => { [[880, 0], [659.25, 0.16], [880, 0.32]].forEach(([f, d]) => { sonidoNota(c, t + d, f, 0.22, { tipo: 'triangle', vol: 0.14 }); sonidoNota(c, t + d, f * 1.5, 0.14, { vol: 0.03 }); }); },
   mensaje: (c, t) => { sonidoNota(c, t, 783.99, 0.14, { vol: 0.1 }); sonidoNota(c, t + 0.1, 1174.66, 0.28, { tipo: 'triangle', vol: 0.09 }); },
   click: (c, t) => { sonidoNota(c, t, 1600, 0.04, { tipo: 'square', vol: 0.03, ataque: 0.002 }); },
@@ -8784,8 +8801,17 @@ function sonido(nombre) {
   const modo = sonidoModo();
   if (modo === 'no' || (modo === 'alertas' && !SONIDO_IMPORTANTES.includes(nombre)) || !SONIDOS[nombre]) return;
   if (typeof pnReduce === 'function' && nombre === 'entrada' && pnReduce()) return;
-  try { const c = sonidoCtxListo(); if (!c || c.state !== 'running') return; SONIDOS[nombre](c, c.currentTime + 0.01); } catch (_) {}
+  try {
+    const c = sonidoCtxListo(); if (!c) return;
+    if (c.state === 'running') SONIDOS[nombre](c, c.currentTime + 0.01);
+    else c.resume().then(() => { if (c.state === 'running') SONIDOS[nombre](c, c.currentTime + 0.01); }).catch(() => {}); // recién despertado
+  } catch (_) {}
 }
+// Los avisos con alert() (datos que faltan, errores) también suenan
+(function () {
+  const orig = window.alert.bind(window);
+  window.alert = m => { if (!/^(Guardado|Carpeta guardada|Clave guardada|Datos del sistema)/.test(String(m || ''))) { try { sonido('error'); } catch (_) {} } return orig(m); };
+})();
 // Avisos de cosas nuevas (resultados, contrarreferencias): suena solo cuando aumentan
 const sonidoVistos = {};
 function sonidoSiAumenta(clave, n, nombre) { const antes = sonidoVistos[clave]; sonidoVistos[clave] = n; if (antes !== undefined ? n > antes : n > 0) sonido(nombre); return antes !== undefined && n > antes; }
@@ -8797,7 +8823,7 @@ function sonidoSiAumenta(clave, n, nombre) { const antes = sonidoVistos[clave]; 
   d.innerHTML = `<div class="scHead"><b>Sonidos</b><small>Solo en esta computadora. Suena en lo importante: firmas, resultados, contrarreferencias, soporte y errores. "Solo alertas": sin el sonido de firma.</small></div>
     <div class="scModos">${modos.map(([k, t]) => `<button type="button" data-sm="${k}">${t}</button>`).join('')}</div>
     <div class="scVoz"><span>🗣 Saludo con voz al entrar</span><div><button type="button" data-voz="fem">👩 Femenina</button><button type="button" data-voz="masc">👨 Masculina</button><button type="button" data-voz="no">Sin voz</button><button type="button" data-voz="oir">▶ Escuchar</button></div></div>
-    <div class="scVoz"><span>🔔 Avisos por voz durante el día<small style="display:block;font-weight:400;color:var(--ink-soft);font-size:11.5px">Resultado alterado, contrarreferencia, paciente en espera, firma, metas y resumen del día. Nunca dice nombres.</small></span><div><button type="button" data-av="si">Sí</button><button type="button" data-av="no">No</button><button type="button" data-av="oir">▶ Probar</button></div></div>
+    <div class="scVoz"><span>🔔 Avisos por voz durante el día<small style="display:block;font-weight:400;color:var(--ink-soft);font-size:11.5px">Resultado alterado, contrarreferencia, paciente en espera, firma, metas y resumen del día. Solo dice el nombre de la paciente al confirmar la colposcopía.</small></span><div><button type="button" data-av="si">Sí</button><button type="button" data-av="no">No</button><button type="button" data-av="oir">▶ Probar</button></div></div>
     <div class="scPrueba"><span>Probar:</span>${[['firma', '✍ Firma'], ['alerta', '⚠ Resultado alterado'], ['mensaje', '💬 Mensaje'], ['error', '✖ Error'], ['ok', '✓ Guardado']].map(([k, t]) => `<button type="button" data-sp2="${k}">${t}</button>`).join('')}</div>`;
   const ancla = document.getElementById('firmaConfig') || (panel.querySelector('h2') || {}).nextElementSibling || panel.firstChild; ancla.after(d);
   const marcar = () => { d.querySelectorAll('[data-sm]').forEach(b => b.classList.toggle('on', b.dataset.sm === sonidoModo())); d.querySelectorAll('[data-voz]:not([data-voz="oir"])').forEach(b => b.classList.toggle('on', b.dataset.voz === vozModo())); let av = 'si'; try { av = localStorage.getItem('sivec_voz_avisos') || 'si'; } catch (_) {} d.querySelectorAll('[data-av]:not([data-av="oir"])').forEach(b => b.classList.toggle('on', b.dataset.av === av)); };
@@ -9436,7 +9462,7 @@ document.addEventListener('change', e => { if (e.target.name === 'fecha_toma' &&
 // El PAP y el VPH van en lote al Oncológico desde el establecimiento que organiza; al cerrar, cada mujer pasa a la ficha de su centro.
 const CAMP_SERV = { pap: '🧪 PAP', vph: '🧬 VPH', colposcopia: '🩺 Colposcopia (IVAA/Schiller)' };
 const CAMP_EST = { registro: '📋 Recepción', consultorio: '🩺 Consultorio', tablero: '📊 Tablero' };
-const CAMP_TRAT = ['Crioterapia', 'Cauterización', 'Biopsia', 'Metronidazol 500mg VV x10 noches', 'Clotrimazol 500mg VV x10 noches', 'Aseo vulvoperineal', 'Orientación sexual'];
+const CAMP_TRAT = ['Crioterapia', 'Termocoagulación', 'Cauterización', 'LEEP / asa diatérmica', 'Biopsia', 'Legrado endocervical', 'Polipectomía', 'Metronidazol 500mg VV x10 noches', 'Metronidazol 500 mg VO c/12 h x7 días', 'Clotrimazol 500mg VV x10 noches', 'Fluconazol 150 mg VO dosis única', 'Nistatina óvulos VV x14 noches', 'Azitromicina 1 g VO dosis única', 'Doxiciclina 100 mg VO c/12 h x7 días', 'Estriol crema vaginal'];
 let campLista = [], campActual = null, campTurnos = [], campPacs = [], campColpos = [], campTimer = null, campAtender = null, campUltimo = null, campOkTabla = true, campEditar = null, campBuscar = '';
 function campIdGuardado() { try { return localStorage.getItem('sivec_campana_id') || ''; } catch (_) { return ''; } }
 function campEstacion() { let e = ''; try { e = localStorage.getItem('sivec_campana_est') || ''; } catch (_) {} return CAMP_EST[e] ? e : ((tieneFuncion('toma') || tieneFuncion('colposcopia')) && !tieneFuncion('recepcion') ? 'consultorio' : 'registro'); }
