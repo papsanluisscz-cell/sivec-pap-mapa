@@ -1327,6 +1327,8 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
 #campanaView .campHecho { display: flex; flex-direction: column; gap: 6px; background: #ecfdf3; border: 1px solid #86efac; border-radius: 12px; padding: 12px; } #campanaView .campHecho span { font-size: 13px; color: var(--ink-soft); }
 #campanaView .campNota { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-soft); line-height: 1.45; }
 #campanaView .campColpo { border: 2px solid var(--teal-700); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px; background: var(--surface); }
+#campanaView .campSec { margin: 4px 0 0; font-size: 12px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--teal-700); display: flex; align-items: center; }
+#campanaView .campColpoCampos { display: flex; flex-direction: column; gap: 10px; } #campanaView .campColpoCampos[hidden] { display: none; }
 #campanaView .campG { display: grid; grid-template-columns: 90px 1fr; gap: 8px; align-items: center; } #campanaView .campG b { font-size: 13px; }
 #campanaView .hoyChips button.neg.on { background: #16a34a; border-color: #16a34a; } #campanaView .hoyChips button.pos.on { background: #dc2626; border-color: #dc2626; }
 #campanaView .campKpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; } #campanaView .campKpis div { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 10px; } #campanaView .campKpis b { display: block; font-size: 26px; color: var(--teal-700); } #campanaView .campKpis small { color: var(--ink-soft); } #campanaView .campKpis .alta b { color: #dc2626; }
@@ -8140,7 +8142,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.14.0 · 28/09/2026';
+const SIVEC_VERSION = '1.14.1 · 28/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -9342,13 +9344,15 @@ function folioPintar() {
 document.addEventListener('click', e => { const b = e.target.closest('#folioModo [data-fm]'); if (!b) return; try { localStorage.setItem('sivec_folio_modo', b.dataset.fm); } catch (_) {} folioPintar(); });
 document.addEventListener('change', e => { if (e.target.name === 'fecha_toma' && e.target.form && e.target.form.id === 'patientForm') folioPintar(); });
 
-// ===== Modo Campaña (Paso 35): un día, un lugar. Registro → toma de PAP/VPH → colposcopia (IVAA/Schiller) en el momento =====
+// ===== Modo Campaña (Paso 35): un día, un lugar. Dos módulos: 📋 Recepción (todos los datos) y 🩺 Consultorio (la doctora hace la toma de PAP/VPH, la colposcopia con IVAA/Schiller y el tratamiento en el momento) =====
 // El PAP y el VPH van en lote al Oncológico desde el establecimiento que organiza; al cerrar, cada mujer pasa a la ficha de su centro.
 const CAMP_SERV = { pap: '🧪 PAP', vph: '🧬 VPH', colposcopia: '🩺 Colposcopia (IVAA/Schiller)' };
-const CAMP_EST = { registro: '📋 Registro', toma: '🧪 Toma', colposcopia: '🩺 Colposcopia', tablero: '📊 Tablero' };
+const CAMP_EST = { registro: '📋 Recepción', consultorio: '🩺 Consultorio', tablero: '📊 Tablero' };
+const CAMP_TRAT = ['Crioterapia', 'Cauterización', 'Biopsia', 'Metronidazol 500mg VV x10 noches', 'Clotrimazol 500mg VV x10 noches', 'Aseo vulvoperineal', 'Orientación sexual'];
+const CAMP_CONDUCTA = ['Esperar resultado de PAP/VPH', 'Referir a colposcopia completa', 'Control en 6 meses', 'Control en 1 año'];
 let campLista = [], campActual = null, campTurnos = [], campPacs = [], campColpos = [], campTimer = null, campAtender = null, campUltimo = null, campOkTabla = true;
 function campIdGuardado() { try { return localStorage.getItem('sivec_campana_id') || ''; } catch (_) { return ''; } }
-function campEstacion() { let e = ''; try { e = localStorage.getItem('sivec_campana_est') || ''; } catch (_) {} return CAMP_EST[e] ? e : (tieneFuncion('colposcopia') && !tieneFuncion('toma') ? 'colposcopia' : tieneFuncion('toma') && !tieneFuncion('recepcion') ? 'toma' : 'registro'); }
+function campEstacion() { let e = ''; try { e = localStorage.getItem('sivec_campana_est') || ''; } catch (_) {} return CAMP_EST[e] ? e : ((tieneFuncion('toma') || tieneFuncion('colposcopia')) && !tieneFuncion('recepcion') ? 'consultorio' : 'registro'); }
 function campGuardar(k, v) { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch (_) {} }
 function campFaltaPaso(err) { return /sivec_campanas|campana_id|centro_seguimiento|schema cache|PGRST20|42P01|42703/i.test((err && (err.message + ' ' + err.code)) || ''); }
 async function campCargar(silencio) {
@@ -9365,21 +9369,21 @@ async function campCargarDatos(silencio) {
   const [t, p, c] = await Promise.all([
     sb.from('sivec_turnos').select('*').eq('campana_id', id).order('numero', { ascending: true }),
     pacQ().eq('campana_id', id).is('deleted_at', null),
-    sb.from('colposcopias').select('id,paciente_id,ivaa,prueba_schiller,plan,campana_id').eq('campana_id', id)]);
+    sb.from('colposcopias').select('id,paciente_id,ivaa,prueba_schiller,plan,derivacion,campana_id').eq('campana_id', id)]);
   const antes = campMiCola().filter(x => x.estado === 'espera').length;
   campTurnos = t.data || []; campPacs = p.data || []; campColpos = c.data || [];
   const ahora = campMiCola().filter(x => x.estado === 'espera').length;
-  if (silencio && ahora > antes && ['toma', 'colposcopia'].includes(campEstacion())) { sonido('mensaje'); vozAviso(ahora - antes === 1 ? 'Tiene una paciente nueva en espera.' : `Tiene ${ahora - antes} pacientes nuevas en espera.`, 'campcola'); }
+  if (silencio && ahora > antes && campEstacion() === 'consultorio') { sonido('mensaje'); vozAviso(ahora - antes === 1 ? 'Tiene una paciente nueva en espera.' : `Tiene ${ahora - antes} pacientes nuevas en espera.`, 'campcola'); }
 }
-function campMiCola() { const e = campEstacion(); return campTurnos.filter(t => t.servicio === (e === 'colposcopia' ? 'colposcopia' : 'toma')); }
+function campMiCola() { return campTurnos; }
 function campPintar() {
   const v = document.getElementById('campanaView'); if (!v) return;
   const c = campActual, cuerpo = v.querySelector('#campCuerpo');
   if (!c) { cuerpo.innerHTML = campListaHTML(); return; }
   const est = campEstacion(), cerrada = c.estado === 'cerrada';
   cuerpo.innerHTML = `<div class="campHead"><div><small>📣 Modo Campaña${cerrada ? ' · cerrada' : ''}</small><h2>${esc(c.nombre)}</h2><p>${fmtFecha(c.fecha)}${c.lugar ? ' · ' + esc(c.lugar) : ''}${c.meta ? ' · meta ' + c.meta + ' mujeres' : ''} · ${plural(campPacs.length, 'mujer registrada', 'mujeres registradas')}</p></div><button type="button" class="hoyBtn sec" data-c="salir">Cambiar de campaña</button></div>
-    <div class="campTabs">${Object.entries(CAMP_EST).map(([k, t]) => `<button type="button" data-est="${k}" class="${k === est ? 'on' : ''}">${t}${k === 'toma' || k === 'colposcopia' ? ` <b>${campTurnos.filter(x => x.servicio === k && x.estado === 'espera').length || ''}</b>` : ''}</button>`).join('')}</div>
-    <div class="campCuerpo">${cerrada && est !== 'tablero' ? '<div class="hoyCard"><div class="hoyVacio">Esta campaña está cerrada: cada mujer ya está en la ficha de su centro de salud. Mirá el <b>📊 Tablero</b> para el informe.</div></div>' : est === 'registro' ? campRegistroHTML() : est === 'tablero' ? campTableroHTML() : campColaHTML(est)}</div>`;
+    <div class="campTabs">${Object.entries(CAMP_EST).map(([k, t]) => `<button type="button" data-est="${k}" class="${k === est ? 'on' : ''}">${t}${k === 'consultorio' ? ` <b>${campTurnos.filter(x => x.estado === 'espera').length || ''}</b>` : ''}</button>`).join('')}</div>
+    <div class="campCuerpo">${cerrada && est !== 'tablero' ? '<div class="hoyCard"><div class="hoyVacio">Esta campaña está cerrada: cada mujer ya está en la ficha de su centro de salud. Mirá el <b>📊 Tablero</b> para el informe.</div></div>' : est === 'registro' ? campRegistroHTML() : est === 'tablero' ? campTableroHTML() : campColaHTML()}</div>`;
   if (est === 'registro' && !cerrada) campRegistroEventos();
 }
 function campListaHTML() {
@@ -9407,6 +9411,7 @@ function campRegistroHTML() {
     <section class="hoyCard"><h3>🗂 Últimas registradas <span class="hoyN">${campPacs.length}</span></h3>${ult.length ? ult.map(p => { const t = campTurnos.find(x => String(x.paciente_id) === String(p.id)); return `<div class="hoyFila"><span class="hoyNum">${t ? t.numero : '·'}</span><div><b>${esc(p.nombre)}</b><small>${esc(campServTexto(p))} · ${esc(centroNombre(p.centro_seguimiento || p.centro_id))}</small></div></div>`; }).join('') : '<div class="hoyVacio">Todavía nadie.</div>'}</section>`;
 }
 function campServTexto(p) { return [p.tipo_examen === 'Papanicolau' ? 'PAP' : p.tipo_examen === 'VPH' ? 'VPH' : '', p.tipo_examen === 'Papanicolau' && p.hizo_prueba_vph ? 'VPH' : '', campTurnos.some(t => String(t.paciente_id) === String(p.id) && (t.servicio === 'colposcopia' || /colpo/.test(t.notas || ''))) || p.tipo_examen === 'Colposcopia' ? 'colposcopia' : ''].filter(Boolean).join(' · '); }
+function campHizo(p) { const c = campColpos.find(x => String(x.paciente_id) === String(p.id)); return c ? [c.ivaa ? 'IVAA ' + c.ivaa.toLowerCase() : '', ...(c.plan || []).filter(x => CAMP_TRAT.includes(x))].filter(Boolean).join(' · ') : ''; }
 function campRegistroEventos() {
   const ci = document.getElementById('rCarnet'); if (!ci) return;
   ci.onchange = ci.onblur = () => {
@@ -9435,7 +9440,7 @@ async function campRegistrar() {
   const { data: ins, error } = await sb.from('pacientes').insert([row]).select();
   if (error) { b.disabled = false; return showToast(campFaltaPaso(error) ? 'Falta el Paso 35 del SQL.' : 'No se pudo registrar: ' + esc(error.message), 'err'); }
   const nueva = ins && ins[0];
-  const turno = { centro_id: perfil.centro_id, campana_id: c.id, paciente_id: nueva.id, paciente_nombre: nombre, carnet: row.carnet, servicio: pap || vph ? 'toma' : 'colposcopia', notas: colpo && (pap || vph) ? 'colpo' : null };
+  const turno = { centro_id: perfil.centro_id, campana_id: c.id, paciente_id: nueva.id, paciente_nombre: nombre, carnet: row.carnet, servicio: 'toma', notas: serv.join(',') };
   const { data: tr, error: e2 } = await sb.from('sivec_turnos').insert([turno]).select();
   b.disabled = false;
   if (e2) showToast('Registrada, pero no entró a la cola: ' + esc(e2.message), 'err');
@@ -9443,64 +9448,91 @@ async function campRegistrar() {
   allPatientsData.push(nueva); campPacs.push(nueva); if (tr && tr[0]) campTurnos.push(tr[0]);
   const num = tr && tr[0] ? tr[0].numero : '';
   campPintar();
-  document.getElementById('rOk').innerHTML = `<div class="campHecho"><b>✔ ${esc(nombre)} · turno Nº ${num}</b><span>Va a ${turno.servicio === 'toma' ? 'la estación de toma' : 'la colposcopia'}${row.numero_folio_pap ? ' · ' + esc(row.numero_folio_pap) : ''}</span><button type="button" class="hoyBtn sec" data-firma="${esc(nueva.id)}">✍ Firma de la paciente</button></div>`;
+  document.getElementById('rOk').innerHTML = `<div class="campHecho"><b>✔ ${esc(nombre)} · turno Nº ${num}</b><span>Va al consultorio: ${esc(serv.map(k => ({ pap: 'PAP', vph: 'VPH', colposcopia: 'colposcopia' })[k]).join(' · '))}${row.numero_folio_pap ? ' · ' + esc(row.numero_folio_pap) : ''}</span><button type="button" class="hoyBtn sec" data-firma="${esc(nueva.id)}">✍ Firma de la paciente</button></div>`;
   document.getElementById('rCarnet').focus();
 }
-function campColaHTML(est) {
+function campColaHTML() {
   const cola = campMiCola(), activos = cola.filter(t => ['espera', 'llamada', 'en_atencion'].includes(t.estado)), hechos = cola.filter(t => !activos.includes(t));
   const fila = t => { const p = campPacs.find(x => String(x.id) === String(t.paciente_id)) || {}; const min = Math.max(0, Math.round((Date.now() - new Date(t.llegada)) / 60000));
-    const acc = ['espera', 'llamada'].includes(t.estado) ? `${t.estado === 'espera' ? `<button type="button" class="hoyBtn sec" data-ct="llamar" data-id="${t.id}">📣 Llamar</button>` : ''}<button type="button" class="hoyBtn" data-ct="${est === 'toma' ? 'tomada' : 'atender'}" data-id="${t.id}">${est === 'toma' ? '✔ Tomada' : 'Atender'}</button>` : t.estado === 'en_atencion' && est === 'colposcopia' ? `<button type="button" class="hoyBtn" data-ct="atender" data-id="${t.id}">Seguir</button>` : '';
-    const edad = edadTexto(p.fecha_nacimiento, campActual.fecha);
-    return `<div class="hoyFila est-${t.estado}"><span class="hoyNum">${t.numero || '·'}</span><div><b>${esc(t.paciente_nombre || '')}</b><small>${[edad, campServTexto(p), p.numero_folio_pap, TURNO_ESTADOS[t.estado] + (['espera', 'llamada'].includes(t.estado) ? ' · espera ' + min + ' min' : '')].filter(Boolean).map(esc).join(' · ')}</small></div><div class="hoyAcc">${acc}</div></div>${campAtender === t.id ? campColpoForm(t) : ''}`; };
-  return `<section class="hoyCard campCola"><h3>${est === 'toma' ? '🧪 En espera para la toma' : '🩺 Para colposcopia'} <span class="hoyN">${activos.length}</span></h3>
-    ${activos.length ? activos.map(fila).join('') : '<div class="hoyVacio">No hay mujeres esperando. Llegan solas desde el registro.</div>'}
+    const acc = ['espera', 'llamada'].includes(t.estado) ? `${t.estado === 'espera' ? `<button type="button" class="hoyBtn sec" data-ct="llamar" data-id="${t.id}">📣 Llamar</button>` : ''}<button type="button" class="hoyBtn" data-ct="atender" data-id="${t.id}">Atender</button>` : t.estado === 'en_atencion' ? `<button type="button" class="hoyBtn" data-ct="atender" data-id="${t.id}">Seguir</button>` : '';
+    const edad = edadTexto(p.fecha_nacimiento, campActual.fecha), hizo = t.estado === 'atendida' ? campHizo(p) : '';
+    return `<div class="hoyFila est-${t.estado}"><span class="hoyNum">${t.numero || '·'}</span><div><b>${esc(t.paciente_nombre || '')}</b><small>${[edad, campServTexto(p) || (t.notas || '').replace(/,/g, ' · '), p.numero_folio_pap, hizo, TURNO_ESTADOS[t.estado] + (['espera', 'llamada'].includes(t.estado) ? ' · espera ' + min + ' min' : '')].filter(Boolean).map(esc).join(' · ')}</small></div><div class="hoyAcc">${acc}</div></div>${campAtender === t.id ? campConsultaForm(t, p) : ''}`; };
+  return `<section class="hoyCard campCola"><h3>🩺 Consultorio · mujeres en espera <span class="hoyN">${activos.length}</span></h3>
+    ${activos.length ? activos.map(fila).join('') : '<div class="hoyVacio">No hay mujeres esperando. Llegan solas desde la recepción.</div>'}
     ${hechos.length ? `<details class="hoyHechos"><summary>Atendidas (${hechos.length})</summary>${hechos.map(fila).join('')}</details>` : ''}
-    ${est === 'toma' ? '<p class="campNota">La muestra se toma en el momento. Las láminas de PAP y el VPH van después <b>en lote al Instituto Oncológico</b> (Balance → armar el lote).</p>' : '<p class="campNota">La colposcopia con IVAA y Schiller se registra <b>en el momento</b> y se firma con el PIN.</p>'}</section>`;
+    <p class="campNota">En el consultorio la doctora hace todo en una sola atención: <b>la toma de PAP/VPH</b>, <b>la colposcopia con IVAA y Schiller</b> y <b>el tratamiento en el momento</b> (crioterapia, cauterización y lo demás). El PAP y el VPH van después en lote al Instituto Oncológico.</p></section>`;
 }
-function campColpoForm(t) {
-  const ch = (k, ops) => `<div class="hoyChips" data-cg="${k}">${ops.map(([v, txt, cls]) => `<button type="button" data-cv="${esc(v)}" class="${cls || ''}">${txt}</button>`).join('')}</div>`;
+function campConsultaForm(t, p) {
+  const quiere = String(t.notas || ''), tienePap = p.tipo_examen === 'Papanicolau' || /pap/.test(quiere), tieneVph = p.tipo_examen === 'VPH' || p.hizo_prueba_vph || /vph/.test(quiere), colpo = /colpo/.test(quiere) || p.tipo_examen === 'Colposcopia';
+  const ch = (k, ops, multi) => `<div class="hoyChips" data-cg="${k}"${multi ? ' data-multi="1"' : ''}>${ops.map(([v, txt, cls]) => `<button type="button" data-cv="${esc(v)}" class="${cls || ''}">${txt}</button>`).join('')}</div>`;
   return `<div class="campColpo" data-turno="${t.id}">
+    <p class="campSec">1 · Toma de la muestra</p>
+    <div class="campG"><b>Muestra</b><div class="hoyChips" data-cg="toma" data-multi="1"><button type="button" data-cv="pap" class="${tienePap ? 'on' : ''}">🧪 PAP (lámina)</button><button type="button" data-cv="vph" class="${tieneVph ? 'on' : ''}">🧬 VPH</button></div></div>
+    <p class="campSec">2 · Colposcopia <label class="campCheck" style="display:inline-flex;margin-left:8px"><input type="checkbox" id="cHizoColpo"${colpo ? ' checked' : ''}> se hizo</label></p>
+    <div class="campColpoCampos"${colpo ? '' : ' hidden'}>
     <div class="campG"><b>IVAA</b>${ch('ivaa', [['Negativo', 'Negativo', 'neg'], ['Positivo', 'Positivo', 'pos'], ['Sospecha de cáncer', 'Sospecha de cáncer', 'pos']])}</div>
     <div class="campG"><b>Schiller</b>${ch('schiller', [['Negativa', 'Yodo positivo (normal)', 'neg'], ['Positiva', 'Zona yodo negativa', 'pos']])}</div>
-    <div class="campG"><b>Unión E-C</b>${ch('union', [['Visible', 'Visible'], ['No visible', 'No visible']])}</div>
-    <div class="campG"><b>Conducta</b>${ch('conducta', [['Esperar resultado de PAP/VPH', 'Esperar PAP/VPH'], ['Referir a colposcopia completa', 'Referir a colposcopia completa'], ['Biopsia', 'Biopsia'], ['Crioterapia', 'Crioterapia']])}</div>
+    <div class="campG"><b>Unión E-C</b>${ch('union', [['Visible', 'Visible'], ['No visible', 'No visible']])}</div></div>
+    <p class="campSec">3 · Tratamiento en el momento</p>
+    <div class="campG"><b>Tratamiento</b>${ch('trat', CAMP_TRAT.map(x => [x, x]), true)}</div>
+    <div class="campG"><b>Conducta</b>${ch('conducta', CAMP_CONDUCTA.map(x => [x, x]))}</div>
     <input id="cObs" placeholder="Observaciones (opcional)">
-    <div class="hoyAcc"><button type="button" class="hoyBtn sec" data-c="cancelarColpo">Cancelar</button><button type="button" class="hoyBtn" data-c="guardarColpo" data-id="${t.id}">✍ Guardar y firmar con PIN</button></div></div>`;
+    <div class="hoyAcc"><button type="button" class="hoyBtn sec" data-c="cancelarColpo">Cancelar</button><button type="button" class="hoyBtn" data-c="guardarColpo" data-id="${t.id}">✍ Guardar la atención</button></div></div>`;
 }
-async function campGuardarColpo(tid) {
+async function campGuardarConsulta(tid) {
   const box = document.querySelector(`.campColpo[data-turno="${tid}"]`), t = campTurnos.find(x => String(x.id) === String(tid)); if (!box || !t) return;
-  const val = k => { const b = box.querySelector(`[data-cg="${k}"] .on`); return b ? b.dataset.cv : null; };
-  const ivaa = val('ivaa'), schiller = val('schiller'), union = val('union'), conducta = val('conducta');
-  if (!ivaa) return showToast('Marcá el resultado del IVAA.', 'err');
-  const data = { paciente_id: t.paciente_id, fecha: campActual.fecha, ivaa, prueba_schiller: schiller, union_ec: union, plan: conducta ? [conducta] : [], otros_hallazgos: box.querySelector('#cObs').value.trim() || null, soap_analisis: 'IVAA ' + ivaa + (schiller ? ' · Schiller ' + schiller.toLowerCase() : '') + ' · campaña ' + campActual.nombre, campana_id: campActual.id };
-  const pin = await firmaPedir({ tipo: 'colposcopia', titulo: 'Firmar la colposcopia', detalle: `${t.paciente_nombre} · IVAA ${ivaa}${schiller ? ' · Schiller ' + schiller.toLowerCase() : ''}`, boton: 'Firmar y guardar' });
-  if (pin === null) return;
-  let { data: ins, error } = await sb.from('colposcopias').insert([data]).select('id');
-  if (error && campFaltaPaso(error)) { delete data.ivaa; delete data.union_ec; delete data.campana_id; ({ data: ins, error } = await sb.from('colposcopias').insert([data]).select('id')); }
-  if (error) return showToast('No se pudo guardar: ' + esc(error.message), 'err');
-  const id = ins && ins[0] && ins[0].id;
+  const uno = k => { const b = box.querySelector(`[data-cg="${k}"] .on`); return b ? b.dataset.cv : null; }, varios = k => [...box.querySelectorAll(`[data-cg="${k}"] .on`)].map(b => b.dataset.cv);
+  const toma = varios('toma'), hizoColpo = box.querySelector('#cHizoColpo').checked, trat = varios('trat'), conducta = uno('conducta');
+  const ivaa = hizoColpo ? uno('ivaa') : null, schiller = hizoColpo ? uno('schiller') : null, union = hizoColpo ? uno('union') : null;
+  if (hizoColpo && !ivaa) return showToast('Marcá el resultado del IVAA.', 'err');
+  if (!toma.length && !hizoColpo && !trat.length) return showToast('Marcá la toma, la colposcopia o el tratamiento.', 'err');
+  const p = campPacs.find(x => String(x.id) === String(t.paciente_id)) || {};
+  // 1) La toma: el tipo de examen queda como se hizo de verdad
+  const pap = toma.includes('pap'), vph = toma.includes('vph');
+  const cambioPac = { tipo_examen: pap ? 'Papanicolau' : vph ? 'VPH' : 'Colposcopia', hizo_prueba_vph: vph, estado_pap: pap ? (p.estado_pap || 'Pendiente') : null, fecha_estimada: pap ? addDays(campActual.fecha, 90) : null };
+  if ((pap || vph) && !p.numero_folio_pap) {
+    const f = { centro_id: perfil.centro_id, fecha_toma: campActual.fecha }; await folioAsignar(f);
+    ['numero_folio_d1', 'numero_folio_d8', 'numero_folio_pap'].forEach(k => { if (f[k]) cambioPac[k] = f[k]; });
+  }
+  const up = await sb.from('pacientes').update(cambioPac).eq('id', t.paciente_id);
+  if (up.error) return showToast('No se pudo guardar la toma: ' + esc(up.error.message), 'err');
+  Object.assign(p, cambioPac);
+  // 2 y 3) Colposcopia y tratamiento: una nota firmada con PIN
+  let colpId = null, data = null;
+  if (hizoColpo || trat.length || conducta) {
+    data = { paciente_id: t.paciente_id, fecha: campActual.fecha, ivaa, prueba_schiller: schiller, union_ec: union, plan: [...trat, ...(conducta ? [conducta] : [])], derivacion: /^Control en/.test(conducta || '') ? conducta : null, otros_hallazgos: box.querySelector('#cObs').value.trim() || null,
+      soap_analisis: [hizoColpo ? 'IVAA ' + ivaa + (schiller ? ' · Schiller ' + schiller.toLowerCase() : '') : '', trat.length ? 'Tratamiento: ' + trat.join(', ') : '', 'Campaña ' + campActual.nombre].filter(Boolean).join(' · '), campana_id: campActual.id };
+    const pin = await firmaPedir({ tipo: 'colposcopia', titulo: 'Firmar la atención', detalle: `${t.paciente_nombre}${hizoColpo ? ' · IVAA ' + ivaa : ''}${trat.length ? ' · ' + trat.join(', ') : ''}`, boton: 'Firmar y guardar' });
+    if (pin === null) return;
+    let { data: ins, error } = await sb.from('colposcopias').insert([data]).select('id');
+    if (error && campFaltaPaso(error)) { const d2 = Object.assign({}, data); delete d2.ivaa; delete d2.union_ec; delete d2.campana_id; ({ data: ins, error } = await sb.from('colposcopias').insert([d2]).select('id')); }
+    if (error) return showToast('No se pudo guardar: ' + esc(error.message), 'err');
+    colpId = ins && ins[0] && ins[0].id;
+    if (colpId) firmaRegistrar('colposcopia', colpId, data, pin);
+    campColpos.push(Object.assign({ id: colpId }, data));
+  }
   await sb.from('sivec_turnos').update({ estado: 'atendida', atendida_at: new Date().toISOString(), atendido_por: perfil.id }).eq('id', t.id);
-  Object.assign(t, { estado: 'atendida' }); campColpos.push(Object.assign({ id }, data)); campAtender = null;
-  if (ivaa !== 'Negativo') { sonido('alerta'); showToast(`⚠ IVAA ${esc(ivaa.toLowerCase())}: queda en la ficha y su centro la ve para el seguimiento.`, 'err', false); }
-  else showToast('Colposcopia guardada ✔', 'ok', 'ok');
-  if (id) firmaRegistrar('colposcopia', id, data, pin);
+  t.estado = 'atendida'; campAtender = null;
+  if (ivaa && ivaa !== 'Negativo') { sonido('alerta'); showToast(`⚠ IVAA ${esc(ivaa.toLowerCase())}${trat.length ? ' · tratada en el momento: ' + esc(trat.join(', ')) : ''}. Queda en la ficha y su centro la sigue.`, 'err', false); }
+  else showToast(`Atención guardada ✔${trat.length ? ' · ' + esc(trat.join(', ')) : ''}`, 'ok', 'ok');
   campPintar();
 }
 function campTableroHTML() {
   const P = campPacs, pap = P.filter(p => p.tipo_examen === 'Papanicolau').length, vph = P.filter(p => p.tipo_examen === 'VPH' || p.hizo_prueba_vph).length;
-  const colpo = campColpos.length, pos = campColpos.filter(c => c.ivaa && c.ivaa !== 'Negativo').length, meta = Number(campActual.meta) || 0;
+  const colpo = campColpos.filter(c => c.ivaa).length, pos = campColpos.filter(c => c.ivaa && c.ivaa !== 'Negativo').length, meta = Number(campActual.meta) || 0;
+  const tratadas = campColpos.filter(c => (c.plan || []).some(x => CAMP_TRAT.includes(x))).length, crio = campColpos.filter(c => (c.plan || []).includes('Crioterapia')).length, caut = campColpos.filter(c => (c.plan || []).includes('Cauterización')).length;
   const sinLote = P.filter(p => p.tipo_examen !== 'Colposcopia' && !p.lote_id).length;
   const horas = {}; campTurnos.filter(t => t.servicio === 'toma' || !campTurnos.some(x => x.paciente_id === t.paciente_id && x.servicio === 'toma')).forEach(t => { const h = new Date(t.llegada).getHours(); horas[h] = (horas[h] || 0) + 1; });
   const hs = Object.keys(horas).map(Number); const h0 = Math.min(8, ...hs), h1 = Math.max(15, ...hs), maxH = Math.max(1, ...Object.values(horas));
-  const esp = s => campTurnos.filter(t => t.servicio === s && t.estado === 'espera');
-  const minEsp = s => { const L = esp(s); return L.length ? Math.max(0, Math.round(L.reduce((a, t) => a + Math.max(0, Date.now() - new Date(t.llegada)) / 60000, 0) / L.length)) : 0; };
+  const esp = () => campTurnos.filter(t => t.estado === 'espera');
+  const minEsp = () => { const L = esp(); return L.length ? Math.max(0, Math.round(L.reduce((a, t) => a + Math.max(0, Date.now() - new Date(t.llegada)) / 60000, 0) / L.length)) : 0; };
   const porCentro = {}; P.forEach(p => { const k = p.centro_seguimiento || p.centro_id; porCentro[k] = (porCentro[k] || 0) + 1; });
   const cerrada = campActual.estado === 'cerrada';
   return `<section class="hoyCard campTab"><h3>📊 ${cerrada ? 'Informe de la campaña' : 'La campaña en vivo'}</h3>
-    <div class="campKpis"><div><b>${P.length}</b><small>mujeres${meta ? ' (meta ' + meta + ')' : ''}</small></div><div><b>${pap}</b><small>PAP tomados</small></div><div><b>${vph}</b><small>VPH tomados</small></div><div><b>${colpo}</b><small>colposcopias</small></div><div class="${pos ? 'alta' : ''}"><b>${pos}</b><small>IVAA positivos</small></div></div>
+    <div class="campKpis"><div><b>${P.length}</b><small>mujeres${meta ? ' (meta ' + meta + ')' : ''}</small></div><div><b>${pap}</b><small>PAP tomados</small></div><div><b>${vph}</b><small>VPH tomados</small></div><div><b>${colpo}</b><small>colposcopias</small></div><div class="${pos ? 'alta' : ''}"><b>${pos}</b><small>IVAA positivos</small></div><div><b>${tratadas}</b><small>tratadas en el momento${crio || caut ? ` (${crio} crio · ${caut} caut.)` : ''}</small></div></div>
     ${meta ? `<div class="campMeta"><i style="width:${Math.min(100, Math.round(P.length * 100 / meta))}%"></i><span>${Math.round(P.length * 100 / meta)} % de la meta</span></div>` : ''}
     <small class="campLbl">Mujeres por hora</small><div class="campBarras">${Array.from({ length: h1 - h0 + 1 }, (_, k) => h0 + k).map(h => `<div><i style="height:${Math.round((horas[h] || 0) * 100 / maxH)}%"></i><span>${h}h</span></div>`).join('')}</div>
-    ${cerrada ? '' : `<small class="campLbl">Estaciones ahora</small><div class="campEsp"><div>🧪 Toma<b>${esp('toma').length} esperando</b><small>${minEsp('toma')} min promedio</small></div><div>🩺 Colposcopia<b>${esp('colposcopia').length} esperando</b><small>${minEsp('colposcopia')} min promedio</small></div></div>`}
+    ${cerrada ? '' : `<small class="campLbl">Estaciones ahora</small><div class="campEsp"><div>📋 Recepción<b>${campPacs.length} registradas</b><small>${P.filter(p => Date.now() - new Date(p.created_at || 0) < 3600e3).length} en la última hora</small></div><div>🩺 Consultorio<b>${esp().length} esperando</b><small>${minEsp()} min promedio</small></div></div>`}
     <small class="campLbl">Por centro de salud (reciben el resultado)</small>
     <div>${Object.entries(porCentro).sort((a, b) => b[1] - a[1]).map(([k, n]) => `<div class="hoyFila"><div><b>${esc(centroNombre(k) || '—')}</b></div><span class="hoyN">${n}</span></div>`).join('') || '<div class="hoyVacio">—</div>'}</div>
     ${cerrada ? `<p class="campNota">✔ Campaña cerrada${campActual.cerrada_at ? ' el ' + fmtFecha(fechaLocalISO(campActual.cerrada_at)) : ''}: cada mujer está en la ficha de su centro de salud.</p>` : `<p class="campNota">${sinLote ? `📦 Faltan <b>${plural(sinLote, 'muestra')}</b> por poner en un lote para el Oncológico (Balance → armar el lote).` : '📦 Todas las muestras ya están en un lote.'}</p>`}
@@ -9508,12 +9540,12 @@ function campTableroHTML() {
 }
 function campInforme() {
   const P = campPacs, c = campActual, porCentro = {};
-  P.forEach(p => { const k = centroNombre(p.centro_seguimiento || p.centro_id) || '—'; porCentro[k] = porCentro[k] || { n: 0, pap: 0, vph: 0, colpo: 0, pos: 0 }; const o = porCentro[k]; o.n++; if (p.tipo_examen === 'Papanicolau') o.pap++; if (p.tipo_examen === 'VPH' || p.hizo_prueba_vph) o.vph++; const cc = campColpos.find(x => String(x.paciente_id) === String(p.id)); if (cc) { o.colpo++; if (cc.ivaa && cc.ivaa !== 'Negativo') o.pos++; } });
+  P.forEach(p => { const k = centroNombre(p.centro_seguimiento || p.centro_id) || '—'; porCentro[k] = porCentro[k] || { n: 0, pap: 0, vph: 0, colpo: 0, pos: 0, trat: 0 }; const o = porCentro[k]; o.n++; if (p.tipo_examen === 'Papanicolau') o.pap++; if (p.tipo_examen === 'VPH' || p.hizo_prueba_vph) o.vph++; const cc = campColpos.find(x => String(x.paciente_id) === String(p.id)); if (cc) { if (cc.ivaa) o.colpo++; if (cc.ivaa && cc.ivaa !== 'Negativo') o.pos++; if ((cc.plan || []).some(x => CAMP_TRAT.includes(x))) o.trat++; } });
   const w = window.open('', '_blank'); if (!w) return showToast('Permití las ventanas emergentes para imprimir.', 'err');
-  const tot = Object.values(porCentro).reduce((a, o) => ({ n: a.n + o.n, pap: a.pap + o.pap, vph: a.vph + o.vph, colpo: a.colpo + o.colpo, pos: a.pos + o.pos }), { n: 0, pap: 0, vph: 0, colpo: 0, pos: 0 });
+  const tot = Object.values(porCentro).reduce((a, o) => ({ n: a.n + o.n, pap: a.pap + o.pap, vph: a.vph + o.vph, colpo: a.colpo + o.colpo, pos: a.pos + o.pos, trat: a.trat + o.trat }), { n: 0, pap: 0, vph: 0, colpo: 0, pos: 0, trat: 0 });
   w.document.write(`<!doctype html><meta charset="utf-8"><title>Informe · ${esc(c.nombre)}</title><style>body{font-family:Arial,sans-serif;margin:32px;color:#222}h1{color:#7d2a4c;margin:0}table{border-collapse:collapse;width:100%;margin-top:16px}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left}th{background:#f5e9ee}</style>
     <h1>Informe de la campaña · ${esc(c.nombre)}</h1><p>${fmtFecha(c.fecha)}${c.lugar ? ' · ' + esc(c.lugar) : ''} · Organiza: ${esc(centroNombre(c.centro_id))}${c.meta ? ' · Meta: ' + c.meta : ''}</p>
-    <table><tr><th>Centro de salud de la mujer</th><th>Mujeres</th><th>PAP</th><th>VPH</th><th>Colposcopias</th><th>IVAA positivos</th></tr>${Object.entries(porCentro).map(([k, o]) => `<tr><td>${esc(k)}</td><td>${o.n}</td><td>${o.pap}</td><td>${o.vph}</td><td>${o.colpo}</td><td>${o.pos}</td></tr>`).join('')}<tr><th>Total</th><th>${tot.n}</th><th>${tot.pap}</th><th>${tot.vph}</th><th>${tot.colpo}</th><th>${tot.pos}</th></tr></table>
+    <table><tr><th>Centro de salud de la mujer</th><th>Mujeres</th><th>PAP</th><th>VPH</th><th>Colposcopias</th><th>IVAA positivos</th><th>Tratadas en el momento</th></tr>${Object.entries(porCentro).map(([k, o]) => `<tr><td>${esc(k)}</td><td>${o.n}</td><td>${o.pap}</td><td>${o.vph}</td><td>${o.colpo}</td><td>${o.pos}</td><td>${o.trat}</td></tr>`).join('')}<tr><th>Total</th><th>${tot.n}</th><th>${tot.pap}</th><th>${tot.vph}</th><th>${tot.colpo}</th><th>${tot.pos}</th><th>${tot.trat}</th></tr></table>
     <p style="margin-top:18px;font-size:12px;color:#666">SIVEC PAP/VPH · Modo Campaña · generado ${fmtFecha(hoyISO())}. Los resultados de PAP y VPH llegan del Instituto Oncológico a la ficha del centro de salud de cada mujer.</p><script>print()<\/script>`);
   w.document.close();
 }
@@ -9532,7 +9564,7 @@ document.addEventListener('click', async e => {
   const v = document.getElementById('campanaView'); if (!v || !v.contains(e.target)) return;
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.sv || b.dataset.rs) { b.classList.toggle('on'); return; }
-  if (b.dataset.cv) { b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); return; }
+  if (b.dataset.cv) { if (b.parentElement.dataset.multi) b.classList.toggle('on'); else b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b && !b.classList.contains('on'))); return; }
   if (b.dataset.abrir) { campGuardar('sivec_campana_id', b.dataset.abrir); return campCargar(); }
   if (b.dataset.est) { campGuardar('sivec_campana_est', b.dataset.est); campAtender = null; return campPintar(); }
   if (b.dataset.firma) { const p = campPacs.find(x => String(x.id) === b.dataset.firma); if (p) { const f = await pacFirmar(p, 'consentimiento'); if (f) { b.textContent = '✔ Firmado por la paciente'; b.disabled = true; } } return; }
@@ -9547,28 +9579,21 @@ document.addEventListener('click', async e => {
   }
   if (c === 'registrar') return campRegistrar();
   if (c === 'cancelarColpo') { campAtender = null; return campPintar(); }
-  if (c === 'guardarColpo') return campGuardarColpo(b.dataset.id);
+  if (c === 'guardarColpo') return campGuardarConsulta(b.dataset.id);
   if (c === 'lote') return switchView('balance');
   if (c === 'cerrar') return campCerrar();
   if (c === 'informe') return campInforme();
   if (b.dataset.ct) {
     const t = campTurnos.find(x => String(x.id) === b.dataset.id); if (!t) return;
     if (b.dataset.ct === 'atender') { if (t.estado !== 'en_atencion') { await sb.from('sivec_turnos').update({ estado: 'en_atencion', atendido_por: perfil.id }).eq('id', t.id); t.estado = 'en_atencion'; } campAtender = t.id; return campPintar(); }
-    const cambio = b.dataset.ct === 'llamar' ? { estado: 'llamada', llamada_at: new Date().toISOString() } : { estado: 'atendida', atendida_at: new Date().toISOString(), atendido_por: perfil.id };
+    const cambio = { estado: 'llamada', llamada_at: new Date().toISOString() };
     const { error } = await sb.from('sivec_turnos').update(cambio).eq('id', t.id);
     if (error) return showToast('Error: ' + esc(error.message), 'err');
     Object.assign(t, cambio);
-    if (b.dataset.ct === 'tomada') {
-      sonido('ok');
-      if (/colpo/.test(t.notas || '')) {
-        const { data: tr } = await sb.from('sivec_turnos').insert([{ centro_id: perfil.centro_id, campana_id: campActual.id, paciente_id: t.paciente_id, paciente_nombre: t.paciente_nombre, carnet: t.carnet, servicio: 'colposcopia' }]).select();
-        if (tr && tr[0]) campTurnos.push(tr[0]);
-        showToast(`${esc(t.paciente_nombre)} ➜ colposcopia`, 'ok', false);
-      }
-    }
     return campPintar();
   }
 });
+document.addEventListener('change', e => { if (e.target.id === 'cHizoColpo') { const c = e.target.closest('.campColpo').querySelector('.campColpoCampos'); if (c) c.hidden = !e.target.checked; } });
 function campActivar(si) { clearInterval(campTimer); campTimer = null; if (si) { campCargar(); campTimer = setInterval(() => { const v = document.getElementById('campanaView'); if (!document.hidden && v && v.classList.contains('active') && campActual && !campAtender && !(document.activeElement && v.contains(document.activeElement) && /INPUT|SELECT/.test(document.activeElement.tagName))) campCargarDatos(true).then(campPintar); }, 12000); } }
 
 // Términos de uso y política de privacidad: cada persona los acepta una vez por versión (Paso 26 del SQL)

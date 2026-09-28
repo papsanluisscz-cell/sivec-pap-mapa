@@ -1025,3 +1025,7 @@ Baseado na história clínica perinatal (CLAP/OPS) e na carteirinha perinatal, e
 - **📊 Tablero en vivo:** mujeres (y % de la meta), PAP, VPH, colposcopias, IVAA positivos, mujeres por hora, espera por estación, por centro de salud, muestras sin lote; botones Armar el lote, **Cerrar la campaña y enviar a cada centro** (las mujeres pasan a la ficha de su centro: allí llega el resultado del Oncológico) e Informe imprimible.
 - Los turnos de campaña no se mezclan con la cola del día del establecimiento.
 - Capturas (datos de prueba) en docs/guias/modo-campana/. Presentación: portada y "Paso 1 · Entrar" con la entrada de 5 puertas; slides de campaña con las pantallas reales.
+
+## 28/09/2026 · Campaña en dos módulos (v1.14.1)
+- Pedido del autor: la campaña tiene **dos módulos**. **📋 Recepción**: todos los datos de la paciente (y su centro de salud). **🩺 Consultorio**: la doctora hace todo en una sola atención: (1) la toma de PAP/VPH (se corrige si al final no se tomó), (2) la colposcopia con IVAA, Schiller y unión E-C (con casilla "se hizo"), (3) el **tratamiento en el momento**: crioterapia, cauterización, biopsia, metronidazol, clotrimazol, aseo vulvoperineal, orientación sexual (varios a la vez) y la conducta (esperar PAP/VPH, referir a colposcopia completa, control en 6 meses o en 1 año). Se firma con PIN solo si hubo colposcopia o tratamiento.
+- Tablero: "tratadas en el momento" (con crioterapias y cauterizaciones); informe con la columna de tratadas. Presentación actualizada (dos módulos y pantallas nuevas).
