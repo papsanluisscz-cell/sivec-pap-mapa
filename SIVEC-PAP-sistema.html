@@ -531,6 +531,7 @@
   .lgPanel { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); border-radius: 22px; padding: 26px; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); box-shadow: 0 30px 80px rgba(0,0,0,.35); }
   .lgQ { font-size: 20px; font-weight: 800; margin-bottom: 14px; }
   .lgTiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .lgTile.lgTileAncho { grid-column: 1 / -1; min-height: 0; }
   .lgTile { position: relative; text-align: left; font-family: inherit; color: #fff; cursor: pointer; border-radius: 16px; padding: 16px 14px 14px; min-height: 142px; display: flex; flex-direction: column; gap: 6px;
     background: linear-gradient(160deg, rgba(255,255,255,.14), rgba(255,255,255,.04)); border: 1px solid rgba(255,255,255,.22); transition: transform .18s, border-color .18s, box-shadow .18s, background .18s; animation: lgIn .5s both; }
   .lgTile:nth-child(2) { animation-delay: .08s; } .lgTile:nth-child(3) { animation-delay: .16s; } .lgTile:nth-child(4) { animation-delay: .24s; }
@@ -1287,6 +1288,52 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
 #segPanel .segPie { margin: 16px 0 0; font-size: 12.5px; color: #a8899a; text-align: center; }
 .segBoton { display: flex; align-items: center; gap: 10px; width: 100%; border: 1px solid var(--line); background: linear-gradient(135deg, #2a1420, #4a1229); color: #fbf1f5; border-radius: 14px; padding: 12px 14px; font: inherit; font-weight: 700; cursor: pointer; margin: 0 0 18px; text-align: left; }
 .segBoton small { display: block; font-weight: 400; color: #e8cdd8; font-size: 12px; }
+#campanaView .hoyCard { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+#campanaView .hoyCard h3 { margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+#campanaView .hoyN { background: var(--teal-700); color: #fff; border-radius: 999px; font-size: 12px; padding: 1px 9px; }
+#campanaView .hoyBtn { background: var(--teal-700); color: #fff; border: 0; border-radius: 10px; padding: 9px 13px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
+#campanaView .hoyBtn.sec { background: var(--paper); color: var(--ink); border: 1px solid var(--line); }
+#campanaView .hoyFila { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); text-align: left; font: inherit; color: var(--ink); width: 100%; }
+#campanaView .hoyFila > div:not(.hoyAcc) { flex: 1; min-width: 0; }
+#campanaView .hoyFila b { display: block; font-size: 14.5px; }
+#campanaView .hoyFila small { color: var(--ink-soft); font-size: 12px; }
+#campanaView .hoyAcc { display: flex; gap: 6px; }
+#campanaView .hoyNum { width: 40px; height: 40px; border-radius: 10px; background: var(--header-grad); color: #fff; font-weight: 800; font-size: 17px; display: flex; align-items: center; justify-content: center; flex: none; }
+#campanaView .est-llamada { border-color: #f59e0b; box-shadow: 0 0 0 2px rgba(245,158,11,.2); }
+#campanaView .est-en_atencion { border-color: #16a34a; }
+#campanaView .est-atendida, #campanaView .est-no_se_presento, #campanaView .est-cancelado { opacity: .6; }
+#campanaView .hoyChips { display: flex; flex-wrap: wrap; gap: 6px; }
+#campanaView .hoyChips button { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 999px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+#campanaView .hoyChips button.on { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
+#campanaView .hoyVacio { color: var(--ink-soft); font-size: 13.5px; text-align: center; padding: 10px; }
+#campanaView .hoyHechos summary { cursor: pointer; color: var(--ink-soft); font-size: 13px; margin-bottom: 6px; }
+#campanaView .hoyHechos .hoyFila { margin-bottom: 6px; }
+#campanaView .hoyRes { cursor: pointer; width: 100%; } #campanaView .hoyRes:hover { border-color: var(--teal-500); } #campanaView .hoyRes span { color: var(--teal-700); font-weight: 700; font-size: 13px; }
+#campanaView { padding: 24px 32px; overflow-y: auto; } @media (max-width: 700px) { #campanaView { padding: 16px 12px; } }
+#campanaView #campCuerpo { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; align-items: start; }
+#campanaView .campHead { grid-column: 1 / -1; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; background: var(--header-grad); color: #fff; border-radius: 18px; padding: 16px 20px; }
+#campanaView .campHead small { font-weight: 800; letter-spacing: 2px; text-transform: uppercase; font-size: 11.5px; opacity: .9; } #campanaView .campHead h2 { margin: 2px 0; color: #fff; } #campanaView .campHead p { margin: 0; opacity: .9; font-size: 13.5px; }
+#campanaView .campHead > div { flex: 1; min-width: 220px; }
+#campanaView .campTabs { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
+#campanaView .campTabs button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 9px 16px; font: inherit; font-weight: 700; cursor: pointer; }
+#campanaView .campTabs button.on { background: var(--teal-700); border-color: var(--teal-700); color: #fff; } #campanaView .campTabs b { background: #e11d74; color: #fff; border-radius: 999px; padding: 0 7px; font-size: 12px; } #campanaView .campTabs b:empty { display: none; }
+#campanaView .campCuerpo { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; align-items: start; }
+#campanaView .campForm { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+#campanaView .campForm label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700; color: var(--ink-soft); } #campanaView .campForm label.w2 { grid-column: span 2; }
+#campanaView .campForm input, #campanaView .campForm select, #campanaView #cObs { padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; font: inherit; font-size: 14.5px; background: var(--surface); color: var(--ink); }
+#campanaView .campLbl { display: block; font-size: 11.5px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-soft); margin: 4px 0; }
+#campanaView .campCheck { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+#campanaView .campYa { background: #dcfce7; color: #166534; border-radius: 10px; padding: 7px 10px; font-size: 13px; font-weight: 600; }
+#campanaView .campHecho { display: flex; flex-direction: column; gap: 6px; background: #ecfdf3; border: 1px solid #86efac; border-radius: 12px; padding: 12px; } #campanaView .campHecho span { font-size: 13px; color: var(--ink-soft); }
+#campanaView .campNota { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-soft); line-height: 1.45; }
+#campanaView .campColpo { border: 2px solid var(--teal-700); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px; background: var(--surface); }
+#campanaView .campG { display: grid; grid-template-columns: 90px 1fr; gap: 8px; align-items: center; } #campanaView .campG b { font-size: 13px; }
+#campanaView .hoyChips button.neg.on { background: #16a34a; border-color: #16a34a; } #campanaView .hoyChips button.pos.on { background: #dc2626; border-color: #dc2626; }
+#campanaView .campKpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; } #campanaView .campKpis div { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 10px; } #campanaView .campKpis b { display: block; font-size: 26px; color: var(--teal-700); } #campanaView .campKpis small { color: var(--ink-soft); } #campanaView .campKpis .alta b { color: #dc2626; }
+#campanaView .campMeta { position: relative; height: 26px; background: var(--paper); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; } #campanaView .campMeta i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #c2417f, #f1a7c3); } #campanaView .campMeta span { position: relative; display: block; text-align: center; font-size: 12.5px; font-weight: 700; line-height: 26px; }
+#campanaView .campBarras { display: flex; align-items: flex-end; gap: 6px; height: 120px; padding-bottom: 18px; } #campanaView .campBarras div { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; position: relative; } #campanaView .campBarras i { display: block; background: linear-gradient(180deg, #c2417f, #f1a7c3); border-radius: 6px 6px 0 0; min-height: 2px; } #campanaView .campBarras span { position: absolute; bottom: -18px; left: 0; right: 0; text-align: center; font-size: 10.5px; color: var(--ink-soft); }
+#campanaView .campEsp { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } #campanaView .campEsp div { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 10px; font-size: 13px; } #campanaView .campEsp b { display: block; font-size: 16px; } #campanaView .campEsp small { color: var(--ink-soft); }
+
 @media (max-width: 520px) { #spPanel { right: 8px; left: 8px; width: auto; max-width: none; bottom: 80px; height: calc(100vh - 100px); } }
 @media (max-width: 760px) { body::after { content: ''; display: block; height: 80px; } }  /* que el botón 💬 no tape el último botón de la página */
 @media print { #spBtn, #spPanel { display: none !important; } }
@@ -1350,7 +1397,7 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
     <div class="lgPanel">
       <div id="lgPaso1">
         <div class="lgQ">¿Cómo entrás hoy?</div>
-        <div class="lgTiles"><button type="button" class="lgTile" data-acceso="admin"><span class="lgIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6l-8-4Z"/><circle cx="12" cy="11" r="2.5"/><path d="M8.5 16.5c.8-1.6 2-2.4 3.5-2.4s2.7.8 3.5 2.4"/></svg></span><b>Administración</b><small>Todas las redes, establecimientos y usuarios</small><span class="lgGo">→</span></button><button type="button" class="lgTile" data-acceso="red"><span class="lgIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v4M12 11.5 6.5 17M12 11.5l5.5 5.5"/></svg></span><b>Red de salud</b><small>Tablero y mapa de la red: metas, positivas, búsqueda activa</small><span class="lgGo">→</span></button><button type="button" class="lgTile" data-acceso="centro"><span class="lgIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M12 10v5M9.5 12.5h5"/></svg></span><b>Centro de salud</b><small>1er nivel: tomas, resultados, lotes y seguimiento</small><span class="lgGo">→</span></button><button type="button" class="lgTile" data-acceso="hospital"><span class="lgIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 7v6M9 10h6M9 21v-4h6v4"/></svg></span><b>Hospital</b><small>2º, 3er y 4º nivel: PAP, laboratorio, colposcopia y biopsia</small><span class="lgGo">→</span></button></div>
+        <div class="lgTiles"><button type="button" class="lgTile" data-acceso="admin"><span class="lgIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6l-8-4Z"/><circle cx="12" cy="11" r="2.5"/><path d="M8.5 16.5c.8-1.6 2-2.4 3.5-2.4s2.7.8 3.5 2.4"/></svg></span><b>Administración</b><small>Todas las redes, establecimientos y usuarios</small><span class="lgGo">→</span></button><button type="button" class="lgTile" data-acceso="red"><span class="lgIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v4M12 11.5 6.5 17M12 11.5l5.5 5.5"/></svg></span><b>Red de salud</b><small>Tablero y mapa de la red: metas, positivas, búsqueda activa</small><span class="lgGo">→</span></button><button type="button" class="lgTile" data-acceso="centro"><span class="lgIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M12 10v5M9.5 12.5h5"/></svg></span><b>Centro de salud</b><small>1er nivel: tomas, resultados, lotes y seguimiento</small><span class="lgGo">→</span></button><button type="button" class="lgTile" data-acceso="hospital"><span class="lgIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 7v6M9 10h6M9 21v-4h6v4"/></svg></span><b>Hospital</b><small>2º, 3er y 4º nivel: PAP, laboratorio, colposcopia y biopsia</small><span class="lgGo">→</span></button><button type="button" class="lgTile lgTileAncho" data-acceso="campana"><span class="lgIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></span><b>Campaña de PAP</b><small>Un día, un lugar: registro, toma de PAP/VPH y colposcopia</small><span class="lgGo">→</span></button></div>
         <p class="lgNota">El sistema abre tu panel según tu usuario. ¿No tenés usuario? Pedíselo al administrador del SIVEC.</p>
       </div>
       <div id="loginBox" style="display:none">
@@ -1404,6 +1451,7 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
       <button data-view="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg><span class="navLabel">Mapa</span></button>
       <button data-view="panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="navLabel">Panel</span></button>
       <button data-view="metodos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span class="navLabel">Métodos</span></button>
+      <button data-view="campana" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg><span class="navLabel">Campaña</span></button>
       <button data-view="trash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span class="navLabel">Papelera</span></button>
       <button data-view="portal" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/></svg><span class="navLabel">Portal</span></button>
       <button data-view="red" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v4M12 11.5 6.5 17M12 11.5l5.5 5.5"/></svg><span class="navLabel">Red</span></button>
@@ -1821,6 +1869,9 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
       <div class="redCard" style="margin-top:14px"><h3>Por establecimiento</h3><div id="redTabla"></div><p class="hint" style="margin:8px 0 0" id="redTablaNota"></p></div>
       <div class="redCard" id="redPend"></div>
     </div>
+
+    <!-- MODO CAMPAÑA (Paso 35) -->
+    <div id="campanaView" class="view"><div id="campCuerpo"></div></div>
 
     <!-- HOY: cola del día (recepción ➜ consultorio), Paso 32 -->
     <div id="hoyView" class="view">
@@ -2423,7 +2474,7 @@ async function init() {
 }
 
 // Base de demostración (tabla sivec_meta con modo = demo): franja "DEMO" y cuentas de prueba en la entrada.
-const DEMO_CUENTAS = { admin: 'admin@demo.sivec.bo', red: 'gestor.centro@demo.sivec.bo', centro: 'sanluis@demo.sivec.bo', hospital: 'frances@demo.sivec.bo' };
+const DEMO_CUENTAS = { admin: 'admin@demo.sivec.bo', red: 'gestor.centro@demo.sivec.bo', centro: 'sanluis@demo.sivec.bo', hospital: 'frances@demo.sivec.bo', campana: 'sanluis@demo.sivec.bo' };
 let modoDemo = false;
 async function detectarDemo() {
   try { const { data, error } = await sb.from('sivec_meta').select('valor').eq('clave', 'modo').maybeSingle(); modoDemo = !error && data && data.valor === 'demo'; } catch (_) { modoDemo = false; }
@@ -2454,7 +2505,7 @@ async function checkAuth() {
 }
 
 // Antesala: el usuario elige cómo entra; el panel que se abre lo decide su perfil.
-const ACCESOS = { admin: 'Administración', red: 'Red de salud', centro: 'Centro de salud', hospital: 'Hospital' };
+const ACCESOS = { admin: 'Administración', red: 'Red de salud', centro: 'Centro de salud', hospital: 'Hospital', campana: 'Campaña de PAP' };
 let lgAcceso = '';
 function lgMostrar(acceso) {
   lgAcceso = acceso || '';
@@ -2563,8 +2614,9 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   await cargarPerfil();
   entradaOcultar(1600);
   const real = accesoDePerfil(perfil);
-  try { localStorage.setItem('sivec_login_' + (real || lgAcceso), email); } catch (_) {}
-  if (real && lgAcceso && real !== lgAcceso) showToast(`Tu usuario es de <b>${ACCESOS[real]}</b>: se abrió tu panel.`, 'ok');
+  try { localStorage.setItem('sivec_login_' + (lgAcceso === 'campana' ? 'campana' : (real || lgAcceso)), email); } catch (_) {}
+  if (lgAcceso === 'campana' && (real === 'centro' || real === 'hospital') && document.querySelector('nav button[data-view="campana"]').style.display !== 'none') switchView('campana');
+  else if (real && lgAcceso && real !== lgAcceso) showToast(`Tu usuario es de <b>${ACCESOS[real]}</b>: se abrió tu panel.`, 'ok');
 });
 
 // Cambiar la contraseña provisoria por una propia.
@@ -2635,6 +2687,7 @@ function vistasPermitidas() {
   if (perfil.es_admin && !base.includes('red')) base.push('red');
   let r = vistasPorFuncion(base);
   if (usaCola() && !r.includes('hoy') && (!misFunciones().length || misFunciones().includes('jefe'))) r.unshift('hoy');
+  if (perfil.rol === 'centro' && (!misFunciones().length || misFunciones().some(f => ['recepcion', 'toma', 'colposcopia', 'jefe'].includes(f)))) r.push('campana');
   if (perfil.es_admin || perfil.rol === 'admin') r.push('admin');
   return r;
 }
@@ -3188,6 +3241,7 @@ function switchView(name) {
   if (name === 'portal') loadPortal();
   if (name === 'form') folioPintar();
   hoyActivar(name === 'hoy');
+  campActivar(name === 'campana');
 }
 
 function addDays(dateStr, days) {
@@ -8086,7 +8140,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.13.0 · 28/09/2026';
+const SIVEC_VERSION = '1.14.0 · 28/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -8722,7 +8776,7 @@ async function saludoPendientes() {
   if (usaCola()) {
     try {
       const { data } = await sb.from('sivec_turnos').select('id,servicio,consultorio,estado').eq('centro_id', perfil.centro_id).eq('fecha', hoy);
-      hoyTurnos = data || []; const n = hoyMiCola().filter(t => t.estado === 'espera').length;
+      hoyTurnos = (data || []).filter(t => !t.campana_id); const n = hoyMiCola().filter(t => t.estado === 'espera').length;
       if (n) items.push({ ic: '👩', n, txt: plural(n, 'paciente esperando', 'pacientes esperando') + ' en la cola', voz: plural(n, 'paciente esperando', 'pacientes esperando') + ' en la cola', ir: 'vista:hoy' });
     } catch (e) {}
   }
@@ -8937,7 +8991,7 @@ async function hoyCargar(silencio) {
   const { data, error } = await sb.from('sivec_turnos').select('*').eq('centro_id', perfil.centro_id).eq('fecha', hoyISO()).order('numero', { ascending: true });
   if (error) { hoyTablaOk = !/sivec_turnos|does not exist|schema cache|PGRST205|42P01/i.test(error.message + error.code); v.querySelector('#hoyCuerpo').innerHTML = `<div class="hoyVacio">${hoyTablaOk ? esc(error.message) : 'La cola del día se activa con el <b>Paso 32</b> del SQL.'}</div>`; return; }
   const antes = hoyMiCola().filter(t => t.estado === 'espera').length;
-  hoyTurnos = data || [];
+  hoyTurnos = (data || []).filter(t => !t.campana_id);
   if (esColpo() && tieneFuncion('recepcion')) { try { const r = await sb.rpc('sivec_colpo_lista'); hoyCitas = (r.data || []).filter(d => d.estado === 'citada' && d.fecha_cita === hoyISO() && !hoyTurnos.some(t => t.derivacion_id === d.id)); } catch (_) { hoyCitas = []; } }
   const ahora = hoyMiCola().filter(t => t.estado === 'espera').length;
   if (silencio && ahora > antes) { sonido('mensaje'); showToast(`👩 Nueva paciente en espera (${ahora})`, 'ok', false); vozAviso(ahora - antes === 1 ? 'Tiene una paciente nueva en espera.' : `Tiene ${ahora - antes} pacientes nuevas en espera.`, 'cola'); }
@@ -9287,6 +9341,235 @@ function folioPintar() {
 }
 document.addEventListener('click', e => { const b = e.target.closest('#folioModo [data-fm]'); if (!b) return; try { localStorage.setItem('sivec_folio_modo', b.dataset.fm); } catch (_) {} folioPintar(); });
 document.addEventListener('change', e => { if (e.target.name === 'fecha_toma' && e.target.form && e.target.form.id === 'patientForm') folioPintar(); });
+
+// ===== Modo Campaña (Paso 35): un día, un lugar. Registro → toma de PAP/VPH → colposcopia (IVAA/Schiller) en el momento =====
+// El PAP y el VPH van en lote al Oncológico desde el establecimiento que organiza; al cerrar, cada mujer pasa a la ficha de su centro.
+const CAMP_SERV = { pap: '🧪 PAP', vph: '🧬 VPH', colposcopia: '🩺 Colposcopia (IVAA/Schiller)' };
+const CAMP_EST = { registro: '📋 Registro', toma: '🧪 Toma', colposcopia: '🩺 Colposcopia', tablero: '📊 Tablero' };
+let campLista = [], campActual = null, campTurnos = [], campPacs = [], campColpos = [], campTimer = null, campAtender = null, campUltimo = null, campOkTabla = true;
+function campIdGuardado() { try { return localStorage.getItem('sivec_campana_id') || ''; } catch (_) { return ''; } }
+function campEstacion() { let e = ''; try { e = localStorage.getItem('sivec_campana_est') || ''; } catch (_) {} return CAMP_EST[e] ? e : (tieneFuncion('colposcopia') && !tieneFuncion('toma') ? 'colposcopia' : tieneFuncion('toma') && !tieneFuncion('recepcion') ? 'toma' : 'registro'); }
+function campGuardar(k, v) { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch (_) {} }
+function campFaltaPaso(err) { return /sivec_campanas|campana_id|centro_seguimiento|schema cache|PGRST20|42P01|42703/i.test((err && (err.message + ' ' + err.code)) || ''); }
+async function campCargar(silencio) {
+  const v = document.getElementById('campanaView'); if (!v || !sb || !conRoles()) return;
+  const { data, error } = await sb.from('sivec_campanas').select('*').eq('centro_id', perfil.centro_id).order('fecha', { ascending: false }).limit(40);
+  if (error) { campOkTabla = !campFaltaPaso(error); v.querySelector('#campCuerpo').innerHTML = `<div class="hoyCard"><div class="hoyVacio">${campOkTabla ? esc(error.message) : 'El Modo Campaña se activa con el <b>Paso 35</b> del SQL.'}</div></div>`; return; }
+  campLista = data || [];
+  campActual = campLista.find(c => c.id === campIdGuardado()) || null;
+  if (campActual) await campCargarDatos(silencio);
+  campPintar();
+}
+async function campCargarDatos(silencio) {
+  const id = campActual.id;
+  const [t, p, c] = await Promise.all([
+    sb.from('sivec_turnos').select('*').eq('campana_id', id).order('numero', { ascending: true }),
+    pacQ().eq('campana_id', id).is('deleted_at', null),
+    sb.from('colposcopias').select('id,paciente_id,ivaa,prueba_schiller,plan,campana_id').eq('campana_id', id)]);
+  const antes = campMiCola().filter(x => x.estado === 'espera').length;
+  campTurnos = t.data || []; campPacs = p.data || []; campColpos = c.data || [];
+  const ahora = campMiCola().filter(x => x.estado === 'espera').length;
+  if (silencio && ahora > antes && ['toma', 'colposcopia'].includes(campEstacion())) { sonido('mensaje'); vozAviso(ahora - antes === 1 ? 'Tiene una paciente nueva en espera.' : `Tiene ${ahora - antes} pacientes nuevas en espera.`, 'campcola'); }
+}
+function campMiCola() { const e = campEstacion(); return campTurnos.filter(t => t.servicio === (e === 'colposcopia' ? 'colposcopia' : 'toma')); }
+function campPintar() {
+  const v = document.getElementById('campanaView'); if (!v) return;
+  const c = campActual, cuerpo = v.querySelector('#campCuerpo');
+  if (!c) { cuerpo.innerHTML = campListaHTML(); return; }
+  const est = campEstacion(), cerrada = c.estado === 'cerrada';
+  cuerpo.innerHTML = `<div class="campHead"><div><small>📣 Modo Campaña${cerrada ? ' · cerrada' : ''}</small><h2>${esc(c.nombre)}</h2><p>${fmtFecha(c.fecha)}${c.lugar ? ' · ' + esc(c.lugar) : ''}${c.meta ? ' · meta ' + c.meta + ' mujeres' : ''} · ${plural(campPacs.length, 'mujer registrada', 'mujeres registradas')}</p></div><button type="button" class="hoyBtn sec" data-c="salir">Cambiar de campaña</button></div>
+    <div class="campTabs">${Object.entries(CAMP_EST).map(([k, t]) => `<button type="button" data-est="${k}" class="${k === est ? 'on' : ''}">${t}${k === 'toma' || k === 'colposcopia' ? ` <b>${campTurnos.filter(x => x.servicio === k && x.estado === 'espera').length || ''}</b>` : ''}</button>`).join('')}</div>
+    <div class="campCuerpo">${cerrada && est !== 'tablero' ? '<div class="hoyCard"><div class="hoyVacio">Esta campaña está cerrada: cada mujer ya está en la ficha de su centro de salud. Mirá el <b>📊 Tablero</b> para el informe.</div></div>' : est === 'registro' ? campRegistroHTML() : est === 'tablero' ? campTableroHTML() : campColaHTML(est)}</div>`;
+  if (est === 'registro' && !cerrada) campRegistroEventos();
+}
+function campListaHTML() {
+  const hoy = hoyISO();
+  return `<section class="hoyCard"><h3>🗓️ Nueva campaña</h3>
+    <div class="campForm"><label>Nombre<input id="cNombre" placeholder="Ej: Campaña PAP · Octubre rosa"></label><label>Fecha<input id="cFecha" type="date" value="${hoy}"></label><label>Lugar<input id="cLugar" placeholder="Ej: Plaza del barrio"></label><label>Meta del día<input id="cMeta" type="number" min="0" placeholder="Ej: 150"></label></div>
+    <div><small class="campLbl">Servicios</small><div class="hoyChips" id="cServ">${Object.entries(CAMP_SERV).map(([k, t]) => `<button type="button" data-sv="${k}" class="on">${t}</button>`).join('')}</div></div>
+    <button type="button" class="hoyBtn" data-c="crear">Crear campaña</button></section>
+    <section class="hoyCard"><h3>📣 Campañas del establecimiento</h3>${campLista.length ? campLista.map(c => `<button type="button" class="hoyFila hoyRes" data-abrir="${esc(c.id)}"><div><b>${esc(c.nombre)}</b><small>${fmtFecha(c.fecha)}${c.lugar ? ' · ' + esc(c.lugar) : ''} · ${c.estado === 'cerrada' ? 'cerrada' : c.fecha === hoy ? '🔴 hoy' : 'abierta'}</small></div><span>Abrir ›</span></button>`).join('') : '<div class="hoyVacio">Todavía no hay campañas.</div>'}</section>`;
+}
+function campOpcionesCentro() {
+  const lista = centros.filter(x => x.activo !== false && (!x.tipo || x.tipo === 'primer_nivel' || String(x.id) === String(perfil.centro_id)));
+  return lista.map(x => `<option value="${esc(x.id)}"${String(x.id) === String(perfil.centro_id) ? ' selected' : ''}>${esc(x.nombre)}</option>`).join('');
+}
+function campRegistroHTML() {
+  const sv = campActual.servicios || ['pap', 'vph', 'colposcopia'];
+  const ult = campPacs.slice().sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || ''))).slice(0, 6);
+  return `<section class="hoyCard campReg"><h3>📥 Llegó una mujer</h3>
+    <div class="campForm"><label>Carnet<input id="rCarnet" inputmode="numeric" autocomplete="off"></label><label class="w2">Nombre completo<input id="rNombre" autocomplete="off"></label><label>Fecha de nacimiento<input id="rNac" type="date"></label>
+    <label>Celular<input id="rCel" inputmode="tel" placeholder="Ej: 70012345"></label><label>Cobertura<select id="rCob"><option value="SUS">SUS</option><option value="Sin SUS">Sin SUS</option><option value="">Sin dato</option></select></label><label class="w2">Su centro de salud (recibe el resultado)<select id="rCentro">${campOpcionesCentro()}</select></label></div>
+    <div id="rAviso"></div>
+    <div><small class="campLbl">Hace hoy</small><div class="hoyChips" id="rServ">${sv.map(k => `<button type="button" data-rs="${k}" class="${k === 'vph' ? '' : 'on'}">${CAMP_SERV[k] || k}</button>`).join('')}</div></div>
+    <label class="campCheck"><input type="checkbox" id="rCons" checked> Fue informada y acepta el registro digital en el SIVEC</label>
+    <button type="button" class="hoyBtn" data-c="registrar">Registrar y enviar a la estación ➜</button><div id="rOk"></div></section>
+    <section class="hoyCard"><h3>🗂 Últimas registradas <span class="hoyN">${campPacs.length}</span></h3>${ult.length ? ult.map(p => { const t = campTurnos.find(x => String(x.paciente_id) === String(p.id)); return `<div class="hoyFila"><span class="hoyNum">${t ? t.numero : '·'}</span><div><b>${esc(p.nombre)}</b><small>${esc(campServTexto(p))} · ${esc(centroNombre(p.centro_seguimiento || p.centro_id))}</small></div></div>`; }).join('') : '<div class="hoyVacio">Todavía nadie.</div>'}</section>`;
+}
+function campServTexto(p) { return [p.tipo_examen === 'Papanicolau' ? 'PAP' : p.tipo_examen === 'VPH' ? 'VPH' : '', p.tipo_examen === 'Papanicolau' && p.hizo_prueba_vph ? 'VPH' : '', campTurnos.some(t => String(t.paciente_id) === String(p.id) && (t.servicio === 'colposcopia' || /colpo/.test(t.notas || ''))) || p.tipo_examen === 'Colposcopia' ? 'colposcopia' : ''].filter(Boolean).join(' · '); }
+function campRegistroEventos() {
+  const ci = document.getElementById('rCarnet'); if (!ci) return;
+  ci.onchange = ci.onblur = () => {
+    const q = ci.value.trim(); const av = document.getElementById('rAviso'); if (q.length < 4) { av.innerHTML = ''; return; }
+    const prev = allPatientsData.filter(p => String(p.carnet || '').trim() === q).sort((a, b) => String(b.fecha_toma || '').localeCompare(String(a.fecha_toma || '')))[0];
+    if (!prev) { av.innerHTML = ''; return; }
+    const f = document.getElementById.bind(document);
+    if (!f('rNombre').value) f('rNombre').value = prev.nombre || ''; if (!f('rNac').value && prev.fecha_nacimiento) f('rNac').value = prev.fecha_nacimiento; if (!f('rCel').value && prev.celular) f('rCel').value = prev.celular;
+    av.innerHTML = `<div class="campYa">✔ Ya está en el SIVEC: último ${esc(prev.tipo_examen || 'PAP')} ${fmtFecha(prev.fecha_toma) || ''}${prev.estado_pap ? ' (' + esc(prev.estado_pap) + ')' : ''}</div>`;
+  };
+}
+async function campRegistrar() {
+  const g = id => document.getElementById(id), serv = [...document.querySelectorAll('#rServ [data-rs].on')].map(b => b.dataset.rs);
+  const nombre = g('rNombre').value.trim().toUpperCase();
+  if (!nombre) return showToast('Falta el nombre.', 'err');
+  if (!serv.length) return showToast('Marcá qué se hace hoy.', 'err');
+  const pap = serv.includes('pap'), vph = serv.includes('vph'), colpo = serv.includes('colposcopia'), c = campActual;
+  const row = { nombre, carnet: g('rCarnet').value.trim() || null, fecha_nacimiento: g('rNac').value || null, celular: g('rCel').value.trim() || null, cobertura: g('rCob').value || null,
+    centro_id: perfil.centro_id, centro_seguimiento: g('rCentro').value || perfil.centro_id, campana_id: c.id, fecha_toma: c.fecha,
+    tipo_examen: pap ? 'Papanicolau' : vph ? 'VPH' : 'Colposcopia', hizo_prueba_vph: vph, estado_pap: pap ? 'Pendiente' : null,
+    fecha_estimada: pap ? addDays(c.fecha, 90) : null, consent_registro_digital: g('rCons').checked, observaciones: 'Campaña: ' + c.nombre + (c.lugar ? ' · ' + c.lugar : '') };
+  if (!(await columnOk('consent_registro_digital'))) delete row.consent_registro_digital;
+  await limpiarCobertura(row);
+  if (pap || vph) await folioAsignar(row);
+  const b = document.querySelector('[data-c="registrar"]'); b.disabled = true;
+  const { data: ins, error } = await sb.from('pacientes').insert([row]).select();
+  if (error) { b.disabled = false; return showToast(campFaltaPaso(error) ? 'Falta el Paso 35 del SQL.' : 'No se pudo registrar: ' + esc(error.message), 'err'); }
+  const nueva = ins && ins[0];
+  const turno = { centro_id: perfil.centro_id, campana_id: c.id, paciente_id: nueva.id, paciente_nombre: nombre, carnet: row.carnet, servicio: pap || vph ? 'toma' : 'colposcopia', notas: colpo && (pap || vph) ? 'colpo' : null };
+  const { data: tr, error: e2 } = await sb.from('sivec_turnos').insert([turno]).select();
+  b.disabled = false;
+  if (e2) showToast('Registrada, pero no entró a la cola: ' + esc(e2.message), 'err');
+  sonido('ok');
+  allPatientsData.push(nueva); campPacs.push(nueva); if (tr && tr[0]) campTurnos.push(tr[0]);
+  const num = tr && tr[0] ? tr[0].numero : '';
+  campPintar();
+  document.getElementById('rOk').innerHTML = `<div class="campHecho"><b>✔ ${esc(nombre)} · turno Nº ${num}</b><span>Va a ${turno.servicio === 'toma' ? 'la estación de toma' : 'la colposcopia'}${row.numero_folio_pap ? ' · ' + esc(row.numero_folio_pap) : ''}</span><button type="button" class="hoyBtn sec" data-firma="${esc(nueva.id)}">✍ Firma de la paciente</button></div>`;
+  document.getElementById('rCarnet').focus();
+}
+function campColaHTML(est) {
+  const cola = campMiCola(), activos = cola.filter(t => ['espera', 'llamada', 'en_atencion'].includes(t.estado)), hechos = cola.filter(t => !activos.includes(t));
+  const fila = t => { const p = campPacs.find(x => String(x.id) === String(t.paciente_id)) || {}; const min = Math.max(0, Math.round((Date.now() - new Date(t.llegada)) / 60000));
+    const acc = ['espera', 'llamada'].includes(t.estado) ? `${t.estado === 'espera' ? `<button type="button" class="hoyBtn sec" data-ct="llamar" data-id="${t.id}">📣 Llamar</button>` : ''}<button type="button" class="hoyBtn" data-ct="${est === 'toma' ? 'tomada' : 'atender'}" data-id="${t.id}">${est === 'toma' ? '✔ Tomada' : 'Atender'}</button>` : t.estado === 'en_atencion' && est === 'colposcopia' ? `<button type="button" class="hoyBtn" data-ct="atender" data-id="${t.id}">Seguir</button>` : '';
+    const edad = edadTexto(p.fecha_nacimiento, campActual.fecha);
+    return `<div class="hoyFila est-${t.estado}"><span class="hoyNum">${t.numero || '·'}</span><div><b>${esc(t.paciente_nombre || '')}</b><small>${[edad, campServTexto(p), p.numero_folio_pap, TURNO_ESTADOS[t.estado] + (['espera', 'llamada'].includes(t.estado) ? ' · espera ' + min + ' min' : '')].filter(Boolean).map(esc).join(' · ')}</small></div><div class="hoyAcc">${acc}</div></div>${campAtender === t.id ? campColpoForm(t) : ''}`; };
+  return `<section class="hoyCard campCola"><h3>${est === 'toma' ? '🧪 En espera para la toma' : '🩺 Para colposcopia'} <span class="hoyN">${activos.length}</span></h3>
+    ${activos.length ? activos.map(fila).join('') : '<div class="hoyVacio">No hay mujeres esperando. Llegan solas desde el registro.</div>'}
+    ${hechos.length ? `<details class="hoyHechos"><summary>Atendidas (${hechos.length})</summary>${hechos.map(fila).join('')}</details>` : ''}
+    ${est === 'toma' ? '<p class="campNota">La muestra se toma en el momento. Las láminas de PAP y el VPH van después <b>en lote al Instituto Oncológico</b> (Balance → armar el lote).</p>' : '<p class="campNota">La colposcopia con IVAA y Schiller se registra <b>en el momento</b> y se firma con el PIN.</p>'}</section>`;
+}
+function campColpoForm(t) {
+  const ch = (k, ops) => `<div class="hoyChips" data-cg="${k}">${ops.map(([v, txt, cls]) => `<button type="button" data-cv="${esc(v)}" class="${cls || ''}">${txt}</button>`).join('')}</div>`;
+  return `<div class="campColpo" data-turno="${t.id}">
+    <div class="campG"><b>IVAA</b>${ch('ivaa', [['Negativo', 'Negativo', 'neg'], ['Positivo', 'Positivo', 'pos'], ['Sospecha de cáncer', 'Sospecha de cáncer', 'pos']])}</div>
+    <div class="campG"><b>Schiller</b>${ch('schiller', [['Negativa', 'Yodo positivo (normal)', 'neg'], ['Positiva', 'Zona yodo negativa', 'pos']])}</div>
+    <div class="campG"><b>Unión E-C</b>${ch('union', [['Visible', 'Visible'], ['No visible', 'No visible']])}</div>
+    <div class="campG"><b>Conducta</b>${ch('conducta', [['Esperar resultado de PAP/VPH', 'Esperar PAP/VPH'], ['Referir a colposcopia completa', 'Referir a colposcopia completa'], ['Biopsia', 'Biopsia'], ['Crioterapia', 'Crioterapia']])}</div>
+    <input id="cObs" placeholder="Observaciones (opcional)">
+    <div class="hoyAcc"><button type="button" class="hoyBtn sec" data-c="cancelarColpo">Cancelar</button><button type="button" class="hoyBtn" data-c="guardarColpo" data-id="${t.id}">✍ Guardar y firmar con PIN</button></div></div>`;
+}
+async function campGuardarColpo(tid) {
+  const box = document.querySelector(`.campColpo[data-turno="${tid}"]`), t = campTurnos.find(x => String(x.id) === String(tid)); if (!box || !t) return;
+  const val = k => { const b = box.querySelector(`[data-cg="${k}"] .on`); return b ? b.dataset.cv : null; };
+  const ivaa = val('ivaa'), schiller = val('schiller'), union = val('union'), conducta = val('conducta');
+  if (!ivaa) return showToast('Marcá el resultado del IVAA.', 'err');
+  const data = { paciente_id: t.paciente_id, fecha: campActual.fecha, ivaa, prueba_schiller: schiller, union_ec: union, plan: conducta ? [conducta] : [], otros_hallazgos: box.querySelector('#cObs').value.trim() || null, soap_analisis: 'IVAA ' + ivaa + (schiller ? ' · Schiller ' + schiller.toLowerCase() : '') + ' · campaña ' + campActual.nombre, campana_id: campActual.id };
+  const pin = await firmaPedir({ tipo: 'colposcopia', titulo: 'Firmar la colposcopia', detalle: `${t.paciente_nombre} · IVAA ${ivaa}${schiller ? ' · Schiller ' + schiller.toLowerCase() : ''}`, boton: 'Firmar y guardar' });
+  if (pin === null) return;
+  let { data: ins, error } = await sb.from('colposcopias').insert([data]).select('id');
+  if (error && campFaltaPaso(error)) { delete data.ivaa; delete data.union_ec; delete data.campana_id; ({ data: ins, error } = await sb.from('colposcopias').insert([data]).select('id')); }
+  if (error) return showToast('No se pudo guardar: ' + esc(error.message), 'err');
+  const id = ins && ins[0] && ins[0].id;
+  await sb.from('sivec_turnos').update({ estado: 'atendida', atendida_at: new Date().toISOString(), atendido_por: perfil.id }).eq('id', t.id);
+  Object.assign(t, { estado: 'atendida' }); campColpos.push(Object.assign({ id }, data)); campAtender = null;
+  if (ivaa !== 'Negativo') { sonido('alerta'); showToast(`⚠ IVAA ${esc(ivaa.toLowerCase())}: queda en la ficha y su centro la ve para el seguimiento.`, 'err', false); }
+  else showToast('Colposcopia guardada ✔', 'ok', 'ok');
+  if (id) firmaRegistrar('colposcopia', id, data, pin);
+  campPintar();
+}
+function campTableroHTML() {
+  const P = campPacs, pap = P.filter(p => p.tipo_examen === 'Papanicolau').length, vph = P.filter(p => p.tipo_examen === 'VPH' || p.hizo_prueba_vph).length;
+  const colpo = campColpos.length, pos = campColpos.filter(c => c.ivaa && c.ivaa !== 'Negativo').length, meta = Number(campActual.meta) || 0;
+  const sinLote = P.filter(p => p.tipo_examen !== 'Colposcopia' && !p.lote_id).length;
+  const horas = {}; campTurnos.filter(t => t.servicio === 'toma' || !campTurnos.some(x => x.paciente_id === t.paciente_id && x.servicio === 'toma')).forEach(t => { const h = new Date(t.llegada).getHours(); horas[h] = (horas[h] || 0) + 1; });
+  const hs = Object.keys(horas).map(Number); const h0 = Math.min(8, ...hs), h1 = Math.max(15, ...hs), maxH = Math.max(1, ...Object.values(horas));
+  const esp = s => campTurnos.filter(t => t.servicio === s && t.estado === 'espera');
+  const minEsp = s => { const L = esp(s); return L.length ? Math.max(0, Math.round(L.reduce((a, t) => a + Math.max(0, Date.now() - new Date(t.llegada)) / 60000, 0) / L.length)) : 0; };
+  const porCentro = {}; P.forEach(p => { const k = p.centro_seguimiento || p.centro_id; porCentro[k] = (porCentro[k] || 0) + 1; });
+  const cerrada = campActual.estado === 'cerrada';
+  return `<section class="hoyCard campTab"><h3>📊 ${cerrada ? 'Informe de la campaña' : 'La campaña en vivo'}</h3>
+    <div class="campKpis"><div><b>${P.length}</b><small>mujeres${meta ? ' (meta ' + meta + ')' : ''}</small></div><div><b>${pap}</b><small>PAP tomados</small></div><div><b>${vph}</b><small>VPH tomados</small></div><div><b>${colpo}</b><small>colposcopias</small></div><div class="${pos ? 'alta' : ''}"><b>${pos}</b><small>IVAA positivos</small></div></div>
+    ${meta ? `<div class="campMeta"><i style="width:${Math.min(100, Math.round(P.length * 100 / meta))}%"></i><span>${Math.round(P.length * 100 / meta)} % de la meta</span></div>` : ''}
+    <small class="campLbl">Mujeres por hora</small><div class="campBarras">${Array.from({ length: h1 - h0 + 1 }, (_, k) => h0 + k).map(h => `<div><i style="height:${Math.round((horas[h] || 0) * 100 / maxH)}%"></i><span>${h}h</span></div>`).join('')}</div>
+    ${cerrada ? '' : `<small class="campLbl">Estaciones ahora</small><div class="campEsp"><div>🧪 Toma<b>${esp('toma').length} esperando</b><small>${minEsp('toma')} min promedio</small></div><div>🩺 Colposcopia<b>${esp('colposcopia').length} esperando</b><small>${minEsp('colposcopia')} min promedio</small></div></div>`}
+    <small class="campLbl">Por centro de salud (reciben el resultado)</small>
+    <div>${Object.entries(porCentro).sort((a, b) => b[1] - a[1]).map(([k, n]) => `<div class="hoyFila"><div><b>${esc(centroNombre(k) || '—')}</b></div><span class="hoyN">${n}</span></div>`).join('') || '<div class="hoyVacio">—</div>'}</div>
+    ${cerrada ? `<p class="campNota">✔ Campaña cerrada${campActual.cerrada_at ? ' el ' + fmtFecha(fechaLocalISO(campActual.cerrada_at)) : ''}: cada mujer está en la ficha de su centro de salud.</p>` : `<p class="campNota">${sinLote ? `📦 Faltan <b>${plural(sinLote, 'muestra')}</b> por poner en un lote para el Oncológico (Balance → armar el lote).` : '📦 Todas las muestras ya están en un lote.'}</p>`}
+    <div class="hoyAcc" style="flex-wrap:wrap">${cerrada ? '' : `<button type="button" class="hoyBtn sec" data-c="lote">📦 Armar el lote</button><button type="button" class="hoyBtn" data-c="cerrar">🔒 Cerrar la campaña y enviar a cada centro</button>`}<button type="button" class="hoyBtn sec" data-c="informe">🖨 Informe</button></div></section>`;
+}
+function campInforme() {
+  const P = campPacs, c = campActual, porCentro = {};
+  P.forEach(p => { const k = centroNombre(p.centro_seguimiento || p.centro_id) || '—'; porCentro[k] = porCentro[k] || { n: 0, pap: 0, vph: 0, colpo: 0, pos: 0 }; const o = porCentro[k]; o.n++; if (p.tipo_examen === 'Papanicolau') o.pap++; if (p.tipo_examen === 'VPH' || p.hizo_prueba_vph) o.vph++; const cc = campColpos.find(x => String(x.paciente_id) === String(p.id)); if (cc) { o.colpo++; if (cc.ivaa && cc.ivaa !== 'Negativo') o.pos++; } });
+  const w = window.open('', '_blank'); if (!w) return showToast('Permití las ventanas emergentes para imprimir.', 'err');
+  const tot = Object.values(porCentro).reduce((a, o) => ({ n: a.n + o.n, pap: a.pap + o.pap, vph: a.vph + o.vph, colpo: a.colpo + o.colpo, pos: a.pos + o.pos }), { n: 0, pap: 0, vph: 0, colpo: 0, pos: 0 });
+  w.document.write(`<!doctype html><meta charset="utf-8"><title>Informe · ${esc(c.nombre)}</title><style>body{font-family:Arial,sans-serif;margin:32px;color:#222}h1{color:#7d2a4c;margin:0}table{border-collapse:collapse;width:100%;margin-top:16px}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left}th{background:#f5e9ee}</style>
+    <h1>Informe de la campaña · ${esc(c.nombre)}</h1><p>${fmtFecha(c.fecha)}${c.lugar ? ' · ' + esc(c.lugar) : ''} · Organiza: ${esc(centroNombre(c.centro_id))}${c.meta ? ' · Meta: ' + c.meta : ''}</p>
+    <table><tr><th>Centro de salud de la mujer</th><th>Mujeres</th><th>PAP</th><th>VPH</th><th>Colposcopias</th><th>IVAA positivos</th></tr>${Object.entries(porCentro).map(([k, o]) => `<tr><td>${esc(k)}</td><td>${o.n}</td><td>${o.pap}</td><td>${o.vph}</td><td>${o.colpo}</td><td>${o.pos}</td></tr>`).join('')}<tr><th>Total</th><th>${tot.n}</th><th>${tot.pap}</th><th>${tot.vph}</th><th>${tot.colpo}</th><th>${tot.pos}</th></tr></table>
+    <p style="margin-top:18px;font-size:12px;color:#666">SIVEC PAP/VPH · Modo Campaña · generado ${fmtFecha(hoyISO())}. Los resultados de PAP y VPH llegan del Instituto Oncológico a la ficha del centro de salud de cada mujer.</p><script>print()<\/script>`);
+  w.document.close();
+}
+async function campCerrar() {
+  const sinLote = campPacs.filter(p => p.tipo_examen !== 'Colposcopia' && !p.lote_id).length;
+  if (sinLote && !confirm(`Todavía hay ${sinLote} muestra(s) sin lote. Si cerrás ahora, esas muestras pasan a la ficha de su centro sin salir en el lote de la campaña.\n\n¿Cerrar igual?`)) return;
+  const otros = campPacs.filter(p => p.centro_seguimiento && String(p.centro_seguimiento) !== String(perfil.centro_id)).length;
+  if (!confirm(`Cerrar "${campActual.nombre}".\n\n${otros} mujer(es) pasan a la ficha de su propio centro de salud, que recibirá el resultado del Oncológico y hará el seguimiento. Este establecimiento ya no las va a ver en su lista.\n\n¿Cerrar la campaña?`)) return;
+  const { data, error } = await sb.rpc('sivec_campana_cerrar', { p_campana: campActual.id });
+  if (error) return showToast(campFaltaPaso(error) ? 'Falta el Paso 35 del SQL.' : 'No se pudo cerrar: ' + esc(error.message), 'err');
+  sonido('firma'); showToast(`🔒 Campaña cerrada · ${(data && data.enviadas) || 0} mujeres pasaron a la ficha de su centro ✔`, 'ok', false);
+  vozAviso('Campaña cerrada. Cada mujer ya está en la ficha de su centro de salud.', 'campcierre');
+  allPatientsData = []; campCargar();
+}
+document.addEventListener('click', async e => {
+  const v = document.getElementById('campanaView'); if (!v || !v.contains(e.target)) return;
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.sv || b.dataset.rs) { b.classList.toggle('on'); return; }
+  if (b.dataset.cv) { b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); return; }
+  if (b.dataset.abrir) { campGuardar('sivec_campana_id', b.dataset.abrir); return campCargar(); }
+  if (b.dataset.est) { campGuardar('sivec_campana_est', b.dataset.est); campAtender = null; return campPintar(); }
+  if (b.dataset.firma) { const p = campPacs.find(x => String(x.id) === b.dataset.firma); if (p) { const f = await pacFirmar(p, 'consentimiento'); if (f) { b.textContent = '✔ Firmado por la paciente'; b.disabled = true; } } return; }
+  const c = b.dataset.c;
+  if (c === 'salir') { campGuardar('sivec_campana_id', ''); campActual = null; return campPintar(); }
+  if (c === 'crear') {
+    const nombre = v.querySelector('#cNombre').value.trim(), fecha = v.querySelector('#cFecha').value, servicios = [...v.querySelectorAll('#cServ .on')].map(x => x.dataset.sv);
+    if (!nombre || !fecha) return showToast('Poné el nombre y la fecha de la campaña.', 'err');
+    const { data, error } = await sb.from('sivec_campanas').insert([{ centro_id: perfil.centro_id, nombre, fecha, lugar: v.querySelector('#cLugar').value.trim() || null, meta: Number(v.querySelector('#cMeta').value) || null, servicios }]).select();
+    if (error) return showToast(campFaltaPaso(error) ? 'Falta el Paso 35 del SQL.' : esc(error.message), 'err');
+    showToast('Campaña creada ✔', 'ok', 'ok'); campGuardar('sivec_campana_id', data[0].id); campGuardar('sivec_campana_est', 'registro'); return campCargar();
+  }
+  if (c === 'registrar') return campRegistrar();
+  if (c === 'cancelarColpo') { campAtender = null; return campPintar(); }
+  if (c === 'guardarColpo') return campGuardarColpo(b.dataset.id);
+  if (c === 'lote') return switchView('balance');
+  if (c === 'cerrar') return campCerrar();
+  if (c === 'informe') return campInforme();
+  if (b.dataset.ct) {
+    const t = campTurnos.find(x => String(x.id) === b.dataset.id); if (!t) return;
+    if (b.dataset.ct === 'atender') { if (t.estado !== 'en_atencion') { await sb.from('sivec_turnos').update({ estado: 'en_atencion', atendido_por: perfil.id }).eq('id', t.id); t.estado = 'en_atencion'; } campAtender = t.id; return campPintar(); }
+    const cambio = b.dataset.ct === 'llamar' ? { estado: 'llamada', llamada_at: new Date().toISOString() } : { estado: 'atendida', atendida_at: new Date().toISOString(), atendido_por: perfil.id };
+    const { error } = await sb.from('sivec_turnos').update(cambio).eq('id', t.id);
+    if (error) return showToast('Error: ' + esc(error.message), 'err');
+    Object.assign(t, cambio);
+    if (b.dataset.ct === 'tomada') {
+      sonido('ok');
+      if (/colpo/.test(t.notas || '')) {
+        const { data: tr } = await sb.from('sivec_turnos').insert([{ centro_id: perfil.centro_id, campana_id: campActual.id, paciente_id: t.paciente_id, paciente_nombre: t.paciente_nombre, carnet: t.carnet, servicio: 'colposcopia' }]).select();
+        if (tr && tr[0]) campTurnos.push(tr[0]);
+        showToast(`${esc(t.paciente_nombre)} ➜ colposcopia`, 'ok', false);
+      }
+    }
+    return campPintar();
+  }
+});
+function campActivar(si) { clearInterval(campTimer); campTimer = null; if (si) { campCargar(); campTimer = setInterval(() => { const v = document.getElementById('campanaView'); if (!document.hidden && v && v.classList.contains('active') && campActual && !campAtender && !(document.activeElement && v.contains(document.activeElement) && /INPUT|SELECT/.test(document.activeElement.tagName))) campCargarDatos(true).then(campPintar); }, 12000); } }
 
 // Términos de uso y política de privacidad: cada persona los acepta una vez por versión (Paso 26 del SQL)
 async function terminosVerificar() {

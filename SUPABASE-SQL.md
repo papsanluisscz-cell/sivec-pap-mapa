@@ -2364,3 +2364,63 @@ Sin el Paso 34 el código igual se arma, contando las tomas que la computadora y
 
 ### Deshacer el Paso 34
 `drop function if exists sivec_folio_siguiente(uuid, text); drop table if exists sivec_folios;` (los códigos ya guardados en las pacientes no se tocan; la columna `sigla` puede quedar).
+
+## Paso 35 — Modo Campaña (un día, un lugar: PAP, VPH y colposcopia)
+
+El médico responsable del programa crea la campaña. En la mesa de registro los datos se toman una sola vez y se elige el **centro de salud de cada mujer**. Las estaciones de toma y de colposcopia usan la cola del día (Paso 32). La colposcopia con IVAA y Schiller se registra en el momento. Las láminas salen en lote al Oncológico desde el establecimiento que organiza; al **cerrar la campaña**, cada mujer pasa a la ficha de su centro de salud, que recibe el resultado y hace el seguimiento. Requiere el Paso 32.
+
+```sql
+-- PASO 35 · Modo Campaña (requiere el Paso 32)
+create table if not exists sivec_campanas (
+  id uuid primary key default gen_random_uuid(),
+  centro_id uuid not null,
+  nombre text not null,
+  fecha date not null,
+  lugar text,
+  meta int,
+  servicios text[] not null default array['pap', 'vph', 'colposcopia'],
+  estado text not null default 'abierta' check (estado in ('abierta', 'cerrada')),
+  creado_por uuid default auth.uid(),
+  creado timestamptz not null default now(),
+  cerrada_at timestamptz
+);
+alter table sivec_campanas enable row level security;
+drop policy if exists "campañas del establecimiento" on sivec_campanas;
+create policy "campañas del establecimiento" on sivec_campanas for all to authenticated
+  using (sivec_edita_centro(centro_id)) with check (sivec_edita_centro(centro_id));
+grant select, insert, update on sivec_campanas to authenticated;
+
+alter table pacientes add column if not exists campana_id uuid;
+alter table pacientes add column if not exists centro_seguimiento uuid;
+alter table sivec_turnos add column if not exists campana_id uuid;
+alter table colposcopias add column if not exists ivaa text;
+alter table colposcopias add column if not exists union_ec text;
+alter table colposcopias add column if not exists campana_id uuid;
+
+-- Cerrar la campaña: cada mujer pasa a la ficha de su centro de salud
+create or replace function sivec_campana_cerrar(p_campana uuid) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare c sivec_campanas; n int;
+begin
+  select * into c from sivec_campanas where id = p_campana;
+  if not found or not sivec_edita_centro(c.centro_id) then raise exception 'Sin permiso para cerrar esta campaña.'; end if;
+  update pacientes set centro_id = centro_seguimiento
+   where campana_id = p_campana and centro_seguimiento is not null and centro_seguimiento <> centro_id and deleted_at is null;
+  get diagnostics n = row_count;
+  update sivec_campanas set estado = 'cerrada', cerrada_at = now() where id = p_campana;
+  return jsonb_build_object('ok', true, 'enviadas', n);
+end $$;
+revoke all on function sivec_campana_cerrar(uuid) from public;
+grant execute on function sivec_campana_cerrar(uuid) to authenticated;
+
+notify pgrst, 'reload schema';
+
+-- Resultado: debe decir "listo"
+select case when to_regclass('public.sivec_campanas') is not null
+             and to_regprocedure('sivec_campana_cerrar(uuid)') is not null
+             and exists (select 1 from information_schema.columns where table_name = 'pacientes' and column_name = 'centro_seguimiento')
+            then 'listo' else 'revisar' end as paso_35;
+```
+
+### Deshacer el Paso 35
+`drop function if exists sivec_campana_cerrar(uuid); drop table if exists sivec_campanas;` (las columnas nuevas pueden quedar vacías; las pacientes ya registradas en campañas siguen en sus fichas).
