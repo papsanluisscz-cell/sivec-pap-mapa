@@ -302,8 +302,8 @@
   #colpModal .cxChips { display: flex; flex-wrap: wrap; gap: 6px; }
   #colpModal .cx { position: relative; margin: 0; cursor: pointer; font-weight: 400; }
   #colpModal .cx input { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; }
-  #colpModal .cx span { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); line-height: 1.3; transition: background .15s, border-color .15s, transform .12s, box-shadow .15s; user-select: none; }
-  #colpModal .cx:hover span { border-color: var(--teal-500); }
+  #colpModal .cx > span { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); line-height: 1.3; transition: background .15s, border-color .15s, transform .12s, box-shadow .15s; user-select: none; }
+  #colpModal .cx:hover > span { border-color: var(--teal-500); }
   #colpModal .cx input:checked + span { background: #f7e2ea; border-color: #9c3a5f; color: #5b1733; font-weight: 700; animation: cxPop .22s ease; }
   #colpModal .cx input:checked + span::before { content: '✓'; }
   #colpModal .cx.neg input:checked + span { background: #e5f6ec; border-color: #16a34a; color: #14532d; }
@@ -321,6 +321,28 @@
   #colpModal .cxSub { font-size: 11.5px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: var(--ink-soft); margin: 10px 0 6px; }
   #colpModal .cxAyuda { font-weight: 400; color: var(--ink-soft); font-size: 12px; margin-left: 6px; }
   #colpModal .cxRes { margin-top: 10px; font-size: 13px; padding: 8px 12px; border-radius: 10px; background: var(--surface-2, rgba(125,42,76,.06)); color: var(--ink); } #colpModal .cxRes:empty { display: none; }
+  #colpModal .cxCard { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin: 10px 0; background: var(--surface); }
+  #colpModal .cxCard h4 { margin: 0 0 10px; font-size: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  #colpModal .cxCard h4 i { font-style: normal; background: var(--teal-700); color: #fff; width: 24px; height: 24px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; }
+  body.dark #colpModal .cxCard h4 i { color: #211419; }
+  #colpModal .ctGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px; }
+  #colpModal .ctCard > span { display: flex; width: 100%; box-sizing: border-box; align-items: flex-start; gap: 8px; padding: 8px 10px; border-radius: 10px; text-align: left; height: 100%; }
+  #colpModal .ctCard > span::before { position: absolute; top: 5px; right: 8px; }
+  #colpModal .ctCard .mIco { font-size: 19px; line-height: 1.1; font-style: normal; }
+  #colpModal .ctCard .mTx { display: flex; flex-direction: column; min-width: 0; padding-right: 14px; }
+  #colpModal .ctCard .mTx b { font-size: 12.5px; } #colpModal .ctCard .mTx small { font-size: 11px; color: var(--ink-soft); line-height: 1.3; font-weight: 400; }
+  #colpModal .ctCard .ctDel { position: absolute; bottom: 3px; right: 6px; border: 0; background: none; color: var(--ink-soft); font-size: 15px; cursor: pointer; padding: 0 2px; }
+  #colpModal .ctCard .ctDel:hover { color: #c0392b; }
+  #colpModal .ctAdd { margin-top: 10px; font: inherit; font-size: 12.5px; font-weight: 700; color: var(--teal-700); background: none; border: 1px dashed var(--teal-500); border-radius: 9px; padding: 7px 12px; cursor: pointer; }
+  #colpModal .ctForm { margin-top: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: var(--paper); }
+  #colpModal .ctTipos, #colpModal .ctIcos { display: flex; flex-wrap: wrap; gap: 5px; }
+  #colpModal .ctTipos button { font: inherit; font-size: 12.5px; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  #colpModal .ctTipos button.on { background: #f7e2ea; border-color: #9c3a5f; font-weight: 700; color: #5b1733; }
+  #colpModal .ctIcos button { font-size: 17px; width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; }
+  #colpModal .ctIcos button.on { border: 2px solid #9c3a5f; background: #f7e2ea; }
+  #colpModal .ctBtns { display: flex; justify-content: flex-end; gap: 6px; margin-top: 6px; }
+  #colpModal .ctBtns button { font: inherit; font-size: 12.5px; font-weight: 600; border-radius: 7px; padding: 6px 12px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+  #colpModal .ctBtns #ctOk { background: var(--teal-700); color: #fff; border-color: var(--teal-700); }
   #colpModal .checkGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; border: 1px solid var(--line); border-radius: 6px; padding: 10px; }
   #colpModal .checkGrid label { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 400; margin: 0; }
   #colpModal .checkGrid input { width: auto; }
@@ -2029,9 +2051,14 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
     <form id="colpForm">
       <div class="row2">
         <div class="field"><label>Fecha</label><input type="date" name="fecha" required></div>
+        <div class="field"></div>
+      </div>
+      <section class="cxCard"><h4><i>O</i> Hallazgos colposcópicos</h4>
+      <div class="row2">
         <div class="field"><label>Prueba de Schiller (Lugol)</label>
           <div class="cxChips" data-radio="1"><label class="cx neg"><input type="radio" name="prueba_schiller" value="Negativa"><span>Negativa (capta yodo)</span></label><label class="cx alto"><input type="radio" name="prueba_schiller" value="Positiva"><span>Positiva (zona yodo negativa)</span></label></div>
         </div>
+        <div class="field"></div>
       </div>
       <div class="row2" id="colpIvaaRow" style="display:none">
         <div class="field"><label>IVAA (ácido acético 3–5 %)</label>
@@ -2054,11 +2081,14 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
       <div class="field"><label>Zona afectada <small class="cxAyuda">las horas se marcan en el mapa de arriba</small></label>
         <div class="cxChips" data-radio="1"><label class="cx neg"><input type="radio" name="zona_afectada" value="Sin lesión"><span>Sin lesión</span></label><label class="cx "><input type="radio" name="zona_afectada" value="Zona de transformación"><span>Zona de transformación</span></label><label class="cx alto"><input type="radio" name="zona_afectada" value="Todo el cérvix"><span>Todo el cérvix</span></label></div>
       </div>
+      </section>
+      <section class="cxCard"><h4><i>A</i> Diagnóstico colposcópico</h4>
       <div class="field"><label>Lesión / Hallazgos <small class="cxAyuda">tocá los que correspondan</small></label>
         <div class="cxChips"><label class="cx neg"><input type="checkbox" name="lesion" value="Sin Lesión"><span>Sin lesión</span></label><label class="cx "><input type="checkbox" name="lesion" value="Ectropión"><span>Ectropión</span></label><label class="cx med"><input type="checkbox" name="lesion" value="LSIL"><span>LSIL</span></label><label class="cx alto"><input type="checkbox" name="lesion" value="HSIL"><span>HSIL</span></label><label class="cx med"><input type="checkbox" name="lesion" value="ASC-US"><span>ASC-US</span></label><label class="cx alto"><input type="checkbox" name="lesion" value="ASC-H"><span>ASC-H</span></label><label class="cx alto"><input type="checkbox" name="lesion" value="AGC"><span>AGC</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Micosis"><span>Micosis</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Trichomona"><span>Trichomona</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Gardnerella"><span>Gardnerella</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Vaginosis"><span>Vaginosis</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Vaginitis"><span>Vaginitis</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Cervicitis"><span>Cervicitis</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Cervicovaginitis"><span>Cervicovaginitis</span></label><label class="cx inf"><input type="checkbox" name="lesion" value="Colpitis"><span>Colpitis</span></label></div>
       </div>
       <div class="field"><label>Otros hallazgos</label><input name="otros_hallazgos"></div>
 
+      </section>
       <div id="colpSoapNota" class="segNote" style="display:none">La nota de consulta (SOAP) ahora se carga aparte: tarjeta de la paciente → ⋯ → <b>Consulta (SOAP)</b>. Al imprimir, la Historia clínica junta la consulta y esta colposcopia.</div>
       <div id="colpSoapBlock">
       <h3>SOAP</h3>
@@ -2077,15 +2107,21 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
       <div class="field"><label>A — Análisis (diagnóstico)</label><textarea name="soap_analisis" rows="2" placeholder="Se completa con la Lesión marcada arriba, o agregar detalle"></textarea></div>
       <div class="field"><label>Observaciones</label><textarea name="soap_observaciones" rows="2"></textarea></div>
       </div>
-      <div class="field cxTrat"><label>P — Tratamiento en el momento <small class="cxAyuda">✨ los sugeridos brillan según lo marcado</small></label>
-        <div class="cxSub">Procedimientos</div><div class="cxChips"><label class="cx proc"><input type="checkbox" name="plan" value="Crioterapia"><span>❄ Crioterapia</span></label><label class="cx proc"><input type="checkbox" name="plan" value="Termocoagulación"><span>🔥 Termocoagulación (ablación térmica)</span></label><label class="cx proc"><input type="checkbox" name="plan" value="Cauterización"><span>⚡ Cauterización</span></label><label class="cx proc"><input type="checkbox" name="plan" value="LEEP / asa diatérmica"><span>〰 LEEP / asa diatérmica</span></label><label class="cx proc"><input type="checkbox" name="plan" value="Biopsia"><span>📍 Biopsia dirigida</span></label><label class="cx proc"><input type="checkbox" name="plan" value="Legrado endocervical"><span>Legrado endocervical</span></label><label class="cx proc"><input type="checkbox" name="plan" value="Polipectomía"><span>Polipectomía</span></label></div>
-        <div class="cxSub">Medicación</div><div class="cxChips"><label class="cx med"><input type="checkbox" name="plan" value="Metronidazol 500mg VV x10 noches"><span>💊 Metronidazol 500 mg óvulo VV × 10 noches</span></label><label class="cx med"><input type="checkbox" name="plan" value="Metronidazol 500 mg VO c/12 h x7 días"><span>💊 Metronidazol 500 mg VO c/12 h × 7 días</span></label><label class="cx med"><input type="checkbox" name="plan" value="Clotrimazol 500mg VV x10 noches"><span>💊 Clotrimazol 500 mg óvulo VV × 10 noches</span></label><label class="cx med"><input type="checkbox" name="plan" value="Fluconazol 150 mg VO dosis única"><span>💊 Fluconazol 150 mg VO dosis única</span></label><label class="cx med"><input type="checkbox" name="plan" value="Nistatina óvulos VV x14 noches"><span>💊 Nistatina óvulo VV × 14 noches</span></label><label class="cx med"><input type="checkbox" name="plan" value="Azitromicina 1 g VO dosis única"><span>💊 Azitromicina 1 g VO dosis única</span></label><label class="cx med"><input type="checkbox" name="plan" value="Doxiciclina 100 mg VO c/12 h x7 días"><span>💊 Doxiciclina 100 mg VO c/12 h × 7 días</span></label><label class="cx med"><input type="checkbox" name="plan" value="Estriol crema vaginal"><span>💊 Estriol crema vaginal</span></label></div>
-        <div class="cxSub">Indicaciones</div><div class="cxChips"><label class="cx "><input type="checkbox" name="plan" value="Aseo vulvoperineal"><span>🚿 Aseo vulvoperineal</span></label><label class="cx "><input type="checkbox" name="plan" value="Orientación sexual"><span>💬 Orientación sexual</span></label><label class="cx "><input type="checkbox" name="plan" value="Uso de preservativo"><span>Uso de preservativo</span></label><label class="cx "><input type="checkbox" name="plan" value="Tratar a la pareja"><span>👫 Tratar a la pareja</span></label><label class="cx "><input type="checkbox" name="plan" value="Abstinencia sexual 4 semanas"><span>Abstinencia sexual 4 semanas</span></label></div>
+      <section class="cxCard cxTrat"><h4><i>P</i> Tratamiento, procedimientos e indicaciones <small class="cxAyuda">✨ los sugeridos brillan según lo marcado</small></h4>
+        <div id="colpTratBox"></div>
+        <button type="button" class="ctAdd" id="ctAddBtn">＋ Agregar tratamiento o procedimiento</button>
+        <div class="ctForm" id="ctForm" hidden>
+          <div class="cxSub">Tipo</div><div class="ctTipos"><button type="button" data-ctg="proc" class="on">🩺 Procedimiento</button><button type="button" data-ctg="med">💊 Medicación</button><button type="button" data-ctg="ind">📋 Indicación</button></div>
+          <div class="cxSub">Ícono</div><div class="ctIcos"></div>
+          <div class="row2"><div class="field"><label>Nombre</label><input id="ctNombre" placeholder="Ej.: Ácido tricloroacético 80 %"></div><div class="field"><label>Indicación / detalle</label><input id="ctIndic" placeholder="Ej.: aplicación única en la lesión"></div></div>
+          <div class="ctBtns"><button type="button" id="ctCancel">Cancelar</button><button type="button" id="ctOk">Guardar en la lista</button></div>
+        </div>
         <div class="cxRes" id="colpTratRes"></div>
-      </div>
-      <div class="field"><label>Derivación / conducta</label>
+        <div class="cxSub">Derivación / conducta</div>
+      <div class="field">
         <div class="cxChips" data-radio="1"><label class="cx "><input type="radio" name="derivacion" value="Esperar resultado de PAP/VPH"><span>Esperar resultado de PAP/VPH</span></label><label class="cx "><input type="radio" name="derivacion" value="Control en 6 meses"><span>Control en 6 meses</span></label><label class="cx neg"><input type="radio" name="derivacion" value="Control en 1 año"><span>Control en 1 año</span></label><label class="cx med"><input type="radio" name="derivacion" value="Ginecología"><span>Ginecología</span></label><label class="cx alto"><input type="radio" name="derivacion" value="Oncología"><span>Oncología</span></label></div>
       </div>
+      </section>
       <div class="actions">
         <button type="button" class="cancelBtn" onclick="closeColposcopia()">Cancelar</button>
         <button type="submit" class="saveBtn">Guardar colposcopia</button>
@@ -7375,6 +7411,7 @@ function fillColpForm(form, colp) {
   marcar('derivacion', colp.derivacion); marcar('ivaa', colp.ivaa); marcar('union_ec', colp.union_ec);
   const lesionSet = new Set(colp.lesion || []);
   form.querySelectorAll('input[name="lesion"]').forEach(cb => { cb.checked = lesionSet.has(cb.value); });
+  colpTratRender([], colp.plan || []);
   const planSet = new Set(colp.plan || []);
   form.querySelectorAll('input[name="plan"]').forEach(cb => { cb.checked = planSet.has(cb.value); });
 }
@@ -7386,6 +7423,74 @@ function colpIvaaOk() {
   if (!colpIvaaPromise) colpIvaaPromise = sb.from('colposcopias').select('ivaa,union_ec,campana_id').limit(1).then(({ error }) => !error, () => false);
   return colpIvaaPromise;
 }
+// Tratamientos de la colposcopia: tarjetas como en la consulta (SOAP). El valor que se guarda es el nombre.
+const COLPO_TRAT_GRUPOS = [['proc', 'Procedimientos en el momento', 'proc'], ['med', 'Medicación', 'med'], ['ind', 'Indicaciones', '']];
+const COLPO_TRAT_BASE = [
+  { g: 'proc', icon: '❄️', v: 'Crioterapia', indic: 'Ablación con frío de la zona de transformación' },
+  { g: 'proc', icon: '🔥', v: 'Termocoagulación', nombre: 'Termocoagulación (ablación térmica)', indic: 'Sonda a 100 °C, 20–40 s por aplicación' },
+  { g: 'proc', icon: '⚡', v: 'Cauterización', indic: 'Ectropión / lesión sangrante' },
+  { g: 'proc', icon: '〰️', v: 'LEEP / asa diatérmica', indic: 'Escisión de la zona de transformación' },
+  { g: 'proc', icon: '📍', v: 'Biopsia', nombre: 'Biopsia dirigida', indic: 'Marcar el sitio con 📍 en el mapa' },
+  { g: 'proc', icon: '🧪', v: 'Legrado endocervical', indic: 'Si la ZT no es visible (tipo 3)' },
+  { g: 'proc', icon: '✂️', v: 'Polipectomía', indic: 'Pólipo cervical, enviar a patología' },
+  { g: 'med', icon: '🥚', v: 'Metronidazol 500mg VV x10 noches', nombre: 'Metronidazol 500 mg óvulo', indic: '1 óvulo vaginal cada noche × 10 noches' },
+  { g: 'med', icon: '💊', v: 'Metronidazol 500 mg VO c/12 h x7 días', nombre: 'Metronidazol 500 mg comprimido', indic: '1 comp. VO cada 12 h × 7 días' },
+  { g: 'med', icon: '🥚', v: 'Clotrimazol 500mg VV x10 noches', nombre: 'Clotrimazol 500 mg óvulo', indic: '1 óvulo vaginal cada noche × 10 noches' },
+  { g: 'med', icon: '💊', v: 'Fluconazol 150 mg VO dosis única', nombre: 'Fluconazol 150 mg cápsula', indic: '1 cápsula VO, dosis única' },
+  { g: 'med', icon: '🥚', v: 'Nistatina óvulos VV x14 noches', nombre: 'Nistatina 100.000 UI óvulo', indic: '1 óvulo vaginal cada noche × 14 noches' },
+  { g: 'med', icon: '💊', v: 'Azitromicina 1 g VO dosis única', nombre: 'Azitromicina 500 mg comprimido', indic: '2 comp. VO juntos, dosis única' },
+  { g: 'med', icon: '💊', v: 'Doxiciclina 100 mg VO c/12 h x7 días', nombre: 'Doxiciclina 100 mg comprimido', indic: '1 comp. VO cada 12 h × 7 días' },
+  { g: 'med', icon: '🧴', v: 'Estriol crema vaginal', indic: 'Aplicar cada noche × 14 días, luego 2 por semana' },
+  { g: 'ind', icon: '🧼', v: 'Aseo vulvoperineal', indic: 'Indicaciones de higiene' },
+  { g: 'ind', icon: '🗣️', v: 'Orientación sexual', indic: 'Conducta sexual segura' },
+  { g: 'ind', icon: '🛡️', v: 'Uso de preservativo', indic: 'En cada relación durante el tratamiento' },
+  { g: 'ind', icon: '👫', v: 'Tratar a la pareja', indic: 'Mismo esquema para la pareja' },
+  { g: 'ind', icon: '⛔', v: 'Abstinencia sexual 4 semanas', indic: 'Después de crioterapia, termocoagulación o LEEP' },
+];
+const COLPO_ICONOS = ['🩺', '❄️', '🔥', '⚡', '〰️', '✂️', '📍', '🧪', '💉', '💊', '🥚', '🧴', '🩹', '🌿', '📋', '⭐'];
+function colpoTratCfg() { try { return JSON.parse(localStorage.getItem('sivec_colpo_trat_v1') || '{}') || {}; } catch (_) { return {}; } }
+function colpoTratLista() { return [...COLPO_TRAT_BASE, ...(colpoTratCfg().extra || []).map(m => Object.assign({ custom: true }, m))]; }
+// Dibuja las tarjetas; conserva lo marcado y agrega lo que la paciente ya tenía y no está en la lista
+function colpTratRender(marcados, deLaPaciente) {
+  const box = document.getElementById('colpTratBox'); if (!box) return;
+  const on = new Set(marcados || [...box.querySelectorAll('input[name="plan"]:checked')].map(i => i.value));
+  const lista = colpoTratLista(), conocidos = new Set(lista.map(m => m.v));
+  const extras = [...new Set([...(deLaPaciente || []), ...on])].filter(v => v && !conocidos.has(v)).map(v => ({ g: 'suelto', icon: '📌', v, indic: 'Registrado antes' }));
+  const card = (m, tono) => `<label class="cx ctCard ${tono}"><input type="checkbox" name="plan" value="${esc(m.v)}"${on.has(m.v) || (deLaPaciente || []).includes(m.v) ? ' checked' : ''}><span><i class="mIco">${m.icon}</i><span class="mTx"><b>${esc(m.nombre || m.v)}</b><small>${esc(m.indic || '')}</small></span></span>${m.custom ? `<button type="button" class="ctDel" data-del="${esc(m.id)}" title="Quitar de la lista">×</button>` : ''}</label>`;
+  box.innerHTML = COLPO_TRAT_GRUPOS.map(([g, t, tono]) => { const ms = lista.filter(m => m.g === g); return ms.length ? `<div class="cxSub">${t}</div><div class="ctGrid">${ms.map(m => card(m, tono)).join('')}</div>` : ''; }).join('')
+    + (extras.length ? `<div class="cxSub">Otros de esta paciente</div><div class="ctGrid">${extras.map(m => card(m, '')).join('')}</div>` : '');
+}
+(function () {
+  const f = document.getElementById('colpForm'); if (!f) return;
+  const form = document.getElementById('ctForm'), icos = form.querySelector('.ctIcos');
+  icos.innerHTML = COLPO_ICONOS.map((ic, i) => `<button type="button" data-ic="${ic}" class="${i ? '' : 'on'}">${ic}</button>`).join('');
+  colpTratRender([]);
+  f.addEventListener('click', e => {
+    const del = e.target.closest('.ctDel');
+    if (del) {
+      e.preventDefault(); e.stopPropagation();
+      const c = colpoTratCfg(), m = (c.extra || []).find(x => x.id === del.dataset.del);
+      if (!m || !confirm(`¿Quitar "${m.nombre || m.v}" de la lista de esta computadora? (las colposcopias ya guardadas no cambian)`)) return;
+      c.extra = c.extra.filter(x => x.id !== m.id); try { localStorage.setItem('sivec_colpo_trat_v1', JSON.stringify(c)); } catch (_) {}
+      colpTratRender(); colpSugerir(); return;
+    }
+    if (e.target.closest('#ctAddBtn')) { form.hidden = !form.hidden; if (!form.hidden) document.getElementById('ctNombre').focus(); return; }
+    const tg = e.target.closest('[data-ctg]'); if (tg) { form.querySelectorAll('[data-ctg]').forEach(b => b.classList.toggle('on', b === tg)); return; }
+    const ic = e.target.closest('[data-ic]'); if (ic) { icos.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === ic)); return; }
+    if (e.target.closest('#ctCancel')) { form.hidden = true; return; }
+    if (e.target.closest('#ctOk')) {
+      const nombre = document.getElementById('ctNombre').value.trim(); if (!nombre) { alert('Escribí el nombre del tratamiento o procedimiento.'); return; }
+      if (colpoTratLista().some(m => m.v.toLowerCase() === nombre.toLowerCase())) { alert('Ya está en la lista.'); return; }
+      const m = { id: 'c' + Date.now().toString(36), g: form.querySelector('[data-ctg].on').dataset.ctg, icon: icos.querySelector('.on').dataset.ic, v: nombre, indic: document.getElementById('ctIndic').value.trim() };
+      const c = colpoTratCfg(); c.extra = [...(c.extra || []), m];
+      try { localStorage.setItem('sivec_colpo_trat_v1', JSON.stringify(c)); } catch (_) { alert('No se pudo guardar en este navegador.'); return; }
+      const marc = [...f.querySelectorAll('input[name="plan"]:checked')].map(i => i.value); marc.push(nombre);
+      document.getElementById('ctNombre').value = ''; document.getElementById('ctIndic').value = ''; form.hidden = true;
+      colpTratRender(marc); colpSugerir(); sonido('ok'); showToast('Agregado a la lista y marcado ✔', 'ok', false);
+    }
+  });
+  form.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('ctOk').click(); } });
+})();
 // Tratamientos sugeridos según lo marcado (brillan; la doctora decide)
 function colpSugerir() {
   const f = document.getElementById('colpForm'); if (!f) return;
@@ -7417,7 +7522,7 @@ function colpSugerir() {
   const blk = document.getElementById('cuelloBlock'); if (blk) blk.addEventListener('click', () => setTimeout(colpSugerir, 0));
 })();
 async function openColposcopia(p, campana) {
-  ajustarColposcopiaSoap();
+  ajustarColposcopiaSoap(); colpTratRender([]); document.getElementById('ctForm').hidden = true;
   colpCampana = campana || null;
   const form = document.getElementById('colpForm');
   const existing = await getLatestColposcopia(p.id);
@@ -8244,7 +8349,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.17.0 · 28/09/2026';
+const SIVEC_VERSION = '1.18.0 · 29/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -9462,7 +9567,8 @@ document.addEventListener('change', e => { if (e.target.name === 'fecha_toma' &&
 // El PAP y el VPH van en lote al Oncológico desde el establecimiento que organiza; al cerrar, cada mujer pasa a la ficha de su centro.
 const CAMP_SERV = { pap: '🧪 PAP', vph: '🧬 VPH', colposcopia: '🩺 Colposcopia (IVAA/Schiller)' };
 const CAMP_EST = { registro: '📋 Recepción', consultorio: '🩺 Consultorio', tablero: '📊 Tablero' };
-const CAMP_TRAT = ['Crioterapia', 'Termocoagulación', 'Cauterización', 'LEEP / asa diatérmica', 'Biopsia', 'Legrado endocervical', 'Polipectomía', 'Metronidazol 500mg VV x10 noches', 'Metronidazol 500 mg VO c/12 h x7 días', 'Clotrimazol 500mg VV x10 noches', 'Fluconazol 150 mg VO dosis única', 'Nistatina óvulos VV x14 noches', 'Azitromicina 1 g VO dosis única', 'Doxiciclina 100 mg VO c/12 h x7 días', 'Estriol crema vaginal'];
+function campEsTrat(x) { const m = colpoTratLista().find(t => t.v === x); return !m || m.g !== 'ind'; }
+const CAMP_TRAT_VIEJO = ['Crioterapia', 'Termocoagulación', 'Cauterización', 'LEEP / asa diatérmica', 'Biopsia', 'Legrado endocervical', 'Polipectomía', 'Metronidazol 500mg VV x10 noches', 'Metronidazol 500 mg VO c/12 h x7 días', 'Clotrimazol 500mg VV x10 noches', 'Fluconazol 150 mg VO dosis única', 'Nistatina óvulos VV x14 noches', 'Azitromicina 1 g VO dosis única', 'Doxiciclina 100 mg VO c/12 h x7 días', 'Estriol crema vaginal'];
 let campLista = [], campActual = null, campTurnos = [], campPacs = [], campColpos = [], campTimer = null, campAtender = null, campUltimo = null, campOkTabla = true, campEditar = null, campBuscar = '';
 function campIdGuardado() { try { return localStorage.getItem('sivec_campana_id') || ''; } catch (_) { return ''; } }
 function campEstacion() { let e = ''; try { e = localStorage.getItem('sivec_campana_est') || ''; } catch (_) {} return CAMP_EST[e] ? e : ((tieneFuncion('toma') || tieneFuncion('colposcopia')) && !tieneFuncion('recepcion') ? 'consultorio' : 'registro'); }
@@ -9527,7 +9633,7 @@ function campRegistroHTML() {
     ${ult.length ? ult.map(p => { const t = campTurnos.find(x => String(x.paciente_id) === String(p.id)); return `<div class="hoyFila"><span class="hoyNum">${t ? t.numero : '·'}</span><div><b>${esc(p.nombre)}</b><small>${esc(campServTexto(p))} · ${esc(centroNombre(p.centro_seguimiento || p.centro_id))}</small></div><div class="hoyAcc"><button type="button" class="hoyBtn sec" data-ced="${esc(p.id)}">✏ Editar</button></div></div>${String(campEditar) === String(p.id) ? campEditarHTML(p) : ''}`; }).join('') : `<div class="hoyVacio">${q ? 'No se encontró.' : 'Todavía nadie.'}</div>`}</section>`;
 }
 function campServTexto(p) { return [p.tipo_examen === 'Papanicolau' ? 'PAP' : p.tipo_examen === 'VPH' ? 'VPH' : '', p.tipo_examen === 'Papanicolau' && p.hizo_prueba_vph ? 'VPH' : '', campTurnos.some(t => String(t.paciente_id) === String(p.id) && (t.servicio === 'colposcopia' || /colpo/.test(t.notas || ''))) || p.tipo_examen === 'Colposcopia' ? 'colposcopia' : ''].filter(Boolean).join(' · '); }
-function campHizo(p) { const c = campColpos.find(x => String(x.paciente_id) === String(p.id)); return c ? [c.ivaa ? 'IVAA ' + c.ivaa.toLowerCase() : '', ...(c.plan || []).filter(x => CAMP_TRAT.includes(x))].filter(Boolean).join(' · ') : ''; }
+function campHizo(p) { const c = campColpos.find(x => String(x.paciente_id) === String(p.id)); return c ? [c.ivaa ? 'IVAA ' + c.ivaa.toLowerCase() : '', ...(c.plan || []).filter(x => campEsTrat(x))].filter(Boolean).join(' · ') : ''; }
 function campRegistroEventos() {
   const ci = document.getElementById('rCarnet'); if (!ci) return;
   ci.onchange = ci.onblur = () => {
@@ -9648,7 +9754,7 @@ async function campGuardarConsulta(tid) {
 function campTableroHTML() {
   const P = campPacs, pap = P.filter(p => p.tipo_examen === 'Papanicolau').length, vph = P.filter(p => p.tipo_examen === 'VPH' || p.hizo_prueba_vph).length;
   const colpo = campColpos.length, pos = campColpos.filter(c => c.ivaa && c.ivaa !== 'Negativo').length, meta = Number(campActual.meta) || 0;
-  const tratadas = campColpos.filter(c => (c.plan || []).some(x => CAMP_TRAT.includes(x))).length, crio = campColpos.filter(c => (c.plan || []).includes('Crioterapia')).length, caut = campColpos.filter(c => (c.plan || []).includes('Cauterización')).length;
+  const tratadas = campColpos.filter(c => (c.plan || []).some(x => campEsTrat(x))).length, crio = campColpos.filter(c => (c.plan || []).includes('Crioterapia')).length, caut = campColpos.filter(c => (c.plan || []).includes('Cauterización')).length;
   const sinLote = P.filter(p => p.tipo_examen !== 'Colposcopia' && !p.lote_id).length;
   const horas = {}; campTurnos.filter(t => t.servicio === 'toma' || !campTurnos.some(x => x.paciente_id === t.paciente_id && x.servicio === 'toma')).forEach(t => { const h = new Date(t.llegada).getHours(); horas[h] = (horas[h] || 0) + 1; });
   const hs = Object.keys(horas).map(Number); const h0 = Math.min(8, ...hs), h1 = Math.max(15, ...hs), maxH = Math.max(1, ...Object.values(horas));
@@ -9670,7 +9776,7 @@ function campTableroHTML() {
 }
 function campInforme() {
   const P = campPacs, c = campActual, porCentro = {};
-  P.forEach(p => { const k = centroNombre(p.centro_seguimiento || p.centro_id) || '—'; porCentro[k] = porCentro[k] || { n: 0, pap: 0, vph: 0, colpo: 0, pos: 0, trat: 0 }; const o = porCentro[k]; o.n++; if (p.tipo_examen === 'Papanicolau') o.pap++; if (p.tipo_examen === 'VPH' || p.hizo_prueba_vph) o.vph++; const cc = campColpos.find(x => String(x.paciente_id) === String(p.id)); if (cc) { o.colpo++; if (cc.ivaa && cc.ivaa !== 'Negativo') o.pos++; if ((cc.plan || []).some(x => CAMP_TRAT.includes(x))) o.trat++; } });
+  P.forEach(p => { const k = centroNombre(p.centro_seguimiento || p.centro_id) || '—'; porCentro[k] = porCentro[k] || { n: 0, pap: 0, vph: 0, colpo: 0, pos: 0, trat: 0 }; const o = porCentro[k]; o.n++; if (p.tipo_examen === 'Papanicolau') o.pap++; if (p.tipo_examen === 'VPH' || p.hizo_prueba_vph) o.vph++; const cc = campColpos.find(x => String(x.paciente_id) === String(p.id)); if (cc) { o.colpo++; if (cc.ivaa && cc.ivaa !== 'Negativo') o.pos++; if ((cc.plan || []).some(x => campEsTrat(x))) o.trat++; } });
   const w = window.open('', '_blank'); if (!w) return showToast('Permití las ventanas emergentes para imprimir.', 'err');
   const tot = Object.values(porCentro).reduce((a, o) => ({ n: a.n + o.n, pap: a.pap + o.pap, vph: a.vph + o.vph, colpo: a.colpo + o.colpo, pos: a.pos + o.pos, trat: a.trat + o.trat }), { n: 0, pap: 0, vph: 0, colpo: 0, pos: 0, trat: 0 });
   w.document.write(`<!doctype html><meta charset="utf-8"><title>Informe · ${esc(c.nombre)}</title><style>body{font-family:Arial,sans-serif;margin:32px;color:#222}h1{color:#7d2a4c;margin:0}table{border-collapse:collapse;width:100%;margin-top:16px}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left}th{background:#f5e9ee}</style>
