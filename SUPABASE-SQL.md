@@ -2424,3 +2424,39 @@ select case when to_regclass('public.sivec_campanas') is not null
 
 ### Deshacer el Paso 35
 `drop function if exists sivec_campana_cerrar(uuid); drop table if exists sivec_campanas;` (las columnas nuevas pueden quedar vacías; las pacientes ya registradas en campañas siguen en sus fichas).
+
+
+## Paso 36 — Tratamientos y procedimientos propios de cada establecimiento (colposcopia)
+
+En la colposcopia, el botón **＋ Agregar tratamiento o procedimiento** guarda el tratamiento en la lista **del establecimiento**: aparece en todas las computadoras del centro (y en el consultorio de sus campañas). Quitar uno solo lo oculta de la lista; las colposcopias ya guardadas no cambian. Lo que ya se había agregado en una computadora antes de este paso pasa solo a la lista del establecimiento la primera vez que se abre la colposcopia. Requiere el Paso 8 (funciones `sivec_ve_centro` y `sivec_edita_centro`).
+
+```sql
+-- PASO 36 · Tratamientos y procedimientos propios de cada establecimiento (colposcopia)
+create table if not exists sivec_tratamientos_centro (
+  id uuid primary key default gen_random_uuid(),
+  centro_id uuid not null,
+  grupo text not null default 'proc' check (grupo in ('proc', 'med', 'ind')),
+  icono text,
+  nombre text not null check (length(trim(nombre)) between 2 and 120),
+  indicacion text check (indicacion is null or length(indicacion) <= 240),
+  activo boolean not null default true,
+  creado_por uuid default auth.uid(),
+  creado timestamptz not null default now()
+);
+create unique index if not exists sivec_trat_centro_nombre on sivec_tratamientos_centro (centro_id, lower(trim(nombre))) where activo;
+alter table sivec_tratamientos_centro enable row level security;
+drop policy if exists "tratamientos: ver los del establecimiento" on sivec_tratamientos_centro;
+create policy "tratamientos: ver los del establecimiento" on sivec_tratamientos_centro for select to authenticated
+  using (sivec_ve_centro(centro_id));
+drop policy if exists "tratamientos: agregar en el establecimiento" on sivec_tratamientos_centro;
+create policy "tratamientos: agregar en el establecimiento" on sivec_tratamientos_centro for insert to authenticated
+  with check (sivec_edita_centro(centro_id));
+drop policy if exists "tratamientos: quitar en el establecimiento" on sivec_tratamientos_centro;
+create policy "tratamientos: quitar en el establecimiento" on sivec_tratamientos_centro for update to authenticated
+  using (sivec_edita_centro(centro_id)) with check (sivec_edita_centro(centro_id));
+grant select, insert, update on sivec_tratamientos_centro to authenticated;
+select 'Paso 36 listo' as resultado;
+```
+
+### Deshacer el Paso 36
+`drop table if exists sivec_tratamientos_centro;` (el sistema vuelve a guardar la lista en cada computadora).

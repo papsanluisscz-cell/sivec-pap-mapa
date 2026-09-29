@@ -761,3 +761,30 @@ select case when to_regclass('public.sivec_campanas') is not null
              and exists (select 1 from information_schema.columns where table_name = 'pacientes' and column_name = 'centro_seguimiento')
             then 'listo' else 'revisar' end as paso_35;
 
+
+
+-- PASO 36 · Tratamientos y procedimientos propios de cada establecimiento (colposcopia)
+create table if not exists sivec_tratamientos_centro (
+  id uuid primary key default gen_random_uuid(),
+  centro_id uuid not null,
+  grupo text not null default 'proc' check (grupo in ('proc', 'med', 'ind')),
+  icono text,
+  nombre text not null check (length(trim(nombre)) between 2 and 120),
+  indicacion text check (indicacion is null or length(indicacion) <= 240),
+  activo boolean not null default true,
+  creado_por uuid default auth.uid(),
+  creado timestamptz not null default now()
+);
+create unique index if not exists sivec_trat_centro_nombre on sivec_tratamientos_centro (centro_id, lower(trim(nombre))) where activo;
+alter table sivec_tratamientos_centro enable row level security;
+drop policy if exists "tratamientos: ver los del establecimiento" on sivec_tratamientos_centro;
+create policy "tratamientos: ver los del establecimiento" on sivec_tratamientos_centro for select to authenticated
+  using (sivec_ve_centro(centro_id));
+drop policy if exists "tratamientos: agregar en el establecimiento" on sivec_tratamientos_centro;
+create policy "tratamientos: agregar en el establecimiento" on sivec_tratamientos_centro for insert to authenticated
+  with check (sivec_edita_centro(centro_id));
+drop policy if exists "tratamientos: quitar en el establecimiento" on sivec_tratamientos_centro;
+create policy "tratamientos: quitar en el establecimiento" on sivec_tratamientos_centro for update to authenticated
+  using (sivec_edita_centro(centro_id)) with check (sivec_edita_centro(centro_id));
+grant select, insert, update on sivec_tratamientos_centro to authenticated;
+select 'Paso 36 listo' as resultado;

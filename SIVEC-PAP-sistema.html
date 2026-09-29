@@ -7449,7 +7449,25 @@ const COLPO_TRAT_BASE = [
 ];
 const COLPO_ICONOS = ['🩺', '❄️', '🔥', '⚡', '〰️', '✂️', '📍', '🧪', '💉', '💊', '🥚', '🧴', '🩹', '🌿', '📋', '⭐'];
 function colpoTratCfg() { try { return JSON.parse(localStorage.getItem('sivec_colpo_trat_v1') || '{}') || {}; } catch (_) { return {}; } }
-function colpoTratLista() { return [...COLPO_TRAT_BASE, ...(colpoTratCfg().extra || []).map(m => Object.assign({ custom: true }, m))]; }
+// Con el Paso 36 la lista propia es del establecimiento (todas las computadoras); sin él, queda en esta computadora
+let colpoTratCentro = null, colpoTratTablaOk = false;
+function colpoTratPropios() { return colpoTratTablaOk ? (colpoTratCentro || []) : (colpoTratCfg().extra || []); }
+function colpoTratLista() { return [...COLPO_TRAT_BASE, ...colpoTratPropios().map(m => Object.assign({ custom: true }, m))]; }
+async function colpoTratCargar() {
+  if (!sb || !perfil || !perfil.centro_id) return;
+  const { data, error } = await sb.from('sivec_tratamientos_centro').select('*').eq('centro_id', perfil.centro_id).eq('activo', true).order('creado');
+  if (error) { colpoTratTablaOk = false; return; }
+  colpoTratTablaOk = true;
+  colpoTratCentro = (data || []).map(r => ({ id: r.id, g: r.grupo, icon: r.icono || '🩺', v: r.nombre, indic: r.indicacion || '' }));
+  // Lo que se había guardado solo en esta computadora pasa a la lista del establecimiento (una vez)
+  const loc = colpoTratCfg().extra || [], ya = new Set(colpoTratCentro.map(m => m.v.toLowerCase())), nuevos = loc.filter(m => !ya.has(String(m.v).toLowerCase()));
+  if (nuevos.length) {
+    const { data: ins, error: e2 } = await sb.from('sivec_tratamientos_centro').insert(nuevos.map(m => ({ centro_id: perfil.centro_id, grupo: m.g, icono: m.icon, nombre: m.v, indicacion: m.indic || null }))).select();
+    if (!e2) (ins || []).forEach(r => colpoTratCentro.push({ id: r.id, g: r.grupo, icon: r.icono || '🩺', v: r.nombre, indic: r.indicacion || '' }));
+    else return;
+  }
+  if (loc.length) try { localStorage.removeItem('sivec_colpo_trat_v1'); } catch (_) {}
+}
 // Dibuja las tarjetas; conserva lo marcado y agrega lo que la paciente ya tenía y no está en la lista
 function colpTratRender(marcados, deLaPaciente) {
   const box = document.getElementById('colpTratBox'); if (!box) return;
@@ -7469,10 +7487,16 @@ function colpTratRender(marcados, deLaPaciente) {
     const del = e.target.closest('.ctDel');
     if (del) {
       e.preventDefault(); e.stopPropagation();
-      const c = colpoTratCfg(), m = (c.extra || []).find(x => x.id === del.dataset.del);
-      if (!m || !confirm(`¿Quitar "${m.nombre || m.v}" de la lista de esta computadora? (las colposcopias ya guardadas no cambian)`)) return;
-      c.extra = c.extra.filter(x => x.id !== m.id); try { localStorage.setItem('sivec_colpo_trat_v1', JSON.stringify(c)); } catch (_) {}
-      colpTratRender(); colpSugerir(); return;
+      const m = colpoTratPropios().find(x => String(x.id) === del.dataset.del);
+      if (!m || !confirm(`¿Quitar "${m.nombre || m.v}" de la lista ${colpoTratTablaOk ? 'del establecimiento' : 'de esta computadora'}? (las colposcopias ya guardadas no cambian)`)) return;
+      (async () => {
+        if (colpoTratTablaOk) {
+          const { error } = await sb.from('sivec_tratamientos_centro').update({ activo: false }).eq('id', m.id);
+          if (error) return showToast('No se pudo quitar: ' + esc(error.message), 'err');
+          colpoTratCentro = colpoTratCentro.filter(x => x.id !== m.id);
+        } else { const c = colpoTratCfg(); c.extra = (c.extra || []).filter(x => x.id !== m.id); try { localStorage.setItem('sivec_colpo_trat_v1', JSON.stringify(c)); } catch (_) {} }
+        colpTratRender(); colpSugerir();
+      })(); return;
     }
     if (e.target.closest('#ctAddBtn')) { form.hidden = !form.hidden; if (!form.hidden) document.getElementById('ctNombre').focus(); return; }
     const tg = e.target.closest('[data-ctg]'); if (tg) { form.querySelectorAll('[data-ctg]').forEach(b => b.classList.toggle('on', b === tg)); return; }
@@ -7482,11 +7506,21 @@ function colpTratRender(marcados, deLaPaciente) {
       const nombre = document.getElementById('ctNombre').value.trim(); if (!nombre) { alert('Escribí el nombre del tratamiento o procedimiento.'); return; }
       if (colpoTratLista().some(m => m.v.toLowerCase() === nombre.toLowerCase())) { alert('Ya está en la lista.'); return; }
       const m = { id: 'c' + Date.now().toString(36), g: form.querySelector('[data-ctg].on').dataset.ctg, icon: icos.querySelector('.on').dataset.ic, v: nombre, indic: document.getElementById('ctIndic').value.trim() };
-      const c = colpoTratCfg(); c.extra = [...(c.extra || []), m];
-      try { localStorage.setItem('sivec_colpo_trat_v1', JSON.stringify(c)); } catch (_) { alert('No se pudo guardar en este navegador.'); return; }
+      const listo = () => {
       const marc = [...f.querySelectorAll('input[name="plan"]:checked')].map(i => i.value); marc.push(nombre);
       document.getElementById('ctNombre').value = ''; document.getElementById('ctIndic').value = ''; form.hidden = true;
-      colpTratRender(marc); colpSugerir(); sonido('ok'); showToast('Agregado a la lista y marcado ✔', 'ok', false);
+      colpTratRender(marc); colpSugerir(); sonido('ok'); showToast(colpoTratTablaOk ? 'Agregado a la lista del establecimiento y marcado ✔' : 'Agregado a la lista de esta computadora y marcado ✔', 'ok', false);
+      };
+      if (colpoTratTablaOk) {
+        sb.from('sivec_tratamientos_centro').insert([{ centro_id: perfil.centro_id, grupo: m.g, icono: m.icon, nombre: m.v, indicacion: m.indic || null }]).select().then(({ data, error }) => {
+          if (error) return showToast(/duplicate|unique/i.test(error.message) ? 'Ya está en la lista del establecimiento.' : 'No se pudo guardar: ' + esc(error.message), 'err');
+          const r = data && data[0]; colpoTratCentro.push({ id: r ? r.id : m.id, g: m.g, icon: m.icon, v: m.v, indic: m.indic }); listo();
+        });
+      } else {
+        const c = colpoTratCfg(); c.extra = [...(c.extra || []), m];
+        try { localStorage.setItem('sivec_colpo_trat_v1', JSON.stringify(c)); } catch (_) { alert('No se pudo guardar en este navegador.'); return; }
+        listo();
+      }
     }
   });
   form.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('ctOk').click(); } });
@@ -7522,7 +7556,7 @@ function colpSugerir() {
   const blk = document.getElementById('cuelloBlock'); if (blk) blk.addEventListener('click', () => setTimeout(colpSugerir, 0));
 })();
 async function openColposcopia(p, campana) {
-  ajustarColposcopiaSoap(); colpTratRender([]); document.getElementById('ctForm').hidden = true;
+  ajustarColposcopiaSoap(); await colpoTratCargar(); colpTratRender([]); document.getElementById('ctForm').hidden = true;
   colpCampana = campana || null;
   const form = document.getElementById('colpForm');
   const existing = await getLatestColposcopia(p.id);
@@ -8349,7 +8383,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.18.0 · 29/09/2026';
+const SIVEC_VERSION = '1.18.1 · 29/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -9584,6 +9618,7 @@ async function campCargar(silencio) {
   campPintar();
 }
 async function campCargarDatos(silencio) {
+  if (!colpoTratCentro) colpoTratCargar().catch(() => {}); // para contar los tratamientos propios del establecimiento
   const id = campActual.id;
   const [t, p, c] = await Promise.all([
     sb.from('sivec_turnos').select('*').eq('campana_id', id).order('numero', { ascending: true }),
