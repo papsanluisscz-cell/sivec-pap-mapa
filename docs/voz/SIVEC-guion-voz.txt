@@ -1,0 +1,132 @@
+SIVEC - frases para la voz (codigo TAB frase). Un audio por linea; el codigo es el nombre del archivo.
+
+S01	Buenos días.
+S02	Buenas tardes.
+S03	Buenas noches.
+S04	Buenos días, doctora.
+S05	Buenos días, doctor.
+S06	Buenos días, licenciada.
+S07	Buenos días, licenciado.
+S08	Buenos días, enfermera.
+S09	Buenas tardes, doctora.
+S10	Buenas tardes, doctor.
+S11	Buenas tardes, licenciada.
+S12	Buenas tardes, licenciado.
+S13	Buenas tardes, enfermera.
+S14	Buenas noches, doctora.
+S15	Buenas noches, doctor.
+S16	Buenas noches, licenciada.
+S17	Buenas noches, licenciado.
+S18	Buenas noches, enfermera.
+S19	Para hoy tiene:
+S20	En la red hay:
+S21	Hoy no tiene pendientes. ¡Buen trabajo!
+P01	Una paciente esperando en la cola.
+P02	pacientes esperando en la cola.
+P03	Un resultado nuevo del laboratorio.
+P04	resultados nuevos del laboratorio.
+P05	Y es un resultado alterado.
+P06	Y hay resultados alterados.
+P07	Una paciente para derivar a colposcopia.
+P08	pacientes para derivar a colposcopia.
+P09	Una positiva esperando conducta.
+P10	positivas esperando conducta.
+P11	Una contrarreferencia nueva.
+P12	contrarreferencias nuevas.
+P13	Un resultado para entregar.
+P14	resultados para entregar.
+P15	Un resultado atrasado.
+P16	resultados atrasados.
+P17	Un lote por recibir.
+P18	lotes por recibir.
+P19	Una muestra por informar.
+P20	muestras por informar.
+P21	Una referencia nueva.
+P22	referencias nuevas.
+P23	Una cita de colposcopia para hoy.
+P24	citas de colposcopia para hoy.
+P25	Una biopsia esperando resultado.
+P26	biopsias esperando resultado.
+P27	Una positiva sin tratar.
+P28	positivas sin tratar.
+P29	Un resultado atrasado en la red.
+P30	resultados atrasados en la red.
+P31	La red va en el
+P32	por ciento de la meta del año.
+C01	Hay probabilidad de lluvia: no se olvide el paraguas.
+C02	Va a hacer mucho calor: tome bastante agua.
+C03	Hace frío: abríguese bien.
+F01	Hoy es un buen día para salvar vidas.
+F02	Cada PAP que se toma hoy puede evitar un cáncer mañana.
+F03	Un resultado entregado a tiempo es una vida protegida.
+F04	Gracias por cuidar a las mujeres de su comunidad.
+F05	Detrás de cada número hay una madre, una hija, una hermana.
+F06	Hoy también podemos llegar a tiempo.
+F07	Lo que usted hace hoy, una familia lo agradece mañana.
+A01	Llegó un resultado alterado del laboratorio.
+A02	Llegaron resultados alterados del laboratorio.
+A03	Llegaron resultados nuevos del laboratorio.
+A04	Llegó una contrarreferencia nueva.
+A05	Tiene una paciente nueva en espera.
+A06	Tiene pacientes nuevas en espera.
+A07	Campaña cerrada. Cada mujer ya está en la ficha de su centro de salud.
+K01	Colposcopía realizada.
+K02	Paciente:
+K03	Contrarreferencia enviada.
+K04	Referencia firmada.
+K05	Contrarreferencia firmada y enviada.
+K06	Informe firmado.
+K07	Consulta firmada.
+K08	Referencia aceptada y firmada.
+K09	Contrarreferencia recibida.
+K10	Documento firmado.
+K11	Firma de la paciente registrada.
+M01	Llegamos al veinticinco por ciento de la meta del año. ¡Sigan así!
+M02	Llegamos a la mitad de la meta del año. ¡Sigan así!
+M03	Llegamos al setenta y cinco por ciento de la meta del año. ¡Sigan así!
+M04	¡Cumplimos la meta del año! ¡Felicidades a todo el equipo!
+R01	Hoy se registró una toma.
+R02	Hoy se registraron
+R03	tomas.
+R04	Más que ayer.
+R05	Igual que ayer.
+R06	El laboratorio informó muestras hoy.
+R07	¡Buen trabajo! Gracias por cuidar a las mujeres de su comunidad.
+N02	Dos.
+N03	Tres.
+N04	Cuatro.
+N05	Cinco.
+N06	Seis.
+N07	Siete.
+N08	Ocho.
+N09	Nueve.
+N10	Diez.
+N11	Once.
+N12	Doce.
+N13	Trece.
+N14	Catorce.
+N15	Quince.
+N16	Dieciséis.
+N17	Diecisiete.
+N18	Dieciocho.
+N19	Diecinueve.
+N20	Veinte.
+N21	Veintiuno.
+N22	Veintidós.
+N23	Veintitrés.
+N24	Veinticuatro.
+N25	Veinticinco.
+N26	Veintiséis.
+N27	Veintisiete.
+N28	Veintiocho.
+N29	Veintinueve.
+N30	Treinta.
+N40	Cuarenta.
+N50	Cincuenta.
+N60	Sesenta.
+N70	Setenta.
+N75	Setenta y cinco.
+N80	Ochenta.
+N90	Noventa.
+N100	Cien.
+N99	Más de treinta.
