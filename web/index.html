@@ -1424,13 +1424,16 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
 #campanaView .campPacTop { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; } #campanaView .campPacTop .campBuscar { flex: 1 1 260px; margin: 0; }
 #campanaView .campPacRes { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); } #campanaView .campPacRes span { background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; } #campanaView .campPacRes b { color: var(--teal-700); }
 #campanaView .campPacWrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
-#campanaView .campPacTabla { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 980px; }
+#campanaView .campPacTabla { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 1060px; }
 #campanaView .campPacTabla th { background: var(--paper); text-align: left; padding: 8px; font-size: 11.5px; color: var(--ink-soft); position: sticky; top: 0; }
 #campanaView .campPacTabla td { padding: 8px; border-top: 1px solid var(--line); vertical-align: top; } #campanaView .campPacTabla td.n { font-weight: 800; color: var(--teal-700); }
 #campanaView .campPacTabla td small { display: block; color: var(--ink-soft); font-size: 11.5px; margin-top: 2px; } #campanaView .campPacTabla .mut { color: var(--ink-soft); }
 #campanaView .campPacTabla tr[data-pac] { cursor: pointer; } #campanaView .campPacTabla tr[data-pac]:hover td { background: color-mix(in srgb, var(--teal-700) 6%, transparent); }
 #campanaView .campPacTabla tr.alt td:first-child { box-shadow: inset 4px 0 0 #7c3aed; }
 #campanaView .campEst { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; background: var(--paper); border: 1px solid var(--line); white-space: nowrap; } #campanaView .campEst.est-atendida { background: #dcfce7; border-color: #86efac; color: #166534; } #campanaView .campEst.est-espera, #campanaView .campEst.est-llamada { background: #fef3c7; border-color: #fcd34d; color: #92400e; }
+#campanaView .campPacAcc { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; max-width: 330px; } #campanaView .campPacAcc .hoyBtn { font-size: 11.5px; padding: 5px 9px; white-space: nowrap; } #campanaView .campPacAcc .hoyBtn:disabled { opacity: .45; cursor: not-allowed; }
+#campanaView .campPacTabla tr.abierta td { background: color-mix(in srgb, var(--teal-700) 7%, transparent); } #campanaView .campPacTabla tr.campPacEdit td { padding: 10px 12px 16px; border-top: 0; cursor: default; }
+#campanaView .campPacTabla tr.campPacEdit td > .campColpo { position: sticky; left: 12px; width: min(980px, calc(100vw - 90px)); box-sizing: border-box; } #campanaView .campPacTabla tr.campPacEdit .campForm { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
 #campanaView .campHechasTit { margin: 14px 0 6px; font-size: 12px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: var(--ink-soft); }
 #campanaView .campBuscar { width: 100%; padding: 8px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; margin-bottom: 6px; }
 #campanaView .campHecho { display: flex; flex-direction: column; gap: 6px; background: #ecfdf3; border: 1px solid #86efac; border-radius: 12px; padding: 12px; } #campanaView .campHecho span { font-size: 13px; color: var(--ink-soft); }
@@ -8451,7 +8454,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.21.0 · 30/09/2026';
+const SIVEC_VERSION = '1.21.1 · 30/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -9875,7 +9878,7 @@ function campEditarHTML(p) {
   return `<div class="campColpo campEd" data-ed="${esc(p.id)}"><p class="campSec">✏ Corregir datos y pedido</p>
     <div class="campForm"><label>Carnet<input data-f="carnet" value="${esc(p.carnet || '')}" inputmode="numeric"></label><label class="w2">Nombre completo<input data-f="nombre" value="${esc(p.nombre || '')}"></label><label>Fecha de nacimiento<input data-f="fecha_nacimiento" type="date" value="${esc(p.fecha_nacimiento || '')}"></label>
     <label>Celular<input data-f="celular" value="${esc(p.celular || '')}" inputmode="tel"></label><label>Cobertura<select data-f="cobertura">${['SUS', 'Sin SUS', ''].map(v => `<option value="${v}"${(p.cobertura || '') === v ? ' selected' : ''}>${v || 'Sin dato'}</option>`).join('')}</select></label><label class="w2">Su centro de salud (recibe el resultado)<select data-f="centro_seguimiento">${opc}</select></label></div>
-    <div><small class="campLbl">Pedido · qué se hace hoy</small><div class="hoyChips" data-cg="edserv" data-multi="1">${['pap', 'vph', 'colposcopia'].map(k => `<button type="button" data-cv="${k}" class="${sv[k] ? 'on' : ''}">${CAMP_SERV[k] || k}</button>`).join('')}</div>${atendida ? '<small class="campLbl">Ya fue atendida: el pedido se corrige en el consultorio.</small>' : ''}</div>
+    <div><small class="campLbl">Pedido · qué se hace hoy</small><div class="hoyChips" data-cg="edserv" data-multi="1">${['pap', 'vph', 'colposcopia'].map(k => `<button type="button" data-cv="${k}" class="${sv[k] ? 'on' : ''}">${CAMP_SERV[k] || k}</button>`).join('')}</div>${atendida ? '<small class="campLbl">Ya fue atendida: lo que se tomó se corrige en 🩺 Atención.</small>' : ''}</div>
     <div class="hoyAcc"><button type="button" class="hoyBtn sec" data-c="edCancelar">Cancelar</button><button type="button" class="hoyBtn" data-c="edGuardar" data-id="${esc(p.id)}">Guardar cambios</button></div></div>`;
 }
 async function campGuardarEdicion(id) {
@@ -9918,8 +9921,11 @@ function campPacientesHTML() {
     <div class="campPacRes">${[['atendidas', n(p => (campTurnos.find(t => String(t.paciente_id) === String(p.id)) || {}).estado === 'atendida')], ['con colposcopía', new Set(campColpos.map(c => String(c.paciente_id))).size], ['IVAA positivo', campColpos.filter(c => c.ivaa && c.ivaa !== 'Negativo').length], ['con resultado', n(p => bethesdaDe(p) || p.resultado_vph)]].map(([t, v]) => `<span><b>${v}</b> ${t}</span>`).join('')}</div>
     ${!campRpcOk && campActual.estado === 'cerrada' ? '<p class="campNota">⚠ Se ven solo las mujeres que quedaron en este establecimiento. Para ver a todas (también las que pasaron a su centro de salud), ejecutá el <b>Paso 38</b> de SUPABASE-SQL.md.</p>' : ''}
     <div class="campPacWrap"><table class="campPacTabla"><thead><tr><th>Nº</th><th>Mujer</th><th>Su centro</th><th>Pedido · toma</th><th>Colposcopía</th><th>Tratamiento · conducta</th><th>Resultado</th><th>Estado</th></tr></thead><tbody>
-    ${F.map(f => `<tr data-pac="${esc(f.p.id)}" class="${f.alt || f.ivaaPos ? 'alt' : ''}"><td class="n">${f.num}</td><td><b>${esc(f.nombre)}</b><small>CI ${esc(f.ci || '—')} · ${esc(f.edad || '—')}${f.cel ? ' · ☎ ' + esc(f.cel) : ''}</small></td><td>${esc(f.centro)}</td><td>${esc(f.pedido || '—')}<small>${f.toma ? 'Tomó: ' + esc(f.toma) : 'Sin toma'}${f.codigo ? ' · ' + esc(f.codigo) : ''}</small></td><td>${f.colpo ? esc(f.colpo) : '<span class="mut">—</span>'}</td><td>${f.trat ? esc(f.trat) : '<span class="mut">—</span>'}</td><td>${esc(f.res || '—')}</td><td><span class="campEst est-${esc(f.t.estado || 'x')}">${esc(f.estado)}</span></td></tr>`).join('') || '<tr><td colspan="8" class="mut">Nadie todavía.</td></tr>'}</tbody></table></div>
-    <p class="campNota">Tocá una fila para abrir la ficha completa de la mujer. Los resultados de PAP y VPH aparecen acá cuando el Oncológico los informa.</p></section>`;
+    ${F.map(f => { const propio = !conRoles() || String(f.p.centro_id) === String(perfil.centro_id), bloq = propio ? '' : ` disabled title="Ya está en la ficha de ${esc(centroNombre(f.p.centro_id) || 'su centro')}: lo corrige ese centro"`;
+      const acc = `<div class="campPacAcc"><button type="button" class="hoyBtn sec" data-ced="${esc(f.p.id)}"${bloq}>✏ Datos</button>${f.t.id ? `<button type="button" class="hoyBtn sec" data-pat="${esc(f.t.id)}"${bloq}>🩺 Atención</button>` : ''}<button type="button" class="hoyBtn sec" data-pcolpo="${esc(f.p.id)}"${bloq}>🔬 Colposcopía y tratamiento</button></div>`;
+      const edit = String(campEditar) === String(f.p.id) ? campEditarHTML(f.p) : f.t.id && campAtender === f.t.id ? campConsultaForm(f.t, f.p) : '';
+      return `<tr data-pac="${esc(f.p.id)}" class="${f.alt || f.ivaaPos ? 'alt' : ''}${edit ? ' abierta' : ''}"><td class="n">${f.num}</td><td><b>${esc(f.nombre)}</b><small>CI ${esc(f.ci || '—')} · ${esc(f.edad || '—')}${f.cel ? ' · ☎ ' + esc(f.cel) : ''}</small>${acc}</td><td>${esc(f.centro)}</td><td>${esc(f.pedido || '—')}<small>${f.toma ? 'Tomó: ' + esc(f.toma) : 'Sin toma'}${f.codigo ? ' · ' + esc(f.codigo) : ''}</small></td><td>${f.colpo ? esc(f.colpo) : '<span class="mut">—</span>'}</td><td>${f.trat ? esc(f.trat) : '<span class="mut">—</span>'}</td><td>${esc(f.res || '—')}</td><td><span class="campEst est-${esc(f.t.estado || 'x')}">${esc(f.estado)}</span></td></tr>${edit ? `<tr class="campPacEdit"><td colspan="8">${edit}</td></tr>` : ''}`; }).join('') || '<tr><td colspan="8" class="mut">Nadie todavía.</td></tr>'}</tbody></table></div>
+    <p class="campNota">Tocá una fila para abrir la ficha completa. Con <b>✏ Datos</b> se corrigen nombre, carnet, nacimiento, celular, cobertura y centro; con <b>🩺 Atención</b>, qué se tomó (PAP/VPH); con <b>🔬 Colposcopía y tratamiento</b>, los hallazgos, el tratamiento y la conducta. Los resultados de PAP y VPH aparecen acá cuando el Oncológico los informa.</p></section>`;
 }
 function campPacientesExportar(imprimir) {
   const F = campPacs.map(campFilaPaciente).sort((a, b) => (Number(a.num) || 9999) - (Number(b.num) || 9999)), c = campActual;
@@ -10051,7 +10057,9 @@ document.addEventListener('click', async e => {
   if (c === 'abrirColpo') { const t = campTurnos.find(x => String(x.id) === b.dataset.id), p = t && campPacs.find(x => String(x.id) === String(t.paciente_id)); if (p) return openColposcopia(p, campActual); return; }
   if (c === 'edCancelar') { campEditar = null; return campPintar(); }
   if (c === 'edGuardar') return campGuardarEdicion(b.dataset.id);
-  if (b.dataset.ced) { campEditar = String(campEditar) === b.dataset.ced ? null : b.dataset.ced; return campPintar(); }
+  if (b.dataset.ced) { campEditar = String(campEditar) === b.dataset.ced ? null : b.dataset.ced; campAtender = null; return campPintar(); }
+  if (b.dataset.pat) { campAtender = campAtender === b.dataset.pat || String(campAtender) === b.dataset.pat ? null : (campTurnos.find(x => String(x.id) === b.dataset.pat) || {}).id; campEditar = null; return campPintar(); }
+  if (b.dataset.pcolpo) { const p = campPacs.find(x => String(x.id) === b.dataset.pcolpo); if (p) return openColposcopia(p, campActual); return; }
   if (c === 'lote') return switchView('balance');
   if (c === 'cerrar') return campCerrar();
   if (c === 'informe') return campInforme();
@@ -10067,7 +10075,7 @@ document.addEventListener('click', async e => {
     return campPintar();
   }
 });
-document.addEventListener('click', e => { const tr = e.target.closest('#campanaView .campPacTabla tr[data-pac]'); if (!tr) return; const p = campPacs.find(x => String(x.id) === tr.dataset.pac); if (p && typeof openFicha === 'function') openFicha(p); });
+document.addEventListener('click', e => { if (e.target.closest('button, input, select, textarea, label, .campColpo')) return; const tr = e.target.closest('#campanaView .campPacTabla tr[data-pac]'); if (!tr) return; const p = campPacs.find(x => String(x.id) === tr.dataset.pac); if (p && typeof openFicha === 'function') openFicha(p); });
 document.addEventListener('input', e => { if (e.target.id === 'pBuscar') { campBuscarP = e.target.value; const pos = e.target.selectionStart; campPintar(); const n = document.getElementById('pBuscar'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (_) {} } return; } if (e.target.id === 'rBuscar') { campBuscar = e.target.value; const pos = e.target.selectionStart; campPintar(); const n = document.getElementById('rBuscar'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (_) {} } } });
 function campActivar(si) { clearInterval(campTimer); campTimer = null; if (si) { campCargar(); campTimer = setInterval(() => { const v = document.getElementById('campanaView'); if (!document.hidden && v && v.classList.contains('active') && campActual && !campAtender && !campEditar && !document.getElementById('colpOverlay').classList.contains('open') && !(document.activeElement && v.contains(document.activeElement) && /INPUT|SELECT/.test(document.activeElement.tagName))) campCargarDatos(true).then(campPintar); }, 12000); } }
 
