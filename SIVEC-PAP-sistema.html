@@ -1421,6 +1421,16 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
 #campanaView .campCola .hoyFila.est-atendida .hoyNum { background: #9ca3af !important; }
 #campanaView .campCola .hoyFila.est-atendida b::after { content: ' ✔'; color: #16a34a; }
 @keyframes campLatido { 50% { transform: scale(1.12); box-shadow: 0 0 0 6px rgba(241,167,195,.35); } }
+#campanaView .campPacTop { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; } #campanaView .campPacTop .campBuscar { flex: 1 1 260px; margin: 0; }
+#campanaView .campPacRes { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); } #campanaView .campPacRes span { background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; } #campanaView .campPacRes b { color: var(--teal-700); }
+#campanaView .campPacWrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+#campanaView .campPacTabla { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 980px; }
+#campanaView .campPacTabla th { background: var(--paper); text-align: left; padding: 8px; font-size: 11.5px; color: var(--ink-soft); position: sticky; top: 0; }
+#campanaView .campPacTabla td { padding: 8px; border-top: 1px solid var(--line); vertical-align: top; } #campanaView .campPacTabla td.n { font-weight: 800; color: var(--teal-700); }
+#campanaView .campPacTabla td small { display: block; color: var(--ink-soft); font-size: 11.5px; margin-top: 2px; } #campanaView .campPacTabla .mut { color: var(--ink-soft); }
+#campanaView .campPacTabla tr[data-pac] { cursor: pointer; } #campanaView .campPacTabla tr[data-pac]:hover td { background: color-mix(in srgb, var(--teal-700) 6%, transparent); }
+#campanaView .campPacTabla tr.alt td:first-child { box-shadow: inset 4px 0 0 #7c3aed; }
+#campanaView .campEst { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; background: var(--paper); border: 1px solid var(--line); white-space: nowrap; } #campanaView .campEst.est-atendida { background: #dcfce7; border-color: #86efac; color: #166534; } #campanaView .campEst.est-espera, #campanaView .campEst.est-llamada { background: #fef3c7; border-color: #fcd34d; color: #92400e; }
 #campanaView .campHechasTit { margin: 14px 0 6px; font-size: 12px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: var(--ink-soft); }
 #campanaView .campBuscar { width: 100%; padding: 8px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; margin-bottom: 6px; }
 #campanaView .campHecho { display: flex; flex-direction: column; gap: 6px; background: #ecfdf3; border: 1px solid #86efac; border-radius: 12px; padding: 12px; } #campanaView .campHecho span { font-size: 13px; color: var(--ink-soft); }
@@ -8441,7 +8451,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.20.4 · 29/09/2026';
+const SIVEC_VERSION = '1.21.0 · 30/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -9214,7 +9224,7 @@ async function vozResumenDelDia(forzar) {
       const ayer = new Date(Date.parse(hoy + 'T12:00:00') - 864e5).toISOString().slice(0, 10);
       const { data } = await sb.from('pacientes').select('id,fecha_toma').eq('centro_id', perfil.centro_id).is('deleted_at', null).gte('fecha_toma', ayer);
       const nh = (data || []).filter(p => p.fecha_toma === hoy).length, na = (data || []).filter(p => p.fecha_toma === ayer).length;
-      if (nh) frases.push(`Hoy se registraron ${plural(nh, 'toma')}` + (nh > na && na ? `, ${nh - na} más que ayer` : nh === na ? ', igual que ayer' : '') + '.');
+      if (nh) frases.push((nh === 1 ? 'Hoy se registró 1 toma' : `Hoy se registraron ${plural(nh, 'toma')}`) + (nh > na && na ? `, ${nh - na} más que ayer` : nh === na ? ', igual que ayer' : '') + '.');
     }
     if (usaCola()) {
       const { data } = await sb.from('sivec_turnos').select('id,estado').eq('centro_id', perfil.centro_id).eq('fecha', hoy);
@@ -9722,7 +9732,8 @@ document.addEventListener('change', e => { if (e.target.name === 'fecha_toma' &&
 // ===== Modo Campaña (Paso 35): un día, un lugar. Dos módulos: 📋 Recepción (todos los datos) y 🩺 Consultorio (la doctora hace la toma de PAP/VPH, la colposcopia con IVAA/Schiller y el tratamiento en el momento) =====
 // El PAP y el VPH van en lote al Oncológico desde el establecimiento que organiza; al cerrar, cada mujer pasa a la ficha de su centro.
 const CAMP_SERV = { pap: '🧪 PAP', vph: '🧬 VPH', colposcopia: '🩺 Colposcopia (IVAA/Schiller)' };
-const CAMP_EST = { registro: '📋 Recepción', consultorio: '🩺 Consultorio', tablero: '📊 Tablero' };
+const CAMP_EST = { registro: '📋 Recepción', consultorio: '🩺 Consultorio', pacientes: '👩 Pacientes', tablero: '📊 Tablero' };
+let campBuscarP = '', campRpcOk = false;
 function campEsTrat(x) { const m = colpoTratLista().find(t => t.v === x); return !m || m.g !== 'ind'; }
 const CAMP_TRAT_VIEJO = ['Crioterapia', 'Termocoagulación', 'Cauterización', 'LEEP / asa diatérmica', 'Biopsia', 'Legrado endocervical', 'Polipectomía', 'Metronidazol 500mg VV x10 noches', 'Metronidazol 500 mg VO c/12 h x7 días', 'Clotrimazol 500mg VV x10 noches', 'Fluconazol 150 mg VO dosis única', 'Nistatina óvulos VV x14 noches', 'Azitromicina 1 g VO dosis única', 'Doxiciclina 100 mg VO c/12 h x7 días', 'Estriol crema vaginal'];
 let campLista = [], campActual = null, campTurnos = [], campPacs = [], campColpos = [], campTimer = null, campAtender = null, campUltimo = null, campOkTabla = true, campEditar = null, campBuscar = '';
@@ -9748,6 +9759,8 @@ async function campCargarDatos(silencio) {
     sb.from('colposcopias').select('*').eq('campana_id', id)]);
   const antes = campMiCola().filter(x => x.estado === 'espera').length;
   campTurnos = t.data || []; campPacs = p.data || []; campColpos = c.data || [];
+  // Paso 38: la organizadora ve a todas las mujeres de la campaña aunque ya pasaron a la ficha de otro centro
+  try { const r = await sb.rpc('sivec_campana_pacientes', { p_campana: id }); if (!r.error && r.data && Array.isArray(r.data.pacientes)) { campPacs = r.data.pacientes; campColpos = r.data.colposcopias || campColpos; campRpcOk = true; } else campRpcOk = false; } catch (_) { campRpcOk = false; }
   const ahora = campMiCola().filter(x => x.estado === 'espera').length;
   if (silencio && ahora > antes && campEstacion() === 'consultorio') { sonido('mensaje'); vozAviso(ahora - antes === 1 ? 'Tiene una paciente nueva en espera.' : `Tiene ${ahora - antes} pacientes nuevas en espera.`, 'campcola'); }
 }
@@ -9759,7 +9772,7 @@ function campPintar() {
   const est = campEstacion(), cerrada = c.estado === 'cerrada';
   cuerpo.innerHTML = `<div class="campHead"><div><small>📣 Modo Campaña${cerrada ? ' · cerrada' : ''}</small><h2>${esc(c.nombre)}</h2><p>${fmtFecha(c.fecha)}${c.lugar ? ' · ' + esc(c.lugar) : ''}${c.meta ? ' · meta ' + c.meta + ' mujeres' : ''} · ${plural(campPacs.length, 'mujer registrada', 'mujeres registradas')}</p></div><button type="button" class="hoyBtn sec" data-c="salir">Cambiar de campaña</button></div>
     <div class="campTabs">${Object.entries(CAMP_EST).map(([k, t]) => `<button type="button" data-est="${k}" class="${k === est ? 'on' : ''}">${t}${k === 'consultorio' ? ` <b>${campTurnos.filter(x => x.estado === 'espera').length || ''}</b>` : ''}</button>`).join('')}</div>
-    <div class="campCuerpo">${cerrada && est !== 'tablero' ? '<div class="hoyCard"><div class="hoyVacio">Esta campaña está cerrada: cada mujer ya está en la ficha de su centro de salud. Mirá el <b>📊 Tablero</b> para el informe.</div></div>' : est === 'registro' ? campRegistroHTML() : est === 'tablero' ? campTableroHTML() : campColaHTML()}</div>`;
+    <div class="campCuerpo">${cerrada && !['tablero', 'pacientes'].includes(est) ? '<div class="hoyCard"><div class="hoyVacio">Esta campaña está cerrada: cada mujer ya está en la ficha de su centro de salud. Mirá <b>👩 Pacientes</b> (qué se hizo con cada una) o el <b>📊 Tablero</b> para el informe.</div></div>' : est === 'registro' ? campRegistroHTML() : est === 'tablero' ? campTableroHTML() : est === 'pacientes' ? campPacientesHTML() : campColaHTML()}</div>`;
   if (est === 'registro' && !cerrada) campRegistroEventos();
 }
 function campListaHTML() {
@@ -9884,6 +9897,46 @@ async function campGuardarEdicion(id) {
   if (t) { const ct = { paciente_nombre: nombre, carnet: cambio.carnet }; if (!atendida) ct.notas = serv.join(','); const r = await sb.from('sivec_turnos').update(ct).eq('id', t.id); if (!r.error) Object.assign(t, ct); }
   campEditar = null; sonido('ok'); showToast('Datos corregidos ✔', 'ok'); campPintar();
 }
+// Todas las mujeres de la campaña y qué se hizo con cada una (también después de cerrarla)
+function campFilaPaciente(p) {
+  const t = campTurnos.filter(x => String(x.paciente_id) === String(p.id)).sort((a, b) => (a.numero || 0) - (b.numero || 0))[0] || {};
+  const c = campColpos.filter(x => String(x.paciente_id) === String(p.id)).pop() || null, sv = campServDe(p);
+  const pedido = ['pap', 'vph', 'colposcopia'].filter(k => sv[k]).map(k => ({ pap: 'PAP', vph: 'VPH', colposcopia: 'Colposcopía' })[k]).join(' + ');
+  const toma = [p.tipo_examen === 'Papanicolau' ? 'PAP' : '', p.hizo_prueba_vph || p.tipo_examen === 'VPH' ? 'VPH' : ''].filter(Boolean).join(' + ');
+  const colpo = c ? [c.ivaa ? 'IVAA ' + c.ivaa.toLowerCase() : '', c.prueba_schiller ? 'Schiller ' + c.prueba_schiller.toLowerCase() : '', cuelloTexto(c.cuello_mapa), (c.lesion || []).join(', '), c.otros_hallazgos || ''].filter(Boolean).join(' · ') : '';
+  const trat = c ? [(c.plan || []).join(', '), c.derivacion ? '→ ' + c.derivacion : ''].filter(Boolean).join(' · ') : '';
+  const bet = bethesdaDe(p), res = [bet ? 'PAP ' + bet : p.tipo_examen === 'Papanicolau' ? 'PAP pendiente' : '', p.resultado_vph ? 'VPH ' + p.resultado_vph.toLowerCase() + (p.vph_genotipo ? ' (' + p.vph_genotipo + ')' : '') : (p.hizo_prueba_vph ? 'VPH pendiente' : '')].filter(Boolean).join(' · ');
+  const estado = t.estado ? TURNO_ESTADOS[t.estado] || t.estado : 'sin turno';
+  return { p, t, c, num: t.numero || '', nombre: p.nombre || t.paciente_nombre || '', ci: p.carnet || '', edad: edadTexto(p.fecha_nacimiento, campActual.fecha) || '', cel: p.celular || '', centro: centroNombre(p.centro_seguimiento || p.centro_id) || '', pedido, toma, codigo: p.numero_folio_pap || p.codigo_muestra || '', colpo, trat, res, estado, alt: metEsPos ? metEsPos(p) : false, ivaaPos: !!(c && c.ivaa && c.ivaa !== 'Negativo') };
+}
+function campPacientesHTML() {
+  const q = campBuscarP.trim().toLowerCase();
+  const F = campPacs.map(campFilaPaciente).sort((a, b) => (Number(a.num) || 9999) - (Number(b.num) || 9999)).filter(f => !q || f.nombre.toLowerCase().includes(q) || String(f.ci).includes(q) || f.centro.toLowerCase().includes(q));
+  const n = k => campPacs.filter(k).length;
+  return `<section class="hoyCard campPacs"><h3>👩 Mujeres de la campaña <span class="hoyN">${campPacs.length}</span></h3>
+    <div class="campPacTop"><input id="pBuscar" class="campBuscar" placeholder="🔍 Buscar por nombre, carnet o centro" value="${esc(campBuscarP)}" autocomplete="off"><div class="hoyAcc"><button type="button" class="hoyBtn sec" data-c="pacExcel">📊 Excel</button><button type="button" class="hoyBtn sec" data-c="pacImprimir">🖨 Imprimir lista</button></div></div>
+    <div class="campPacRes">${[['atendidas', n(p => (campTurnos.find(t => String(t.paciente_id) === String(p.id)) || {}).estado === 'atendida')], ['con colposcopía', new Set(campColpos.map(c => String(c.paciente_id))).size], ['IVAA positivo', campColpos.filter(c => c.ivaa && c.ivaa !== 'Negativo').length], ['con resultado', n(p => bethesdaDe(p) || p.resultado_vph)]].map(([t, v]) => `<span><b>${v}</b> ${t}</span>`).join('')}</div>
+    ${!campRpcOk && campActual.estado === 'cerrada' ? '<p class="campNota">⚠ Se ven solo las mujeres que quedaron en este establecimiento. Para ver a todas (también las que pasaron a su centro de salud), ejecutá el <b>Paso 38</b> de SUPABASE-SQL.md.</p>' : ''}
+    <div class="campPacWrap"><table class="campPacTabla"><thead><tr><th>Nº</th><th>Mujer</th><th>Su centro</th><th>Pedido · toma</th><th>Colposcopía</th><th>Tratamiento · conducta</th><th>Resultado</th><th>Estado</th></tr></thead><tbody>
+    ${F.map(f => `<tr data-pac="${esc(f.p.id)}" class="${f.alt || f.ivaaPos ? 'alt' : ''}"><td class="n">${f.num}</td><td><b>${esc(f.nombre)}</b><small>CI ${esc(f.ci || '—')} · ${esc(f.edad || '—')}${f.cel ? ' · ☎ ' + esc(f.cel) : ''}</small></td><td>${esc(f.centro)}</td><td>${esc(f.pedido || '—')}<small>${f.toma ? 'Tomó: ' + esc(f.toma) : 'Sin toma'}${f.codigo ? ' · ' + esc(f.codigo) : ''}</small></td><td>${f.colpo ? esc(f.colpo) : '<span class="mut">—</span>'}</td><td>${f.trat ? esc(f.trat) : '<span class="mut">—</span>'}</td><td>${esc(f.res || '—')}</td><td><span class="campEst est-${esc(f.t.estado || 'x')}">${esc(f.estado)}</span></td></tr>`).join('') || '<tr><td colspan="8" class="mut">Nadie todavía.</td></tr>'}</tbody></table></div>
+    <p class="campNota">Tocá una fila para abrir la ficha completa de la mujer. Los resultados de PAP y VPH aparecen acá cuando el Oncológico los informa.</p></section>`;
+}
+function campPacientesExportar(imprimir) {
+  const F = campPacs.map(campFilaPaciente).sort((a, b) => (Number(a.num) || 9999) - (Number(b.num) || 9999)), c = campActual;
+  if (!imprimir) {
+    const ws = XLSX.utils.aoa_to_sheet([[`Campaña: ${c.nombre} · ${fmtFecha(c.fecha)}${c.lugar ? ' · ' + c.lugar : ''} · ${centroNombre(c.centro_id)}`], [],
+      ['Nº', 'Nombre', 'Carnet', 'Edad', 'Celular', 'Su centro de salud', 'Pedido', 'Tomó', 'Código', 'Colposcopía', 'Tratamiento · conducta', 'Resultado', 'Estado'],
+      ...F.map(f => [f.num, f.nombre, f.ci, f.edad, f.cel, f.centro, f.pedido, f.toma, f.codigo, f.colpo, f.trat, f.res, f.estado])]);
+    ws['!cols'] = [4, 30, 11, 9, 11, 26, 18, 10, 16, 40, 34, 24, 12].map(w => ({ wch: w }));
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Pacientes'); XLSX.writeFile(wb, `Campana_${String(c.nombre).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\w]+/g, '_')}_${c.fecha}.xlsx`); return;
+  }
+  const w = window.open('', '_blank'); if (!w) return showToast('Permití las ventanas emergentes para imprimir.', 'err');
+  w.document.write(`<!doctype html><meta charset="utf-8"><title>Pacientes · ${esc(c.nombre)}</title><style>body{font-family:Arial,sans-serif;margin:18px;color:#222;font-size:11px}h1{color:#7d2a4c;margin:0;font-size:18px}table{border-collapse:collapse;width:100%;margin-top:10px}th,td{border:1px solid #ccc;padding:4px 6px;text-align:left;vertical-align:top}th{background:#f5e9ee}small{display:block;color:#666}@page{size:A4 landscape;margin:10mm}</style>
+    <h1>Mujeres de la campaña · ${esc(c.nombre)}</h1><div>${fmtFecha(c.fecha)}${c.lugar ? ' · ' + esc(c.lugar) : ''} · Organiza: ${esc(centroNombre(c.centro_id))} · ${F.length} mujeres</div>
+    <table><tr><th>Nº</th><th>Mujer</th><th>Su centro</th><th>Pedido · toma</th><th>Colposcopía</th><th>Tratamiento · conducta</th><th>Resultado</th><th>Estado</th></tr>${F.map(f => `<tr><td>${f.num}</td><td><b>${esc(f.nombre)}</b><small>CI ${esc(f.ci)} · ${esc(f.edad)} · ${esc(f.cel)}</small></td><td>${esc(f.centro)}</td><td>${esc(f.pedido)}<small>${esc(f.toma)} ${esc(f.codigo)}</small></td><td>${esc(f.colpo)}</td><td>${esc(f.trat)}</td><td>${esc(f.res)}</td><td>${esc(f.estado)}</td></tr>`).join('')}</table>
+    <p style="color:#666;margin-top:10px">SIVEC PAP/VPH · Modo Campaña · ${fmtFecha(hoyISO())}. Documento con datos personales de salud: guardar con reserva.</p><script>print()<\/script>`);
+  w.document.close();
+}
 function campColaHTML() {
   const cola = campMiCola(), activos = cola.filter(t => ['espera', 'llamada', 'en_atencion'].includes(t.estado)), hechos = cola.filter(t => !activos.includes(t));
   const fila = t => { const p = campPacs.find(x => String(x.id) === String(t.paciente_id)) || {}; const min = Math.max(0, Math.round((Date.now() - new Date(t.llegada)) / 60000));
@@ -10002,6 +10055,8 @@ document.addEventListener('click', async e => {
   if (c === 'lote') return switchView('balance');
   if (c === 'cerrar') return campCerrar();
   if (c === 'informe') return campInforme();
+  if (c === 'pacExcel') return campPacientesExportar(false);
+  if (c === 'pacImprimir') return campPacientesExportar(true);
   if (b.dataset.ct) {
     const t = campTurnos.find(x => String(x.id) === b.dataset.id); if (!t) return;
     if (b.dataset.ct === 'atender') { if (t.estado !== 'en_atencion') { await sb.from('sivec_turnos').update({ estado: 'en_atencion', atendido_por: perfil.id }).eq('id', t.id); t.estado = 'en_atencion'; } campAtender = t.id; return campPintar(); }
@@ -10012,7 +10067,8 @@ document.addEventListener('click', async e => {
     return campPintar();
   }
 });
-document.addEventListener('input', e => { if (e.target.id === 'rBuscar') { campBuscar = e.target.value; const pos = e.target.selectionStart; campPintar(); const n = document.getElementById('rBuscar'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (_) {} } } });
+document.addEventListener('click', e => { const tr = e.target.closest('#campanaView .campPacTabla tr[data-pac]'); if (!tr) return; const p = campPacs.find(x => String(x.id) === tr.dataset.pac); if (p && typeof openFicha === 'function') openFicha(p); });
+document.addEventListener('input', e => { if (e.target.id === 'pBuscar') { campBuscarP = e.target.value; const pos = e.target.selectionStart; campPintar(); const n = document.getElementById('pBuscar'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (_) {} } return; } if (e.target.id === 'rBuscar') { campBuscar = e.target.value; const pos = e.target.selectionStart; campPintar(); const n = document.getElementById('rBuscar'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (_) {} } } });
 function campActivar(si) { clearInterval(campTimer); campTimer = null; if (si) { campCargar(); campTimer = setInterval(() => { const v = document.getElementById('campanaView'); if (!document.hidden && v && v.classList.contains('active') && campActual && !campAtender && !campEditar && !document.getElementById('colpOverlay').classList.contains('open') && !(document.activeElement && v.contains(document.activeElement) && /INPUT|SELECT/.test(document.activeElement.tagName))) campCargarDatos(true).then(campPintar); }, 12000); } }
 
 // Términos de uso y política de privacidad: cada persona los acepta una vez por versión (Paso 26 del SQL)

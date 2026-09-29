@@ -2496,3 +2496,28 @@ select 'Paso 37 listo' as resultado;
 
 ### Deshacer el Paso 37
 `drop table if exists sivec_metricas_revision;`
+
+
+## Paso 38 — Campaña: ver a todas las mujeres y qué se hizo (también después de cerrarla)
+
+En **📣 Campaña → abrir la campaña → 👩 Pacientes** aparece la lista de todas las mujeres: número, datos, su centro de salud, qué se pidió, qué se tomó (con el código), la colposcopía (IVAA, Schiller, mapa, lesiones), el tratamiento y la conducta, el resultado cuando llega y el estado. Se puede buscar, abrir la ficha, imprimir y bajar en Excel. Al cerrar la campaña, cada mujer pasa a la ficha de su centro y las reglas de seguridad ya no dejan que la organizadora la vea; esta función se la muestra igual, solo para las campañas de su propio establecimiento. Requiere el Paso 35.
+
+```sql
+-- PASO 38 · Campaña: la organizadora ve a todas las mujeres de la campaña y qué se hizo (también después de cerrarla)
+create or replace function sivec_campana_pacientes(p_campana uuid) returns jsonb
+language plpgsql stable security definer set search_path = public as $$
+declare c sivec_campanas;
+begin
+  select * into c from sivec_campanas where id = p_campana;
+  if not found or not sivec_ve_centro(c.centro_id) then raise exception 'Sin permiso para ver esta campaña.'; end if;
+  return jsonb_build_object(
+    'pacientes', coalesce((select jsonb_agg(to_jsonb(p) order by p.created_at) from pacientes p where p.campana_id = p_campana and p.deleted_at is null), '[]'::jsonb),
+    'colposcopias', coalesce((select jsonb_agg(to_jsonb(x)) from colposcopias x where x.campana_id = p_campana), '[]'::jsonb));
+end $$;
+revoke all on function sivec_campana_pacientes(uuid) from public;
+grant execute on function sivec_campana_pacientes(uuid) to authenticated;
+select 'Paso 38 listo' as resultado;
+```
+
+### Deshacer el Paso 38
+`drop function if exists sivec_campana_pacientes(uuid);`

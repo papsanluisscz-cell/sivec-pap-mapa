@@ -815,3 +815,19 @@ create policy "métricas: volver a revisar" on sivec_metricas_revision for updat
   using (sivec_edita_centro(centro_id)) with check (sivec_edita_centro(centro_id));
 grant select, insert, update on sivec_metricas_revision to authenticated;
 select 'Paso 37 listo' as resultado;
+
+
+-- PASO 38 · Campaña: la organizadora ve a todas las mujeres de la campaña y qué se hizo (también después de cerrarla)
+create or replace function sivec_campana_pacientes(p_campana uuid) returns jsonb
+language plpgsql stable security definer set search_path = public as $$
+declare c sivec_campanas;
+begin
+  select * into c from sivec_campanas where id = p_campana;
+  if not found or not sivec_ve_centro(c.centro_id) then raise exception 'Sin permiso para ver esta campaña.'; end if;
+  return jsonb_build_object(
+    'pacientes', coalesce((select jsonb_agg(to_jsonb(p) order by p.created_at) from pacientes p where p.campana_id = p_campana and p.deleted_at is null), '[]'::jsonb),
+    'colposcopias', coalesce((select jsonb_agg(to_jsonb(x)) from colposcopias x where x.campana_id = p_campana), '[]'::jsonb));
+end $$;
+revoke all on function sivec_campana_pacientes(uuid) from public;
+grant execute on function sivec_campana_pacientes(uuid) to authenticated;
+select 'Paso 38 listo' as resultado;
