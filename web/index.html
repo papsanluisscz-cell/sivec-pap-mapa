@@ -545,6 +545,20 @@
   #demoPuertas { position: fixed; left: 12px; bottom: 12px; z-index: 2100; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; max-width: calc(100vw - 110px); background: rgba(28,10,19,.88); backdrop-filter: blur(6px); border: 1px solid rgba(241,167,195,.35); border-radius: 16px; padding: 6px 8px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
   #demoPuertas span { color: #f1a7c3; font-size: 11.5px; font-weight: 800; letter-spacing: .04em; padding: 0 4px; }
   #demoPuertas button { border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.08); color: #fff; border-radius: 999px; padding: 5px 10px; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+  #demoPuertas .dsvBtn { background: #f1a7c3; color: #4a1229; border-color: #f1a7c3; }
+  #sonVitrina { position: fixed; inset: 0; z-index: 3000; background: rgba(20,8,14,.55); display: flex; align-items: center; justify-content: center; padding: 16px; }
+  #sonVitrina .svCard { background: var(--surface); color: var(--ink); border-radius: 18px; width: min(920px, 100%); max-height: 92vh; overflow: auto; padding: 18px 20px; box-shadow: 0 24px 60px rgba(0,0,0,.35); }
+  #sonVitrina .svHead { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; } #sonVitrina .svHead b { font-size: 18px; display: block; } #sonVitrina .svHead small { color: var(--ink-soft); }
+  #sonVitrina .svX { border: 0; background: none; font-size: 26px; cursor: pointer; color: var(--ink-soft); }
+  #sonVitrina .svVoz { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin: 10px 0 4px; font-size: 13px; }
+  #sonVitrina .svVoz button { font: inherit; font-size: 12.5px; border-radius: 999px; padding: 5px 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; } #sonVitrina .svVoz button.on { background: #f7e2ea; border-color: #9c3a5f; color: #5b1733; font-weight: 700; }
+  #sonVitrina .svSec { font-size: 11.5px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: var(--ink-soft); margin: 14px 0 6px; }
+  #sonVitrina .svGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+  #sonVitrina .svItem { position: relative; text-align: left; font: inherit; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 12px; padding: 10px 34px 10px 12px; cursor: pointer; display: flex; flex-direction: column; gap: 3px; transition: transform .12s, border-color .15s; }
+  #sonVitrina .svItem:hover { border-color: #9c3a5f; transform: translateY(-1px); } #sonVitrina .svItem.on { border-color: #9c3a5f; background: #f7e2ea; color: #4a1229; }
+  #sonVitrina .svItem b { font-size: 13.5px; } #sonVitrina .svItem small { font-size: 11.5px; color: var(--ink-soft); line-height: 1.35; } #sonVitrina .svItem i { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-style: normal; color: #9c3a5f; }
+  #sonVitrina .svNota { font-size: 12px; color: var(--ink-soft); margin: 14px 0 0; }
+  .svAbrir { margin-top: 10px; font: inherit; font-size: 12.5px; font-weight: 700; border-radius: 9px; padding: 7px 12px; border: 1px dashed #9c3a5f; background: none; color: #9c3a5f; cursor: pointer; }
   #demoPuertas button.on { background: #f1a7c3; color: #4a1229; border-color: #f1a7c3; }
   body.modoDemo #demoFranja { bottom: 64px; }
   #demoFranja { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 2000; pointer-events: none; font-size: 12px; letter-spacing: .04em; color: #fff;
@@ -2522,9 +2536,10 @@ function demoPuertasPintar() {
   if (!modoDemo || !perfil || perfil.sinPerfil) return;
   const actual = (() => { try { return localStorage.getItem('sivec_demo_puerta') || ''; } catch (_) { return ''; } })();
   const d = document.createElement('div'); d.id = 'demoPuertas';
-  d.innerHTML = `<span>🎬 Demo · entrar como</span>${DEMO_PUERTAS.map(([k, t]) => `<button type="button" data-dp="${k}" class="${k === actual ? 'on' : ''}">${t}</button>`).join('')}`;
+  d.innerHTML = `<span>🎬 Demo · entrar como</span>${DEMO_PUERTAS.map(([k, t]) => `<button type="button" data-dp="${k}" class="${k === actual ? 'on' : ''}">${t}</button>`).join('')}<button type="button" data-dsv="1" class="dsvBtn">🔊 Sonidos y voz</button>`;
   document.body.appendChild(d);
   d.onclick = async e => {
+    if (e.target.closest('[data-dsv]')) return sonVitrinaAbrir();
     const b = e.target.closest('[data-dp]'); if (!b) return;
     const k = b.dataset.dp; entradaMostrar('Entrando como ' + (ACCESOS[k] || 'Laboratorio'));
     try { await sb.auth.signOut(); } catch (_) {}
@@ -8383,7 +8398,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.18.1 · 29/09/2026';
+const SIVEC_VERSION = '1.19.0 · 29/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -9171,6 +9186,64 @@ async function vozResumenDelDia(forzar) {
   vozAviso(texto, 'resumen');
 }
 setInterval(() => { if (!document.hidden) { vozResumenDelDia(false); } }, 5 * 60000);
+// ===== Vitrina de sonidos y voz: para mostrar en una presentación todo lo que el sistema dice y hace sonar =====
+// Solo ejemplos ficticios. Se abre desde la barra de la demo (🔊) y desde ⚙ → Sonidos.
+const SON_VITRINA = [
+  ['Efectos de sonido', [
+    ['ok', '✅ Guardado', 'Al guardar una toma, un turno o un dato.', ''],
+    ['firma', '✍️ Firma con PIN', 'Al firmar una referencia, un informe o la colposcopía.', ''],
+    ['alerta', '⚠️ Resultado alterado', 'Cuando llega un PAP o VPH positivo del laboratorio.', ''],
+    ['mensaje', '💬 Aviso nuevo', 'Resultado nuevo, contrarreferencia o paciente en espera.', ''],
+    ['error', '✖ Error o dato que falta', 'Cuando falta algo o no se pudo guardar.', ''],
+    ['entrada', '🚪 Entrada al sistema', 'Al entrar con usuario y contraseña.', ''],
+    ['click', '👆 Toque suave', 'Al marcar una opción de la colposcopía.', '']]],
+  ['Saludo al entrar', [
+    ['', '🌅 Saludo del día (centro)', '', () => `${saludoHora()}, doctora. En Santa Cruz hay 31 grados y está parcialmente nublado; la máxima será de 35. Va a hacer mucho calor: tome bastante agua. Para hoy tiene 3 resultados nuevos del laboratorio, uno alterado, 2 pacientes para derivar a colposcopia y 4 resultados para entregar. Cada PAP que se toma hoy puede evitar un cáncer mañana.`],
+    ['', '🔬 Saludo del laboratorio', '', () => `${saludoHora()}, licenciada. Para hoy tiene 2 lotes por recibir y 38 muestras por informar. Un resultado entregado a tiempo es una vida protegida.`],
+    ['', '🏨 Saludo del hospital', '', () => `${saludoHora()}, doctor. Para hoy tiene 3 referencias nuevas, 5 citas de colposcopia para hoy y 2 biopsias esperando resultado.`],
+    ['', '🕸 Saludo del gestor de la red', '', () => `${saludoHora()}, doctora. La Red Centro va en el 68 por ciento de la meta del año. Hay 15 positivas sin tratar y 7 resultados atrasados en la red.`]]],
+  ['Avisos durante el día', [
+    ['alerta', '⚠️ Resultado alterado', '', 'Llegó un resultado alterado del laboratorio.'],
+    ['mensaje', '🔬 Resultados nuevos', '', 'Llegaron resultados nuevos del laboratorio.'],
+    ['mensaje', '↩️ Contrarreferencia', '', 'Llegó una contrarreferencia nueva.'],
+    ['mensaje', '👩 Paciente en espera', '', 'Tiene una paciente nueva en espera.'],
+    ['firma', '🎉 Meta del año', '', 'C.S. San Luis llegó al 75 % de la meta del año: 390 de 520 tomas. ¡Sigan así!'],
+    ['mensaje', '🌙 Resumen del día', '', 'Hoy se registraron 14 tomas, 3 más que ayer. Pasaron 18 pacientes por la cola del día. ¡Buen trabajo! Gracias por cuidar a las mujeres de su comunidad.']]],
+  ['Firmas y confirmaciones', [
+    ['firma', '🔬 Colposcopía realizada', 'Dice el nombre de la paciente (ejemplo ficticio).', () => vozColpo('Rosa Ejemplo Ficticia')],
+    ['firma', '📤 Referencia firmada', '', 'Referencia firmada.'],
+    ['firma', '↩️ Contrarreferencia enviada', '', 'Contrarreferencia firmada y enviada.'],
+    ['firma', '🧪 Informe del laboratorio', '', 'Informe firmado.'],
+    ['firma', '✍️ Firma de la paciente', '', 'Firma de la paciente registrada.'],
+    ['firma', '📣 Campaña cerrada', '', 'Campaña cerrada. Cada mujer ya está en la ficha de su centro de salud.']]]
+];
+function sonVitrinaAbrir() {
+  document.getElementById('sonVitrina')?.remove();
+  sonidoCtxListo();
+  const ov = document.createElement('div'); ov.id = 'sonVitrina';
+  const voz = vozModo();
+  ov.innerHTML = `<div class="svCard" role="dialog" aria-label="Sonidos y voz del SIVEC"><div class="svHead"><div><b>🔊 Sonidos y voz del SIVEC</b><small>Tocá cada uno para escucharlo como suena en el sistema. Ejemplos ficticios.</small></div><button type="button" class="svX" aria-label="Cerrar">×</button></div>
+    <div class="svVoz"><span>Voz:</span><button type="button" data-svv="fem" class="${voz !== 'masc' ? 'on' : ''}">👩 Femenina</button><button type="button" data-svv="masc" class="${voz === 'masc' ? 'on' : ''}">👨 Masculina</button><button type="button" data-svstop="1">⏹ Parar</button></div>
+    ${SON_VITRINA.map(([t, L], gi) => `<div class="svSec">${t}</div><div class="svGrid">${L.map(([son, tit, sub, txt], i) => `<button type="button" class="svItem" data-sv="${gi}.${i}"><b>${tit}</b><small>${esc(sub || (typeof txt === 'function' ? '' : txt) || '')}</small><i>▶</i></button>`).join('')}</div>`).join('')}
+    <p class="svNota">Los avisos de voz se pueden apagar en ⚙ → Sonidos. La voz depende de las voces instaladas en la computadora (Windows: Pablo, Raúl, Helena, Sabina).</p></div>`;
+  document.body.appendChild(ov);
+  const cerrar = () => { try { speechSynthesis.cancel(); } catch (_) {} ov.remove(); };
+  ov.onclick = e => {
+    if (e.target === ov || e.target.closest('.svX')) return cerrar();
+    if (e.target.closest('[data-svstop]')) { try { speechSynthesis.cancel(); } catch (_) {} return; }
+    const vv = e.target.closest('[data-svv]');
+    if (vv) { try { localStorage.setItem('sivec_voz', vv.dataset.svv); } catch (_) {} ov.querySelectorAll('[data-svv]').forEach(b => b.classList.toggle('on', b === vv)); return; }
+    const it = e.target.closest('[data-sv]'); if (!it) return;
+    const [gi, i] = it.dataset.sv.split('.').map(Number), [son, , , txt] = SON_VITRINA[gi][1][i];
+    ov.querySelectorAll('.svItem').forEach(b => b.classList.toggle('on', b === it));
+    try { speechSynthesis.cancel(); } catch (_) {}
+    if (son) { const m = sonidoModo(); try { localStorage.setItem('sivec_sonidos', 'todos'); sonido(son); } finally { try { localStorage.setItem('sivec_sonidos', m); } catch (_) {} } }
+    const texto = typeof txt === 'function' ? txt() : txt;
+    if (texto) setTimeout(() => vozDecir(texto, true), son ? 650 : 0);
+  };
+  document.addEventListener('keydown', function esc_(e) { if (e.key === 'Escape') { cerrar(); document.removeEventListener('keydown', esc_); } });
+}
+setTimeout(() => { const sc = document.getElementById('sonidoConfig'); if (!sc || sc.querySelector('.svAbrir')) return; const b = document.createElement('button'); b.type = 'button'; b.className = 'svAbrir'; b.textContent = '🔊 Escuchar todos los sonidos y frases'; b.onclick = sonVitrinaAbrir; sc.appendChild(b); }, 0);
 function saludoTexto(items, cl, frase) {
   const t = saludoTrato();
   const solas = items.filter(i => i.sola).map(i => i.voz + '.');
