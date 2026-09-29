@@ -180,6 +180,21 @@
   .moreWrap { position: relative; display: inline-block; }
   .moreMenu { display: none; position: absolute; right: 0; top: calc(100% + 4px); z-index: 50; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); padding: 5px; min-width: 150px; }
   .moreWrap.open .moreMenu { display: block; }
+  /* ===== Aura: lo nuevo que espera atención (campaña, referencia/colposcopia nueva, contrarreferencia y biopsia nuevas) =====
+     Borde que gira en los tonos del sistema (vino, rosa, violeta), halo que respira y estrellas sueltas que titilan. */
+  @property --aura { syntax: '<angle>'; initial-value: 0deg; inherits: true; }
+  .aura:not(tr) { position: relative; border: 2px solid transparent !important; background: linear-gradient(var(--aura-bg, var(--surface)), var(--aura-bg, var(--surface))) padding-box, conic-gradient(from var(--aura), #7d2a4c, #b0487a, #f1a7c3, #c4b5fd, #7c3aed, #9c3a5f, #7d2a4c) border-box !important; animation: auraGira 5s linear infinite, auraHalo 3.6s ease-in-out infinite; }
+  .patientCard.aura { --aura-bg: #fff; } body.dark .patientCard.aura { --aura-bg: var(--surface); }
+  .aura.rapida:not(tr) { animation-duration: 1.9s, 1.5s; }
+  .auraChispas { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+  .auraChispas i { position: absolute; font-style: normal; font-size: var(--t, 12px); line-height: 1; color: #f7c6da; text-shadow: 0 0 5px #fff, 0 0 10px #f1a7c3, 0 0 18px rgba(124,58,237,.8); opacity: 0; transform: scale(0); animation: auraChispa var(--d, 2.6s) ease-in-out var(--del, 0s) infinite; }
+  .auraChispas i:nth-child(3n) { color: #ddd6fe; text-shadow: 0 0 6px #a78bfa, 0 0 12px rgba(125,42,76,.7); }
+  tr.aura > td { animation: auraCelda 3.6s ease-in-out infinite; } tr.aura > td:first-child { position: relative; }
+  @keyframes auraGira { to { --aura: 360deg; } }
+  @keyframes auraHalo { 0%, 100% { box-shadow: 0 0 10px 1px rgba(125,42,76,.35), 0 0 22px 4px rgba(241,167,195,.25); } 33% { box-shadow: 0 0 16px 3px rgba(241,167,195,.6), 0 0 32px 8px rgba(196,181,253,.3); } 66% { box-shadow: 0 0 14px 2px rgba(124,58,237,.45), 0 0 28px 6px rgba(125,42,76,.28); } }
+  @keyframes auraChispa { 0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); } 15% { opacity: 1; transform: scale(1.15) rotate(45deg); } 35% { opacity: .9; transform: scale(.8) rotate(90deg) translateY(-3px); } 55% { opacity: 0; transform: scale(0) rotate(140deg) translateY(-6px); } }
+  @keyframes auraCelda { 0%, 100% { background-color: rgba(241,167,195,.14); box-shadow: inset 0 2px 0 rgba(241,167,195,.9), inset 0 -2px 0 rgba(167,139,250,.8); } 50% { background-color: rgba(196,181,253,.16); box-shadow: inset 0 2px 0 rgba(167,139,250,.9), inset 0 -2px 0 rgba(125,42,76,.8); } }
+  @media (prefers-reduced-motion: reduce) { .aura:not(tr), tr.aura > td, .auraChispas i { animation: none !important; } .auraChispas { display: none; } }
   .patientCard { position: relative; }
   .patientCard:has(.moreWrap.open) { z-index: 30; transform: none !important; }
   .moreMenu { min-width: 190px; white-space: nowrap; }
@@ -1390,35 +1405,14 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
 #campanaView .campYa { background: #dcfce7; color: #166534; border-radius: 10px; padding: 7px 10px; font-size: 13px; font-weight: 600; }
 #campanaView .campAuto { animation: campAuto 1.6s ease; } @keyframes campAuto { 0% { background:#dcfce7; box-shadow:0 0 0 3px rgba(22,163,74,.35); } 100% { background:inherit; box-shadow:none; } }
 #campanaView .campYa small { display:block; font-weight:400; font-size:12px; opacity:.8; margin-top:2px; } #campanaView .campYa.nuevo { background:#eff6ff; border-color:#bfdbfe; color:#1e3a8a; } #campanaView .campYa.buscando { opacity:.7; }
-/* Fila de la campaña: las que esperan tienen una aura que gira y respira alrededor del card, con estrellas que cruzan; las atendidas quedan apagadas */
-@property --aura { syntax: '<angle>'; initial-value: 0deg; inherits: true; }
-#campanaView .campCola { isolation: isolate; }
+/* Fila de la campaña: las que esperan llevan la aura (clase .aura); las atendidas quedan apagadas */
 #campanaView .campCola .hoyFila { position: relative; transition: opacity .4s, filter .4s; }
-#campanaView .campCola .hoyFila.est-espera, #campanaView .campCola .hoyFila.est-llamada, #campanaView .campCola .hoyFila.est-en_atencion {
-  margin: 10px 4px 14px; border: 2px solid transparent;
-  background: linear-gradient(105deg, transparent 38%, rgba(255,255,255,.55) 50%, transparent 62%) padding-box, linear-gradient(var(--surface), var(--surface)) padding-box, conic-gradient(from var(--aura), #f1a7c3, #c084fc, #5eead4, #f9d86b, #f1a7c3) border-box;
-  background-size: 260% 100%, auto, auto; background-repeat: no-repeat;
-  animation: auraGira 4.5s linear infinite, auraBrillo 3.4s ease-in-out infinite; }
-#campanaView .campCola .hoyFila.est-espera::before, #campanaView .campCola .hoyFila.est-llamada::before, #campanaView .campCola .hoyFila.est-en_atencion::before {
-  content: ''; position: absolute; inset: -9px; border-radius: 18px; z-index: -1; pointer-events: none;
-  background: conic-gradient(from var(--aura), #f1a7c3, #c084fc, #5eead4, #f9d86b, #f1a7c3); filter: blur(14px); opacity: .55; animation: auraRespira 2.6s ease-in-out infinite; }
-#campanaView .campCola .hoyFila.est-espera::after, #campanaView .campCola .hoyFila.est-llamada::after, #campanaView .campCola .hoyFila.est-en_atencion::after {
-  content: '✦    ✧      ✦    ✧   ✦'; position: absolute; left: 0; top: -1px; font-size: 13px; letter-spacing: 3px; color: #e2a93b; pointer-events: none; white-space: nowrap; text-shadow: 0 0 6px rgba(249,216,107,.95), 0 0 14px rgba(192,132,252,.7); animation: auraEstrellas 6s linear infinite; }
-#campanaView .campCola .hoyFila.est-llamada { animation-duration: 2s, 3.4s; }
-#campanaView .campCola .hoyFila.est-llamada::before { animation-duration: 1.1s; opacity: .8; }
+#campanaView .campCola .hoyFila.aura { --aura-bg: var(--paper); margin: 10px 4px 14px; }
 #campanaView .campCola .hoyFila.est-llamada .hoyNum { animation: campLatido 1.1s ease-in-out infinite; }
-#campanaView .campCola .hoyFila.est-en_atencion::after { content: '✦ en atención ✦'; letter-spacing: 1px; font-weight: 800; animation: auraTitila 1.8s ease-in-out infinite; left: 46%; top: 50%; }
-#campanaView .campCola .hoyFila .hoyAcc, #campanaView .campCola .hoyFila .hoyNum, #campanaView .campCola .hoyFila > div { position: relative; z-index: 1; }
 #campanaView .campCola .hoyFila.est-atendida, #campanaView .campCola .hoyFila.est-no_se_presento, #campanaView .campCola .hoyFila.est-cancelado { opacity: .5; filter: grayscale(.85); }
 #campanaView .campCola .hoyFila.est-atendida .hoyNum { background: #9ca3af !important; }
 #campanaView .campCola .hoyFila.est-atendida b::after { content: ' ✔'; color: #16a34a; }
-@keyframes auraGira { to { --aura: 360deg; } }
-@keyframes auraBrillo { 0% { background-position: 130% 0, 0 0, 0 0; } 60%, 100% { background-position: -30% 0, 0 0, 0 0; } }
-@keyframes auraRespira { 0%, 100% { opacity: .35; transform: scale(.985); } 50% { opacity: .75; transform: scale(1.02); } }
-@keyframes auraEstrellas { 0% { transform: translate(-30%, -50%); opacity: 0; } 12% { opacity: 1; } 50% { transform: translate(120%, -62%); opacity: 1; } 88% { opacity: 1; } 100% { transform: translate(260%, -50%); opacity: 0; } }
-@keyframes auraTitila { 0%, 100% { opacity: .5; transform: translateY(-50%) scale(.95); } 50% { opacity: 1; transform: translateY(-50%) scale(1.06); } }
 @keyframes campLatido { 50% { transform: scale(1.12); box-shadow: 0 0 0 6px rgba(241,167,195,.35); } }
-@media (prefers-reduced-motion: reduce) { #campanaView .campCola .hoyFila, #campanaView .campCola .hoyFila::before, #campanaView .campCola .hoyFila::after, #campanaView .campCola .hoyNum { animation: none !important; } }
 #campanaView .campHechasTit { margin: 14px 0 6px; font-size: 12px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: var(--ink-soft); }
 #campanaView .campBuscar { width: 100%; padding: 8px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; margin-bottom: 6px; }
 #campanaView .campHecho { display: flex; flex-direction: column; gap: 6px; background: #ecfdf3; border: 1px solid #86efac; border-radius: 12px; padding: 12px; } #campanaView .campHecho span { font-size: 13px; color: var(--ink-soft); }
@@ -3921,7 +3915,7 @@ function colRender() {
   const pane = document.getElementById('colPane');
   pane.innerHTML = `<div class="labCard"><table><thead><tr><th>Paciente</th><th>Centro que deriva</th><th>Motivo</th><th>Derivada</th><th>${colTab === 'citadas' ? 'Cita' : 'Estado'}</th></tr></thead><tbody>${lista.map(d => {
     const dias = Math.round((hoy - new Date(d.fecha_derivacion + 'T12:00:00')) / 86400000);
-    return `<tr class="colFila${d.id === colSel ? ' on' : ''}" data-col="${d.id}"><td><b>${esc(d.nombre)}</b>${d.prioridad === 'urgente' ? '<span class="urg">URGENTE</span>' : ''}${COBRO_ACTIVO && d.cobertura === 'Sin SUS' ? `<span class="urg" style="background:${d.pago_recibo ? '#15803d' : '#b45309'}">💵 ${d.pago_recibo ? 'pagó' : 'sin SUS' + (d.monto ? ' · Bs ' + esc(d.monto) : '')}</span>` : ''}<div class="loteCod">CI ${esc(d.carnet || '—')} · ${edadDe(d.fecha_nacimiento) ?? '—'} a · ☎ ${esc(d.celular || '—')}</div></td>
+    return `<tr class="colFila${d.id === colSel ? ' on' : ''}${d.estado === 'enviada' ? ' aura' : ''}" data-col="${d.id}" title="${d.estado === 'enviada' ? 'Referencia nueva: colposcopia por agendar' : ''}"><td><b>${esc(d.nombre)}</b>${d.prioridad === 'urgente' ? '<span class="urg">URGENTE</span>' : ''}${COBRO_ACTIVO && d.cobertura === 'Sin SUS' ? `<span class="urg" style="background:${d.pago_recibo ? '#15803d' : '#b45309'}">💵 ${d.pago_recibo ? 'pagó' : 'sin SUS' + (d.monto ? ' · Bs ' + esc(d.monto) : '')}</span>` : ''}<div class="loteCod">CI ${esc(d.carnet || '—')} · ${edadDe(d.fecha_nacimiento) ?? '—'} a · ☎ ${esc(d.celular || '—')}</div></td>
       <td>${esc(centroNombre(d.centro_origen))}</td><td>${esc(d.motivo || '—')}<div class="loteCod">${esc(d.indicacion || '')}</div></td><td>${fmtFecha(d.fecha_derivacion)}<div class="loteCod">${dias} día${dias === 1 ? '' : 's'}</div></td>
       <td>${d.estado === 'citada' ? fmtFecha(d.fecha_cita) : d.estado === 'no_asistio' ? '<span class="balPill no">no asistió</span>' : d.estado === 'contrarreferida' ? '<span class="balPill rec">contrarreferida</span>' : esc(DER_ESTADO[d.estado] || d.estado)}${d.biopsia_tomada ? `<div class="loteCod">biopsia: ${esc(d.biopsia_resultado || 'pendiente')}</div>` : ''}</td></tr>`;
   }).join('') || '<tr><td colspan="5">No hay pacientes en esta lista.</td></tr>'}</tbody></table></div><div id="colDet" style="margin-top:14px"></div>`;
@@ -5027,7 +5021,7 @@ function renderPatientCards(data, base) {
     const fechaEst = p.fecha_estimada || addDays(p.fecha_toma, 90);
     const atrasado = estado === 'Pendiente' && fechaEst && fechaEst < hoy;
     const card = document.createElement('div');
-    card.className = 'patientCard';
+    { const dN = derivDe(p); card.className = 'patientCard' + (dN && derEsNueva(dN) ? ' aura' : ''); }
     card.dataset.id = p.id;
     card.title = 'Tocá para ver la ficha y la línea de tiempo';
     card.style.borderLeftColor = COLORS[estado];
@@ -8437,7 +8431,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.20.1 · 29/09/2026';
+const SIVEC_VERSION = '1.20.2 · 29/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -9885,7 +9879,8 @@ function campColaHTML() {
     const ed = `<button type="button" class="hoyBtn sec" data-ced="${esc(p.id || '')}" title="Corregir datos o pedido">✏</button>`;
     const acc = ed + (['espera', 'llamada'].includes(t.estado) ? `${t.estado === 'espera' ? `<button type="button" class="hoyBtn sec" data-ct="llamar" data-id="${t.id}">📣 Llamar</button>` : ''}<button type="button" class="hoyBtn" data-ct="atender" data-id="${t.id}">Atender</button>` : t.estado === 'en_atencion' ? `<button type="button" class="hoyBtn" data-ct="atender" data-id="${t.id}">Seguir</button>` : '');
     const edad = edadTexto(p.fecha_nacimiento, campActual.fecha), hizo = t.estado === 'atendida' ? campHizo(p) : '';
-    return `<div class="hoyFila est-${t.estado}"><span class="hoyNum">${t.numero || '·'}</span><div><b>${esc(t.paciente_nombre || '')}</b><small>${[edad, campServTexto(p) || (t.notas || '').replace(/,/g, ' · '), p.numero_folio_pap, hizo, TURNO_ESTADOS[t.estado] + (['espera', 'llamada'].includes(t.estado) ? ' · espera ' + min + ' min' : '')].filter(Boolean).map(esc).join(' · ')}</small></div><div class="hoyAcc">${acc}</div></div>${String(campEditar) === String(p.id) ? campEditarHTML(p) : ''}${campAtender === t.id ? campConsultaForm(t, p) : ''}`; };
+    const espera = ['espera', 'llamada', 'en_atencion'].includes(t.estado);
+    return `<div class="hoyFila est-${t.estado}${espera ? ' aura' : ''}${t.estado === 'llamada' ? ' rapida' : ''}"><span class="hoyNum">${t.numero || '·'}</span><div><b>${esc(t.paciente_nombre || '')}</b><small>${[edad, campServTexto(p) || (t.notas || '').replace(/,/g, ' · '), p.numero_folio_pap, hizo, TURNO_ESTADOS[t.estado] + (['espera', 'llamada'].includes(t.estado) ? ' · espera ' + min + ' min' : '')].filter(Boolean).map(esc).join(' · ')}</small></div><div class="hoyAcc">${acc}</div></div>${String(campEditar) === String(p.id) ? campEditarHTML(p) : ''}${campAtender === t.id ? campConsultaForm(t, p) : ''}`; };
   return `<section class="hoyCard campCola"><h3>🩺 Consultorio · mujeres en espera <span class="hoyN">${activos.length}</span></h3>
     ${activos.length ? activos.map(fila).join('') : '<div class="hoyVacio">No hay mujeres esperando. Llegan solas desde la recepción.</div>'}
     ${hechos.length ? `<div class="campHechasTit">✔ Ya atendidas (${hechos.length})</div>${hechos.slice().reverse().map(fila).join('')}` : ''}
@@ -10490,6 +10485,25 @@ document.addEventListener('change', e => {
   if (e.target.id === 'metRed') { metSt.red = e.target.value; metPintarCtl(); metGenerar(); }
 });
 
+
+// ===== Aura: estrellas sueltas alrededor de lo nuevo (se agregan solas a cada elemento con .aura) =====
+function auraChispas(el) {
+  if (el.dataset.chispas) return; el.dataset.chispas = '1';
+  const dest = el.tagName === 'TR' ? el.firstElementChild : el; if (!dest) return;
+  const c = document.createElement('span'); c.className = 'auraChispas'; c.setAttribute('aria-hidden', 'true');
+  const g = ['✦', '✧', '✦', '·', '✧', '✦', '✧'], n = el.tagName === 'TR' ? 4 : 7, r = (a, b) => a + Math.random() * (b - a);
+  c.innerHTML = Array.from({ length: n }, (_, k) => {
+    const lado = k % 4, pos = lado === 0 ? `top:${r(-8, -2)}px;left:${r(4, 94)}%` : lado === 1 ? `bottom:${r(-8, -2)}px;left:${r(4, 94)}%` : lado === 2 ? `left:${r(-7, -2)}px;top:${r(15, 75)}%` : `right:${r(-7, -2)}px;top:${r(15, 75)}%`;
+    return `<i style="${pos};--t:${r(12, 19).toFixed(0)}px;--d:${r(2.2, 3.8).toFixed(2)}s;--del:${r(0, 3).toFixed(2)}s">${g[k % g.length]}</i>`;
+  }).join('');
+  dest.appendChild(c);
+}
+(function () {
+  let pend = false;
+  const pasar = () => { pend = false; document.querySelectorAll('.aura:not([data-chispas])').forEach(auraChispas); };
+  new MutationObserver(() => { if (!pend) { pend = true; requestAnimationFrame(pasar); } }).observe(document.body, { childList: true, subtree: true });
+  pasar();
+})();
 // ===== Sitio: instalar como aplicación (PWA) =====
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 let instalarEvt = null;
