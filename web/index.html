@@ -194,6 +194,8 @@
   .auraChispas i { position: absolute; font-style: normal; font-size: var(--t, 12px); line-height: 1; color: var(--ch, #f7c6da); text-shadow: 0 0 5px #fff, 0 0 10px var(--chg, #f1a7c3), 0 0 18px var(--h3, rgba(124,58,237,.8)); opacity: 0; transform: scale(0); animation: auraChispa var(--d, 2.6s) ease-in-out var(--del, 0s) infinite; }
   .auraChispas i:nth-child(3n) { color: #fff; }
   /* Balón del asistente de voz ("Para hoy") */
+  .aura.auraLab { --a1: #2f6fb0; --a2: #60a5fa; --a3: #c7d2fe; --a4: #c4b5fd; --a5: #7c3aed; --a6: #1d4ed8; --h1: rgba(47,111,176,.35); --h2: rgba(96,165,250,.55); --h3: rgba(124,58,237,.4); --ch: #dbeafe; --chg: #60a5fa; --vel: 4.5s; --resp: 3.2s; }
+  #resultadosBanner.aura { --aura-bg: #dfeaff; } body.dark #resultadosBanner.aura { --aura-bg: #1d2733; } #resultadosBanner.aura.auraPos { --aura-bg: #ece6ff; color: #3b1f6e; } body.dark #resultadosBanner.aura.auraPos { --aura-bg: #261d3a; color: #e4dcff; }
   #paraHoy.aura { overflow: visible; } #paraHoy.aura .phHead { border-radius: 16px 16px 0 0; }
   tr.aura > td { animation: auraCelda 3.6s ease-in-out infinite; } tr.aura > td:first-child { position: relative; }
   @keyframes auraGira { to { --aura: 360deg; } }
@@ -4756,12 +4758,14 @@ function renderBanners(data) {
     const alt = nuevos.filter(p => p.estado_pap === 'Positivo' || p.resultado_vph === 'Positiva').length;
     const rep = nuevos.filter(p => ['rechazada', 'insatisfactoria'].includes(p.muestra_estado)).length;
     rbanner.style.display = 'flex';
+    rbanner.className = 'aura ' + (alt ? 'auraPos rapida' : 'auraLab');
+    rbanner.removeAttribute('data-chispas'); // se redibuja: las estrellas vuelven a ponerse
     rbanner.innerHTML = `<span>🔬 <b>${nuevos.length} resultado${nuevos.length > 1 ? 's' : ''} nuevo${nuevos.length > 1 ? 's' : ''} del laboratorio</b> <span class="bannerHint">· ${[alt ? alt + ' alterado' + (alt > 1 ? 's' : '') : '', rep ? rep + ' para repetir toma' : '', 'llegaron sin papel'].filter(Boolean).join(' · ')}</span></span>` +
       `<button type="button" class="bannerBtn" data-quick="nuevos">${listQuick === 'nuevos' ? 'Ver todas' : 'Ver solo estas'}</button>` +
       (conRoles() && perfil.rol === 'centro' ? `<button type="button" class="bannerBtn" id="vistosTodos">✓ Marcar todos como vistos</button>` : '');
     const vt = document.getElementById('vistosTodos');
     if (vt) vt.onclick = () => marcarVisto(nuevos);
-  } else { rbanner.style.display = 'none'; rbanner.innerHTML = ''; }
+  } else { rbanner.style.display = 'none'; rbanner.innerHTML = ''; rbanner.className = ''; rbanner.removeAttribute('data-chispas'); }
 
   const crs = data.filter(p => { const d = derivDe(p); return d && derEsNueva(d); });
   try { if (sonidoSiAumenta('contra', crs.length, 'mensaje')) vozAviso('Llegó una contrarreferencia nueva.', 'contra'); } catch (_) {}
@@ -5027,7 +5031,7 @@ function renderPatientCards(data, base) {
     const fechaEst = p.fecha_estimada || addDays(p.fecha_toma, 90);
     const atrasado = estado === 'Pendiente' && fechaEst && fechaEst < hoy;
     const card = document.createElement('div');
-    { const dN = derivDe(p); card.className = 'patientCard' + (dN && derEsNueva(dN) ? ' aura' : esResultadoNuevo(p) ? ' aura ' + ({ Positivo: 'auraPos', 'Positivo VPH': 'auraVph', Negativo: 'auraNeg' }[estadoDe(p)] || (p.resultado_vph === 'Negativa' ? 'auraNeg' : '')) : ''); }
+    { const dN = derivDe(p); card.className = 'patientCard' + (dN && derEsNueva(dN) ? ' aura' : ''); }
     card.dataset.id = p.id;
     card.title = 'Tocá para ver la ficha y la línea de tiempo';
     card.style.borderLeftColor = COLORS[estado];
@@ -8437,7 +8441,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.20.3 · 29/09/2026';
+const SIVEC_VERSION = '1.20.4 · 29/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
