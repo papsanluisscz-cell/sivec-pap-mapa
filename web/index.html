@@ -183,15 +183,21 @@
   /* ===== Aura: lo nuevo que espera atención (campaña, referencia/colposcopia nueva, contrarreferencia y biopsia nuevas) =====
      Borde que gira en los tonos del sistema (vino, rosa, violeta), halo que respira y estrellas sueltas que titilan. */
   @property --aura { syntax: '<angle>'; initial-value: 0deg; inherits: true; }
-  .aura:not(tr) { position: relative; border: 2px solid transparent !important; background: linear-gradient(var(--aura-bg, var(--surface)), var(--aura-bg, var(--surface))) padding-box, conic-gradient(from var(--aura), #7d2a4c, #b0487a, #f1a7c3, #c4b5fd, #7c3aed, #9c3a5f, #7d2a4c) border-box !important; animation: auraGira 5s linear infinite, auraHalo 3.6s ease-in-out infinite; }
+  .aura { --a1: #7d2a4c; --a2: #b0487a; --a3: #f1a7c3; --a4: #c4b5fd; --a5: #7c3aed; --a6: #9c3a5f; --h1: rgba(125,42,76,.35); --h2: rgba(241,167,195,.6); --h3: rgba(124,58,237,.45); --ch: #f7c6da; --chg: #f1a7c3; --vel: 5s; --resp: 3.6s; }
+  .aura.auraPos { --a1: #4c1d95; --a2: #7c3aed; --a3: #c4b5fd; --a4: #f1a7c3; --a5: #9c3a5f; --a6: #7c3aed; --h1: rgba(76,29,149,.4); --h2: rgba(167,139,250,.65); --h3: rgba(156,58,95,.45); --ch: #ede9fe; --chg: #a78bfa; --vel: 3.2s; --resp: 2.4s; }
+  .aura.auraVph { --a1: #7f1d1d; --a2: #dc2626; --a3: #fca5a5; --a4: #f1a7c3; --a5: #9c3a5f; --a6: #b91c1c; --h1: rgba(127,29,29,.4); --h2: rgba(248,113,113,.6); --h3: rgba(156,58,95,.45); --ch: #fee2e2; --chg: #f87171; --vel: 3.2s; --resp: 2.4s; }
+  .aura.auraNeg { --a1: #c2410c; --a2: #ea8c2e; --a3: #fcd34d; --a4: #fde68a; --a5: #f1a7c3; --a6: #ea8c2e; --h1: rgba(194,65,12,.25); --h2: rgba(251,191,36,.45); --h3: rgba(241,167,195,.35); --ch: #fef3c7; --chg: #fbbf24; --vel: 7s; --resp: 4.8s; }
+  .aura:not(tr) { position: relative; border: 2px solid transparent !important; background: linear-gradient(var(--aura-bg, var(--surface)), var(--aura-bg, var(--surface))) padding-box, conic-gradient(from var(--aura), var(--a1), var(--a2), var(--a3), var(--a4), var(--a5), var(--a6), var(--a1)) border-box !important; animation: auraGira var(--vel) linear infinite, auraHalo var(--resp) ease-in-out infinite; }
   .patientCard.aura { --aura-bg: #fff; } body.dark .patientCard.aura { --aura-bg: var(--surface); }
   .aura.rapida:not(tr) { animation-duration: 1.9s, 1.5s; }
   .auraChispas { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
-  .auraChispas i { position: absolute; font-style: normal; font-size: var(--t, 12px); line-height: 1; color: #f7c6da; text-shadow: 0 0 5px #fff, 0 0 10px #f1a7c3, 0 0 18px rgba(124,58,237,.8); opacity: 0; transform: scale(0); animation: auraChispa var(--d, 2.6s) ease-in-out var(--del, 0s) infinite; }
-  .auraChispas i:nth-child(3n) { color: #ddd6fe; text-shadow: 0 0 6px #a78bfa, 0 0 12px rgba(125,42,76,.7); }
+  .auraChispas i { position: absolute; font-style: normal; font-size: var(--t, 12px); line-height: 1; color: var(--ch, #f7c6da); text-shadow: 0 0 5px #fff, 0 0 10px var(--chg, #f1a7c3), 0 0 18px var(--h3, rgba(124,58,237,.8)); opacity: 0; transform: scale(0); animation: auraChispa var(--d, 2.6s) ease-in-out var(--del, 0s) infinite; }
+  .auraChispas i:nth-child(3n) { color: #fff; }
+  /* Balón del asistente de voz ("Para hoy") */
+  #paraHoy.aura { overflow: visible; } #paraHoy.aura .phHead { border-radius: 16px 16px 0 0; }
   tr.aura > td { animation: auraCelda 3.6s ease-in-out infinite; } tr.aura > td:first-child { position: relative; }
   @keyframes auraGira { to { --aura: 360deg; } }
-  @keyframes auraHalo { 0%, 100% { box-shadow: 0 0 10px 1px rgba(125,42,76,.35), 0 0 22px 4px rgba(241,167,195,.25); } 33% { box-shadow: 0 0 16px 3px rgba(241,167,195,.6), 0 0 32px 8px rgba(196,181,253,.3); } 66% { box-shadow: 0 0 14px 2px rgba(124,58,237,.45), 0 0 28px 6px rgba(125,42,76,.28); } }
+  @keyframes auraHalo { 0%, 100% { box-shadow: 0 0 10px 1px var(--h1), 0 0 22px 4px var(--h2); } 33% { box-shadow: 0 0 16px 3px var(--h2), 0 0 32px 8px var(--h3); } 66% { box-shadow: 0 0 14px 2px var(--h3), 0 0 28px 6px var(--h1); } }
   @keyframes auraChispa { 0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); } 15% { opacity: 1; transform: scale(1.15) rotate(45deg); } 35% { opacity: .9; transform: scale(.8) rotate(90deg) translateY(-3px); } 55% { opacity: 0; transform: scale(0) rotate(140deg) translateY(-6px); } }
   @keyframes auraCelda { 0%, 100% { background-color: rgba(241,167,195,.14); box-shadow: inset 0 2px 0 rgba(241,167,195,.9), inset 0 -2px 0 rgba(167,139,250,.8); } 50% { background-color: rgba(196,181,253,.16); box-shadow: inset 0 2px 0 rgba(167,139,250,.9), inset 0 -2px 0 rgba(125,42,76,.8); } }
   @media (prefers-reduced-motion: reduce) { .aura:not(tr), tr.aura > td, .auraChispas i { animation: none !important; } .auraChispas { display: none; } }
@@ -5021,7 +5027,7 @@ function renderPatientCards(data, base) {
     const fechaEst = p.fecha_estimada || addDays(p.fecha_toma, 90);
     const atrasado = estado === 'Pendiente' && fechaEst && fechaEst < hoy;
     const card = document.createElement('div');
-    { const dN = derivDe(p); card.className = 'patientCard' + (dN && derEsNueva(dN) ? ' aura' : ''); }
+    { const dN = derivDe(p); card.className = 'patientCard' + (dN && derEsNueva(dN) ? ' aura' : esResultadoNuevo(p) ? ' aura ' + ({ Positivo: 'auraPos', 'Positivo VPH': 'auraVph', Negativo: 'auraNeg' }[estadoDe(p)] || (p.resultado_vph === 'Negativa' ? 'auraNeg' : '')) : ''); }
     card.dataset.id = p.id;
     card.title = 'Tocá para ver la ficha y la línea de tiempo';
     card.style.borderLeftColor = COLORS[estado];
@@ -8431,7 +8437,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.20.2 · 29/09/2026';
+const SIVEC_VERSION = '1.20.3 · 29/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -9307,6 +9313,7 @@ function saludoTarjeta(items, texto, cl, frase) {
   document.getElementById('paraHoy')?.remove();
   const t = saludoTrato();
   const c = document.createElement('div'); c.id = 'paraHoy'; c.setAttribute('role', 'status');
+  c.className = 'aura' + (items.some(i => i.tono === 'crit') ? ' rapida' : '');
   c.innerHTML = `<div class="phHead"><div><small>${saludoHora()}${cl ? ` · ${cl.ic} ${cl.temp}° · máx ${cl.max}°${cl.lluvia >= 60 ? ' · ☂ ' + cl.lluvia + '%' : ''}` : ''}</small><b>${esc(t.texto || '')}</b></div>
       <button type="button" class="phVoz" title="Escuchar otra vez" aria-label="Escuchar otra vez">🔊</button><button type="button" class="phX" aria-label="Cerrar">×</button></div>
     <div class="phSub">${items.length ? 'Para hoy' : 'Hoy no hay pendientes · ¡buen trabajo!'}</div>
