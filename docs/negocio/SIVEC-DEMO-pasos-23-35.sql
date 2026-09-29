@@ -788,3 +788,30 @@ create policy "tratamientos: quitar en el establecimiento" on sivec_tratamientos
   using (sivec_edita_centro(centro_id)) with check (sivec_edita_centro(centro_id));
 grant select, insert, update on sivec_tratamientos_centro to authenticated;
 select 'Paso 36 listo' as resultado;
+
+
+-- PASO 37 · Métricas SNIS y CAI: revisión de cada establecimiento (el gestor ve quién ya revisó)
+create table if not exists sivec_metricas_revision (
+  id uuid primary key default gen_random_uuid(),
+  centro_id uuid not null,
+  tipo text not null check (tipo in ('snis', 'cai')),
+  periodo text not null check (periodo ~ '^[0-9]{4}(-[0-9]{2}|-T[1-4]|-S[12])?$'),
+  revisado_por uuid default auth.uid(),
+  revisado_nombre text,
+  revisado_at timestamptz not null default now(),
+  datos jsonb,
+  notas text,
+  unique (centro_id, tipo, periodo)
+);
+alter table sivec_metricas_revision enable row level security;
+drop policy if exists "métricas: ver las de sus centros" on sivec_metricas_revision;
+create policy "métricas: ver las de sus centros" on sivec_metricas_revision for select to authenticated
+  using (sivec_ve_centro(centro_id));
+drop policy if exists "métricas: revisar en el establecimiento" on sivec_metricas_revision;
+create policy "métricas: revisar en el establecimiento" on sivec_metricas_revision for insert to authenticated
+  with check (sivec_edita_centro(centro_id));
+drop policy if exists "métricas: volver a revisar" on sivec_metricas_revision;
+create policy "métricas: volver a revisar" on sivec_metricas_revision for update to authenticated
+  using (sivec_edita_centro(centro_id)) with check (sivec_edita_centro(centro_id));
+grant select, insert, update on sivec_metricas_revision to authenticated;
+select 'Paso 37 listo' as resultado;
