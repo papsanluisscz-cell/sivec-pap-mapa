@@ -2228,7 +2228,7 @@ body.dark #hoyView .hoyElegida { background: #2a1f3d; }
           <div class="field vphCasa"><label>Kit devuelto el<span class="helpTip" data-tip="Mientras la paciente no devuelva el kit, la muestra no se puede poner en un lote. Cuando lo traiga, marcá la fecha.">ⓘ</span></label><input type="date" name="vph_kit_devuelto"></div>
         </div>
       <div class="field" id="genotipoField" style="display:none"><label>Genotipo VPH · ¿16, 18 u otros? (obligatorio si es positivo)</label>
-        <select id="vphGenotipoSel"><option value="">— Elegir el genotipo —</option><option>16</option><option>18</option><option>16 y 18</option><option>16 + otros de alto riesgo</option><option>18 + otros de alto riesgo</option><option>Otros de alto riesgo</option></select>
+        <select id="vphGenotipoSel"><option value="">— Elegir el genotipo —</option><option>16</option><option>18</option><option>16 y 18</option><option>16 + otros de alto riesgo</option><option>18 + otros de alto riesgo</option><option>Otros de alto riesgo</option><option value="Sin genotipificar">Sin genotipificar (la prueba no distingue, ej. careHPV)</option></select>
         <div class="hint" id="genotipoHint" style="display:none;margin-top:4px">Para guardar el genotipo hay que ejecutar el Paso 2 de SUPABASE-SQL.md (una columna nueva).</div>
       </div>
       <div id="segVphFields" style="display:none">
@@ -2873,7 +2873,7 @@ const LAB_HALLAZGOS = ['Candida', 'Trichomonas', 'Cambio de flora (vaginosis)', 
 // Plataformas de prueba molecular de VPH más usadas en la región (se guarda en el informe)
 const LAB_VPH_METODO = ['GeneXpert (Xpert HPV)', 'cobas (Roche)', 'careHPV', 'Abbott RealTime', 'BD Onclarity', 'Otra'];
 function labMetodoUlt() { try { return localStorage.getItem('sivec_lab_metodo') || ''; } catch (e) { return ''; } }
-const LAB_VPH = [['Negativo', 'Negativa', ''], ['Positivo 16', 'Positiva', '16'], ['Positivo 18', 'Positiva', '18'], ['Positivo 16 y 18', 'Positiva', '16 y 18'], ['Otros alto riesgo', 'Positiva', 'Otros de alto riesgo']];
+const LAB_VPH = [['Negativo', 'Negativa', ''], ['Positivo 16', 'Positiva', '16'], ['Positivo 18', 'Positiva', '18'], ['Positivo 16 y 18', 'Positiva', '16 y 18'], ['Otros alto riesgo', 'Positiva', 'Otros de alto riesgo'], ['Positivo (la prueba no genotipa)', 'Positiva', 'Sin genotipificar']];
 let labData = [], labLotes = [], labTab = 'rec', labLoteId = null, labSelId = null, labRecep = {}, labForm = null;
 async function labCargar() {
   const pane = document.getElementById('labPane');
@@ -6676,9 +6676,15 @@ function hcSoapDatos(consulta, colp) {
   return { colp_fecha: fmtFecha(x.fecha) || '', colp_subjetivo: up(x.S), colp_objetivo: up(x.O), colp_analisis: up(x.A), colp_plan: up(x.P) };
 }
 // Renglones del D1 con los medicamentos de la consulta (los 4 del PAP ya vienen impresos)
-function d1Datos(consulta) {
+function d1Datos(consulta, colp) {
   const out = {};
-  const meds = ((consulta && consulta.detalle && consulta.detalle.meds) || []).filter(m => m.d1).slice(0, 10);
+  const meds = ((consulta && consulta.detalle && consulta.detalle.meds) || []).filter(m => m.d1);
+  // Medicación marcada en la colposcopia (si es del mismo día o más nueva que la consulta)
+  if (colp && Array.isArray(colp.plan) && String(colp.fecha || '') >= String((consulta && consulta.fecha) || '')) {
+    const ya = new Set(meds.map(m => String(m.nombre).toLowerCase()));
+    colp.plan.forEach(v => { const t = colpoTratLista().find(x => x.v === v && x.g === 'med'); if (!t) return; const nombre = t.nombre || t.v; if (ya.has(nombre.toLowerCase())) return; ya.add(nombre.toLowerCase()); meds.push({ nombre, indic: t.indic || '', cant: t.cant || '', d1: true }); });
+  }
+  meds.splice(10);
   meds.forEach((m, i) => { out['d1_item_' + (i + 1)] = up1(m.nombre); out['d1_indic_' + (i + 1)] = m.indic || ''; out['d1_cant_' + (i + 1)] = m.cant ? String(m.cant).padStart(2, '0') : ''; });
   return out;
 }
@@ -6686,7 +6692,7 @@ function up1(s) { return (s || '').toUpperCase(); }
 async function completarHc(data, p) {
   const [colp, consulta] = await Promise.all([getLatestColposcopia(p.id), getLatestConsulta(p.id)]);
   if (colp || consulta) Object.assign(data, hcSoapDatos(consulta, colp));
-  Object.assign(data, d1Datos(consulta));
+  Object.assign(data, d1Datos(consulta, colp));
   const esp = (consulta && (espBuscar(consulta.codigo_esp) || espBuscar(consulta.especialidad))) || espPorDoctora(p.doctora);
   data.__codigo_d1 = esp.codigo;
   return { colp, consulta, esp };
@@ -7448,14 +7454,14 @@ const COLPO_TRAT_BASE = [
   { g: 'proc', icon: '📍', v: 'Biopsia', nombre: 'Biopsia dirigida', indic: 'Marcar el sitio con 📍 en el mapa' },
   { g: 'proc', icon: '🧪', v: 'Legrado endocervical', indic: 'Si la ZT no es visible (tipo 3)' },
   { g: 'proc', icon: '✂️', v: 'Polipectomía', indic: 'Pólipo cervical, enviar a patología' },
-  { g: 'med', icon: '🥚', v: 'Metronidazol 500mg VV x10 noches', nombre: 'Metronidazol 500 mg óvulo', indic: '1 óvulo vaginal cada noche × 10 noches' },
-  { g: 'med', icon: '💊', v: 'Metronidazol 500 mg VO c/12 h x7 días', nombre: 'Metronidazol 500 mg comprimido', indic: '1 comp. VO cada 12 h × 7 días' },
-  { g: 'med', icon: '🥚', v: 'Clotrimazol 500mg VV x10 noches', nombre: 'Clotrimazol 500 mg óvulo', indic: '1 óvulo vaginal cada noche × 10 noches' },
-  { g: 'med', icon: '💊', v: 'Fluconazol 150 mg VO dosis única', nombre: 'Fluconazol 150 mg cápsula', indic: '1 cápsula VO, dosis única' },
-  { g: 'med', icon: '🥚', v: 'Nistatina óvulos VV x14 noches', nombre: 'Nistatina 100.000 UI óvulo', indic: '1 óvulo vaginal cada noche × 14 noches' },
-  { g: 'med', icon: '💊', v: 'Azitromicina 1 g VO dosis única', nombre: 'Azitromicina 500 mg comprimido', indic: '2 comp. VO juntos, dosis única' },
-  { g: 'med', icon: '💊', v: 'Doxiciclina 100 mg VO c/12 h x7 días', nombre: 'Doxiciclina 100 mg comprimido', indic: '1 comp. VO cada 12 h × 7 días' },
-  { g: 'med', icon: '🧴', v: 'Estriol crema vaginal', indic: 'Aplicar cada noche × 14 días, luego 2 por semana' },
+  { g: 'med', icon: '🥚', v: 'Metronidazol 500mg VV x10 noches', cant: '10', nombre: 'Metronidazol 500 mg óvulo', indic: '1 óvulo vaginal cada noche × 10 noches' },
+  { g: 'med', icon: '💊', v: 'Metronidazol 500 mg VO c/12 h x7 días', cant: '14', nombre: 'Metronidazol 500 mg comprimido', indic: '1 comp. VO cada 12 h × 7 días' },
+  { g: 'med', icon: '🥚', v: 'Clotrimazol 500mg VV x10 noches', cant: '10', nombre: 'Clotrimazol 500 mg óvulo', indic: '1 óvulo vaginal cada noche × 10 noches' },
+  { g: 'med', icon: '💊', v: 'Fluconazol 150 mg VO dosis única', cant: '1', nombre: 'Fluconazol 150 mg cápsula', indic: '1 cápsula VO, dosis única' },
+  { g: 'med', icon: '🥚', v: 'Nistatina óvulos VV x14 noches', cant: '14', nombre: 'Nistatina 100.000 UI óvulo', indic: '1 óvulo vaginal cada noche × 14 noches' },
+  { g: 'med', icon: '💊', v: 'Azitromicina 1 g VO dosis única', cant: '2', nombre: 'Azitromicina 500 mg comprimido', indic: '2 comp. VO juntos, dosis única' },
+  { g: 'med', icon: '💊', v: 'Doxiciclina 100 mg VO c/12 h x7 días', cant: '14', nombre: 'Doxiciclina 100 mg comprimido', indic: '1 comp. VO cada 12 h × 7 días' },
+  { g: 'med', icon: '🧴', v: 'Estriol crema vaginal', cant: '1', indic: 'Aplicar cada noche × 14 días, luego 2 por semana' },
   { g: 'ind', icon: '🧼', v: 'Aseo vulvoperineal', indic: 'Indicaciones de higiene' },
   { g: 'ind', icon: '🗣️', v: 'Orientación sexual', indic: 'Conducta sexual segura' },
   { g: 'ind', icon: '🛡️', v: 'Uso de preservativo', indic: 'En cada relación durante el tratamiento' },
@@ -8398,7 +8404,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.19.0 · 29/09/2026';
+const SIVEC_VERSION = '1.19.1 · 29/09/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -8978,10 +8984,14 @@ function sonidoSiAumenta(clave, n, nombre) { const antes = sonidoVistos[clave]; 
     <div class="scModos">${modos.map(([k, t]) => `<button type="button" data-sm="${k}">${t}</button>`).join('')}</div>
     <div class="scVoz"><span>🗣 Saludo con voz al entrar</span><div><button type="button" data-voz="fem">👩 Femenina</button><button type="button" data-voz="masc">👨 Masculina</button><button type="button" data-voz="no">Sin voz</button><button type="button" data-voz="oir">▶ Escuchar</button></div></div>
     <div class="scVoz"><span>🔔 Avisos por voz durante el día<small style="display:block;font-weight:400;color:var(--ink-soft);font-size:11.5px">Resultado alterado, contrarreferencia, paciente en espera, firma, metas y resumen del día. Solo dice el nombre de la paciente al confirmar la colposcopía.</small></span><div><button type="button" data-av="si">Sí</button><button type="button" data-av="no">No</button><button type="button" data-av="oir">▶ Probar</button></div></div>
+    <div class="scVoz"><span>🔬 Decir el nombre de la paciente al confirmar la colposcopía<small style="display:block;font-weight:400;color:var(--ink-soft);font-size:11.5px">En una campaña o sala con gente, conviene "No": dice solo "Colposcopía realizada".</small></span><div><button type="button" data-vn="si">Sí</button><button type="button" data-vn="no">No</button></div></div>
     <div class="scPrueba"><span>Probar:</span>${[['firma', '✍ Firma'], ['alerta', '⚠ Resultado alterado'], ['mensaje', '💬 Mensaje'], ['error', '✖ Error'], ['ok', '✓ Guardado']].map(([k, t]) => `<button type="button" data-sp2="${k}">${t}</button>`).join('')}</div>`;
   const ancla = document.getElementById('firmaConfig') || (panel.querySelector('h2') || {}).nextElementSibling || panel.firstChild; ancla.after(d);
   const marcar = () => { d.querySelectorAll('[data-sm]').forEach(b => b.classList.toggle('on', b.dataset.sm === sonidoModo())); d.querySelectorAll('[data-voz]:not([data-voz="oir"])').forEach(b => b.classList.toggle('on', b.dataset.voz === vozModo())); let av = 'si'; try { av = localStorage.getItem('sivec_voz_avisos') || 'si'; } catch (_) {} d.querySelectorAll('[data-av]:not([data-av="oir"])').forEach(b => b.classList.toggle('on', b.dataset.av === av)); };
   marcar();
+  const marcarVn = () => { const v = vozNombreSi() ? 'si' : 'no'; d.querySelectorAll('[data-vn]').forEach(b => b.classList.toggle('on', b.dataset.vn === v)); };
+  marcarVn();
+  d.addEventListener('click', e => { const vn = e.target.closest('[data-vn]'); if (vn) { try { localStorage.setItem('sivec_voz_nombre', vn.dataset.vn); } catch (_) {} marcarVn(); } });
   d.onclick = e => {
     const m = e.target.closest('[data-sm]'), p = e.target.closest('[data-sp2]'), vz = e.target.closest('[data-voz]'), av = e.target.closest('[data-av]');
     if (av) { if (av.dataset.av === 'oir') { if (!vozActiva()) return showToast('Elegí primero una voz (femenina o masculina).', 'err'); sonido('alerta'); setTimeout(() => vozDecir('Llegó un resultado alterado del laboratorio.'), 650); } else { try { localStorage.setItem('sivec_voz_avisos', av.dataset.av); } catch (_) {} marcar(); } return; }
@@ -9127,7 +9137,8 @@ async function vozDecir(texto, encolar) {
 function vozAvisosActivos() { let v = 'si'; try { v = localStorage.getItem('sivec_voz_avisos') || 'si'; } catch (_) {} return v === 'si' && vozActiva(); }
 const vozAvisoUlt = {};
 // Confirmación hablada de la colposcopia: queda el nombre de la paciente en el audio
-function vozColpo(nombre) { return 'Colposcopía realizada. Paciente: ' + String(nombre || '').toLowerCase().replace(/(^|\s)\S/g, x => x.toUpperCase()).trim() + '.'; }
+function vozNombreSi() { try { return (localStorage.getItem('sivec_voz_nombre') || 'si') === 'si'; } catch (_) { return true; } }
+function vozColpo(nombre, forzar) { return (forzar || vozNombreSi()) && nombre ? 'Colposcopía realizada. Paciente: ' + String(nombre || '').toLowerCase().replace(/(^|\s)\S/g, x => x.toUpperCase()).trim() + '.' : 'Colposcopía realizada.'; }
 function vozAviso(texto, clave) {
   if (!texto || !vozAvisosActivos()) return;
   const k = clave || texto, t = Date.now();
@@ -9210,7 +9221,7 @@ const SON_VITRINA = [
     ['firma', '🎉 Meta del año', '', 'C.S. San Luis llegó al 75 % de la meta del año: 390 de 520 tomas. ¡Sigan así!'],
     ['mensaje', '🌙 Resumen del día', '', 'Hoy se registraron 14 tomas, 3 más que ayer. Pasaron 18 pacientes por la cola del día. ¡Buen trabajo! Gracias por cuidar a las mujeres de su comunidad.']]],
   ['Firmas y confirmaciones', [
-    ['firma', '🔬 Colposcopía realizada', 'Dice el nombre de la paciente (ejemplo ficticio).', () => vozColpo('Rosa Ejemplo Ficticia')],
+    ['firma', '🔬 Colposcopía realizada', 'Dice el nombre de la paciente (ejemplo ficticio).', () => vozColpo('Rosa Ejemplo Ficticia', true)],
     ['firma', '📤 Referencia firmada', '', 'Referencia firmada.'],
     ['firma', '↩️ Contrarreferencia enviada', '', 'Contrarreferencia firmada y enviada.'],
     ['firma', '🧪 Informe del laboratorio', '', 'Informe firmado.'],
@@ -9873,7 +9884,7 @@ function campTableroHTML() {
   return `<section class="hoyCard campTab"><h3>📊 ${cerrada ? 'Informe de la campaña' : 'La campaña en vivo'}</h3>
     <div class="campKpis"><div><b>${P.length}</b><small>mujeres${meta ? ' (meta ' + meta + ')' : ''}</small></div><div><b>${pap}</b><small>PAP tomados</small></div><div><b>${vph}</b><small>VPH tomados</small></div><div><b>${colpo}</b><small>colposcopias</small></div><div class="${pos ? 'alta' : ''}"><b>${pos}</b><small>IVAA positivos</small></div><div><b>${tratadas}</b><small>tratadas en el momento${crio || caut ? ` (${crio} crio · ${caut} caut.)` : ''}</small></div></div>
     ${(() => { const V = P.filter(p => p.resultado_vph); if (!V.length) return ''; const pos = V.filter(p => p.resultado_vph === 'Positiva'), g = re => pos.filter(p => re.test(p.vph_genotipo || '')).length;
-      return `<small class="campLbl">Resultados de VPH (llegan del Oncológico)</small><div class="campKpis"><div><b>${V.length - pos.length}</b><small>negativos</small></div><div class="${g(/16/) ? 'alta' : ''}"><b>${g(/16/)}</b><small>positivo 16</small></div><div class="${g(/18/) ? 'alta' : ''}"><b>${g(/18/)}</b><small>positivo 18</small></div><div><b>${pos.filter(p => /otros/i.test(p.vph_genotipo || '') && !/16|18/.test(p.vph_genotipo || '')).length}</b><small>otros de alto riesgo</small></div>${pos.some(p => !p.vph_genotipo) ? `<div><b>${pos.filter(p => !p.vph_genotipo).length}</b><small>positivo sin genotipo</small></div>` : ''}</div>`; })()}
+      return `<small class="campLbl">Resultados de VPH (llegan del Oncológico)</small><div class="campKpis"><div><b>${V.length - pos.length}</b><small>negativos</small></div><div class="${g(/16/) ? 'alta' : ''}"><b>${g(/16/)}</b><small>positivo 16</small></div><div class="${g(/18/) ? 'alta' : ''}"><b>${g(/18/)}</b><small>positivo 18</small></div><div><b>${pos.filter(p => /otros/i.test(p.vph_genotipo || '') && !/16|18/.test(p.vph_genotipo || '')).length}</b><small>otros de alto riesgo</small></div>${pos.some(p => !p.vph_genotipo || /sin genot/i.test(p.vph_genotipo)) ? `<div><b>${pos.filter(p => !p.vph_genotipo || /sin genot/i.test(p.vph_genotipo)).length}</b><small>positivo sin genotipo</small></div>` : ''}</div>`; })()}
     ${meta ? `<div class="campMeta"><i style="width:${Math.min(100, Math.round(P.length * 100 / meta))}%"></i><span>${Math.round(P.length * 100 / meta)} % de la meta</span></div>` : ''}
     <small class="campLbl">Mujeres por hora</small><div class="campBarras">${Array.from({ length: h1 - h0 + 1 }, (_, k) => h0 + k).map(h => `<div><i style="height:${Math.round((horas[h] || 0) * 100 / maxH)}%"></i><span>${h}h</span></div>`).join('')}</div>
     ${cerrada ? '' : `<small class="campLbl">Estaciones ahora</small><div class="campEsp"><div>📋 Recepción<b>${campPacs.length} registradas</b><small>${P.filter(p => Date.now() - new Date(p.created_at || 0) < 3600e3).length} en la última hora</small></div><div>🩺 Consultorio<b>${esp().length} esperando</b><small>${minEsp()} min promedio</small></div></div>`}
@@ -10047,7 +10058,8 @@ async function snisInforme() {
   const vr = informados.filter(p => p.resultado_vph);
   fila('VPH informados: negativo', vr.filter(p => p.resultado_vph === 'Negativa'), p => p.fecha_toma);
   fila('VPH informados: positivo 16 y/o 18', vr.filter(p => p.resultado_vph === 'Positiva' && /16|18/.test(p.vph_genotipo || '')), p => p.fecha_toma);
-  fila('VPH informados: positivo otros de alto riesgo', vr.filter(p => p.resultado_vph === 'Positiva' && !/16|18/.test(p.vph_genotipo || '')), p => p.fecha_toma);
+  fila('VPH informados: positivo otros de alto riesgo', vr.filter(p => p.resultado_vph === 'Positiva' && !/16|18/.test(p.vph_genotipo || '') && !/sin genot/i.test(p.vph_genotipo || '') && !!p.vph_genotipo), p => p.fecha_toma);
+  fila('VPH informados: positivo sin genotipificar', vr.filter(p => p.resultado_vph === 'Positiva' && (!p.vph_genotipo || /sin genot/i.test(p.vph_genotipo))), p => p.fecha_toma);
   const pacDe = d => ({ fecha_nacimiento: (tomas.concat(informados).find(p => String(p.id) === String(d.paciente_id)) || {}).fecha_nacimiento });
   fila('Derivadas a colposcopia', ders.filter(d => enMes(d.fecha_derivacion)).map(d => Object.assign(pacDe(d), { f: d.fecha_derivacion })), p => p.f);
   fila('Colposcopias realizadas', ders.filter(d => enMes(d.fecha_atencion)).map(d => Object.assign(pacDe(d), { f: d.fecha_atencion })), p => p.f);
