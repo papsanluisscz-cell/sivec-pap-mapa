@@ -258,7 +258,7 @@ Custos de referência estão na planilha `SIVEC-modelo-financeiro.xlsx` (equipe 
 | Modalidade | Faixa aproximada | Exemplo SIVEC |
 |---|---|---|
 | Contratação menor | até ~Bs 50.000 | demonstração ou piloto pequeno |
-| ANPE (apoio nacional à produção e emprego) | ~Bs 50.001 a 1.000.000 | **piloto Red Centro (~Bs 490 mil/ano)** |
+| ANPE (apoio nacional à produção e emprego) | ~Bs 50.001 a 1.000.000 | **Red Centro + Oncológico: 1º ano ≈ Bs 191 mil (US$ 27.437)** |
 | Licitação pública | acima de ~Bs 1.000.000 | município, departamento |
 | Contratação direta | casos especiais previstos em lei | exclusividade técnica, se aplicável |
 
@@ -279,10 +279,10 @@ Custos de referência estão na planilha `SIVEC-modelo-financeiro.xlsx` (equipe 
 5. **Piloto contratado de 6 meses** com metas acordadas.
 6. **Relatório de impacto → ampliação** para município e departamento.
 
-### 10.4 Preço (referência — ver planilha)
-- 1º nível US$ 180/mês · 2º nível US$ 1.400 · 3º nível US$ 3.800, sem impostos, mais a implantação única.
-- **Bolívia completa ≈ US$ 14,2 milhões por ano ≈ US$ 1,16 por habitante por ano.**
-- O piloto sozinho não paga a equipe: negociar valor fixo ou vinculado à ampliação.
+### 10.4 Preço (atualizado em 28/09/2026 — o mesmo da apresentação)
+- Mensalidade: 1º nível sem colposcopia **US$ 120** · 1º nível com colposcopia e biópsia **US$ 270** · 2º nível **US$ 275** · 3º/4º nível e laboratórios **US$ 521** · tablero da rede **US$ 250**. Implantação única: 225 / 225 / 525 / 575 / 275.
+- Red Centro + Oncológico: US$ 2.026/mês + US$ 3.125 de implantação → **1º ano US$ 27.437 (Bs 190.961,52)** → ANPE.
+- Município de Santa Cruz (4 redes, ~109 estabelecimentos, estimativa): ~US$ 18.461/mês → **~Bs 1,54 mi/ano** → licitação pública (1º/2º nível e tableros pelo GAM ~Bs 1,28 mi; 3º/4º pela Gobernación ~Bs 261 mil, ANPE).
 
 ---
 
