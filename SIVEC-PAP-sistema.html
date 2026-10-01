@@ -8454,7 +8454,7 @@ async function saveDocsToDrive() {
 init();
 
 // ===== Versión, soporte, términos de uso, modo sin internet e informe SNIS =====
-const SIVEC_VERSION = '1.21.1 · 30/09/2026';
+const SIVEC_VERSION = '1.21.2 · 01/10/2026';
 const TERMINOS_VERSION = '2026-09';
 (function soporteEnConfiguracion() {
   const panel = document.getElementById('settingsPanel'); if (!panel) return;
@@ -10217,6 +10217,10 @@ const MET_CSS_DOC = `
 .metDoc table.mt { width:100%; border-collapse:collapse; font-size:12.5px; } .metDoc .mt th { background:var(--r3); color:#fff; padding:6px 8px; text-align:center; font-size:11.5px; } .metDoc .mt th:first-child { text-align:left; }
 .metDoc .mt td { border-bottom:1px solid var(--ln); padding:5px 8px; } .metDoc .mt tbody tr:nth-child(even) td { background:#fdf9fa; } .metDoc .mt td.n { text-align:center; } .metDoc .mt td.tot { font-weight:800; color:var(--r2); }
 .metDoc .mt tr.tt td { background:var(--rs) !important; color:#5b1733; font-weight:800; font-size:12px; } .metDoc .mt tr.sub td:first-child { padding-left:22px; color:#5a4750; }
+.metDoc table.mt { background:#fff; color:#2e1f27; } .metDoc .mt td { color:#2e1f27; background:#fff; }
+.metDoc .mCai textarea { background:#fff; color:#2e1f27; }
+.metDoc .mt.pac { font-size:11.5px; } .metDoc .mt.pac th, .metDoc .mt.pac td { white-space:normal; vertical-align:top; } .metDoc .mt.pac td.nw { white-space:nowrap; } .metDoc .mt.pac tr { break-inside:avoid; }
+.metDoc .mPacOp { display:flex; align-items:center; gap:6px; font-size:12.5px; color:#5a4750; margin:-2px 0 8px; } .metDoc .mPacOp input { accent-color:#9c3a5f; width:16px; height:16px; }
 .metDoc .mt.cai td small { display:block; font-size:10.5px; color:#8a7078; }
 .metDoc .sem { display:inline-block; width:11px; height:11px; border-radius:50%; margin-left:5px; vertical-align:middle; } .metDoc .sem.ok { background:#16a34a; } .metDoc .sem.med { background:#f59e0b; } .metDoc .sem.mal { background:#dc2626; }
 .metDoc .pend { color:#b45309; font-weight:700; }
@@ -10233,7 +10237,7 @@ body.print, .metClon { background:#fff; margin:0; } body.print .metDoc, .metClon
 body.print .noPrint, .metClon .noPrint, body.print .mhF input, .metClon .mhF input, body.print textarea, .metClon textarea { display:none !important; }
 body.print .mhP, .metClon .mhP { display:block; } body.print .mhF b, .metClon .mhF b { display:block; }
 .metClon { position:fixed; left:-12000px; top:0; width:1000px; padding:22px 26px !important; }
-@media print { @page { size: A4; margin: 12mm; } .metDoc .mhTop, .metDoc .mt th, .metDoc .mt tr.tt td, .metDoc .mBars i, .metDoc .sem { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .metDoc .ms { break-inside: avoid; } }
+@media print { @page { size: A4; margin: 12mm; } .metDoc .mhTop, .metDoc .mt th, .metDoc .mt tr.tt td, .metDoc .mBars i, .metDoc .sem { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .metDoc .ms { break-inside: avoid; } .metDoc .ms.pac { break-inside: auto; } }
 `;
 (function () { const st = document.createElement('style'); st.id = 'metCss'; st.textContent = MET_CSS_DOC + `
 #metOverlay { position:fixed; inset:0; z-index:2500; background: radial-gradient(circle at 20% 0%, #5b1733 0%, #2a0b19 60%); display:none; flex-direction:column; }
@@ -10255,7 +10259,7 @@ body.print .mhP, .metClon .mhP { display:block; } body.print .mhF b, .metClon .m
 // CAI: análisis periódico de indicadores (metodología del SNIS-VE) con problemas y acciones.
 // Cada establecimiento revisa sus métricas; el gestor genera el consolidado de toda la red. Paso 37 guarda la revisión.
 const MET_PROG = 'Programa de Prevención y Control del Cáncer de Cuello Uterino';
-let metSt = { tipo: 'snis', mes: '', alcance: 't', centro: '', datos: null, revTabla: null };
+let metSt = { tipo: 'snis', mes: '', alcance: 't', centro: '', datos: null, revTabla: null, conLista: true };
 function metPuedeRed() { return conRoles() && (perfil.rol === 'gestor' || perfil.rol === 'admin'); }
 function metCentrosRed() {
   if (!conRoles()) return [];
@@ -10430,6 +10434,19 @@ function metCabecera(M) {
       <div class="mhF"><small>Elaborado por</small><b>${esc((perfil && perfil.nombre_completo) || '—')}</b></div>
       <div class="mhF"><small>Fecha de emisión</small><b>${fmtFecha(hoyISO())}</b></div></div></div>`;
 }
+// Lista nominal de las tomas del período (para revisar y firmar): se ordena por fecha de toma y nombre
+function metListaPac(M) {
+  const nom = {}; M.porCentro.forEach(({ c, D }) => D.tomas.forEach(p => { nom[p.id] = c.nombre || ''; }));
+  return M.U.tomas.slice().sort((a, b) => String(a.fecha_toma || '').localeCompare(String(b.fecha_toma || '')) || String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es'))
+    .map(p => ({ p, centro: nom[p.id] || '', edad: edadAl(p.fecha_nacimiento, p.fecha_toma), examen: esSoloVph(p) ? 'VPH' : (p.hizo_prueba_vph ? 'PAP + VPH' : 'PAP') }));
+}
+function metListaHTML(M) {
+  const L = metListaPac(M), red = M.esRed;
+  return `<section class="ms pac"><h2>Lista de pacientes del período (${L.length})</h2>
+    <table class="mt pac"><thead><tr><th>Nº</th><th>Fecha de toma</th><th>Examen</th><th>Nombre completo</th><th>Carnet</th><th>Fecha de nacimiento</th><th>Edad</th><th>Celular</th><th>Dirección</th>${red ? '<th>Establecimiento</th>' : ''}</tr></thead>
+    <tbody>${L.map(({ p, centro, edad, examen }, i) => `<tr><td class="n">${i + 1}</td><td class="nw">${p.fecha_toma ? fmtFecha(p.fecha_toma) : '—'}</td><td class="nw">${examen}</td><td>${esc(p.nombre || '')}</td><td class="nw">${esc(p.carnet || '—')}</td><td class="nw">${p.fecha_nacimiento ? fmtFecha(p.fecha_nacimiento) : '—'}</td><td class="n">${edad ?? '—'}</td><td class="nw">${esc(p.celular || '—')}</td><td>${esc(p.direccion || '—')}</td>${red ? `<td>${esc(centro)}</td>` : ''}</tr>`).join('') || `<tr><td colspan="${red ? 10 : 9}">Sin tomas en el período.</td></tr>`}</tbody></table>
+    <p class="mNota">Edad a la fecha de la toma. Documento confidencial: contiene datos personales de las pacientes, de uso interno del establecimiento.</p></section>`;
+}
 function metSemaf(i) { if (i.valor == null) return ''; const b = i.bueno(i.valor); return b ? `<i class="sem ${b}"></i>` : ''; }
 function metDocHTML() {
   const M = metSt.datos, R = M.R, rev1 = !M.esRed && M.porCentroRes[0] && M.porCentroRes[0].rev;
@@ -10452,8 +10469,12 @@ function metDocHTML() {
     h += `<section class="ms"><h2>Análisis del comité</h2><div class="mCai"><label><b>Problemas identificados</b><textarea data-cai="problemas" rows="4" placeholder="Ej.: 18 % de muestras sin resultado a los 45 días; 3 positivas sin derivación…">${esc(n.problemas || '')}</textarea><div class="mhP pre">${esc(n.problemas || '—')}</div></label>
       <label><b>Acciones y compromisos (qué · quién · hasta cuándo)</b><textarea data-cai="acciones" rows="4" placeholder="Ej.: Búsqueda activa de las 3 positivas · Lic. X · 15/10">${esc(n.acciones || '')}</textarea><div class="mhP pre">${esc(n.acciones || '—')}</div></label></div></section>`;
   }
+  if (metSt.tipo === 'snis') {
+    h += `<label class="mPacOp noPrint"><input type="checkbox" data-ma="lista"${metSt.conLista ? ' checked' : ''}> Incluir la lista de pacientes (nombre, carnet, nacimiento, edad, celular y dirección) antes de las firmas</label>`;
+    if (metSt.conLista) h += metListaHTML(M);
+  }
   h += `<div class="mf"><div class="mfFirmas"><div><span></span><small>Responsable del programa</small></div><div><span></span><small>${M.esRed ? 'Gerente / coordinador(a) de red' : 'Director(a) / médico(a) jefe'}</small></div><div><span></span><small>Estadístico(a) · SNIS</small></div></div>
-    <p>Generado por el SIVEC PAP/VPH · Ferreira Salud Digital S.R.L. · ${fmtFecha(hoyISO())}. Documento de apoyo: no reemplaza el formulario oficial del SNIS. Sin nombres de pacientes.</p></div>`;
+    <p>Generado por el SIVEC PAP/VPH · Ferreira Salud Digital S.R.L. · ${fmtFecha(hoyISO())}. Documento de apoyo: no reemplaza el formulario oficial del SNIS. ${metSt.tipo === 'snis' && metSt.conLista ? 'Incluye datos personales de las pacientes: documento confidencial.' : 'Sin nombres de pacientes.'}</p></div>`;
   return h;
 }
 function metDocEventos() {
@@ -10538,6 +10559,13 @@ async function metExcel() {
     if (estilos) for (let c = 0; c < 7; c++) { const k = X.utils.encode_cell({ r: 0, c }); w2[k].s = { fill: { fgColor: { rgb: '9C3A5F' } }, font: { bold: true, color: { rgb: 'FFFFFF' } } }; }
     X.utils.book_append_sheet(wb, w2, 'Por establecimiento');
   }
+  if (metSt.tipo === 'snis' && metSt.conLista) {
+    const enc = ['Nº', 'Fecha de toma', 'Examen', 'Nombre completo', 'Carnet', 'Fecha de nacimiento', 'Edad', 'Celular', 'Dirección', ...(M.esRed ? ['Establecimiento'] : [])];
+    const P = [enc, ...metListaPac(M).map(({ p, centro, edad, examen }, i) => [i + 1, p.fecha_toma ? fmtFecha(p.fecha_toma) : '', examen, p.nombre || '', p.carnet || '', p.fecha_nacimiento ? fmtFecha(p.fecha_nacimiento) : '', edad ?? '', p.celular || '', p.direccion || '', ...(M.esRed ? [centro] : [])])];
+    const w3 = X.utils.aoa_to_sheet(P); w3['!cols'] = [{ wch: 5 }, { wch: 13 }, { wch: 10 }, { wch: 36 }, { wch: 12 }, { wch: 13 }, { wch: 6 }, { wch: 12 }, { wch: 44 }, { wch: 28 }].slice(0, enc.length);
+    if (estilos) for (let c = 0; c < enc.length; c++) { const k = X.utils.encode_cell({ r: 0, c }); w3[k].s = { fill: { fgColor: { rgb: '9C3A5F' } }, font: { bold: true, color: { rgb: 'FFFFFF' } } }; }
+    X.utils.book_append_sheet(wb, w3, 'Pacientes');
+  }
   X.writeFile(wb, metNombreArchivo('xlsx')); showToast('Excel listo ✔' + (estilos ? '' : ' (sin colores: no se pudo cargar el estilo, revisá internet)'), 'ok');
 }
 document.addEventListener('click', e => {
@@ -10558,6 +10586,7 @@ document.addEventListener('change', e => {
   if (e.target.id === 'metAlc') { metSt.alcance = e.target.value; metGenerar(); }
   if (e.target.id === 'metCentro') { metSt.centro = e.target.value; metGenerar(); }
   if (e.target.id === 'metRed') { metSt.red = e.target.value; metPintarCtl(); metGenerar(); }
+  if (e.target.dataset.ma === 'lista' && metSt.datos) { metSt.conLista = e.target.checked; const doc = document.getElementById('metDoc'); doc.innerHTML = metDocHTML(); metDocEventos(); }
 });
 
 
